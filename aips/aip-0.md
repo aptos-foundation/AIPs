@@ -21,15 +21,15 @@ The formal AIP process will typically (and advisably) begin after the champion o
     * ✅ Draft – If agreeable, the AIP Managers approve the pull request.
     * 🛑 Draft – Reasons for denying Draft status include misalignment with Aptos mission or Aptos Foundation policy, being too unfocused, too broad, duplication of effort, being technically unjustified, not providing proper motivation, or not addressing backwards compatibility. The Authors can work to refine and resubmit their AIP Idea for review again.
 
-  * **Draft** – After the draft is merged, additional changes may be submitted via pull requests. When an AIP appears to be completed and stable, Authors may ask to change the status to Last Call.
+  * **Draft** – After the draft is merged, additional changes may be submitted via pull requests. When an AIP appears to be completed and stable, Authors may ask to change the status to Review for sharing it more widely with the community.
 
-    * ✅  Last Call – If agreeable, the AIP manager will approve the Last Call status and set a reasonable amount of time (usually 1-2 weeks) for a final review. Additional time can be granted by the AIP Manager if requested.
-    * 🛑  Last Call – A request for Last Call will be denied if material changes are still needed for the draft. AIPs should only be promoted to Last Call once.
+    * ✅  Review – If agreeable, the AIP manager will approve the Review status and set a reasonable amount of time (usually 1-2 weeks) for a community review to collect Aptos community feedbacks. Additional time can be granted by the AIP Manager if requested.
+    * 🛑  Review – A request for Review will be denied if material changes are still needed for the draft.
 
   * **Review** – After the draft is merged, AIP should be shared widely with the Aptos community to gather feedbacks. Additional changes may be submitted via pull requests. When an AIP appears to be completed and stable, Authors may ask to change the status to Last Call.
 
     * ✅  Last Call – If agreeable from Aptos community and Aptos maintainer group, the AIP manager will approve the Last Call status and set a reasonable amount of time (usually 1-2 weeks) for a final review. Additional time can be granted by the AIP Manager if requested.
-    * 🛑  Rejected – A request for Review will be denied if material changes are still needed for the draft or if there is strong feedback from community to reject it.
+    * 🛑  Rejected – A request for Review will be denied if material changes are still needed for the draft, or if there is strong feedback from community to reject it.
 
   * **Last Call** - The final status change by the AIP Manager will be either Accepted or Rejected.
 
