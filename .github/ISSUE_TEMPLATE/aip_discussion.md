@@ -8,7 +8,8 @@ assignees: ''
 ---
 
 # AIP Discussion
+This is discussion and feedback thread for AIP.
 
-Discussion and feedback thread for AIP.
+Link to AIP PR: < >  
 
-Link to API: 
+< Copy and Paste content of the AIP itself to make it easier for readers > 
