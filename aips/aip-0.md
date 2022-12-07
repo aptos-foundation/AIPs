@@ -28,14 +28,8 @@ The formal AIP process will typically (and advisably) begin after the champion o
 
   * **Review** – After the draft is merged, AIP should be shared widely with the Aptos community to gather feedbacks. Additional changes may be submitted via pull requests. When an AIP appears to be completed and stable, Authors may ask to change the status to Last Call.
 
-    * ✅  Last Call – If agreeable from Aptos community and Aptos maintainer group, the AIP manager will approve the Last Call status and set a reasonable amount of time (usually 1-2 weeks) for a final review. Additional time can be granted by the AIP Manager if requested.
-    * 🛑  Rejected – A request for Review will be denied if material changes are still needed for the draft, or if there is strong feedback from community to reject it.
-
-  * **Last Call** - The final status change by the AIP Manager will be either Accepted or Rejected.
-
-    * ✅ Accepted – A successful Last Call without any material changes or unaddressed technical complaints will become Accepted. This status signals that material changes are unlikely and Aptos Maintainers should support driving this AIP for inclusion.
-
-    * 🛑 Rejected – The Maintainers can decide to mark this AIP as Rejected at their discretion, e.g., a major, but uncorrectable, flaw was found in the AIP.
+    * ✅  Accepted – A successful review without any material changes or unaddressed technical complaints will become Accepted. This status signals that material changes are unlikely and Aptos Maintainers should support driving this AIP for inclusion.
+    * 🛑  Rejected – A request for Review will be denied if material changes are still needed for the draft, or if there is strong feedback from community to reject it, or a major, but uncorrectable, flaw was found in the AIP.
 
   * **Accepted** - An AIP in the Accepted state **means the Aptos Maintainer group has determined it** is ready for active implementation
 
