@@ -13,24 +13,12 @@ Aptos Improvement Proposals (AIP) describe standards for the Aptos Network inclu
 
 ## The AIP Process
 
-The formal AIP process will typically (and advisably) begin after the champion of the proposal has already discussed and socialized it with the Aptos community and Aptos Foundation. It is comprised of the following steps:
+The formal AIP process will typically (and advisably) begin after the champion of the proposal has already informally discussed and socialized it with the Aptos community and Aptos Foundation. It is comprised of the following steps:
 
-  * **Idea** – Authors will socialize their idea with the developer community and Aptos Maintainers, by writing a GitHub Issue and getting feedback. If possible (and relevant), authors should include in discussions an implementation to support their proposal.
+  * **Draft Review** – Authors will socialize their idea with the developer community and Aptos Maintainers. Author will create a pull-request to the aptos-foundation/AIPs folder. The status field of the document should be “Draft Review” at this point. Author will also create an accompanying GitHub Issue to facillitate collection of feedback. If possible (and relevant), authors should include a reference implementation to support their proposal. AIP numbers are the same as the issue number from the initial proposal as assigned above. AIP drafts will be open for review for at least a week, with extensions decided by the AIP manager. After the end of the community review period, the AIP Manager will cooridnate with the Maintainers, and formally review/comment/approve/deny the pull-request, two Maintainer approvals are required to commit the AIP draft into the AIP repo. After the pull-request is approved, additional changes may be submitted via further pull requests.
 
-    Once the discussion reaches a mature point, the formal AIP process starts with a pull-request to the aptos-foundation/AIPs folder. The status field of the document should be “Draft” at this point. AIP numbers are the same as the issue number from the initial proposal as assigned above. An AIP Manager will review/comment/approve/deny the pull-request, two maintainer approvals are required to commit the AIP draft into the AIP repo.
-
-    * ✅ Draft – If agreeable, the AIP Managers approve the pull request.
-    * 🛑 Draft – Reasons for denying Draft status include misalignment with Aptos mission or Aptos Foundation policy, being too unfocused, too broad, duplication of effort, being technically unjustified, not providing proper motivation, or not addressing backwards compatibility. The Authors can work to refine and resubmit their AIP Idea for review again.
-
-  * **Draft** – After the draft is merged, additional changes may be submitted via pull requests. When an AIP appears to be completed and stable, Authors may ask to change the status to Review for sharing it more widely with the community.
-
-    * ✅  Review – If agreeable, the AIP manager will approve the Review status and set a reasonable amount of time (usually 1-2 weeks) for a community review to collect Aptos community feedbacks. Additional time can be granted by the AIP Manager if requested.
-    * 🛑  Review – A request for Review will be denied if material changes are still needed for the draft.
-
-  * **Review** – After the draft is merged, AIP should be shared widely with the Aptos community to gather feedbacks. Additional changes may be submitted via pull requests. The author and maintainers should monitoring the feedbacks from the community, address any concerns and questions might come up regarding the proposal.
-
-    * ✅  Accepted – A successful review without any material changes or unaddressed technical complaints will become Accepted. This status signals that material changes are unlikely and Aptos Maintainers should support driving this AIP for inclusion.
-    * 🛑  Rejected – A request for Review will be denied if material changes are still needed for the draft, or if there is strong feedback from community to reject it, or a major, but uncorrectable, flaw was found in the AIP.
+    * ✅ Draft – A successful review without any material changes or unaddressed technical complaints will become Accepted. This status signals that material changes are unlikely and Aptos Maintainers should support driving this AIP for inclusion.
+    * 🛑 Draft – A request for Review will be denied if material changes are still needed for the draft, or if there is strong feedback from community to reject it, or a major, but uncorrectable, flaw was found in the AIP. Some reasons for denying Draft status include misalignment with Aptos mission or Aptos Foundation policy, being too unfocused, too broad, duplication of effort, being technically unjustified, not providing proper motivation, or not addressing backwards compatibility. The Authors can work to refine and resubmit their AIP Idea for review again.
 
   * **Accepted** - An AIP in the Accepted state **means the Aptos Maintainer group has determined it** is ready for active implementation
 
