@@ -4,7 +4,8 @@ title: Aptos Improvement Proposals
 authors: aptos-foundation
 status: draft
 type: Informational
-created: 12/05/22
+created: 12/05/2022
+updated: 12/07/2022
 ---
 
 # AIP-0 - Aptos Improvement Proposals
@@ -26,7 +27,7 @@ The formal AIP process will typically (and advisably) begin after the champion o
     * ✅  Review – If agreeable, the AIP manager will approve the Review status and set a reasonable amount of time (usually 1-2 weeks) for a community review to collect Aptos community feedbacks. Additional time can be granted by the AIP Manager if requested.
     * 🛑  Review – A request for Review will be denied if material changes are still needed for the draft.
 
-  * **Review** – After the draft is merged, AIP should be shared widely with the Aptos community to gather feedbacks. Additional changes may be submitted via pull requests. When an AIP appears to be completed and stable, Authors may ask to change the status to Last Call.
+  * **Review** – After the draft is merged, AIP should be shared widely with the Aptos community to gather feedbacks. Additional changes may be submitted via pull requests. The author and maintainers should monitoring the feedbacks from the community, address any concerns and questions might come up regarding the proposal.
 
     * ✅  Accepted – A successful review without any material changes or unaddressed technical complaints will become Accepted. This status signals that material changes are unlikely and Aptos Maintainers should support driving this AIP for inclusion.
     * 🛑  Rejected – A request for Review will be denied if material changes are still needed for the draft, or if there is strong feedback from community to reject it, or a major, but uncorrectable, flaw was found in the AIP.
