@@ -11,4 +11,6 @@ assignees: ''
 
 Discussion and feedback thread for AIP.
 
-Link to API: 
+Link to AIP: 
+
+< Copy AIP text here as well for reader's ease > 
