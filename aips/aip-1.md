@@ -2,13 +2,11 @@
 aip: (this is determined by the AIP Manager)
 title: Proposer selection improvements
 author: igor-aptos
-discussions-to (*optional): TBD
-Status: Draft
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/9
+Status: Review
 last-call-end-date (*optional):
 type: Standard (Core)
 created: 12/7/2022
-updated (*optional):
-requires (*optional): <AIP number(s)>
 ---
 
 ## Summary
