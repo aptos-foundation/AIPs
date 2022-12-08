@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager)
+aip: 1
 title: Proposer selection improvements
 author: igor-aptos
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/9
