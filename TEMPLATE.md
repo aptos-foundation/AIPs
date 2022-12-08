@@ -5,7 +5,7 @@ author: <a list of the author's or authors' name(s) and/or username(s), or name(
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: <Draft | Last Call | Accepted | Final | Rejected>
 last-call-end-date (*optional):
-type: <Standard (Core, Networking, Interface, Application) | Informational | Process>
+type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
 created:
 updated (*optional):
 requires (*optional): <AIP number(s)>
