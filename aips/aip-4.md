@@ -26,7 +26,7 @@ An alternative solution to the non-transferability problem is creating a "Lockin
 
 Modifications required to the current [Aptos-Token](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token/sources/token.move) implementation:
 
-- Append “soulbound: bool” too *Tokens* and *Collections.*
+- Append “soulbound: bool” too *Tokens*
 - Minting of soulbound tokens can only be handled through *“claims”*. After a soulbound NFT has been claimed it is locked to the receiver with the only valid operation being *“burn”,* if applicable to the token’s configuration*.*
 - Validate before any transfer execution to ensure the token isn’t soulbound.
 
