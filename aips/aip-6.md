@@ -1,7 +1,7 @@
 ---
 aip: 6
 title: Delegation pool for node operators
-author: alexfilip2
+author: alexfilip2/alexandru@bwarelabs.com
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/20
 Status: Draft
 last-call-end-date (*optional):
