@@ -2,7 +2,7 @@
 aip: 8
 title: Transaction fee distribution
 author: georgemitenkov
-discussions-to: https://github.com/aptos-foundation/AIPs/issues/21
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/23
 Status: Draft
 last-call-end-date (*optional):
 type: Standard (framework)
@@ -18,7 +18,7 @@ If transaction fees are redistributed to validators, we will be able to both 1) 
 
 ## Proposal
 
-Enable collection and per-epoch distribution of transaction fees to valiadtors. 
+Enable collection and per-epoch distribution of transaction fees to validators. 
 
 ## Rationale
 
