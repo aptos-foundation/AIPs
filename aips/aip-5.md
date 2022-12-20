@@ -1,4 +1,4 @@
-# AIP-4: Multi-Composable Token Standard
+# [AIP-5] Multi-Composable Token Standard
 
 ### This standard allows the coexistence of soulbound and non-soulbound NFTs.
 
