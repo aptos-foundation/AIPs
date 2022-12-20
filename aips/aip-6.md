@@ -52,30 +52,19 @@ To summarize, the following behavior would be supported:
 - Reset-lockup = No one
 - Delegated voter = Admin
 
+The operator fee, previously configured by the owner, will be immutably set at pool's creation by the node operator itself. Therefore, delegators have the option to participate in pools of their choice with regard to commission fee.
+
 ## Reference Implementation
 
-There is a reference autonomous (external to the Aptos framework) and tested implementation treating the stake module as a black box at https://github.com/bwarelabs/aptos-delegation-pool.
-Additionally, an example delegation pool, linked to a running validator node and active on the Aptos testnet, can be examined on the [explorer](https://explorer.aptoslabs.com/account/0x61f9e2697d5eee926e990b537a8286a029c908c1ae117e76ddf7a849bf87fb59/resources).
-
-The integration into the Aptos framework would preserve the rewards-distribution formula and the accounting of delegators' stakes, while deprecating resources already available within the framework and responsible for tracking epochs, rewards and pool's aggregated stakes.
-
-The delegation pool would remain a proxy resource for the underlying stake pool, while the factory module could support the wrapping of existing stake pools into delegation ones in the future.
+There is a reference implementation, integrated directly into the framework, treating `aptos_framework::stake` module as a black box, at https://github.com/bwarelabs/aptos-core/tree/bwarelabs/shares_based_delegation_pool.
 
 ## Risks and Drawbacks
 
-The staking API initially exposed would incur a higher gas cost (only for delegation pools) as additional resources have to be stored and maintained in order to keep track of individual delegators' stakes and cumulative rewards earned by pool's aggregated stakes.
-
-Compared to a single-owner stake pool, rewards produced each epoch would not be automatically restaked for delegators as this would introduce a quadratic complexity when updating the validators set at the epoch's end. Nonetheless, delegators can manually restake their earned rewards, while failing to do so over an entire year would result in their compound APR dropping from 16.18% (automatically restaking each epoch of 1h duration) to 15% (current reward rate).
-
-The operator fee, previously configurable by the owner, could be set either by a governance process at the level of the delegation pool or immutably at pool's creation by the node operator itself. For the latter, delegators have the option to participate in pools of their choice with regard to fee and node performance.
-
-The role of delegated voter could be either extended per delegator stake, assigned to the node operator itself for the entire stake or discarded for all delegated stake.
+The staking API initially exposed would incur a higher gas cost (only for delegation pools) as additional resources have to be stored and maintained in order to keep track of individual delegators' stakes and rewards earned by pool's aggregated stakes.
 
 ## Future Potential
 
-Automatic restake could be achieved for a fixed maximum count of delegators owning the highest stakes within the delegation pool.
-
-We could uniformly enforce that a delegator cannot decrease the total stake on the pool below the active threshold or decide to fully unstake the delegation pool through governance.
+We could uniformly enforce that a delegator cannot decrease the total stake on the pool below the active threshold or decide to fully unstake the delegation pool.
 
 We could restrict the node operator to deposit a minimum stake amount in order to allow its pool to accept delegations.
 
