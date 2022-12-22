@@ -1,10 +1,6 @@
-# [AIP-5] Multi-Composable Token Standard
+# [AIP-5] Soulbound and Freezing Token Standard
 
-### This standard allows the coexistence of soulbound and non-soulbound NFTs.
-
-### Summary
-
-This standard is an extension of [Aptos-Token](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token/sources/token.move). It proposes an interface allowing each token to define its soulbound property directly.
+### This standard allows for the existence of soulbound NFTs and freezing tokens.
 
 ### Motivation
 
@@ -12,15 +8,11 @@ Soulbound tokens have enormous potential in a wide variety of applications. Howe
 
 This AIP (Aptos Improvement Proposal) envisions soulbound tokens as non-transferable NFTs that will unlock primitives such as robust proof of attendance, credentials, distributed governance rights, and much more. However, soulbound tokens must be distinguishable from [Aptos-Tokens](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token/sources/token.move) to provide this utility.
 
-### Rationale
-
-Extending this utility to the existing Aptos-Token standard provides significant benefits:
+Benefits:
 
 - Consensus on a soulbound token standard
 - Monitoring a single event store for soulbound and non-soulbound tokens
 - Compatibility with the Aptos-Token standard.
-
-An alternative solution to the non-transferability problem is creating a "Locking Standard", where tokens can be deposited, claimed, and burned. Creating a locker that acts as a wrapper around tokens essentially makes them soulbound. This solution has a significant drawback: monitoring can no longer be handled for both soulbound and non-soulbound tokens in a single event store, thus creating the need for separate monitoring of an entirely different event store. This is undesirable from usability, composability, and scalability standpoints.
 
 ### Requirements
 
