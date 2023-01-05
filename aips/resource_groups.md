@@ -1,13 +1,13 @@
 ---
 aip: (this is determined by the AIP Manager)
 title: Resource Groups
-author: davidiw
-discussions-to:
+author: davidiw, wrwg
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/26
 Status: Draft
 last-call-end-date:
 type: Standard (Interface, Framework)
-created: TBD
-updated: TBD
+created: 2023/1/5
+updated: N/A
 requires: N/A
 ---
 
