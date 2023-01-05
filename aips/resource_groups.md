@@ -1,5 +1,3 @@
-# Resource Groups
-
 ---
 aip: (this is determined by the AIP Manager)
 title: Resource Groups
