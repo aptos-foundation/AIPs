@@ -46,7 +46,7 @@ public(friend) fun update_non_framework_reserved_properties(map: &mut PropertyMa
 
 **Overhead of token default property mutation cost**
 
-The validation of framework reserved properties will cost extra gas when calling `mutate_tokendata/token_property` , Currently, when creators mutate the properties, the function loop through all the properties to be mutated and update the property value.  The additional cost would be we need to check if the property key starts with `TOKEN_`.  This cost is very minimal. The current function already did many validations of the string length, key duplication, etc, the overhead of checking if a key has a prefix should have negligible impact on user experience.
+The validation of framework reserved properties will cost extra gas when calling `mutate_tokendata/token_property` , Currently, when creators mutate the properties, the function loop through all the properties to be mutated and update the property value.  The additional cost would be we need to check if the property key starts with `TOKEN_`.  This cost should be minimal by using substring matching and early exit of comparisons. Also the current function already does many validations on the string length, key duplication, etc, the overhead of checking if a key has a prefix should have negligible impact on gas costs and user experience.
 
 ## Timelines
 
