@@ -50,7 +50,7 @@ The validation of framework reserved properties will cost extra gas when calling
 
 ## Timelines
 
-The change is to be implemented. Ideally, these should be landed to mainnet in 1/2 weeks and waiting for mainnet release.
+The change has yet to be implemented. Ideally, these should will landed to main in 1 to 2 weeks, then testnet, followed by mainnet.
 
 ## Future Potentials
 
