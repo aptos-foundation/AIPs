@@ -15,7 +15,7 @@ requires: AIP_number_of(Resource Groups)
 
 ## Summary
 
-This AIP proposes Move objects for global access to composite set of resources stored at a single address on-chain. By leveraging the account model, objects can directly emit events that can lead to richer understanding of on-chain actions. Finally, objects offer a rich capability model that allows for fine-grained resource control and ownership objects in a single store.
+This AIP proposes Move objects for global access to heterogeneous set of resources stored at a single address on-chain. By leveraging the aspects of the account model, objects can directly emit events that can lead to richer understanding of on-chain actions. Finally, objects offer a rich capability model that allows for fine-grained resource control and ownership objects in a single store.
 
 ## Motivation
 
@@ -24,10 +24,10 @@ The object model allows Move on Aptos to represent a complex type as a set of re
 The object model improves type safety and data access through the use of a capability framework implemented by different accessors or references that define and distribute out various capabilities that allow for rich operations. These include:
 
 - `CreatorRef` that allows the creation of all other capabilities, allows adding resources to the object, and can only be accessed at the time the object is created
-- `OwnerRef` defines ownership of an object. Objects may have one or more `OwnerRef` and an `OwnerRef` can be aggregated, thus allow for fungability of objects.
-- `MintRef` allows for the creation of `OwnerRef`.
+- `OwnerRef` defines ownership of an object.
 - `DeleteRef` allows the holder to delete the object from storage.
 - `ExtendRef` allows for the holder to add new resources to the object after creation.
+- `WithdrawRef` allows for an entity to withdraw objects store from an owner.
 
 A `DeleteRef` stored within a module could allow the creator or owner to burn a token, if present.
 `OwnerRef` of different objects can be stored within a common data store, e.g., a `table`. This allows for a user to store ownership of heterogeneous resources together. It also allows for composability of objects, where one object can own another object by storing an `OwnerRef`. ownership of a token and can be stored within the owner’s account.
@@ -60,7 +60,7 @@ Objects are built with the following considerations:
 - Support emitting events directly: directly built-in.
 - Simplified access to storage avoiding costly deserialization, serialization: resources, once loaded, have limited costs associated with future access.
 - Objects are fully deletable.
-- Objects must be fully instantiated at creation time and cannot have new resources added afterward
+- Support assistance modes that allow external entities to manage assets on behalf of owners.
 
 ### Object Lifecycle
 
@@ -99,12 +99,7 @@ Each object is stored in its own address or object id. To ensure unique Ids, the
     - Data layout `{ self: address }`
 - `OwnerRef`
     - Represents ownership
-    - There can be many for a single object
-    - They can be aggregated
-    - Abilities: `store`
-    - Data layout: `{ self: address, amount: u64 }`
-- `MintRef`
-    - Has the ability to generate `OwnerRef`
+    - There can only be one a single object
     - Abilities: `store`
     - Data layout: `{ self: address }`
 - `DeleteRef`
@@ -117,12 +112,34 @@ Each object is stored in its own address or object id. To ensure unique Ids, the
     - Can be used to move an object into the `ObjectGroup`
     - Abilities: `drop, store`
     - Data layout `{ self: address }`
+- `WithdrawRef`
+    - Can be used to remove an `OwnerRef` from an `ObjectStore`
+    - Abilities: `drop, store`
+    - Data layout `{ self: address }`
+
+### API
+
+```move
+public fun create_object(creator: &signer, seed: vector<u8>): CreatorRef;
+public fun generate_owner(creator: CreatorRef): OwnerRef;
+public fun generate_deleter(creator: &CreatorRef): DeleteRef;
+public fun generate_extender(creator: &CreatorRef): ExtendRef;
+public fun generate_withdrawer(ceator: &CreatorRef): WithdrawRef;
+
+public fun get_signer(creator: &CreatorRef): &signer;
+public fun get_signer_for_extending(extender: &ExtendRef): &signer;
+public fun delete(delete_ref: DeleteRef);
+```
 
 ### Object Store
 
 Each user should initialize an `ObjectStore` as a means to store ownership of objects
 
 ```move
+#[resource_group(scope = address)]
+struct ObjectStoreGroup { }
+
+#[resource_group_member(group = objects::object_store::ObjectStoreGroup)]
 struct ObjectStore has key {
     inner: table::Table<address, OwnerRef>,
     deposits: event::EventHandle<DepositEvent>,
@@ -137,14 +154,33 @@ struct WithdrawEvent has drop, store {
     object_id: address,
 }
 
-public fun withdraw(account: &signer, addr: address): OwnerAbility;
+public fun withdraw(account: &signer, addr: address): OwnerRef;
 
-public fun deposit(account: &signer, object: OwnerAbility);
+public fun withdraw_with_ref(withdraw_ref: &WithdrawRef): OwnerRef;
+
+public fun deposit(account: &signer, object: OwnerRef);
+
+public fun deposit_with_ref(deposit_proof: &DepositProof, object: OwnerRef);
+
+public fun generate_deposit_ref(
+    depositer: &signer,
+    depositee: proof: vector<u8>,
+    valid_until: u64,
+    key_scheme: u8,
+    key_bytes: vector<u8>,
+): DepositRef;
+
+struct DepositProof has copy, drop {
+    depositor: address,
+    depositee: address,
+    valid_until: u64,
+    chain_id: u8,
+}
 ```
 
-Prior to completing this AIP, `inner` should be replaced by a more efficient storage type that can aggregate multiple `OwnerRef` into a single storage slot via `BucketTable`, for example.
-
 When withdraw or deposit are called, either deposit or withdraw events are emitted.
+
+The `ObjectStore` is placed into a group to allow for lower cost upgrading into more efficient forms of stores in the future.
 
 ## Reference Implementation
 
@@ -154,11 +190,8 @@ There is an early reference implementation in the following PR: https://github.c
 
 Open areas for discussion include:
 
-- Whether or not to offer the ability for objects to have new resources added after creation? The current proposal has `ExtendRef` that can call `move_to`
-- Should `Object` be single owner and should that single owner be placed in the `Object` itself. As a result do we need `amount` in `OwnerRef` or `OwnerRef` at all. Note, we’d likely want some form of read-only Ref, so that if an object owns another object, it can be determined by reading on-chain only data.
 - Should addition and deletion of resources count the number of resources within an object to ensure that deletion is complete?
-- Should ownership be aggregable?
-- Should we block this on the availability of `BucketTable` or something similar for tracking ownership
+- How explicit should this AIP be about the `WithdrawRef` and `DepositRef`, should they be added as an extension, another AIP?
 
 ## Future Potential
 
