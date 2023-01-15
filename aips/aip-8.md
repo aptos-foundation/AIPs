@@ -18,7 +18,7 @@ This proposal introduces framework-reserved properties to
 
 ## Motivation
 
-We have existing token properties used by our token standard to control who can burn the token. However, when the token’s default properties are mutable, creators can add these control properties after the token has been minted. The creator can burn these tokens from collectors. This is a known issue called out in token standard to set the token default properties to be immutable as a best practice.  To prevent this entirely, this proposal is to make it infeasible to update the control properties after the token creation.
+We have existing token properties used by our token standard to control who can burn the token. However, when the token’s default properties are mutable, creators can add these control properties after the token has been minted. The creator can burn these tokens from collectors. This is a known issue called out in the token standard to set the token default properties to be immutable as a best practice.  To prevent this entirely, this proposal is to make it infeasible to update the control properties after the token creation.
 
 The reserved framework properties can be utilized for controlling token behavior to make it programmable. One example is having a framework reserved property to freeze tokens at the token store.
 
