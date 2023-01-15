@@ -1,5 +1,5 @@
 ---
-aip: 9
+aip: TBD
 title: Token Standard Reserved Properties
 author: areshand
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/28
@@ -18,7 +18,7 @@ This proposal introduces framework-reserved properties to
 
 ## Motivation
 
-We have existing token properties used by our token standard to control who can burn the token. However, when the token’s default properties are mutable, creators can add these control properties after the token has been minted. The creator can burn these tokens from collectors. This is a known issue called out in the token standard to set the token default properties to be immutable as a best practice.  To prevent this entirely, this proposal is to make it infeasible to update the control properties after the token creation.
+We have existing token properties used by our [token standard](https://aptos.dev/concepts/coin-and-token/aptos-token#token-burn) to control who can burn the token. However, when the token’s default properties are mutable, creators can add these control properties after the token has been minted. The creator can burn these tokens from collectors. This is a known issue called out in the token standard to set the token default properties to be immutable as a best practice.  To prevent this entirely, this proposal is to make it infeasible to update the control properties after the token creation.
 
 The reserved framework properties can be utilized for controlling token behavior to make it programmable. One example is having a framework reserved property to freeze tokens at the token store.
 
@@ -54,4 +54,8 @@ The change has yet to be implemented. Ideally, these should will landed to main 
 
 ## Future Potentials
 
-There will be follow-up AIPs on soulbound token and token freezing leveraging these framework-reserved properties.
+This unblocks follow-up AIPs on soulbound token and token freezing leveraging this framework-reserved properties.
+
+## References
+
+- [Token standard](https://aptos.dev/concepts/coin-and-token/aptos-token/)
