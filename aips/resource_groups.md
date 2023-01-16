@@ -99,6 +99,8 @@ During compilation and publishing, these attributes are checked to ensure that:
 
 From a storage perspective, a resource group is stored as a BCS-encoded `BTreeMap<StructTag, BCS encoded MoveValue>`, where a `StructTag` is a known structure in Move of the form: `{ account: Address, module_name: String, struct_name: String }`.  Whereas, a typical resource is stored as a `BCS encoded MoveValue`.
 
+Resource groups introduce a new storage access path: `ResourceGroup` to distinguish from existing access paths. This provides a cleaner interface and segration of different types of storage. This becomes advantageous to indexers and other direct readers of storage that can now parse storage without inspecting module metadata.
+
 At read time, a resource must be checked to see if that resource is part of a resource group by reading the associated metadata with a resource. If it is, the data is read from the resource group’s `StructTag` instead.
 
 At write time, an element of a resource group must be appropriately updated into a resource group by determining the delta the resource group as a result of the write operation. This results in the handful of possibilities:
