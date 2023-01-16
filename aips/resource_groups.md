@@ -31,6 +31,10 @@ A resource group co-locates data into a single storage slot by encoding within t
 
 At the storage layer, the resource groups are stored as a BCS-encoded BTreeMap where the key is a BCS-encoded fully qualified struct name (`address::module_name::struct_name`, e.g., `0x1::account::Account`) and the value is the BCS-encoded data associated with the resource.
 
+![image](https://user-images.githubusercontent.com/73818/212690642-f8c24ed8-8869-4ce2-9941-4958aae3f8a9.png)
+
+The above diagram illustrates data stored at address `0xcafef00d`. `0x1::account::Account` is a resource stored at address `0xcafef00d`. `0xaa::resource::Group` contains a set of resources or a resource group stored at the same address. The resource group packs multiple resources into the group. Resources within a resource group require nested reading, wherein first the resource group must be read from storge followed by reading the specific resource from the resource group.
+
 ### Alternative 1 — Any within a SimpleMap
 
 One alternative that was considered is storing data in a `SimpleMap` using the `any` module. While this is a model that could be shipped without any change to Aptos-core, it incurs some drawbacks around developer and application complexity both on and off-chain. There’s no implicit caching, and therefore any read or write would require a deserialization of the object and any write would require a serialization. This means a transaction with 3 writes would result in 3 deserializations and 3 serializations. In order to get around this, the framework would need substantial, non-negligible changes, though with the emergence of `SmartMap` there may be more viability here. Finally, due to the lack of a common pattern, indexers and APIs would not be able to easily access this data.
@@ -89,19 +93,27 @@ struct Token has key {
 
 During compilation and publishing, these attributes are checked to ensure that:
 
-1. A `resource_group_member` has no abilities and no fields.
-2. The `scope` within the `resource_group_member` can only become more permissive, that is it can either remain at a remain at the same level of accessibility or increase to the next.
-3. Each entry within a resource group has a `resource_group_member` attribute.
+1. A `resource_group` has no abilities and no fields.
+2. The `scope` within the `resource_group` can only become more permissive, that is it can either remain at a remain at the same level of accessibility or increase to the next.
+3. Each resource within a resource group has a `resource_group_member` attribute.
 4. The `group` parameter is set to a struct that is labeled as a `resource_group`.
-5. During upgrade, an existing `struct` cannot either enter or leave a `resource_group_member`.
+5. During upgrade, an existing `struct` cannot either add or remove a `resource_group_member`.
+
+The motivation for each of these requirements are:
+
+1. Ensures that a `resource_group` struct won't be used for other storage purposes. While there is no strict requirement that this be true, it is intended to mitigate confusion to developers.
+2. Making a scope less permissive can result in breakage of deployed `resource_group_member`s.
+3. Without explicitly labeling a resource `resource_group_member`, there is no way for Move to know that it is within a `resource_group`.
+4. Is discussed above as the intent to enforce clean typesafety and a single place to define the properties of the resource group.
+5. If there exists data stored wtihin a resource, entering or leaving a resource group can result in that data being inaccessible.
 
 ### Within Storage
 
 From a storage perspective, a resource group is stored as a BCS-encoded `BTreeMap<StructTag, BCS encoded MoveValue>`, where a `StructTag` is a known structure in Move of the form: `{ account: Address, module_name: String, struct_name: String }`.  Whereas, a typical resource is stored as a `BCS encoded MoveValue`.
 
-Resource groups introduce a new storage access path: `ResourceGroup` to distinguish from existing access paths. This provides a cleaner interface and segration of different types of storage. This becomes advantageous to indexers and other direct readers of storage that can now parse storage without inspecting module metadata.
+Resource groups introduce a new storage access path: `ResourceGroup` to distinguish from existing access paths. This provides a cleaner interface and segregation of different types of storage. This becomes advantageous to indexers and other direct readers of storage that can now parse storage without inspecting module metadata. Using the example above, `0x1::account::Account` is stored at `AccessPath::Resource(0xcafef00d, 0x1::account::Account)`, whereas the resource group and its contents are stored at `AccessPath::ResourceGroup(0xcafef00d, 0xaa::resource::Group)`
 
-At read time, a resource must be checked to see if that resource is part of a resource group by reading the associated metadata with a resource. If it is, the data is read from the resource group’s `StructTag` instead.
+The only way to tell that a resource is within a resource group is by reading the module metadata associated with the resource. After reading module metadata, the storage client should either directly read form the `AccessPath::Resource` or by first reading `AccessPath::ResourceGroup` followed by deserializing the `BTreeMap` and then extracting the appropriate resource.
 
 At write time, an element of a resource group must be appropriately updated into a resource group by determining the delta the resource group as a result of the write operation. This results in the handful of possibilities:
 
@@ -118,12 +130,7 @@ The implications for the gas schedule are:
 
 ### Within the Interface
 
-To read a resource group from storage:
-
-- Attempt to read the resource from an account directly and find that it does not exist
-- Read the `struct` metadata from storage and find that it is within a resource group
-- Read the resource group from storage
-- Parse and return the resource from the resource group
+The above text in storage discusses the layout for resources and resources groups. User facing interfaces, such as a REST API, should not be exposed to resource groups. It is entirely a Move concept. A direct read on a resource group should be avoided. A resource group should be flattened and included within a set of resources when reading bulk resources at an address.
 
 ## Reference Implementation
 
