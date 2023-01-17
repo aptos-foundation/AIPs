@@ -66,7 +66,7 @@ public inline fun map<T, S>(v: vector<T>, f: |T|S): vector<S> {
 
 ### Effected Data Types in Aptos
 
-Those data types in the Aptos frameworks should get the higher-order functions:
+Those data types in the Aptos frameworks should get the higher-order functions (TO BE COMPLETED):
 
 - Move stdlib
     - vector
@@ -97,8 +97,9 @@ None visible.
 
 ## Future Potential
 
-- The Move Prover can benefit from these functions to avoid loop invariants which are one of the most challenging parts of working with the prover.
-- In the future, function parameters may also be supported by the Move VM. Then this proposal simply generalizes such that it does not longer depend on inline functions.
+- Parts of the Aptos framework can be rewritten to make them better auditable by removing low-level loops and replacing them by calls to higher-order functions.
+- The Move Prover can benefit from these functions to avoid looplow-level which are one of the most challenging parts of working with the prover.
+- In the future, function parameters may also be supported by the Move VM. Then this proposal simply generalizes such that higher-order functions on collections not necessarily need to be inline functions.
 
 ## Suggested implementation timeline
 
