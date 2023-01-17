@@ -19,18 +19,17 @@ This AIP proposes Move objects for global access to heterogeneous set of resourc
 
 ## Motivation
 
-The object model allows Move on Aptos to represent a complex type as a set of resources stored within a single address. In an object model, an NFT or token can place common token data within a `Token` resource, object data within an `Object` resource, and then specialize into additional resources as necessary, for example, a `Player` object could define a player within a game. 
+The object model allows Move on Aptos to represent a complex type as a set of resources stored within a single address. In an object model, an NFT or token can place common token data within a `Token` resource, object data within an `Object` resource, and then specialize into additional resources as necessary, for example, a `Player` object could define a player within a game. The `Object` itself stores both the `address` of the current owner, the appropriate data for creating event streams, and a value to denote if the object has been deleted.
 
 The object model improves type safety and data access through the use of a capability framework implemented by different accessors or references that define and distribute out various capabilities that allow for rich operations. These include:
 
-- `CreatorRef` that allows the creation of all other capabilities, allows adding resources to the object, and can only be accessed at the time the object is created
-- `OwnerRef` defines ownership of an object.
+- `CreatorRef` that allows the creation of all other capabilities, allows adding resources to the object, and can only be accessed at the time the object is created.
+- `ObjectId` points to an object. This is useful for storing references to a resource for reverse lookup and other operations.
 - `DeleteRef` allows the holder to delete the object from storage.
-- `ExtendRef` allows for the holder to add new resources to the object after creation.
-- `WithdrawRef` allows for an entity to withdraw objects store from an owner.
+- `TransferRef` allows for the holder to transfer new resources to the object after creation.
 
 A `DeleteRef` stored within a module could allow the creator or owner to burn a token, if present.
-`OwnerRef` of different objects can be stored within a common data store, e.g., a `table`. This allows for a user to store ownership of heterogeneous resources together. It also allows for composability of objects, where one object can own another object by storing an `OwnerRef`. ownership of a token and can be stored within the owner’s account.
+An object can own other objects thus allowing composability. A `ObjectId` allows for reverse lookups of owned to owner, thus allowing seamless navigation of the object model.
 
 ## Rationale
 
@@ -45,6 +44,7 @@ The existing Aptos data model emphasizes the use of the `store` ability within M
 - Events cannot be emitted from data but from an account that may not be associated with the data.
 - The existing data model makes it challenging to provide rich accessibility models as behavior must be defined well before applications can be built. This leads to excessively complex security policies and unnecessary data to support flexible configuration.
 - The existing Move model has only a single capability — signer, everything else must be defined and codified by the developer of a module.
+- Transferring logic is limited to the APIs provided in the respective modules and generally requires loading resources on both the sender and receiver adding unnecessary cost overheads.
 
 ## Specification
 
@@ -52,14 +52,14 @@ The existing Aptos data model emphasizes the use of the `store` ability within M
 
 Objects are built with the following considerations:
 
-- Allow for storing ownership of heterogeneous types: `OwnerRef`.
+- Simplified storage interface for heterogeneous types.
 - Enable a rich and dynamic data model while limited impact on storage, i.e., storage should not take up more than effectively a single resource (storage slot): see Resource Groups AIP.
 - Data is immobile but ownership still remains portable: storing data in resources and ownership within `OwnerRef`.
 - Make easily usable from entry functions: each object is stored at an address, which is a supported API type.
 - Offer rich set of capabilities: the `Ref` model.
 - Support emitting events directly: directly built-in.
 - Simplified access to storage avoiding costly deserialization, serialization: resources, once loaded, have limited costs associated with future access.
-- Objects are fully deletable.
+- Objects are deletable.
 - Support assistance modes that allow external entities to manage assets on behalf of owners.
 
 ### Object Lifecycle
@@ -69,20 +69,21 @@ Objects are built with the following considerations:
 - This is repeated until the top-most ancestor is the `Object` struct, which defines the `create_object` function.
 - The `create_object` generates a new address, stores an `Object` struct at that address within the `ObjectGroup` resource group, and returns back a `CreatorRef`.
 - The create functions called earlier can use the `CreatorRef` to obtain a signer, store an appropriate struct within the `ObjectGroup` resource, make any additional modifications, and return the `CreatorRef` back up the stack.
-- In the object creation stack, any of the modules can define properties such as ownership, deletion, and mutability.
-- Upon finishing the object creation, the `OwnerRef` can be stored in an `ObjectStore`, where it can be then transferred to another `ObjectStore` or even embedded within another object, offering object composability.
+- In the object creation stack, any of the modules can define properties such as ownership, deletion, transferability, and mutability.
 
 ### The Core Object
 
 An object is stored in the `ObjectGroup` resource group. The core `Object` contains a single field: `guid_creation_num`, which is used to create distinct event streams.
 
 ```move
-#[resource_group_container]
+#[resource_group(scope = global)]
 struct ObjectGroup { }
 
-#[resource_group(container = aptos_framework::object::ObjectGroup)]
+#[resource_group_member(group = aptos_framework::object::ObjectGroup)]
 struct Object {
     guid_creation_num: u64,
+    owner: address,
+    deleted: bool,
 }
 ```
 
@@ -92,95 +93,49 @@ Each object is stored in its own address or object id. To ensure unique Ids, the
 
 ### Capabilities
 
+- `ObjectId`
+    - A pointer to an object, a type-safe wrapper around address
+    - Abilities: `copy, drop, store`
+    - Data layout `{ inner: address }`
 - `CreatorRef`
     - Provided to the object creator at creation time
     - Can create any other ref type
     - Abilities: `drop`
-    - Data layout `{ self: address }`
-- `OwnerRef`
-    - Represents ownership
-    - There can only be one a single object
-    - Abilities: `store`
-    - Data layout: `{ self: address }`
+    - Data layout `{ self: ObjectId }`
 - `DeleteRef`
     - Can be used to remove an object from the `ObjectGroup`
     - There can be many for a single object
     - They cannot be aggregated
     - Abilities: `drop`, `store`
-    - Data layout: `{ self: address }`
+    - Data layout: `{ self: ObjectId }`
 - `ExtendRef`
     - Can be used to move an object into the `ObjectGroup`
     - Abilities: `drop, store`
-    - Data layout `{ self: address }`
-- `WithdrawRef`
-    - Can be used to remove an `OwnerRef` from an `ObjectStore`
+    - Data layout `{ self: ObjectId }`
+- `TransferRef`
+    - Can be used transfer ownership of the object from one address to another
     - Abilities: `drop, store`
-    - Data layout `{ self: address }`
+    - Data layout `{ self: ObjectId }`
 
 ### API
 
 ```move
 public fun create_object(creator: &signer, seed: vector<u8>): CreatorRef;
-public fun generate_owner(creator: CreatorRef): OwnerRef;
+public fun generate_object_id(object_id: address): OwnerRef;
 public fun generate_deleter(creator: &CreatorRef): DeleteRef;
 public fun generate_extender(creator: &CreatorRef): ExtendRef;
-public fun generate_withdrawer(ceator: &CreatorRef): WithdrawRef;
+public fun generate_transfer(ceator: &CreatorRef): TransferRef;
 
 public fun get_signer(creator: &CreatorRef): &signer;
 public fun get_signer_for_extending(extender: &ExtendRef): &signer;
 public fun delete(delete_ref: DeleteRef);
-```
 
-### Object Store
-
-Each user should initialize an `ObjectStore` as a means to store ownership of objects
-
-```move
-#[resource_group(scope = address)]
-struct ObjectStoreGroup { }
-
-#[resource_group_member(group = objects::object_store::ObjectStoreGroup)]
-struct ObjectStore has key {
-    inner: table::Table<address, OwnerRef>,
-    deposits: event::EventHandle<DepositEvent>,
-    withdraws: event::EventHandle<WithdrawEvent>,
-}
-
-struct DepositEvent has drop, store {
+struct TransferEvent has drop, store {
     object_id: address,
-}
-
-struct WithdrawEvent has drop, store {
-    object_id: address,
-}
-
-public fun withdraw(account: &signer, addr: address): OwnerRef;
-
-public fun withdraw_with_ref(withdraw_ref: &WithdrawRef): OwnerRef;
-
-public fun deposit(account: &signer, object: OwnerRef);
-
-public fun deposit_with_ref(deposit_proof: &DepositProof, object: OwnerRef);
-
-public fun generate_deposit_ref(
-    depositer: &signer,
-    depositee: proof: vector<u8>,
-    valid_until: u64,
-    key_scheme: u8,
-    key_bytes: vector<u8>,
-): DepositRef;
-
-struct DepositProof has copy, drop {
-    depositor: address,
-    depositee: address,
-    valid_until: u64,
-    chain_id: u8,
+    from: address,
+    to: address,
 }
 ```
-
-When withdraw or deposit are called, either deposit or withdraw events are emitted.
-
-The `ObjectStore` is placed into a group to allow for lower cost upgrading into more efficient forms of stores in the future.
 
 ## Reference Implementation
 
@@ -191,11 +146,13 @@ There is an early reference implementation in the following PR: https://github.c
 Open areas for discussion include:
 
 - Should addition and deletion of resources count the number of resources within an object to ensure that deletion is complete?
-- How explicit should this AIP be about the `WithdrawRef` and `DepositRef`, should they be added as an extension, another AIP?
+- How explicit should this AIP be about any of the abilities? Should there be a BaseObject for trivial usage that dictates an owner-centric set of policies.
+- Deletion could be complete, but then we need to ensure two objects can never be stored at the same address. An objected created over another risks corrupting storage due to overlapping event streams.
 
 ## Future Potential
 
 - Allow for entry functions to dictate (expected) capabilities associated with objects, either via attributes or by allowing for certain `Ref` types to be passed in.
+- Allow users to dictate which resources can be transferred to them.
 
 ## Suggested implementation timeline
 
