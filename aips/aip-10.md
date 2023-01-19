@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager)
+aip: 10
 title: Resource Groups
 author: davidiw, wrwg
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/26
