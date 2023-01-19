@@ -9,6 +9,8 @@ type: Standard (framework)
 created: 12/16/2022
 ---
 
+# AIP-6 - Delegation pool for node operators
+
 ## Summary
 
 Currently, only token owners with 1M APT are able to stake their tokens and earn staking rewards. We want to enable everyone in the community to have access to staking rewards as well. We propose adding a delegation contract to the framework. This extension enables multiple token owners to contribute any amount of APT to the same permissionless delegation pool. As long as the total amount of APT in a delegation pool meets the minimum stake required for staking, the validator node on which it is set on will be able to join the active set and earn staking rewards.

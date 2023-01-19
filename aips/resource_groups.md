@@ -11,6 +11,8 @@ updated: N/A
 requires: N/A
 ---
 
+# AIP-TBD - Resource Groups
+
 ## Summary
 
 This AIP proposes resource groups to support storing multiple distinct Move resources together into a single storage slot.
