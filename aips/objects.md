@@ -11,6 +11,8 @@ updated: N/A
 requires: AIP_number_of(Resource Groups)
 ---
 
+# AIP-TBD - Move Objects
+
 ## Summary
 
 This AIP proposes Move objects for global access to composite set of resources stored at a single address on-chain. By leveraging the account model, objects can directly emit events that can lead to richer understanding of on-chain actions. Finally, objects offer a rich capability model that allows for fine-grained resource control and ownership objects in a single store.

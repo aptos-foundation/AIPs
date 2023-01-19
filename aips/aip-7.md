@@ -1,5 +1,5 @@
 ---
-aip: 8
+aip: 7
 title: Transaction fee distribution
 author: georgemitenkov
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/23
@@ -8,6 +8,9 @@ last-call-end-date (*optional):
 type: Standard (framework)
 created: 12/20/2022
 ---
+
+# AIP-7 - Transaction fee distribution
+
 ## Summary
 
 Currently, all transaction fees are burnt on Aptos. This design choice does not motivate validators to prioritise the highest value transactions, as well as use bigger blocks of transactions, leading to lower throughput of the system. For example, a validator can submit an empty block and still get rewarded. We would like to solve this issue by distributing transaction fees to validators. In particular, we want to collect transaction fees for each block, store them, and then redistribute at the end of each epoch.

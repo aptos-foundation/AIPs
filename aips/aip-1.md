@@ -9,6 +9,8 @@ type: Standard (Core)
 created: 12/7/2022
 ---
 
+# AIP-1 - Proposer selection improvements
+
 ## Summary
 
 This change brings two simple improvements to proposer selection:

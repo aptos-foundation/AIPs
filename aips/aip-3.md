@@ -9,6 +9,8 @@ type: Standard (framework)
 created: 12/7/2022
 ---
 
+# AIP-3 - Multi-step Governance Proposal
+
 ## Summary
 
 The Aptos on-chain governance is a process by which the Aptos community can govern operations and development of the Aptos blockchain via proposing, voting on, and resolving proposals.

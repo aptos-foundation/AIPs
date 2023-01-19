@@ -1,6 +1,6 @@
 ---
 aip: (this is determined by the AIP Manager)
-title:
+title: (AIP title)
 author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: <Draft | Last Call | Accepted | Final | Rejected>
@@ -10,6 +10,8 @@ created:
 updated (*optional):
 requires (*optional): <AIP number(s)>
 ---
+
+# AIP-(AIP number or TBD) - (AIP title)
 
 ## Summary
 

@@ -11,6 +11,8 @@ updated:
 requires: AIP_number_of(Move Objects)
 ---
 
+# AIP-TBD - Tokens as Objects
+
 ## Summary
 
 This AIP proposes a new Token standard using Move Objects. In this model, a token only represents the base concept of a token and is used as a building blocker for applications of tokens, such as NFTs, game assets, no code solutions, etc.

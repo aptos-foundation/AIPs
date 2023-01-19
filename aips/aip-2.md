@@ -9,6 +9,8 @@ type: Standard (framework)
 created: 12/7/2022
 ---
 
+# AIP-2 - Multiple Token Changes
+
 ## Summary
 
 This proposal contains the following changes:
