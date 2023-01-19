@@ -74,7 +74,7 @@ Objects are built with the following considerations:
 
 ### The Core Object
 
-An object is stored in the `ObjectGroup` resource group. This allows additional resources within the object to be co-located for data locality and data cost savings.
+An object is stored in the `ObjectGroup` resource group. This allows additional resources within the object to be co-located for data locality and data cost savings. Note, all resources within an object need not be co-located within the `ObjectGroup`. This is left to the developer of an object ot define their data layout.
 
 ```move
 #[resource_group(scope = global)]
@@ -120,7 +120,6 @@ Each object is stored in its own address or object id. Object addreses are deriv
 - `DeleteRef`
     - Can be used to remove an object from the `ObjectGroup`
     - There can be many for a single object
-    - They cannot be aggregated
     - Abilities: `drop`, `store`
     - Data layout: `{ self: ObjectId }`
 - `ExtendRef`
