@@ -1,5 +1,5 @@
 ---
-aip: TBD
+aip: 8
 title: Higher-Order Inline Functions for Collections
 author: wrwg
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/33
