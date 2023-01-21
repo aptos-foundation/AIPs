@@ -16,6 +16,8 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 5 | N/A |
 | AIP 6 | Delegation pool for node operators |
 | AIP 7 | Transaction fee distribution |
+| AIP 8 | Higher-Order Inline Functions for Collections |
+| AIP 9 | Resource Groups |
 | ... | ... |
 
 
