@@ -27,6 +27,7 @@ The object model improves type safety and data access through the use of a capab
 - `OwnerRef`allows for an owner to have a handle or strong reference to an object.
 - `ObjectId` points to an object. This is useful for storing references to a resource for reverse lookup and other operations.
 - `DeleteRef` allows the holder to delete the object from storage.
+- `ExtendRef` allows th holder to gain access to the signer to add new resources.
 - `TransferRef` allows for the holder to transfer new resources to the object after creation.
 
 A `DeleteRef` stored within a module could allow the creator or owner to burn a token, if present.
