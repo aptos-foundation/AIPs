@@ -1,7 +1,7 @@
 ---
-aip: (this is determined by the AIP Manager)
+aip: 9
 title: Resource Groups
-author: davidiw, wrwg
+author: davidiw, wrwg, msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/26
 Status: Draft
 last-call-end-date:
@@ -157,9 +157,9 @@ In the current VM implementation, resources are cached upon read. This can be im
 
 ## Suggested implementation timeline
 
-- Middle of January a complete working model is available.
-- Testnet cut is middle of February
-- Mainnnet may land as early as middle of March
+- Heading to DevNet before end of January.
+- Should be in the February testnet cut.
+- Ideally lands in Mainet sometime in March.
 
 ## References
 
