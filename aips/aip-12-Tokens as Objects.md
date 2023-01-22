@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager)
+aip: 12
 title: Tokens as Objects
 author: davidiw
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/31
@@ -11,7 +11,7 @@ updated:
 requires: AIP_number_of(Move Objects)
 ---
 
-# AIP-TBD - Tokens as Objects
+# AIP-12 - Tokens as Objects
 
 ## Summary
 
