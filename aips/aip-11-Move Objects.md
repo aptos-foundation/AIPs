@@ -1,5 +1,5 @@
 ---
-aip: 11
+aip: (this is determined by the AIP Manager)
 title: Move Objects
 author: davidiw, wrwg
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/27
@@ -10,8 +10,6 @@ created: 2023/01/05
 updated: N/A
 requires: AIP_number_of(Resource Groups)
 ---
-
-# AIP-11 - Move Objects
 
 ## Summary
 
