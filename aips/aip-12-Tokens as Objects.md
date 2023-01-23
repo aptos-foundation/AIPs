@@ -25,7 +25,7 @@ Objects provide a natural means to represent tokens:
 - Every token has a common set of state, which can be represented by a `Token` resource within the resource group: `ObjectGroup`.
 - Tokens can have actions performed on them independent of the creator, objects can directly emit events.
 - Easier composability and extensibility, specifically token behavior and attributes should not be limited by the standard but by the imagination of their creator, the framework for creating objects allows for this.
-- Objects make it easier to define properties like soul bound tokens and ensuring burning can happen. Soul bound tokens need not have an `OwnerRef` and instead can have an additional resource `SoulBound` that specifies the entity that owns it. A globally defined token can easily be burned or marked as having violated royalties.
+- Objects make it easier to define properties like soul bound tokens and ensuring burning can happen. Soul bound tokens simply disable transferring. Similarly, a globally defined token can easily be burned or marked as having violated royalties.
 
 ## Rationale
 
@@ -81,13 +81,18 @@ struct Collection has key {
 }
 
 #[resource_group(container = aptos_framework::object::ObjectGroup)]
+/// This config specifies mutable fields for collections
+struct Collection::MutabilityConfig has key {
+    description: bool,
+    uri: bool,
+}
+
+#[resource_group(container = aptos_framework::object::ObjectGroup)]
 /// This config specifies mutable fields for Tokens in this collection
-struct MutabilityConfig has key {
-    collection_description: bool,
-		collection_uri: bool,
-    token_description: bool,
-    token_name: bool,
-    token_uri: bool,
+struct Collection::MutabilityConfig has key {
+    description: bool,
+    name: bool,
+    uri: bool,
 }
 
 #[resource_group(container = aptos_framework::object::ObjectGroup)]
@@ -122,9 +127,9 @@ public fun create_fixed_collection(
     creator: &signer,
     collection: String,
     description: String,
-		max_supply: u64,
-    mutability_config: MutabilityConfig,
-    royalty: Royalty,
+    max_supply: u64,
+    mutability_config: Collection::MutabilityConfig,
+    royalty: Option<Royalty>,
     uri: String,
 ): CreatorAbility;
 
@@ -132,8 +137,8 @@ public fun create_aggregable_collection(
     creator: &signer,
     collection: String,
     description: String,
-    mutability_config: MutabilityConfig,
-    royalty: Royalty,
+    mutability_config: Collection::MutabilityConfig,
+    royalty: Option<Royalty>,
     uri: String,
 ): CreatorAbility;
 
@@ -141,7 +146,9 @@ public fun create_token(
     creator: &signer,
     collection: String,
     description: String,
+    mutability_config: Token::MutabilityConfig,
     name: String,
+    royalty: Option<Royalty>,
     uri: String,
 ): CreatorAbility;
 ```
@@ -150,7 +157,7 @@ The standard will contain all viable APIs for mutating the token, deleting token
 
 ## Reference Implementation
 
-Coming soon. Something starting from this: https://github.com/aptos-labs/aptos-core/pull/5976
+The second commit in https://github.com/aptos-labs/aptos-core/pull/5976
 
 ## Risks and Drawbacks
 
