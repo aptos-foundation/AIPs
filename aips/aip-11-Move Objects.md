@@ -7,13 +7,14 @@ Status: Draft
 last-call-end-date:
 type: Standard (Framework)
 created: 2023/01/05
-updated: N/A
-requires: AIP_number_of(Resource Groups)
+updated: 2023/01/23
+requires: [AIP-9](./aip-9-Resource Groups.md) (Resource Groups)
 ---
 
 ## Summary
 
-This AIP proposes Move objects for global access to heterogeneous set of resources stored at a single address on-chain. By leveraging the aspects of the account model, objects can directly emit events that can lead to richer understanding of on-chain actions. Finally, objects offer a rich capability model that allows for fine-grained resource control and ownership objects in a single store.
+This AIP proposes *Move objects* for global access to heterogeneous set of resources stored at a single address on-chain. Objects offer a rich capability model that allows for fine-grained resource control and ownership management. By leveraging the aspects of the account model, objects can directly emit events that can lead to richer understanding of on-chain actions.
+
 
 ## Motivation
 
@@ -24,7 +25,7 @@ The object model improves type safety and data access through the use of a capab
 - `CreatorRef` that allows the creation of all other capabilities, allows adding resources to the object, and can only be accessed at the time the object is created.
 - `ObjectId` points to an object. This is useful for storing references to a resource for reverse lookup and other operations.
 - `DeleteRef` allows the holder to delete the object from storage.
-- `ExtendRef` allows th holder to gain access to the signer to add new resources.
+- `ExtendRef` allows the holder to gain access to the signer to add new resources.
 - `TransferRef` allows for the holder to transfer new resources to the object after creation.
 
 A `DeleteRef` stored within a module could allow the creator or owner to burn a token, if present.
@@ -36,7 +37,7 @@ The existing Aptos data model emphasizes the use of the `store` ability within M
 
 - Data cannot be guaranteed to be accessible, someone could store the data in an unaddressable location that might violate some of the goals for that data, e.g., the creators ability to burn an NFT. This can be confusing to both the users and creators of this data.
 - Heterogeneous data cannot be stored together. In order to ensure that tokens can co-exist, the data type has been frozen, the only expressability comes via the `property_map`.
-- Data of differing types can be stored to a single data structure via `any`, but for complex data types `any` incurs additional costs within Move as each access requires deserialization. Use of `any` can also lead to run-time type mismatch as the data within an `any` can be changed throughout its lifetime.
+- Data of differing types can be stored to a single data structure via `any`, but for complex data types `any` incurs additional costs within Move as each access requires deserialization. 
 - The existing model limits programmability that provides more autonomy of the underlying data. While this has been somewhat addressed by resource accounts, much of the data associated with a resource account goes unused and can be an inefficient representation. Additionally, resource accounts still provide direct access to the account signer after creation, which can have security implications.
 - Data cannot be recursively composable, Move currently has a restriction on recursive data structures. Furthermore, experience suggests that true recursive data structures can lead to security vulnerabilities.
 - Existing data cannot be easily referenced from entry functions, for example, supporting string validation requires many lines of code. Each key within a table can be very unique and specializing to support within entry functions becomes complex.
@@ -98,7 +99,7 @@ struct Object has key {
 
 ### Object Id
 
-Each object is stored in its own address or object id. Object ids can be generated from a user provided input or from the current account's globally unique ID generator (`guid.move`). Furthermore, object id generation leverages a domain separator that is different from existing account address generation: `sha3_256(address_of(creator) | seed | 0xF4)`, where `0xF4` is uniquely reserved for objects.
+Each object is stored in its own address or *object id*. Object ids can be generated from a user provided input or from the current account's globally unique ID generator (`guid.move`). Furthermore, object id generation leverages a domain separator that is different from existing account address generation: `sha3_256(address_of(creator) | seed | 0xF4)`, where `0xF4` is uniquely reserved for objects.
 
 - GUIDs
   - `seed` is the current guid produced by `guid.move`: `bcs::to_bytes(account address | u64)`.
