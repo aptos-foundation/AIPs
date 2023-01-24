@@ -1,5 +1,5 @@
 ---
-aip: 12
+aip: 11
 title: Tokens as Objects
 author: davidiw
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/31
@@ -8,10 +8,10 @@ last-call-end-date (*optional:
 type: Standard (Framework)
 created: 2023/1/9
 updated:
-requires: AIP_number_of(Move Objects)
+requires: [AIP-10](Move Objects)
 ---
 
-# AIP-12 - Tokens as Objects
+# AIP-11 - Tokens as Objects
 
 ## Summary
 

@@ -11,7 +11,7 @@ updated: N/A
 requires: N/A
 ---
 
-# AIP-TBD - Resource Groups
+# AIP-9 - Resource Groups
 
 ## Summary
 

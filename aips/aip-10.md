@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager)
+aip: 10
 title: Move Objects
 author: davidiw, wrwg
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/27
@@ -8,9 +8,10 @@ last-call-end-date:
 type: Standard (Framework)
 created: 2023/01/05
 updated: 2023/01/23
-requires: [AIP-9](./aip-9-Resource Groups.md) (Resource Groups)
+requires: [AIP-9](Resource Groups)
 ---
 
+# AIP-10 - Move Objects
 ## Summary
 
 This AIP proposes *Move objects* for global access to heterogeneous set of resources stored at a single address on-chain. Objects offer a rich capability model that allows for fine-grained resource control and ownership management. By leveraging the aspects of the account model, objects can directly emit events that can lead to richer understanding of on-chain actions.
