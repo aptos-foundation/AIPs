@@ -18,6 +18,7 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 7 | Transaction fee distribution |
 | AIP 8 | Higher-Order Inline Functions for Collections |
 | AIP 9 | Resource Groups |
+| AIP 9 | Resource Groups |
+| AIP 10 | Move Objects |
+| AIP 11 | Tokens as Objects |
 | ... | ... |
-
-
