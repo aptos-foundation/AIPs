@@ -36,16 +36,24 @@ An object can own other objects thus allowing composability. A `ObjectId` allows
 
 The existing Aptos data model emphasizes the use of the `store` ability within Move. As a result, data can live anywhere, e.g., anyone can publish a module that can contain this data. While this provides great flexibility it has many limitations:
 
-- Data cannot be guaranteed to be accessible, someone could store the data in an unaddressable location that might violate some of the goals for that data, e.g., the creators ability to burn an NFT. This can be confusing to both the users and creators of this data.
+- Data cannot be guaranteed to be accessible, for example, it can be placed within a user-defined resource that may violate some goals for that data, e.g., a creator attempting to burn an NFT put into a user-defined store. This can be confusing to both the users and creators of this data.
 - Heterogeneous data cannot be stored together. In order to ensure that tokens can co-exist, the data type has been frozen, the only expressability comes via the `property_map`.
-- Data of differing types can be stored to a single data structure via `any`, but for complex data types `any` incurs additional costs within Move as each access requires deserialization. 
-- The existing model limits programmability that provides more autonomy of the underlying data. While this has been somewhat addressed by resource accounts, much of the data associated with a resource account goes unused and can be an inefficient representation. Additionally, resource accounts still provide direct access to the account signer after creation, which can have security implications.
+- Data of differing types can be stored to a single data structure via `any`, but for complex data types `any` incurs additional costs within Move as each access requires deserialization. It also can lead to confusion if API developers expect that a specific any field changes the type it represents.
+- While resource accounts allow for greater autonomy of data, it does so inefficiently for objects and does not take advantage of resource groups.
 - Data cannot be recursively composable, Move currently has a restriction on recursive data structures. Furthermore, experience suggests that true recursive data structures can lead to security vulnerabilities.
 - Existing data cannot be easily referenced from entry functions, for example, supporting string validation requires many lines of code. Each key within a table can be very unique and specializing to support within entry functions becomes complex.
 - Events cannot be emitted from data but from an account that may not be associated with the data.
-- The existing data model makes it challenging to provide rich accessibility models as behavior must be defined well before applications can be built. This leads to excessively complex security policies and unnecessary data to support flexible configuration.
-- The existing Move model has only a single capability — signer, everything else must be defined and codified by the developer of a module.
 - Transferring logic is limited to the APIs provided in the respective modules and generally requires loading resources on both the sender and receiver adding unnecessary cost overheads.
+
+### Alternatives
+
+Along the path several alternatives were considered:
+
+* Using an `OwnerRef` instead of ownership defined within an object. `OwnerRef` provides a natural approach to "nested" objects. However, `OwnerRef` requires additional storage, would still require accessing the object in order to provide for gated storage, and becomes a weak reference in the case of deletable objects.
+* Having an explicit object store. Other implementations of Move implement dynamic fields, bags, and other mechanisms to track ownership. This require additional storage, limits deletabiity, and is not iterable. While there may be some applications for this, the goal of Move objects is to enable the developer to dictate their preferred path, while being unopinionated as possible.
+* Allowing objects to have store. Having store on an object directly goes against the principles of an object, which is that is always globally accessible.
+* More expansive reference or capability set. There's a lot of opportunity to invest in richer means to access and manage objects. Rather than dictate a set of best practices at this point, the goal is to defer that until objects have sufficient bake time in the community. Ultimately the core of objects that is defined herein should be sufficient to support any direction for higher level functionality that ideally generalizes across all applicatoins.
+* Add support for revocation of existing ref or capabilities. Each ref that has store ability can be placed into any module with the intent of allowing the creator to dictate how the object may evolve over time. Because of this, there exists no generalizable means to actually revoke a specific capability. Capabilities can be given to an account or a to a module and stored anywhere. The intent is to keep them limber so as to not impact storage or add additional friction around their use. With caution of course, as naive use of capabilities can result in undesirable behavior.
 
 ## Specification
 
