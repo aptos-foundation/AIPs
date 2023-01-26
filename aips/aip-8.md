@@ -10,7 +10,7 @@ created: 2023/1/9
 updated: 2023/1/9
 ---
 
-# AIP-TBD - Higher-Order Inline Functions for Collections
+# AIP-8 - Higher-Order Inline Functions for Collections
 
 ## Summary
 
