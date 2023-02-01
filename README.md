@@ -8,18 +8,18 @@ This table contains an overview of all created and tracked AIPs. It should be up
 
 | AIP Number | AIP Title |
 |--|--|
-| AIP 0 | Aptos Improvement Proposals |
-| AIP 1 | Proposer selection improvements |
-| AIP 2 | Multiple Token Changes |
-| AIP 3 | Multi-step Governance Proposal |
-| AIP 4 | Update Simple Map To Save Gas |
-| AIP 5 | N/A |
-| AIP 6 | Delegation pool for node operators |
-| AIP 7 | Transaction fee distribution |
-| AIP 8 | Higher-Order Inline Functions for Collections |
-| AIP 9 | Resource Groups |
-| AIP 10 | Move Objects |
-| AIP 11 | Tokens as Objects |
-| AIP 12 | Multisig Accounts v2 |
-| AIP 13 | Coin Standard Improvements |
+| AIP 0    | Aptos Improvement Proposals |
+| AIP 1    | Proposer selection improvements |
+| AIP 2    | Multiple Token Changes |
+| AIP 3    | Multi-step Governance Proposal |
+| AIP 4    | Update Simple Map To Save Gas |
+| AIP 5    | N/A |
+| AIP 6    | Delegation pool for node operators |
+| AIP 7    | Transaction fee distribution |
+| AIP 8    | Higher-Order Inline Functions for Collections |
+| AIP 9    | Resource Groups |
+| AIP 10   | Move Objects |
+| AIP 11   | Tokens as Objects |
+| AIP 12   | Multisig Accounts v2 |
+| AIP 13   | Coin Standard Improvements |
 | ... | ... |
