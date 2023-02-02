@@ -108,7 +108,7 @@ struct Object has key {
 
 ### Object Id
 
-Each object is stored in its own address or *object id*. Object ids can be generated from a user provided input or from the current account's globally unique ID generator (`guid.move`). Furthermore, object id generation leverages a domain separator that is different from existing account address generation: `sha3_256(address_of(creator) | seed | 0xFE)`, where `0xF4` is uniquely reserved for objects.
+Each object is stored in its own address or *object id*. Object ids can be generated from a user provided input or from the current account's globally unique ID generator (`guid.move`). Furthermore, object id generation leverages a domain separator that is different from existing account address generation: `sha3_256(address_of(creator) | seed | 0xFE)`, where `0xFE` is uniquely reserved for objects.
 
 - GUIDs
   - `seed` is the current guid produced by `guid.move`: `bcs::to_bytes(account address | u64)`.
