@@ -1,17 +1,19 @@
 ---
-aip: (this is determined by the AIP Manager)
+aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: (AIP title)
 author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: <Draft | Last Call | Accepted | Final | Rejected>
-last-call-end-date (*optional):
+last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
-created:
-updated (*optional):
+created: <mm/dd/yyyy>
+updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
 # AIP-(AIP number or TBD) - (AIP title)
+  
+(Please give a temporary file name to your AIP when first drafting it, AIP manager will assign a number to it after reviewing)
 
 ## Summary
 
