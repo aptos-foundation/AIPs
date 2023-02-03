@@ -41,7 +41,7 @@ Express here the potential negative ramifications of taking on this proposal. Wh
 
 Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in in one year? In five years?
 
-## Suggested implementation timeline
+## Suggested deployment timeline
 
 When should community expect to see it on devnet
 
