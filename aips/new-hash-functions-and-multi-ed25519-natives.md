@@ -1,17 +1,17 @@
 ---
-aip: 14 
+aip: TBD
 title: New cryptography natives for hashing and MultiEd25519 PK validation
 author: Alin Tomescu <alin@aptoslabs.com>
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/57
 Status: Draft # | Last Call | Accepted | Final | Rejected
 last-call-end-date (*optional):
 type: Standard Framework # <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
-created: 2022-02-02
+created: 02/02/2022
 updated (*optional):
 requires (*optional):
 ---
 
-# AIP-14 - New cryptography natives for hashing and MultiEd25519 PK validation
+# AIP TBD - New cryptography natives for hashing and MultiEd25519 PK validation
 
 ## Summary
 
