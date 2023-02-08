@@ -96,8 +96,8 @@ The hash functions could be used for many cryptographic applications on chains (
 
 ## Suggested implementation timeline
 
-When should community expect to see it on devnet? I don’t know how to find out the answer.
+Everything has already been implemented.
 
-Testnet? I don’t know how to find out the answer.
+## Suggested deployment timeline
 
-On mainnet? I don’t know how to find out the answer.
+This would likely make it to testnet early March.
