@@ -45,8 +45,12 @@ Think through the evolution of this proposal well into the future. How do you se
 
 ## Suggested implementation timeline
 
-When should community expect to see it on devnet
+Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
 
-testnet?
+## Suggested deployment timeline
+
+When should community expect to see this deployed on devnet?
+
+On testnet?
 
 On mainnet?
