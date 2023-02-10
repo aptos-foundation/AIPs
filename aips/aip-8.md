@@ -3,7 +3,7 @@ aip: 8
 title: Higher-Order Inline Functions for Collections
 author: wrwg
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/33
-Status: Draft
+Status: Accepted
 last-call-end-date: TBD
 type: Standard (Framework)
 created: 2023/1/9
