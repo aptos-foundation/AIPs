@@ -3,7 +3,7 @@ aip: 3
 title: Multi-step Governance Proposal
 author: 0xchloe
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/3
-Status: Review
+Status: Accepted
 last-call-end-date (*optional):
 type: Standard (framework)
 created: 12/7/2022
