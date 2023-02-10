@@ -3,7 +3,7 @@ aip: 13
 title: Coin Standard Improvements
 author: movekevin
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/24
-Status: Draft
+Status: Accepted
 last-call-end-date:
 type: Standard (Framework)
 created: 2023/01/05
