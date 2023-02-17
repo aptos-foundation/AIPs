@@ -11,7 +11,7 @@ updated (*optional):
 requires (*optional):
 ---
 
-# AIP TBD - New cryptography natives for hashing and MultiEd25519 PK validation
+# AIP 16 - New cryptography natives for hashing and MultiEd25519 PK validation
 
 ## Summary
 
