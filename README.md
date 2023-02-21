@@ -19,20 +19,22 @@ Aptos Improvement Proposals (AIP) describe standards for the Aptos Network inclu
 
 This table contains an overview of all created and tracked AIPs. It should be updated with each new AIP.
 
-| AIP Number | AIP Title |
-|--|--|
-| AIP 0 | Aptos Improvement Proposals |
-| AIP 1 | Proposer selection improvements |
-| AIP 2 | Multiple Token Changes |
-| AIP 3 | Multi-step Governance Proposal |
-| AIP 4 | Update Simple Map To Save Gas |
-| AIP 5 | N/A |
-| AIP 6 | Delegation pool for node operators |
-| AIP 7 | Transaction fee distribution |
-| AIP 8 | Higher-Order Inline Functions for Collections |
-| AIP 9 | Resource Groups |
-| AIP 10 | Move Objects |
-| AIP 11 | Tokens as Objects |
-| AIP 12 | Multisig Accounts v2 |
-| AIP 13 | Coin Standard Improvements |
-| ... | ... |
+| AIP Number | AIP Title | Status |
+|--|--|--|
+| AIP 0 | Aptos Improvement Proposals | N/A |
+| AIP 1 | Proposer selection improvements | Accepted |
+| AIP 2 | Multiple Token Changes | Accepted |
+| AIP 3 | Multi-step Governance Proposal | Accepted |
+| AIP 4 | Update Simple Map To Save Gas | Accepted |
+| AIP 5 | N/A | N/A |
+| AIP 6 | Delegation pool for node operators | Accepted |
+| AIP 7 | Transaction fee distribution | Draft |
+| AIP 8 | Higher-Order Inline Functions for Collections | Accepted |
+| AIP 9 | Resource Groups | Accepted |
+| AIP 10 | Move Objects | In Review |
+| AIP 11 | Tokens as Objects | Draft |
+| AIP 12 | Multisig Accounts v2 | Accepted |
+| AIP 13 | Coin Standard Improvements | Accepted |
+| AIP 14 | Update vesting contract | Accepted |
+| AIP 15 | Token Framework Reserved Properties | In Review |
+| AIP 16 | New cryptography natives for hashing | In Review |
