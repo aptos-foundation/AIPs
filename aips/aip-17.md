@@ -11,7 +11,7 @@ updated:
 requires:
 ---
 
-# AIP-17 - Decouple storage and execution gas pricing to allow cheaper execution
+# AIP-17 - Reducing Execution Costs by Decoupling Transaction Storage and Execution Charges
   
 ## Summary
 
