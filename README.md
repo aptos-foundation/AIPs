@@ -35,4 +35,5 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 11 | Tokens as Objects |
 | AIP 12 | Multisig Accounts v2 |
 | AIP 13 | Coin Standard Improvements |
+| AIP 17 | Reducing Execution Costs by Decoupling Transaction Storage and Execution Charges. |
 | ... | ... |

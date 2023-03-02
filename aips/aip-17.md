@@ -1,6 +1,6 @@
 ---
 aip: 17
-title: Storage Fee
+title: Reducing Execution Costs by Decoupling Transaction Storage and Execution Charges
 author: msmouse, vgao1996, davidiw
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/79
 Status: Draft
@@ -11,7 +11,7 @@ updated:
 requires:
 ---
 
-# AIP-17 - Storage Fee
+# AIP-17 - Reducing Execution Costs by Decoupling Transaction Storage and Execution Charges
   
 ## Summary
 
@@ -58,17 +58,48 @@ These entries will be added to the global gas schedule to specify the native tok
 - `storage_fee_per_event_byte`
 - `storage_fee_per_transaction_byte`
 
+Each of the per byte charges respect a per transaction free quota:
+
+- `free_write_bytes_quota`: (1KB) This is existing, now governs `storage_fee_per_excess_state_byte`as well.
+- `large_transaction_cutoff`: (600 bytes) This is existing, now governs `storage_fee_per_transaction_byte` as well.
+- `free_event_bytes_quota`: (1KB) This is new, which governs `storage_fee_per_event_byte`.
+
 These per transaction hard limits for different categories of gas charges will be added to the global gas schedule to reflect that the network has different amounts of resources under different categories, a reasonable amount of gas spent on disk space allocation in a single transaction might be sufficient for another transaction to run for minutes of CPU consuming operations.
 
 - `max_execution_gas`: This is in gas units.
 - `max_io_gas_per`: This is in gas units, governing the transient aspects of the storage cost, i.e. IOPS and bandwidth.
 - `max_storage_fee`: This is in Octas, governing the new category of fees described in this proposal.
 
+
 ## Reference Implementation
 
 [#6683](https://github.com/aptos-labs/aptos-core/pull/6683)
-
 [#6816](https://github.com/aptos-labs/aptos-core/pull/6816)
+[#6837](https://github.com/aptos-labs/aptos-core/pull/6837)
+
+| Transaction Type | Current Cost | New Cost | Change | reduced by factor |
+| - | - | - | - | - |
+| (minimal per transaction charge) | 15000 | 200 | -98.67% | 75.0x |
+| Transfer | 54200 | 600 | -98.89% | 90.3x |
+| CreateAccount | 153600 | 101600 | -33.85% | 1.5x |
+| CreateTransfer | 188000 | 101900 | -45.80% | 1.8x |
+| CreateStakePool | 776200 | 207700 | -73.24% | 3.7x |
+| RotateConsensusKey | 2178300 | 21800 | -99.00% | 99.9x |
+| JoinValidator100 | 625300 | 461100 | -26.26% | 1.4x |
+| AddStake | 675700 | 461500 | -31.70% | 1.5x |
+| UnlockStake | 163500 | 1600 | -99.02% | 102.2x |
+| WithdrawStake | 153900 | 1600 | -98.96% | 96.2x |
+| LeaveValidatorSet100 | 610500 | 460900 | -24.50% | 1.3x |
+| CreateCollection | 174100 | 100800 | -42.10% | 1.7x |
+| CreateTokenFirstTime | 382100 | 152400 | -60.12% | 2.5x |
+| MintToken | 117100 | 1200 | -98.98% | 97.6x |
+| MutateToken | 272200 | 52200 | -80.82% | 5.2x |
+| MutateToken2ndTime | 129000 | 1300 | -98.99% | 99.2x |
+| MutateTokenAdd10NewProperties | 430900 | 4300 | -99.00% | 100.2x |
+| MutateTokenMutate10ExistingProperties | 451100 | 4500 | -99.00% | 100.2x |
+| PublishSmall | 745700 | 107400 | -85.60% | 6.9x |
+| UpgradeSmall | 660200 | 8100 | -98.77% | 81.5x |
+| PublishLarge | 10735800 | 9810700 | -8.62% | 1.1x |
 
 ## Risks and Drawbacks
 
