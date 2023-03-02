@@ -1,6 +1,6 @@
 ---
 aip: 17
-title: Decouple storage and execution gas pricing to allow cheaper execution
+title: Reducing Execution Costs by Decoupling Transaction Storage and Execution Charges
 author: msmouse, vgao1996, davidiw
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/79
 Status: Draft
