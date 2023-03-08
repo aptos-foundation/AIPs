@@ -35,5 +35,9 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 11 | Tokens as Objects |
 | AIP 12 | Multisig Accounts v2 |
 | AIP 13 | Coin Standard Improvements |
+| AIP 14 | Update vesting contract |
+| AIP 15 | Update and rename token_standard_reserved_properties |
+| AIP 16 | New cryptography natives for hashing and MultiEd25519 PK validation |
 | AIP 17 | Reducing Execution Costs by Decoupling Transaction Storage and Execution Charges. |
+| AIP 18 | Introducing SmartVector and SmartTable to apto_std |
 | ... | ... |
