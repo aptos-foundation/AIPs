@@ -11,7 +11,7 @@ updated (*optional): 3/8/2023
 
 ---
 
-# AIP-19 - Enable updating commission_percentage
+# AIP-19 - Enable updating commission_percentage in staking_contract module
  
 ## Summary
 
