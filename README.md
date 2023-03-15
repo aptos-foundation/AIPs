@@ -41,4 +41,5 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 17 | Reducing Execution Costs by Decoupling Transaction Storage and Execution Charges. |
 | AIP 18 | Introducing SmartVector and SmartTable to apto_std |
 | AIP 19 | Enable updating commission_percentage in staking_contract module
+| AIP 20 | Generic Operations of Algebraic Structures
 | ... | ... |
