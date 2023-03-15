@@ -2,13 +2,9 @@
 aip: 20
 title: Generic Operations of Algebraic Structures
 author: zhoujun-ma, alin
-discussions-to: TBD
 Status: Draft
-last-call-end-date:
 type: Standard (Framework)
 created: 2023/03/15
-updated: 2023/03/15
-requires: None
 ---
 
 # AIP-14 - Generic Operations of Algebraic Structures
