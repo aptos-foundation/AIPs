@@ -2,7 +2,7 @@
 title: Multisig Account
 author: movekevin
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/50
-Status: Draft
+Status: Accepted
 last-call-end-date:
 type: Standard (Framework)
 created: 2023/01/24

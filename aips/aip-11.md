@@ -15,7 +15,7 @@ requires: [AIP-10](Move Objects)
 
 ## Summary
 
-This AIP proposes a new Token standard using Move Objects. In this model, a token only represents the base concept of a token and is used as a building blocker for applications of tokens, such as NFTs, game assets, no code solutions, etc.
+This AIP proposes a new Token standard using Move Objects. In this model, a token only represents the base concept of a token and is used as a building block for applications of tokens, such as NFTs, game assets, no code solutions, etc.
 
 ## Motivation
 
@@ -37,7 +37,7 @@ In parallel to this, there is an expectation to continue to manage and support t
 
 ### Object IDs for Tokens and Collections
 
-Because tokens build upon objects, they must adhere to how object ids are generated. Object IDs are generated using the following: `sha3_256(address_of(creator) | seed | 0xF4)`. Tokens can use the `seed` field to generate unique addresses for each token. Tokens use the following when generating the seed: `bcs::to_bytes(collection) | b"::" | bcs::to_bytes(name)`. Similarly tokens uses the following when generating a seed `bcs::to_bytes(collection)`. This ensures global uniqueness for all collections and tokens, except in the case that a token or collection has been burned. Note, `0xF4` was chosen to provide domain separation and ensure that address generation is unique to prevent duplicate address generation between objects and accounts.
+Because tokens build upon objects, they must adhere to how object ids are generated. Object IDs are generated using the following: `sha3_256(address_of(creator) | seed | 0xFE)`. Tokens can use the `seed` field to generate unique addresses for each token. Tokens use the following when generating the seed: `bcs::to_bytes(collection) | b"::" | bcs::to_bytes(name)`. Similarly tokens use the following when generating a seed `bcs::to_bytes(collection)`. This ensures global uniqueness for all collections and tokens, except in the case that a token or collection has been burned. Note, `0xFE` was chosen to provide domain separation and ensure that address generation is unique to prevent duplicate address generation between objects and accounts.
 
 ### Token Data Structures
 
