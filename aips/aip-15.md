@@ -3,7 +3,7 @@ aip: 15
 title: Token Standard Reserved Properties
 author: areshand
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/28
-Status: Review
+Status: Accepted
 last-call-end-date (*optional):
 type: Standard (framework)
 created: 01/06/2023
