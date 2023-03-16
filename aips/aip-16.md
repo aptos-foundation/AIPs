@@ -3,7 +3,7 @@ aip: 16
 title: New cryptography natives for hashing and MultiEd25519 PK validation
 author: Alin Tomescu <alin@aptoslabs.com>
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/57
-Status: Review
+Status: Accepted
 last-call-end-date (*optional):
 type: Standard Framework # <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
 created: 02/02/2022

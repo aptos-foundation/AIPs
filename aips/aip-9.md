@@ -3,7 +3,7 @@ aip: 9
 title: Resource Groups
 author: davidiw, wrwg, msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/26
-Status: Draft
+Status: Accepted
 last-call-end-date:
 type: Standard (Interface, Framework)
 created: 2023/1/5
