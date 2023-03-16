@@ -43,7 +43,9 @@ To keep the Aptos stdlib concise while still covering as many use cases as possi
 
 ## Specifications
 
-### Generic Structs and Functions
+### Generic Operations
+
+#### Structs and Functions
 
 Module `aptos_std::algebra` is designed to have the following definitions.
 
@@ -93,12 +95,6 @@ module aptos_std::algebra {
     /// Return none if `x` is the additive identity of field `S`.
     public fun field_inv<S>(x: &Element<S>): Option<Element<S>>;
 
-    /// Check if an element `x` is the multiplicative identity of field `S`.
-    public fun field_is_one<S>(x: &Element<S>): bool;
-
-    /// Check if an element `x` is the aditive identity of field `S`.
-    public fun field_is_zero<S>(x: &Element<S>): bool;
-
     /// Compute `P + Q` for elements `P` and `Q` of a group `G`.
     public fun group_add<G>(element_p: &Element<G>, element_q: &Element<G>): Element<G>;
 
@@ -107,9 +103,6 @@ module aptos_std::algebra {
 
     /// Get the fixed generator of a cyclic group `G`.
     public fun group_generator<G>(): Element<G>;
-
-    /// Get the identity of a group `G`.
-    public fun group_identity<G>(): Element<G>;
 
     /// Compute `k[0]*P[0]+...+k[n-1]*P[n-1]`, where
     /// `P[]` are `n` elements of group `G` represented by parameter `elements`, and
@@ -168,7 +161,7 @@ module aptos_std::algebra {
     public fun hash_to<St, Su>(dst: &vector<u8>, msg: &vector<u8>): Element<St>;
 ```
 
-### Shared Scalar Fields
+#### Shared Scalar Fields
 
 Some groups share the same group order.
 They should share the same scalar field for easier programming.
@@ -203,7 +196,7 @@ let q1 = element_scalar_mul<GroupB1>(&p1, &k_for_p1);
 let q2 = element_scalar_mul<GroupB2>(&p2, &k_for_p2);
 ```
 
-### Handling Incorrect Type Parameter(s)
+#### Handling Incorrect Type Parameter(s)
 
 The implementation should help mitigate the type safety problem.
 
