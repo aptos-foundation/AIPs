@@ -220,7 +220,7 @@ The construction of BLS12-381 curves involve many groups/fields, some frequently
 
 Below are the full specification in pseudo-Move.
 
-NOTE: some items below are not implemented but still present to facilitate the definition of some other items.
+NOTE: some items below are marked "not implemented" but still presented here to facilitate the definition of some other items.
 
 ```rust
 module aptos_std::algebra_bls12381 {
@@ -389,9 +389,9 @@ For move application developers, constructing cryptographic schemes manually wit
 
 ## Future Potential
 
-As cryptography research advances and Aptos ecosystem grows, more cryptographic schemes will be needed in stdlib. It is expected to see new groups/group operations supported and new cryptographic systems on chain implemented, which can be done with minimum work using the generic framework introduced by this change.
+The module can be extended to support more structures and operations, allowing more complicated cryptographic applications to be built.
 
-Once Move interface is available, use it to rewrite the move side specifications.
+Once Move interface is available, it can be use to rewrite the move side specifications to ensure type safety at compile time.
 
 ## Suggested implementation timeline
 
