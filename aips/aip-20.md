@@ -59,7 +59,7 @@ module aptos_std::algebra {
     /// An element of the group `G`.
     struct Element<S> has copy, drop;
 
-		/// Check if `x == y` for elements `x` and `y` of an algebraic structure `S`.
+    /// Check if `x == y` for elements `x` and `y` of an algebraic structure `S`.
     public fun eq<S>(x: &Element<S>, y: &Element<S>): bool;
 
     /// Convert a u64 to an element of an algebraic structure `S`.
@@ -143,6 +143,11 @@ module aptos_std::algebra {
     /// for each independent collision-resistent mapping involved in the protocol built atop.
     /// Abort if `dst` is too long.
     public fun hash_to<St, Su>(dst: &vector<u8>, msg: &vector<u8>): Element<St>;
+
+    #[test_only]
+    /// Generate a random element of an algebraic structure `S`.
+    public fun rand_insecure<S>(): Element<S>;
+
 ```
 
 In general, every structure implements basic operations like (de)serialization, equality check, random sampling.
