@@ -2,7 +2,7 @@
 aip: 18
 title: Introducing SmartVector and SmartTable to aptos_std
 author: lightmark
-Status: Draft
+Status: Accepted
 type: Standard (Framework)
 created: 03/07/2022
 ---

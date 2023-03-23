@@ -3,7 +3,7 @@ aip: 19
 title: Enable updating commission_percentage
 author: michelle-aptos, gerben-stavenga
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): 
 type: Standard
 created: 3/8/2023
