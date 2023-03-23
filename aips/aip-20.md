@@ -182,8 +182,11 @@ For a subset/superset relationship between 2 structures, `upcast()` and `downcas
 
 #### Shared Scalar Fields
 
-Some groups share the same group order.
-They should share the same scalar field for easier programming.
+Some groups share the same group order,
+and an ergonomic design from this is to
+allow multiple groups to share the same scalar field
+(mainly for the purpose scalar multiplication),
+if they have the same order.
 
 E.g. the following should be supported.
 
@@ -199,28 +202,14 @@ let q1 = scalar_mul<GroupB1, ScalarForBx>(&p1, &k);
 let q2 = scalar_mul<GroupB2, ScalarForBx>(&p2, &k);
 ```
 
-So developers doesn’t have to do:
-
-```rust
-//groups.move
-pub fun element_scalar_mul<G>(element: &Element<G>, scalar: &Scalar<G>)...
-
-// user_contract.move
-**let k_for_p1: Scalar<GroupB1> = somehow_get_k();
-let k_for_p1_encoded: vector<u8> = scalar_serialize(&k_for_p1);
-let k_for_p2 = scalar_deserialize<GroupB2>(&k_for_p1_encoded);**
-let p1 = one<GroupB1>();
-let p2 = one<GroupB2>();
-let q1 = element_scalar_mul<GroupB1>(&p1, &k_for_p1);
-let q2 = element_scalar_mul<GroupB2>(&p2, &k_for_p2);
-```
-
 #### Handling Incorrect Type Parameter(s)
 
-The implementation should help mitigate the type safety problem.
+There is currently no easy way to ensure type safety for the generic operations.
+E.g., `pairing<A,B,C>(a,b,c)` can compile even there is no pairing between `A,B,C` existing/implemented.
+
+Therefore the backend should handle the type checks at runtime.
 
 If a group operations that takes 2+ type parameters is invoked with incompatible type parameters, it should abort.
-
 E.g. `scalar_mul<GroupA, ScalarForBx>()` should abort with a “not implemented” error.
 
 Invoking operation functions with user-defined types should also abort with a “not implemented” error.
