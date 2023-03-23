@@ -235,7 +235,7 @@ NOTE: some items below are not implemented but still present to facilitate the d
 
 ```rust
 module aptos_std::algebra_bls12381 {
-		/// The finite field $F_q$ used in BLS12-381 curves.
+    /// The finite field $F_q$ used in BLS12-381 curves.
     ///
     /// NOTE: not implemented.
     struct Fq {}
