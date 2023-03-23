@@ -14,7 +14,7 @@ This AIP proposes some generic functions and structs for performing operations o
 
 The initial list of supported generic operations includes group/field element serialization/deserialization, basic arithmetic, pairing, hash-to-structure, casting.
 
-The list of supported groups starts with groups/fields used in BLS12-381, a popular pairing-friendly curve.
+The list of supported groups starts with groups/fields used in BLS12-381, a popular pairing-friendly curve as described [here](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-11#name-bls-curves-for-the-128-bit-).
 
 Either the operation list or the structure list can be extended by future AIPs.
 
@@ -65,60 +65,47 @@ module aptos_std::algebra {
     /// Convert a u64 to an element of an algebraic structure `S`.
     public fun from_u64<S>(value: u64): Element<S>;
 
-    /// Return the additive identity of a field `S`.
-    public fun field_zero<S>(): Element<S>;
+    /// Return the additive identity of field `S`, or the identity of group `S`.
+    public fun zero<S>(): Element<S>;
 
-    /// Return the multiplicative identity of a field `S`.
-    public fun field_one<S>(): Element<S>;
+    /// Return the multiplicative identity of field `S`, or a fixed generator of group `S`.
+    public fun one<S>(): Element<S>;
 
-    /// Compute `-x` for an element `x` of a field `S`.
-    public fun field_neg<S>(x: &Element<S>): Element<S>;
+    /// Compute `-x` for an element `x` of a structure `S`.
+    public fun neg<S>(x: &Element<S>): Element<S>;
 
-    /// Compute `x + y` for elements `x` and `y` of a field `S`.
-    public fun field_add<S>(x: &Element<S>, y: &Element<S>): Element<S>;
+    /// Compute `x + y` for elements `x` and `y` of a structure `S`.
+    public fun add<S>(x: &Element<S>, y: &Element<S>): Element<S>;
 
-    /// Compute `x - y` for elements `x` and `y` of a field `S`.
-    public fun field_sub<S>(x: &Element<S>, y: &Element<S>): Element<S>;
+    /// Compute `x - y` for elements `x` and `y` of a structure `S`.
+    public fun sub<S>(x: &Element<S>, y: &Element<S>): Element<S>;
 
-    /// Compute `x * y` for elements `x` and `y` of a field `S`.
-    public fun field_mul<S>(x: &Element<S>, y: &Element<S>): Element<S>;
+    /// Try computing `x^(-1)` for an element `x` of a structure `S`.
+    /// Return none if `x` is the additive identity of structure `S`.
+    public fun inv<S>(x: &Element<S>): Option<Element<S>>;
 
-    /// Try computing `x / y` for elements `x` and `y` of a field `S`.
-    /// Return none if y is the additive identity of field `S`.
-    public fun field_div<S>(x: &Element<S>, y: &Element<S>): Option<Element<S>>;
+    /// Compute `x * y` for elements `x` and `y` of a structure `S`.
+    public fun mul<S>(x: &Element<S>, y: &Element<S>): Element<S>;
 
-    /// Compute `x^2` for an element `x` of a field `S`.
-    ///
-    public fun field_sqr<S>(x: &Element<S>): Element<S>;
+    /// Try computing `x / y` for elements `x` and `y` of a structure `S`.
+    /// Return none if y is the additive identity of structure `S`.
+    public fun div<S>(x: &Element<S>, y: &Element<S>): Option<Element<S>>;
 
-    /// Try computing `x^(-1)` for an element `x` of a field `S`.
-    /// Return none if `x` is the additive identity of field `S`.
-    public fun field_inv<S>(x: &Element<S>): Option<Element<S>>;
+    /// Compute `x^2` for an element `x` of a structure `S`.
+    public fun sqr<S>(x: &Element<S>): Element<S>;
 
-    /// Compute `P + Q` for elements `P` and `Q` of a group `G`.
-    public fun group_add<G>(element_p: &Element<G>, element_q: &Element<G>): Element<G>;
+    /// Compute `2*P` for an element `P` of a structure `G`. Faster and cheaper than `P + P`.
+    public fun double<G>(element_p: &Element<G>): Element<G>;
 
-    /// Compute `2*P` for an element `P` of a group `G`. Faster and cheaper than `P + P`.
-    public fun group_double<G>(element_p: &Element<G>): Element<G>;
-
-    /// Get the fixed generator of a cyclic group `G`.
-    public fun group_generator<G>(): Element<G>;
+    /// Compute `k*P`, where `P` is an element of a group `G` and `k` is an element of the scalar field `S` of group `G`.
+    public fun scalar_mul<G, S>(element_p: &Element<G>, scalar_k: &Element<S>): Element<G>;
 
     /// Compute `k[0]*P[0]+...+k[n-1]*P[n-1]`, where
     /// `P[]` are `n` elements of group `G` represented by parameter `elements`, and
-    /// `k[]` are `n` elements of the scalarfield `S` of group `G` represented by parameter `scalars`.
+    /// `k[]` are `n` elements of the scalar field `S` of group `G` represented by parameter `scalars`.
     ///
     /// Abort with code 0x010000 if the sizes of `elements` and `scalars` do not match.
-    public fun group_multi_scalar_mul<G, S>(elements: &vector<Element<G>>, scalars: &vector<Element<S>>): Element<G>;
-
-    /// Compute `-P` for an element `P` of a group `G`.
-    public fun group_neg<G>(element_p: &Element<G>): Element<G>;
-
-    /// Compute `k*P`, where `P` is an element of a group `G` and `k` is an element of the scalar field `S` of group `G`.
-    public fun group_scalar_mul<G, S>(element_p: &Element<G>, scalar_k: &Element<S>): Element<G>;
-
-    /// Compute `P - Q` for elements `P` and `Q` of a group `G`.
-    public fun group_sub<G>(element_p: &Element<G>, element_q: &Element<G>): Element<G>;
+    public fun multi_scalar_mul<G, S>(elements: &vector<Element<G>>, scalars: &vector<Element<S>>): Element<G>;
 
     /// Efficiently compute `e(P[0],Q[0])+...+e(P[n-1],Q[n-1])`,
     /// where `e: (G1,G2) -> (Gt)` is a pre-compiled pairing function from groups `(G1,G2)` to group `Gt`,
@@ -140,10 +127,7 @@ module aptos_std::algebra {
     public fun serialize<S, F>(element: &Element<S>): vector<u8>;
 
     /// Get the order of group `G`, a big integer little-endian encoded as a byte array.
-    public fun group_order<G>(): vector<u8>;
-
-    /// Check if an element `x` is the identity of its group `G`.
-    public fun group_is_identity<G>(element_x: &Element<G>): bool;
+    public fun order<G>(): vector<u8>;
 
     /// Cast an element of a structure `S` to a super-structure `L`.
     public fun upcast<S,L>(element: &Element<S>): Element<L>;
@@ -161,6 +145,36 @@ module aptos_std::algebra {
     public fun hash_to<St, Su>(dst: &vector<u8>, msg: &vector<u8>): Element<St>;
 ```
 
+In general, every structure implements basic operations like (de)serialization, equality check, random sampling.
+
+A group may also implement the following operations. (Additive notions are used.)
+- `order()` for group order.
+- `zero()` for group identity.
+- `one()` for group generator (if exists).
+- `neg()` for inverse.
+- `add()` for a basic group operation.
+- `sub()` for group element subtraction.
+- `double()` for efficient doubling.
+- `scalar_mul()` for group scalar multiplication.
+- `multi_scalar_mul()` for efficient group multi-scalar multiplication.
+- `hash_to()` for hash-to-group.
+
+A field may also implement the following operations.
+- `zero()` for the field additive identity.
+- `one()` for the field multiplicative identity.
+- `add()` for field addition.
+- `sub()` for field subtraction.
+- `mul()` for field multiplication.
+- `div()` for field division.
+- `neg()` for field negation.
+- `inv()` for field inversion.
+- `sqr()` for efficient field element squaring.
+- `from_u64()` for quick conversion from u64 to field element.
+
+For 3 groups that form a bilinear map, `pairing()` and `multi_pairing()` may be implemented.
+
+For a subset/superset relationship between 2 structures, `upcast()` and `downcast()` may be implemented.
+
 #### Shared Scalar Fields
 
 Some groups share the same group order.
@@ -170,14 +184,14 @@ E.g. the following should be supported.
 
 ```rust
 // algebra.move
-pub fun group_scalar_mul<G,S>(element: &Element<G>, scalar: &Scalar<S>)...
+pub fun scalar_mul<G,S>(element: &Element<G>, scalar: &Scalar<S>)...
 
 // user_contract.move
 **let k: Scalar<ScalarForBx> = somehow_get_k();**
-let p1 = group_generator<GroupB1>();
-let p2 = group_generator<GroupB2>();
-let q1 = group_scalar_mul<GroupB1, ScalarForBx>(&p1, &k);
-let q2 = group_scalar_mul<GroupB2, ScalarForBx>(&p2, &k);
+let p1 = one<GroupB1>();
+let p2 = one<GroupB2>();
+let q1 = scalar_mul<GroupB1, ScalarForBx>(&p1, &k);
+let q2 = scalar_mul<GroupB2, ScalarForBx>(&p2, &k);
 ```
 
 So developers doesn’t have to do:
@@ -190,8 +204,8 @@ pub fun element_scalar_mul<G>(element: &Element<G>, scalar: &Scalar<G>)...
 **let k_for_p1: Scalar<GroupB1> = somehow_get_k();
 let k_for_p1_encoded: vector<u8> = scalar_serialize(&k_for_p1);
 let k_for_p2 = scalar_deserialize<GroupB2>(&k_for_p1_encoded);**
-let p1 = group_generator<GroupB1>();
-let p2 = group_generator<GroupB2>();
+let p1 = one<GroupB1>();
+let p2 = one<GroupB2>();
 let q1 = element_scalar_mul<GroupB1>(&p1, &k_for_p1);
 let q2 = element_scalar_mul<GroupB2>(&p2, &k_for_p2);
 ```
@@ -202,7 +216,7 @@ The implementation should help mitigate the type safety problem.
 
 If a group operations that takes 2+ type parameters is invoked with incompatible type parameters, it should abort.
 
-E.g. `group_scalar_mul<GroupA, ScalarForBx>()` should abort with a “not implemented” error.
+E.g. `scalar_mul<GroupA, ScalarForBx>()` should abort with a “not implemented” error.
 
 Invoking operation functions with user-defined types should also abort with a “not implemented” error.
 
@@ -212,30 +226,31 @@ The construction of BLS12-381 curves involve many groups/fields, some frequently
 
 Below are the full specification in pseudo-Move.
 
+NOTE: some items below are not implemented but still present to facilitate the definition of some other items.
+
 ```rust
 module aptos_std::algebra_bls12381 {
 		/// The finite field $F_q$ used in BLS12-381 curves.
-    /// It has a prime order $q$ equal to 0x1a0111ea397fe69a4b1ba7b6434bacd764774b84f38512bf6730d2a0f6b0f6241eabfffeb153ffffb9feffffffffaaab.
     ///
-    /// NOTE: currently information-only and no operations are implemented for this structure.
+    /// NOTE: not implemented.
     struct Fq {}
 
     /// A serialization format for `Fq` elements,
     /// where an element is represented by a byte array `b[]` of size 48 with the least signature byte coming first.
     ///
-    /// NOTE: currently information-only, not implemented.
+    /// NOTE: not implemented.
     struct FqFormatLsb {}
 
     /// A serialization format for `Fq` elements,
     /// where an element is represented by a byte array `b[]` of size 48 with the most significant byte coming first.
     ///
-    /// NOTE: currently information-only, not implemented.
+    /// NOTE: not implemented.
     struct FqFormatMsb {}
 
     /// The finite field $F_{q^2}$ used in BLS12-381 curves.
     /// It is an extension field of `Fq`, constructed as $F_{q^2}=F_q[u]/(u^2+1)$.
     ///
-    /// NOTE: currently information-only and no operations are implemented for this structure.
+    /// NOTE: not implemented.
     struct Fq2 {}
 
     /// A serialization format for `Fq2` elements.
@@ -244,7 +259,7 @@ module aptos_std::algebra_bls12381 {
     /// - `b[0..48]` is $c_0$ serialized using `FqFormatLsb`.
     /// - `b[48..96]` is $c_1$ serialized using `FqFormatLsb`.
     ///
-    /// NOTE: currently information-only, not implemented.
+    /// NOTE: not implemented.
     struct Fq2FormatLscLsb {}
 
     /// A serialization format for `Fq2` elements,
@@ -253,13 +268,13 @@ module aptos_std::algebra_bls12381 {
     /// - `b[0..48]` is $c_1$ serialized using `FqFormatMsb`.
     /// - `b[48..96]` is $c_0$ serialized using `FqFormatMsb`.
     ///
-    /// NOTE: currently information-only, not implemented.
+    /// NOTE: not implemented.
     struct Fq2FormatMscMsb {}
 
     /// The finite field $F_{q^6}$ used in BLS12-381 curves.
     /// It is an extension field of `Fq2`, constructed as $F_{q^6}=F_{q^2}[v]/(v^3-u-1)$.
     ///
-    /// NOTE: currently information-only and no operations are implemented for this structure.
+    /// NOTE: not implemented.
     struct Fq6 {}
 
     /// A serialization scheme for `Fq6` elements,
@@ -269,7 +284,7 @@ module aptos_std::algebra_bls12381 {
     /// - `b[96..192]` is $c_1$ serialized using `Fq2FormatLscLsb`.
     /// - `b[192..288]` is $c_2$ serialized using `Fq2FormatLscLsb`.
     ///
-    /// NOTE: currently information-only, not implemented.
+    /// NOTE: not implemented.
     struct Fq6FormatLscLsb {}
 
     /// The finite field $F_{q^12}$ used in BLS12-381 curves.
@@ -280,136 +295,80 @@ module aptos_std::algebra_bls12381 {
     /// where an element $(c_0+c_1\cdot w)$ is represented by a byte array `b[]` of size 576.
     /// `b[0..288]` is $c_0$ serialized using `Fq6FormatLscLsb`.
     /// `b[288..576]` is $c_1$ serialized using `Fq6FormatLscLsb`.
-    ///
-    /// NOTE: the same scheme is also used in other implementations (e.g. ark-bls12-381-0.4.0).
     struct Fq12FormatLscLsb {}
 
     /// A group constructed by the points on the BLS12-381 curve $E(F_q): y^2=x^3+4$ and the point at inifinity,
     /// under the elliptic curve point addition.
-    /// It contains the prime-order subgroup $G_1$ used in pairing.
-    /// The identity is the point at infinity.
     ///
-    /// NOTE: currently information-only and no operations are implemented for this structure.
+    /// NOTE: not implemented.
     struct G1AffineParent {}
 
-    /// A serialization scheme for `G1AffineParent` elements,
-    /// where an element is represented by a byte array `b[]` of size 96,
-    /// with the following rules deseribed from the perspective of deserialization.
-    /// 1. Read `b[0] & 0x80` as the compression flag. Abort if it is 1.
-    /// 1. Read `b[0] & 0x40` as the infinity flag.
-    /// 1. Read `b[0] & 0x20` as the lexicographical flag. This is ignored.
-    /// 1. If the infinity flag is 1, return the point at infinity.
-    /// 1. Deserialize $x$ from `[b[0] & 0x1f, ..., b[47]]` using `FqFormatMsb`. Abort if this failed.
-    /// 1. Deserialize $y$ from `[b[48], ..., b[95]]` using `FqFormatMsb`. Abort if this failed.
-    /// 1. Abort if point $(x,y)$ is not on curve $E(F_q)$.
-    /// 1. Return $(x,y)$.
+    /// An uncompressed serialization scheme for `G1AffineParent` elements specified in
+    /// https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-11#name-zcash-serialization-format-.
     ///
-    /// NOTE: currently information-only, not implemented.
+    /// NOTE: not implemented.
     struct G1AffineParentFormatUncompressed {}
 
-    /// A serialization scheme for `G1AffineParent` elements,
-    /// where an element is represented by a byte array `b[]` of size 48,
-    /// with the following rules deseribed from the perspective of deserialization.
-    /// 1. Read `b[0] & 0x80` as the compression flag. Abort if it is 0.
-    /// 1. Read `b[0] & 0x40` as the infinity flag.
-    /// 1. Read `b[0] & 0x20` as the lexicographical flag.
-    /// 1. If the infinity flag is 1, return the point at infinity.
-    /// 1. Deserialize $x$ from `[b[0] & 0x1f, ..., b[47]]` using `FqFormatMsb`. Abort if this failed.
-    /// 1. Try computing $y$ such that point $(x,y)$ is on the curve $E(F_q)$. Abort if there is no such $y$.
-    /// 1. Let $\overline{y}=-y$.
-    /// 1. Set $y$ as $\min(y,\overline{y})$ if the the lexicographical flag is 0, or $\max(y,\overline{y})$ otherwise.
-    /// 1. Return $(x,y)$.
+    /// A compressed serialization scheme for `G1AffineParent` elements specified in
+    /// https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-11#name-zcash-serialization-format-.
     ///
-    /// NOTE: currently information-only, not implemented.
+    /// NOTE: not implemented.
     struct G1AffineParentFormatCompressed {}
 
     /// The group $G_1$ in BLS12-381-based pairing $G_1 \times G_2 \rightarrow G_t$.
     /// It is subgroup of `G1AffineParent`.
-    /// It has a prime order $r$ equal to 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001.
-    /// (so `Fr` is the scalar field).
     struct G1Affine {}
 
     /// A serialization format for `G1Affine` elements,
     /// essentially the format represented by `G1AffineParentFormatUncompressed`
     /// but only applicable to `G1Affine` elements.
-    ///
-    /// NOTE: the same scheme is also used in other implementations (e.g. ark-bls12-381-0.4.0).
     struct G1AffineFormatUncompressed {}
 
     /// A serialization format for `G1Affine` elements,
     /// essentially the format represented by `G1AffineParentFormatCompressed`
     /// but only applicable to `G1Affine` elements.
-    ///
-    /// NOTE: the same scheme is also used in other implementations (e.g. ark-bls12-381-0.4.0).
     struct G1AffineFormatCompressed {}
 
-    /// A group constructed by the points on a curve $E'(F_{q^2})$ and the point at inifinity under the elliptic curve point addition.
-    /// $E'(F_{q^2})$ is an elliptic curve $y^2=x^3+4(u+1)$ defined over $F_{q^2}$.
-    /// The identity of `G2Affine` is the point at infinity.
+    /// A group constructed by the points on a curve $E'(F_{q^2}): y^2=x^3+4(u+1)$
+    /// and the point at inifinity, under the elliptic curve point addition.
     ///
-    /// NOTE: currently information-only and no operations are implemented for this structure.
+    /// NOTE: not implemented.
     struct G2AffineParent {}
 
-    /// A serialization scheme for `G2AffineParent` elements.
-    /// where an element is represented by a byte array `b[]` of size 192,
-    /// with the following rules deseribed from the perspective of deserialization.
-    /// 1. Read `b[0] & 0x80` as the compression flag. Abort if it is 1.
-    /// 1. Read `b[0] & 0x40` as the infinity flag.
-    /// 1. Read `b[0] & 0x20` as the lexicographical flag. This is ignored.
-    /// 1. If the infinity flag is 1, return the point at infinity.
-    /// 1. Deserialize $x$ from `[b[0] & 0x1f, ..., b[95]]` using `Fq2FormatMscMsb`. Abort if this failed.
-    /// 1. Deserialize $y$ from `[b[96], ..., b[191]]` using `Fq2FormatMscMsb`. Abort if this failed.
-    /// 1. Abort if point $(x,y)$ is not on curve $E'(F_{q^2})$.
-    /// 1. Return $(x,y)$.
+    /// An uncompressed serialization scheme for `G2AffineParent` elements specified in
+    /// https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-11#name-zcash-serialization-format-.
     ///
-    /// NOTE: currently information-only, not implemented.
+    /// NOTE: not implemented.
     struct G2AffineParentFormatUncompressed {}
 
-    /// A serialization scheme for `G1AffineParent` elements,
-    /// where an element is represented by a byte array `b[]` of size 96,
-    /// with the following rules deseribed from the perspective of deserialization.
-    /// 1. Read `b[0] & 0x80` as the compression flag. Abort if it is 0.
-    /// 1. Read `b[0] & 0x40` as the infinity flag.
-    /// 1. Read `b[0] & 0x20` as the lexicographical flag.
-    /// 1. If the infinity flag is 1, return the point at infinity.
-    /// 1. Deserialize $x$ from `[b[0] & 0x1f, ..., b[96]]` using `Fq2FormatMscMsb`. Abort if this failed.
-    /// 1. Try computing $y$ such that point $(x,y)$ is on the curve $E(F_{q^2})$. Abort if there is no such $y$.
-    /// 1. Let $\overline{y}=-y$.
-    /// 1. Set $y$ as $\min(y,\overline{y})$ if the the lexicographical flag is 0, or $\max(y,\overline{y})$ otherwise.
-    /// 1. Return $(x,y)$.
+    /// A compressed serialization scheme for `G2AffineParent` elements specified in
+    /// https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-11#name-zcash-serialization-format-.
     ///
-    /// NOTE: currently information-only, not implemented.
+    /// NOTE: not implemented.
     struct G2AffineParentFormatCompressed {}
 
     /// The group $G_2$ in BLS12-381-based pairing $G_1 \times G_2 \rightarrow G_t$.
     /// It is a subgroup of `G2AffineParent`.
-    /// It has a prime order $r$ equal to 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001.
-    /// (so `Fr` is the scalar field).
     struct G2Affine {}
 
     /// A serialization scheme for `G2Affine` elements,
     /// essentially `G2AffineParentFormatUncompressed` but only applicable to `G2Affine` elements.
     ///
-    /// NOTE: currently information-only, not implemented.
+    /// NOTE: not implemented.
     struct G2AffineFormatUncompressed {}
 
     /// A serialization scheme for `G2Affine` elements,
     /// essentially `G2AffineParentFormatCompressed` but only applicable to `G2Affine` elements.
     ///
-    /// NOTE: currently information-only, not implemented.
+    /// NOTE: not implemented.
     struct G2AffineFormatCompressed {}
 
     /// The group $G_t$ in BLS12-381-based pairing $G_1 \times G_2 \rightarrow G_t$.
     /// It is a multiplicative subgroup of `Fq12`.
-    /// It has a prime order $r$ equal to 0x73eda753299d7d483339d80809a1d80553bda402fffe5bfeffffffff00000001.
-    /// (so `Fr` is the scalar field).
-    /// The identity of `Gt` is 1.
     struct Gt {}
 
     /// A serialization scheme for `Gt` elements,
     /// essentially `Fq12FormatLscLsb` but only applicable to `Gt` elements.
-    ///
-    /// NOTE: the same scheme is also used in other implementations (e.g. ark-bls12-381-0.4.0).
     struct GtFormat {}
 
     /// The finite field $F_r$ that can be used as the scalar fields
@@ -418,14 +377,10 @@ module aptos_std::algebra_bls12381 {
 
     /// A serialization format for `Fr` elements,
     /// where an element is represented by a byte array `b[]` of size 32 with the least significant byte coming first.
-    ///
-    /// NOTE: the same scheme is also used in other implementations (e.g., ark-bls12-381-0.4.0, blst-0.3.7).
     struct FrFormatLsb {}
 
     /// A serialization scheme for `Fr` elements,
     /// where an element is represented by a byte array `b[]` of size 32 with the most significant byte coming first.
-    ///
-    /// NOTE: the same scheme is also used in other implementations (e.g., ark-bls12-381-0.4.0, blst-0.3.7).
     struct FrFormatMsb {}
 }
 ```
