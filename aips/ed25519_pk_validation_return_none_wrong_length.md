@@ -42,7 +42,8 @@ The relevant code in the reference implementation below is as follows:
                 });
             }
         },
-    };```
+    };
+```
 
 ## Reference Implementation
 
