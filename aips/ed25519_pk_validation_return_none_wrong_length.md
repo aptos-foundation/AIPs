@@ -2,7 +2,7 @@
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Make Ed25519 Public Key Validation Return False if Key Is the Wrong Length
 author: Michael Straka <michael@aptoslabs.com>
-Status: Accepted
+Status: Draft
 type: Standard (Framework)
 created: <03/24/2023>
 ---
