@@ -4,7 +4,7 @@ title: Make Ed25519 Public Key Validation Return False if Key Is the Wrong Lengt
 author: Michael Straka <michael@aptoslabs.com>
 Status: Draft
 type: Standard (Framework)
-created: <03/24/2023>
+created: 03/24/2023
 ---
 
 # AIP-TBD - Make Ed25519 Public Key Validation Return None if Key Is the Wrong Length
