@@ -2,6 +2,7 @@
 aip: 20
 title: Generic Operations of Algebraic Structures
 author: zhoujun-ma, alin
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/94
 Status: Draft
 type: Standard (Framework)
 created: 2023/03/15
