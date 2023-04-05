@@ -48,7 +48,7 @@ To keep the Aptos stdlib concise while still covering as many use cases as possi
 
 #### Structs and Functions
 
-Module `aptos_std::algebra` is designed to have the following definitions.
+Module `aptos_std::crypto_algebra` is designed to have the following definitions.
 
 - A generic struct `Element<S>` that represents an element of algebraic structure `S`.
 - Generic functions that represent group/field operations.
@@ -56,7 +56,7 @@ Module `aptos_std::algebra` is designed to have the following definitions.
 Below is the full specification in pseudo-Move.
 
 ```rust
-module aptos_std::crypt_algebra {
+module aptos_std::crypto_algebra {
     /// An element of the group `G`.
     struct Element<S> has copy, drop;
 
@@ -218,10 +218,13 @@ Invoking operation functions with user-defined types should also abort with a â€
 
 ### Implementation of BLS12-381 structures
 
-The construction of BLS12-381 curves involve many groups/fields, some frequently interacted by applications (e.g., `Fq12`, `Fr`, `G1`, `G2`, `Gt`) while others rarely used. Marker types for using these structures with `aptos_std::crypt_algebra` APIs should be defined and exposed to developers, along with their widely-used serialization formats and hash-to-group suites, (ideally in its own module named `aptos_std::crypt_algebra_bls12381`).
+To support all potential BLS12-381 operations using the `aptos_std::crypto_algebra` API,
+the following marker types may need to be exposed (related operation implemented).
 
-Below are BLS12-381 marker types that may be worth supporting.
-Those marked as "implemented" are currently implemented in the reference PR.
+The reference implementation chose to implement a subset of them,
+namely `Fq12`, `Fr`, `G1`, `G2`, `Gt`, their popular serialization formats and hash-to-group suites,
+all marked as "implemented" below,
+which should be sufficient to support most BLS12-381 applications.
 
 #### `Fq`
 The finite field $F_q$ used in BLS12-381 curves with a prime order $q$ equal to
@@ -425,11 +428,13 @@ associated with the groups $G_1$, $G_2$, $G_t$ in BLS12-381-based pairing.
 #### `FormatFrLsb` (implemented)
 A serialization format for `Fr` elements,
 where an element is represented by a byte array `b[]` of size 32 with the least significant byte (LSB) coming first.
+
 NOTE: other implementation(s) using this format: ark-bls12-381-0.4.0, blst-0.3.7.
 
 #### `FormatFrMsb` (implemented)
 A serialization scheme for `Fr` elements,
 where an element is represented by a byte array `b[]` of size 32 with the most significant byte (MSB) coming first.
+
 NOTE: other implementation(s) using this format: ark-bls12-381-0.4.0, blst-0.3.7.
 
 #### `HashG1XmdSha256SswuRo` (implemented)
