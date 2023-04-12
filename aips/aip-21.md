@@ -22,3 +22,11 @@ To facilitate move developers with a more comprehensive standard library.
 - Math lib https://github.com/aptos-labs/aptos-core/pull/6714/
 - Inline functions https://github.com/aptos-labs/aptos-core/pull/6882
 - Upsert https://github.com/aptos-labs/aptos-core/pull/6860
+
+# Timeline
+
+Devnet: Already available for testing
+
+Testnet: ~4/24
+
+Mainnet: May 1st

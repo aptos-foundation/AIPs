@@ -43,5 +43,5 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 19 | Enable updating commission_percentage in staking_contract module |
 | AIP 20 | Generic Operations of Algebraic Structures |
 | AIP 21 | AIP move library |
-| AIP 22 | Support for select structs as argument  |
+| AIP 22 | Struct transaction arguments |
 | ... | ... |

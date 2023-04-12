@@ -2,7 +2,7 @@
 
 # Summary
 
-We enable the some structs as valid parameters to entry functions.
+We enable some select set of structs as valid parameters to entry and view functions.
 
 # Motivation
 
@@ -18,3 +18,11 @@ So far only primitive values can be passed into entry functions. Mainly because 
 # Reference Implementation
 
 - The code to enable generic structs is merged in https://github.com/aptos-labs/aptos-core/pull/7090
+
+# Timeline
+
+Devnet: Already available for testing
+
+Testnet: ~4/24
+
+Mainnet: May 1st
