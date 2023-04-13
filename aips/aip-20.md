@@ -221,13 +221,14 @@ For example, `zero<std::option::Option<u64>>()` will abort.
 
 ### Implementation of BLS12-381 structures
 
-To support all potential BLS12-381 operations using the `aptos_std::crypto_algebra` API,
-the following marker types may need to be exposed (related operation implemented).
+To support a wide-enough variety of BLS12-381 operations using the `aptos_std::crypto_algebra` API,
+we implement several marker types for the relevant groups of order `r` (for `G1`, `G2` and `Gt`) and fields (e.g., `Fr`, `Fq12`).
 
-The reference implementation chose to implement a subset of them,
-namely `Fq12`, `Fr`, `G1`, `G2`, `Gt`, their popular serialization formats and hash-to-group suites,
-all marked as "implemented" below,
-which should be sufficient to support most BLS12-381 applications.
+We also implement marker types for popular serialization formats and hash-to-group suites.
+
+Below, we describe all *possible* marker types we *could* implement for BLS12-381
+and mark the ones that we actually implement as "implemented".
+These, we believe, should be sufficient to support most BLS12-381 applications.
 
 #### `Fq`
 The finite field $F_q$ used in BLS12-381 curves with a prime order $q$ equal to
@@ -454,13 +455,24 @@ Full specification is defined in https://datatracker.ietf.org/doc/html/draft-irt
 
 ## Risks and Drawbacks
 
-For move application developers, constructing cryptographic schemes manually with these building blocks can be error-prone, or even result in vulnerable applications.
+Developing cryptographic schemes, whether in Move or in any other language, is very difficult due to the inherent mathematic complexity of such schemes, as well as the difficulty of using cryptographic libraries securely.
+
+As a result, we caution Move application developers that
+implementing cryptographic schemes using `crypto_algebra.move` and/or the `bls12381_algebra.move` modules will be error prone and could result in vulnerable applications.
+
+That being said, the `crypto_algebra.move` and the `bls12381_algebra.move` Move modules have been designed with safety in mind.
+First, we offer a minimal, hard-to-misuse abstraction for algebraic structures like groups and fields.
+Second, our Move modules are type safe (e.g., inversion in a group G returns an Option<G>).
+Third, our BLS12-381 implementation always performs prime-order subgroup checks when deserializing group elements, to avoid serious implementation bugs.
 
 ## Future Potential
 
-The module can be extended to support more structures and operations, allowing more complicated cryptographic applications to be built.
+The `crypto_algebra.move` Move module can be extended to support more structures (e.g., new elliptic curves) and operations (e.g., batch inversion of field elements), This will:
+1. Allow porting existing generic cryptosystems built on top of this module to new, potentially-faster-or-smaller curves.
+2. Allow building more complicated cryptographic applications that leverage new operations or new algebraic structures (e.g., rings, hidden-order groups, etc.)
 
-Once Move interface is available, it can be use to rewrite the move side specifications to ensure type safety at compile time.
+Once the Move language is upgraded with support for some kind of interfaces,
+it can be use to rewrite the Move side specifications to ensure type safety at compile time.
 
 ## Suggested implementation timeline
 
