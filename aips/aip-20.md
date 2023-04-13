@@ -1,6 +1,6 @@
 ---
 aip: 20
-title: Generic Operations of Algebraic Structures
+title: Generic Cryptography Algebra and BLS12-381 Implementation
 author: zhoujun-ma, alin
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/94
 Status: Draft
@@ -8,14 +8,14 @@ type: Standard (Framework)
 created: 2023/03/15
 ---
 
-# AIP-14 - Generic Operations of Algebraic Structures
+# AIP-14 - Generic Cryptography Algebra and BLS12-381 Implementation
 ## Summary
 
-This AIP proposes some generic functions and structs for performing operations on cryptographic algebraic structures in Move.
+This AIP proposes the support of generic cryptography algebra operations in Aptos standard library.
 
-The initial list of supported generic operations includes group/field element serialization/deserialization, basic arithmetic, pairing, hash-to-structure, casting.
+The initial list of the supported generic operations includes group/field element serialization/deserialization, basic arithmetic, pairing, hash-to-structure, casting.
 
-The list of supported groups starts with groups/fields used in BLS12-381, a popular pairing-friendly curve as described [here](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-11#name-bls-curves-for-the-128-bit-).
+The initial list of supported algebraic structures includes groups/fields used in BLS12-381, a popular pairing-friendly curve as described [here](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-pairing-friendly-curves-11#name-bls-curves-for-the-128-bit-).
 
 Either the operation list or the structure list can be extended by future AIPs.
 
