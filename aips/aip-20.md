@@ -30,15 +30,17 @@ BLS12-381-based Groth16 proof verifier has been implemented this way as part of 
 
 ## Rationale
 
-An alternative non-generic approach is to expose instantiated schemes directly in stdlib.
+An alternative non-generic approach is to expose instantiated schemes directly in aptos_stdlib.
 For example, we can define a Groth16 proof verification function
-`0x1::groth16_b::verify_proof(vk, proof, public_inputs): bool`
-for every bilinear map `b`;
-for ECDSA signatures which requires a hash function and a group, we can define
-`0x1::ecdsa_h_g::verify_signature(pk, msg, sig):bool`
-for each pair of proper hash function `h` and group `g`.
+`0x1::groth16_<curve>::verify_proof(vk, proof, public_inputs): bool`
+for every pairing-friendly elliptic curve `<curve>`.
 
-Compared with the proposed approach, the alternative approach saves the work of constructing the schemes for Move developers. However, the size of stdlib can multiply too fast in the future.
+For ECDSA signatures which require a hash function and a group, we can define
+`0x1::ecdsa_<hash>_<group>::verify_signature(pk, msg, sig):bool`
+for each pair of proper hash function `<hash>` and group `<group>`.
+
+Compared with the proposed approach, the alternative approach saves the work of constructing the schemes for Move developers. However, the size of aptos_stdlib can multiply too fast in the future.
+Furthermore, the non-generic approach is not scalable from a development standpoint: a new native is needed for every combination of cryptosystem and its underlying algebraic structure (e.g., elliptic curve).
 
 To keep the Aptos stdlib concise while still covering as many use cases as possible, the proposed generic approach should be chosen over the alternative approach.
 
@@ -153,7 +155,7 @@ module aptos_std::crypto_algebra {
 
 In general, every structure implements basic operations like (de)serialization, equality check, random sampling.
 
-A group may also implement the following operations. (Additive notions are used.)
+For example, A group may also implement the following operations. (Additive notions are used.)
 - `order()` for getting the group order.
 - `zero()` for getting the group identity.
 - `one()` for getting the group generator (if exists).
@@ -165,7 +167,7 @@ A group may also implement the following operations. (Additive notions are used.
 - `multi_scalar_mul()` for efficient group multi-scalar multiplication.
 - `hash_to()` for hash-to-group.
 
-A field may also implement the following operations.
+As another example, a field may also implement the following operations.
 - `order()` for getting the field order.
 - `zero()` for the field additive identity.
 - `one()` for the field multiplicative identity.
@@ -178,19 +180,20 @@ A field may also implement the following operations.
 - `sqr()` for efficient field element squaring.
 - `from_u64()` for quick conversion from u64 to field element.
 
-For 3 groups that form a bilinear map, `pairing()` and `multi_pairing()` may be implemented.
+Similarly, for 3 groups `G1`, `G2`, `Gt` that admit a bilinear map, `pairing<G1, G2, Gt>()` and `multi_pairing<G1, G2, Gt>()` may be implemented.
 
 For a subset/superset relationship between 2 structures, `upcast()` and `downcast()` may be implemented.
+E.g., in BLS12-381 `Gt` is a multiplicative subgroup from `Fq12` so upcasting from `Gt` to `Fq12` and downcasting from `Fq12` to `Gt` can be supported.
 
 #### Shared Scalar Fields
 
 Some groups share the same group order,
-and an ergonomic design from this is to
+and an ergonomic design for this is to
 allow multiple groups to share the same scalar field
-(mainly for the purpose scalar multiplication),
+(mainly for the purpose of scalar multiplication),
 if they have the same order.
 
-E.g. the following should be supported.
+In other words, the following should be supported.
 
 ```rust
 // algebra.move
