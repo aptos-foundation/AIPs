@@ -210,14 +210,14 @@ let q2 = scalar_mul<GroupB2, ScalarForBx>(&p2, &k);
 #### Handling Incorrect Type Parameter(s)
 
 There is currently no easy way to ensure type safety for the generic operations.
-E.g., `pairing<A,B,C>(a,b,c)` can compile even there is no pairing between `A,B,C` existing/implemented.
+E.g., `pairing<A,B,C>(a,b,c)` can compile even if groups `A`, `B` and `C` do not admin a pairing.
 
-Therefore the backend should handle the type checks at runtime.
-
-If a group operations that takes 2+ type parameters is invoked with incompatible type parameters, it should abort.
-E.g. `scalar_mul<GroupA, ScalarForBx>()` should abort with a “not implemented” error.
+Therefore, the backend should handle the type checks at runtime.
+For example, if a group operation that takes 2+ type parameters is invoked with incompatible type parameters, it must abort.
+For example, `scalar_mul<GroupA, ScalarB>()` where `GroupA` and `ScalarB` have different orders, will abort with a “not implemented” error.
 
 Invoking operation functions with user-defined types should also abort with a “not implemented” error.
+For example, `zero<std::option::Option<u64>>()` will abort.
 
 ### Implementation of BLS12-381 structures
 
