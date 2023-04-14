@@ -30,6 +30,8 @@ BLS12-381-based Groth16 proof verifier has been implemented this way as part of 
 
 ## Rationale
 
+### Generic API
+
 An alternative non-generic approach is to expose instantiated schemes directly in aptos_stdlib.
 For example, we can define a Groth16 proof verification function
 `0x1::groth16_<curve>::verify_proof(vk, proof, public_inputs): bool`
@@ -43,6 +45,17 @@ Compared with the proposed approach, the alternative approach saves the work of 
 Furthermore, the non-generic approach is not scalable from a development standpoint: a new native is needed for every combination of cryptosystem and its underlying algebraic structure (e.g., elliptic curve).
 
 To keep the Aptos stdlib concise while still covering as many use cases as possible, the proposed generic approach should be chosen over the alternative approach.
+
+### Backend Dispatch Framework
+
+On the backend, the native functions for the generic API implement dynamic dispatch:
+they act based on the given marker types.
+E.g., in the context of BLS12-381,
+the native for `add<S>(x: &Element<S>, y:&Element<S>): Element<S>` will calculate `x*y`
+if `S` is `Gt` that represents the multiplicative subgroup `Gt` in BLS12-381,
+or `x+y` if `S` is the scalar field `Fr`.
+
+This is required by the generic API design.
 
 ## Specifications
 
