@@ -1,7 +1,7 @@
 ---
 aip: 21
-title: Fungible Asset Standard using objects
-author: lightmark
+title: Fungible Asset Standard
+author: lightmark, movekevin, davidiw
 Status: Draft
 type: Standard (Framework)
 created: 04/11/2022
@@ -11,47 +11,33 @@ created: 04/11/2022
 
 ## Summary
 
-This AIP proposes a standard of Fungible Asset (FA) using Move Objects. In this model, any object, which is called **
-Metadata** in the standard, can be used as metadata to issue fungible asset units. This standard provides the building
-blocks for applications to explore the possibilities of fungibility.
+This AIP proposes a standard for Fungible Assets (FA) using Move Objects. In this model, any on-chain asset represented as an object can also be expressed as a fungible asset allowing for a single object to be represented by many distinct, yet interchangeable units of ownership.
 
 ## Motivation
 
-We are eager to build fungible asset on Aptos as it plays an critical role in the Web3 ecosystem beyond cryptocurrency.
-it enables the tokenization of various assets, including commodities, real estate, and financial instruments, and
-facilitate the creation of decentralized financial applications.
+Deriving fungible assets out of objects allows for both a seamless developer experience but also simplifies application development time. This standard supports potential applicatoins like
 
-- Tokenization of securities and commodities provides fractional ownership, making these markets more accessible to a
-  broader range of investors.
-- Fungible tokens can also represent ownership of real estate, enabling fractional ownership and providing liquidity to
-  the traditionally illiquid market.
-- In-game assets such as virtual currencies and characters can be tokenized, enabling players to own and trade their
-  assets, creating new revenue streams for game developers and players.
+- The tokenization of securities and commodities provides fractional ownership.
+- Ownership of real estate, enabling fractional ownership and providing liquidity to the traditionally illiquid market.
+- In-game assets such as virtual currencies and characters can be tokenized, enabling players to own and trade their   assets, creating new revenue streams for game developers and players.
 
-Besides aforementioned features, fungible asset is a superset of cryptocurrency as coin is just one type of fungible
-asset. Coin module in Move could be replaced by fungible asset framework.
+Besides aforementioned features, a fungible asset provides a super set of existing Aptos Coin standard concepts along with properties, common to objects, that ensure that healthy ecosystems can be formed around these assets.
 
 ## Rationale
 
 The rationale is two-folds:
 
-We witnessed an drastically increasing needs of fungible asset framework from Aptos community and partners. The earlier
-coin module is obsolete and insufficient for today's needs partially due to the rigidity of Move structs and the
-inherently poor extensibility that it’s built upon. Also, the basic model of authorization management is not flexible
-enough to enable creative innovations of fungible asset policy.
+Since Mainnet launch, the existing coin module has been deemed insufficient for current and future needs due to the rigidity of Move structs and the inherently poor extensibility. For example, there's no mechanism that enforces transfers take a certain path or that only certain parties may own said assets. In short, the existing model of authorization management is not flexible enough to enable creative innovations of fungible asset policy.
 
-The old coin module has a noticeable deficiency that the `store` ability makes ownership tracing a nightmare. Therefore,
-it is not amenable to centralized management such as account freezing because it is not programmably feasible to find
-all the coins belonging to an account.
+The root of these issues is two fold:
+* The existing `Coin` struct leverages the `store` ability allowing for assets on-chain to become untraceable. Creating challenges to off-chain observability and on-chain management, such as freezing or burning.
+* Lack of access modifiers preventing managers of `Coin`s to dictate requirements for transfer.
 
-fungible asset framework is born to solve both issues.
+Fungible assets addresses these issues.
 
 ## Specification
 
-`fungible_asset::Metadata` serves as metadata or information associated with a kind of fungible asset. Any object with
-fungibility has to be extended with this resource and then become the metadata object. It is noted that this object can
-have other resources attached to provide richer context. For example, if the fungible asset represents a gem, it can
-hold another `Gem` resource with fields like color, size, quality, rarity, etc.
+`fungible_asset::Metadata` serves as metadata or information associated with a kind of fungible asset. An object with this resource is now a fungible resource, where ownership of this resource can be represented by a `FungibleAsset` amount. An object can have other resources attached to provide additional context. For example, the metadata could define a gem of a given type, color, quality, and rarity, where ownership indicates the quantity or total weight owned of that type of gem.
 
 ```rust
 #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
@@ -100,16 +86,13 @@ struct FungibleAsset {
 
 ### Primary and Secondary Stores
 
-Each account can own multiple `FungibleStore`s but only one is primary and the rest are called secondary stores. The
-primary store address is deterministic, `hash(owner_address | metadata_address | 0xFC)`. Whereas the secondary store
-could be created when needed.
+Each account can own multiple `FungibleStore`s but only one is primary and the rest are called secondary stores. The primary store address is deterministic, `hash(owner_address | metadata_address | 0xFC)`. The secondary stores are created as needed and derived typically from GUID-based objects.
 
-The difference between primary and secondary stores are summarized as:
+The key features of a primary store are:
 
-1. Primary store address is deterministic to the owner account so there is no need to index.
-2. Primary store supports unilateral sending so that it will be created on demand if not exist. Whereas secondary ones
-   do not.
-3. Primary store cannot be deleted.
+1. The primary store object address is deterministic so that transactions cam seamlessly access with knowledage of owner's account address.
+2. Primary stores will be created upon transferring of assets if they do not exist.
+3. A primary store cannot be deleted.
 
 ## Reference Implementation
 
@@ -192,21 +175,13 @@ amount: u64,
 
 ## Risks and Drawbacks
 
-- Make an asset fungible is not an irreversible operation and there is no way to clear the fungible asset data if not
-  needed any more.
-- The solution to use primary store is not perfect in that the same `DeriveRef` could also be used by other module to
-  squat the primary store object. This requires the creator of metadata to bear that in mind. So we limit the function
-  can be only called by `primary_store` module for now. The reason behind this is the name deriving scheme does not have
-  native domain separator for different modules.
+- Making an asset fungible is not an irreversible operation and there is no way to clear the fungible asset data if not
+  needed any more. Though one could burn all representations of that fungible asset.
+- The use of primary stores has some implication on performance as the application must perform a sha-256 hashing algorithm to access each asset in a transaction. At the same time, object indexers are still in their infancy and secondary stores are not readily available.
 
 ## Future Potential
 
-There is still some room for improvements of management capabilities and the way to locate fungible asset objects. Once
-we have a powerful indexer with a different programming model then it may be unnecessary to have primary store anymore.
-
-## Suggested implementation timeline
-
-By end of March.
+As this standard stabilizies, we anticipate SDK and indexing solutions to eliminate the need for the primary store allowing for clearer transaction transcripts as well as a path towards better parallelization of transactions on-chain.
 
 ## Suggested deployment timeline
 
