@@ -153,6 +153,7 @@ const ADDRESS: u8 = 7;
 const BYTE_VECTOR: u8 = 8;
 const STRING: u8 = 9;
 ```
+PropertyMap enforces a maximum number of items, 1000, with a property name length of up to 128 characters. In practice, a PropertyMaps should be kept as small as possible. As the price of storage dictates write costs, loading large data stores during indexing and API queries can result in undesirable delays. An non-empirical recommendation would be to keep the data below 10KB.
 
 ### APIs
 

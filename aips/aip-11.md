@@ -1,7 +1,7 @@
 ---
 aip: 11
 title: Tokens as Objects
-author: davidiw, movekevin, lightmark, capcap, kslee8224
+author: davidiw, movekevin, lightmark, capcap, kslee8224, neoul
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/31
 Status: Draft
 last-call-end-date (*optional:
@@ -178,6 +178,14 @@ struct UnlimitedSupply has key {
     mint_events: event::EventHandle<MintEvent>,
 }
 ```
+
+### Data Limits
+
+To ensure access to the data stored on-chain, for example, during indexing or querying APIs, the standard employs several limits to fields with dynamic length:
+
+* Description fields can contain up to 2048 characters.
+* Name fields can contain up to 128 characters.
+* URI fields can contain up to 512 characters.
 
 #### Royalty Data Structures
 
