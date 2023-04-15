@@ -25,24 +25,25 @@ Gating behind a feature flag ensures backwards compatibility with previous calls
 
 The relevant code in the reference implementation below is as follows:
 
-```let key_bytes_slice = match <[u8; ED25519_PUBLIC_KEY_LENGTH]>::try_from(key_bytes) {
-        Ok(slice) => slice,
-        Err(_) => {
+```
+let key_bytes_slice = match <[u8; ED25519_PUBLIC_KEY_LENGTH]>::try_from(key_bytes) {
+    Ok(slice) => slice,
+    Err(_) => {
+        return Err(SafeNativeError::Abort {
+            abort_code: abort_codes::E_WRONG_PUBKEY_SIZE,
+        });
+        if context
+            .get_feature_flags()
+            .is_enabled(FeatureFlag::ED25519_PUBKEY_VALIDATE_RETURN_FALSE_WRONG_LENGTH)
+        {
+            return Ok(smallvec![Value::bool(false)]);
+        } else {
             return Err(SafeNativeError::Abort {
                 abort_code: abort_codes::E_WRONG_PUBKEY_SIZE,
             });
-            if context
-                .get_feature_flags()
-                .is_enabled(FeatureFlag::ED25519_PUBKEY_VALIDATE_RETURN_FALSE_WRONG_LENGTH)
-            {
-                return Ok(smallvec![Value::bool(false)]);
-            } else {
-                return Err(SafeNativeError::Abort {
-                    abort_code: abort_codes::E_WRONG_PUBKEY_SIZE,
-                });
-            }
-        },
-    };
+        }
+    },
+};
 ```
 
 ## Reference Implementation
