@@ -1,6 +1,6 @@
 ---
 aip: 21
-title: Fungible Asset Standard
+title: Fungible Assets
 author: lightmark, movekevin, davidiw
 Status: Draft
 type: Standard (Framework)
