@@ -44,4 +44,5 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 20 | Generic Operations of Algebraic Structures |
 | AIP 21 | Fungible Assets |
 | AIP 22 | No-Code Token Objects |
+| AIP 23 | Make Ed25519 Public Key Validation Return False if Key Is the Wrong Length |
 | ... | ... |
