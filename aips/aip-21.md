@@ -7,7 +7,7 @@ type: Standard (Framework)
 created: 04/11/2022
 ---
 
-# AIP-21 - Fungible Asset using objects
+# AIP-21 - Fungible Assets
 
 ## Summary
 
