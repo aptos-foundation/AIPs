@@ -45,6 +45,6 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 21 | Fungible Assets |
 | AIP 22 | No-Code Token Objects |
 | AIP 23 | Make Ed25519 Public Key Validation Return False if Key Is the Wrong Length |
-| AIP 24 | AIP move library |
-| AIP 25 | Struct transaction arguments |
+| AIP 24 | Move Library Updates |
+| AIP 25 | Transaction Argument Support for Structs |
 | ... | ... |
