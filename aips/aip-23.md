@@ -1,5 +1,5 @@
 ---
-aip: aip-23
+aip: 23
 title: Make Ed25519 Public Key Validation Return False if Key Is the Wrong Length
 author: Michael Straka <michael@aptoslabs.com>
 Status: Draft
@@ -7,7 +7,7 @@ type: Standard (Framework)
 created: 03/24/2023
 ---
 
-# AIP-TBD - Make ed25519 public key validation return none if key has the wrong length
+# AIP-23 - Make ed25519 public key validation return none if key has the wrong length
   
 ## Summary
 
