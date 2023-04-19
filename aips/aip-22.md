@@ -11,7 +11,7 @@ updated:
 requires: [AIP-11](Tokens as Objects)
 ---
 
-# AIP-20 - No-Code Tokens using Token Objects
+# AIP-22 - No-Code Token Objects
 
 ## Summary
 
