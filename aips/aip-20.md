@@ -8,7 +8,7 @@ type: Standard (Framework)
 created: 2023/03/15
 ---
 
-# AIP-14 - Generic Cryptography Algebra and BLS12-381 Implementation
+# AIP-20 - Generic Cryptography Algebra and BLS12-381 Implementation
 ## Summary
 
 This AIP proposes the support of generic cryptography algebra operations in Aptos standard library.
