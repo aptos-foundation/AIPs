@@ -1,17 +1,17 @@
 ---
 aip: aip-23
-title: Make Ed25519 Public Key Validation Return False if Key Is the Wrong Length
+title: Make Ed25519 public key validation native return `false` if key has the wrong length
 author: Michael Straka <michael@aptoslabs.com>
 Status: Draft
 type: Standard (Framework)
 created: 03/24/2023
 ---
 
-# AIP-TBD - Make ed25519 public key validation return none if key has the wrong length
+# AIP-23 - Make Ed25519 public key validation native return `false` if key has the wrong length
   
 ## Summary
 
-Changes the function `native_public_key_validate` used by the native Move function `native fun pubkey_validate_internal` to return false if the public key provided is the wrong length. Previously, this function would abort if the key length provided was incorrect. This change is gated by a feature flag.  
+Changes the function `native_public_key_validate` used by the native Move function `native fun pubkey_validate_internal` to return `false` if the public key provided is the wrong length. Previously, this function would abort if the key length provided was incorrect. This change is gated by a feature flag.  
 
 ## Motivation
 
@@ -52,7 +52,7 @@ https://github.com/aptos-labs/aptos-core/pull/7043
 
 ## Risks and Drawbacks
 
-Callers relying on the previous behavior of `native_public_key_validate` may be affected by this change. Currently, end-to-end tests show there are no such callers. Furthermore, it is unlikely that past callers of this function, if any, would be affected if the function returns false instead of aborting. This is because such callers would typically need to check the return value of the function anyway & would most likely abort anyway if the return value is false.
+Callers relying on the previous behavior of `native_public_key_validate` may be affected by this change. Currently, end-to-end tests show there are no such callers. Furthermore, it is unlikely that past callers of this function, if any, would be affected if the function returns `false` instead of aborting. This is because such callers would typically need to check the return value of the function anyway & would most likely abort anyway if the return value is `false`.
 
 ## Future Potential
 
