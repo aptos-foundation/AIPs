@@ -1,20 +1,15 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: (AIP title)
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
-discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: <Draft | Last Call | Accepted | Final | Rejected>
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
-created: <mm/dd/yyyy>
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+aip: 26
+title: Quorum Store
+author: bchocho
+Status: Draft
+last-call-end-date: 04/19/2023
+type: Consensus
+created: 04/18/2023
 ---
 
-# AIP-(AIP number or TBD) - Quorum Store
+# AIP-26 - Quorum Store
   
-(Please give a temporary file name to your AIP when first drafting it, AIP manager will assign a number to it after reviewing)
-
 ## Summary
 
 Quorum Store is a production-optimized implementation of Narwhal [1], that improves consensus throughput. Quorum Store was tested in previewnet, a mainnet-like 100+ node network, where it increased TPS by 3x. It will remove consensus as the primary bottleneck for throughput in mainnet. It has a wide surface area that changes details of how validators disseminate, order, and execute transactions.
