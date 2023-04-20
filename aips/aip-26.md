@@ -65,6 +65,14 @@ An implementation is code complete in main. It is gated by an onchain config, so
 - [https://github.com/aptos-labs/aptos-core/pull/5779](https://github.com/aptos-labs/aptos-core/pull/5779)
 - [https://github.com/aptos-labs/aptos-core/pull/5613](https://github.com/aptos-labs/aptos-core/pull/5613)
 - [https://github.com/aptos-labs/aptos-core/pull/6055](https://github.com/aptos-labs/aptos-core/pull/6055)
+- [https://github.com/aptos-labs/aptos-core/pull/6710](https://github.com/aptos-labs/aptos-core/pull/6710)
+- [https://github.com/aptos-labs/aptos-core/pull/6785](https://github.com/aptos-labs/aptos-core/pull/6785)
+- [https://github.com/aptos-labs/aptos-core/pull/7045](https://github.com/aptos-labs/aptos-core/pull/7045)
+- [https://github.com/aptos-labs/aptos-core/pull/7114](https://github.com/aptos-labs/aptos-core/pull/7114)
+- [https://github.com/aptos-labs/aptos-core/pull/7194](https://github.com/aptos-labs/aptos-core/pull/7194)
+- [https://github.com/aptos-labs/aptos-core/pull/7190](https://github.com/aptos-labs/aptos-core/pull/7190)
+- [https://github.com/aptos-labs/aptos-core/pull/7639](https://github.com/aptos-labs/aptos-core/pull/7639)
+- [https://github.com/aptos-labs/aptos-core/pull/7315](https://github.com/aptos-labs/aptos-core/pull/7315)
 
 ## Risks and Drawbacks
 
