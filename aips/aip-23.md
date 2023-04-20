@@ -1,6 +1,6 @@
 ---
-aip: aip-23
-title: Make Ed25519 public key validation native return `false` if key has the wrong length
+aip: 23
+title: Make Ed25519 Public Key Validation Return False if Key Is the Wrong Length
 author: Michael Straka <michael@aptoslabs.com>
 Status: Draft
 type: Standard (Framework)
