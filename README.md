@@ -47,4 +47,6 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 23 | Make Ed25519 public key validation native return `false` if key has the wrong length |
 | AIP 24 | Move Library Updates |
 | AIP 25 | Transaction Argument Support for Structs |
+| AIP 26 | Quorum Store |
+| AIP 27 | Sender Aware Transaction Shuffling |
 | ... | ... |
