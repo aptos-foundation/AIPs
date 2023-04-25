@@ -19,7 +19,7 @@ Deriving fungible assets out of objects allows for both a seamless developer exp
 
 - The tokenization of securities and commodities provides fractional ownership.
 - Ownership of real estate, enabling fractional ownership and providing liquidity to the traditionally illiquid market.
-- In-game assets such as virtual currencies and characters can be tokenized, enabling players to own and trade their   assets, creating new revenue streams for game developers and players.
+- In-game assets such as virtual currencies and characters can be tokenized, enabling players to own and trade their assets, creating new revenue streams for game developers and players.
 
 Besides aforementioned features, a fungible asset provides a super set of existing Aptos Coin standard concepts along with properties, common to objects, that ensure that healthy ecosystems can be formed around these assets.
 
@@ -30,6 +30,7 @@ The rationale is two-folds:
 Since Mainnet launch, the existing coin module has been deemed insufficient for current and future needs due to the rigidity of Move structs and the inherently poor extensibility. For example, there's no mechanism that enforces transfers take a certain path or that only certain parties may own said assets. In short, the existing model of authorization management is not flexible enough to enable creative innovations of fungible asset policy.
 
 The root of these issues is two fold:
+
 * The existing `Coin` struct leverages the `store` ability allowing for assets on-chain to become untraceable. Creating challenges to off-chain observability and on-chain management, such as freezing or burning.
 * Lack of access modifiers preventing managers of `Coin`s to dictate requirements for transfer.
 
@@ -72,8 +73,8 @@ struct FungibleStore has key {
 metadata: Object<Metadata>,
 /// The balance of the fungible metadata.
 balance: u64,
-/// Fungible Assets transferring is a common operation, this allows for freezing/unfreezing accounts.
-allow_ungated_balance_transfer: bool,
+/// If true, owner transfer is disabled that only `TransferRef` can move in/out from this store.
+frozen: bool,
 }
 
 /// FungibleAsset can be passed into function for type safety and to guarantee a specific amount.
@@ -105,43 +106,17 @@ The key features of a primary store are:
 ### Fungible asset main APIs
 
 ```rust
-public entry fun transfer<T: key>(
-sender: & signer,
-from: Object<T>,
-to: Object<T>,
-amount: u64,
-)
-public fun withdraw<T: key>(
-owner: & signer,
-store: Object<T>,
-amount: u64,
-): FungibleAsset
+public entry fun transfer<T: key>(sender: & signer, from: Object<T>, to: Object<T>, amount: u64)
+public fun withdraw<T: key>(owner: & signer, store: Object<T>, amount: u64): FungibleAsset
 public fun deposit<T: key>(store: Object<T>, fa: FungibleAsset)
 public fun mint( ref: & MintRef, amount: u64): FungibleAsset
 public fun mint_to<T: key>( ref: & MintRef, store: Object<T>, amount: u64)
-public fun set_ungated_transfer<T: key>( ref: & TransferRef, store: Object<T>, allow: bool)
+public fun set_frozen_flag<T: key>( ref: & TransferRef, store: Object<T>, frozen: bool)
 public fun burn( ref: & BurnRef, fa: FungibleAsset)
-public fun burn_from<T: key>(
-ref: & BurnRef,
-store: Object<T>,
-amount: u64
-)
-public fun withdraw_with_ref<T: key>(
-ref: & TransferRef,
-store: Object<T>,
-amount: u64
-)
-public fun deposit_with_ref<T: key>(
-ref: & TransferRef,
-store: Object<T>,
-fa: FungibleAsset
-)
-public fun transfer_with_ref<T: key>(
-transfer_ref: & TransferRef,
-from: Object<T>,
-to: Object<T>,
-amount: u64,
-)
+public fun burn_from<T: key>( ref: & BurnRef, store: Object<T>, amount: u64)
+public fun withdraw_with_ref<T: key>( ref: & TransferRef, store: Object<T>, amount: u64)
+public fun deposit_with_ref<T: key>( ref: & TransferRef, store: Object<T>, fa: FungibleAsset)
+public fun transfer_with_ref<T: key>(transfer_ref: & TransferRef, from: Object<T>, to: Object<T>, amount: u64)
 ```
 
 ### Fungible store main APIs
@@ -155,8 +130,8 @@ public fun primary_store_address<T: key>(owner: address, metadata: Object<T>): a
 public fun balance<T: key>(account: address, metadata: Object<T>): u64
 
 # [view]
-/// Return whether the given account's primary store can do direct transfers.
-public fun ungated_balance_transfer_allowed<T: key>(account: address, metadata: Object<T>): bool
+/// Return whether the given account's primary store is frozen.
+public fun is_frozen<T: key>(account: address, metadata: Object<T>): bool
 
 /// Withdraw `amount` of fungible asset from `store` by the owner.
 public fun withdraw<T: key>(owner: & signer, metadata: Object<T>, amount: u64): FungibleAsset
@@ -165,12 +140,7 @@ public fun withdraw<T: key>(owner: & signer, metadata: Object<T>, amount: u64): 
 public fun deposit(owner: address, fa: FungibleAsset)
 
 /// Transfer `amount` of fungible asset from sender's primary store to receiver's primary store.
-public entry fun transfer<T: key>(
-sender: & signer,
-metadata: Object<T>,
-recipient: address,
-amount: u64,
-)
+public entry fun transfer<T: key>(sender: & signer, metadata: Object<T>, recipient: address, amount: u64)
 ```
 
 ## Risks and Drawbacks
