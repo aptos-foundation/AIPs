@@ -12,7 +12,7 @@ updated: 2023/01/26
 
 ## Summary
 
-This AIP proposes a new multisig account standard that is primarily governed by transparent data structures and functions in a smart contract (multisig_account) with more ease of use and powerful features than the current multied25519-auth-key-based accounts. There’s also a strong direction for this to involve as part of a more general account abstraction in Aptos with more types of accounts and functionalities for users to manage their accounts.
+This AIP proposes a new multisig account standard that is primarily governed by transparent data structures and functions in a smart contract (multisig_account) with more ease of use and powerful features than the current multied25519-auth-key-based accounts. There’s also a strong direction for this to evolve as part of a more general account abstraction in Aptos with more types of accounts and functionalities for users to manage their accounts.
 
 This is not meant to be a full-fledged multisig wallet product but instead just the primitive construct and potentially SDK support to enable the community to build more powerful multisig products.
 
