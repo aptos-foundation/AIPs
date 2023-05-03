@@ -1,3 +1,15 @@
+---
+aip: 28
+title: Partial voting for on chain governance
+author: michelle-aptos, xingdingw
+discussions-to (*optional): <a url pointing to the official discussion thread>
+Status: Draft
+last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+type: Framework
+created: 5/3/2023
+updated (*optional): 5/3/2023
+---
+
 ## Summary
 
 With `delegation_pool.move`, end users are able to participate in staking, but the delegation pool owner votes on behalf of the entire pool. Partial voting proposes changes to Aptos Governance by enabling delegators to participate in on chain governance and vote on governance proposals in proportion to their stake amount.
