@@ -1,5 +1,5 @@
 ---
-aip: 28
+aip: 29
 title: Peer monitoring service
 author: joshlind
 discussions-to (*optional): <a url pointing to the official discussion thread>
