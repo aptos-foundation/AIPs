@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 29
 title: Peer monitoring service
 author: joshlind
 discussions-to (*optional): <a url pointing to the official discussion thread>
