@@ -2,7 +2,7 @@
 aip: 28
 title: Partial voting for on chain governance
 author: michelle-aptos, xingdingw
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/117
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Framework
@@ -10,7 +10,7 @@ created: 5/3/2023
 updated (*optional): 5/3/2023
 ---
 
-# AIP X - Partial voting for on chain governance
+# AIP 28 - Partial voting for on chain governance
 
 ## Summary
 

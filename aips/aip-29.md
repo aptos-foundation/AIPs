@@ -2,7 +2,7 @@
 aip: 29
 title: Peer monitoring service
 author: joshlind
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/118
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Blockchain core
@@ -10,7 +10,7 @@ created: 5/3/2023
 updated (*optional): 5/3/2023
 ---
 
-# AIP-X - Peer monitoring service
+# AIP-29 - Peer monitoring service
 
 ## Summary
 
