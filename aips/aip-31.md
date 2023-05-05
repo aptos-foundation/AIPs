@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 31
 title: Allowlisting for delegation pool
 author: michelle-aptos, xingdingw
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -10,7 +10,7 @@ created: 5/3/2023
 updated (*optional): 5/3/2023
 ---
 
-# AIP-X - Allowlisting for delegation pool
+# AIP-31 - Allowlisting for delegation pool
 
 ## Summary
 
