@@ -9,6 +9,7 @@ type: <Standard (Core, Networking, Interface, Application, Framework) | Informat
 created: <mm/dd/yyyy>
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
+
 ---
 
 # AIP-(AIP number or TBD) - (AIP title)
@@ -42,6 +43,9 @@ Express here the potential negative ramifications of taking on this proposal. Wh
 ## Future Potential
 
 Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in in one year? In five years?
+
+## Impact
+What audience does this aip impact -- partners, ecosystem, etc? How are they impacted?
 
 ## Suggested implementation timeline
 
