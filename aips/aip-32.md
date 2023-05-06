@@ -1,5 +1,5 @@
 ---
-aip: TBD
+aip: 32
 title: Storage Deletion Refund
 author: msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/127
@@ -9,7 +9,7 @@ type: Standard (Core)
 created: 05/05/2023
 ---
 
-# AIP x - Storage Deposit and Refund
+# AIP 32 - Storage Deposit and Refund
 
 # Summary
 
