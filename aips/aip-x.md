@@ -2,7 +2,7 @@
 aip: TBD
 title: Storage Deletion Refund
 author: msmouse
-discussions-to: TBD
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/127
 Status: Draft
 last-call-end-date: TBD
 type: Standard (Core)
