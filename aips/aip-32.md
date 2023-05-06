@@ -9,7 +9,7 @@ type: Standard (Core)
 created: 05/05/2023
 ---
 
-# AIP 32 - Storage Deposit and Refund
+# AIP 32 - Storage Deletion Refund
 
 # Summary
 
