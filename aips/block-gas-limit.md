@@ -1,5 +1,5 @@
 ---
-aip: 
+aip: 33
 title: Block Gas Limit
 author: danielxiangzl
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -9,7 +9,7 @@ type: Execution
 created: 05/07/2023
 ---
 
-# AIP-(TBD) - Block Gas Limit
+# AIP-33 - Block Gas Limit
   
 
 ## Summary
