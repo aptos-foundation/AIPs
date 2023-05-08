@@ -53,4 +53,6 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 29 | [Peer monitoring service](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-29.md) |
 | AIP 30 | [Implement decrease in staking rewards](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-30.md) |
 | AIP 31 | [Allowlisting for delegation pool](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-31.md) |
+| AIP 32 | [Storage Deletion Refund](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-32.md) |
+| AIP 33 | [Block Gas Limit](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-33.md) |
 | ... | ... |
