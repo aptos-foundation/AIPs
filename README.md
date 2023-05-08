@@ -49,4 +49,8 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 25 | [Transaction Argument Support for Structs](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-25.md) |
 | AIP 26 | [Quorum Store](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-26.md) |
 | AIP 27 | [Sender Aware Transaction Shuffling](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-27.md) |
+| AIP 28 | [Partial voting for on chain governance](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-28.md) |
+| AIP 29 | [Peer monitoring service](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-29.md) |
+| AIP 30 | [Implement decrease in staking rewards](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-30.md) |
+| AIP 31 | [Allowlisting for delegation pool](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-31.md) |
 | ... | ... |
