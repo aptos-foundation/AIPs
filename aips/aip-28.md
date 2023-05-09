@@ -7,7 +7,7 @@ Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Framework
 created: 5/3/2023
-updated (*optional): 5/3/2023
+updated (*optional): 5/9/2023
 ---
 
 # AIP 28 - Partial voting for on chain governance
@@ -72,7 +72,7 @@ Now a voter can vote on a proposal by calling ```aptos_governance::vote```. Howe
 4. Existing ```aptos_governance::vote```’s behavior will be slightly different.
     - aptos_governance::vote still votes with all voting power of this stake pool.
     - **Before** partial governance voting is enabled, a stake pool can only call this function once on a proposal with all its voting power at that time. Even if the stake pool has more voting power later(by adding stake or receiving rewards), the stake pool cannot vote with the newly added voting power. 
-    - **After** partial governance voting is enabled, a stake pool can still call aptos_governance::vote or aptos_governance::partial_vote no matter if the stake pool has already called aptos_governance::vote or not. The only exception is that the stake pool has already already voted on a proposal before partial governance voting is enabled.
+    - **After** partial governance voting is enabled, a stake pool can still call aptos_governance::vote or aptos_governance::partial_vote no matter if the stake pool has already called aptos_governance::vote or not. The only exception is that the stake pool has already voted on a proposal before partial governance voting is enabled.
     
 ### delegation_pool.move
     
@@ -82,12 +82,14 @@ A delegator’s voting power on a delegation pool is its active+pending_active+p
     
 **Proposed changes**
     
-1. Add a struct, ```DelegatedVoters``` to track voter addresses of each delegator. 
-    - The struct stores data with a table where the key is a delegator address and the value is its voter address.
-2. Add a function ```delegation_pool::delegate_voting_power(delegator: &signer, voter: address)```. 
+1. Add a struct, ```GovernanceRecords``` to track governance state of a delegation pool. The struct tracks:
+    - Each delegtor's delegated voter.
+    - Each voter's total voting power.
+    - Each voter's used voting power on each proposal.
+2. Add a function ```delegation_pool::delegate_voting_power(delegator: &signer, pool_address: address, voter: address)```. 
     - A delegator could delegate its voting power to another address. 
     - Delegators can change their voter at any time but the change won’t take effect until the next lockup period.
-    - Observed lockup period of last time a delegator changes its voter is recorded. So we can always know its latest voter.
+    - Lockup period expiration time of last time a delegator changes its voter is recorded. So we can always know its latest voter.
 3. Add tables to track voters’ shares in active_shares and inactive_shares pools.
     - The goal is to save gas by avoiding iterating over all delegators.
     - A voter’s shares always equal the sum of all its delegators’ shares.
