@@ -9,8 +9,6 @@ assignees: ''
 
 # AIP Discussion
 
-Discussion and feedback thread for AIP.
+< Copy Summary of AIP here in md >
 
-Link to AIP: 
-
-< Copy AIP text here as well for reader's ease > 
+Read more about it here: < Link to AIP >
