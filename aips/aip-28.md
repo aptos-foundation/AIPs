@@ -1,7 +1,7 @@
 ---
 aip: 28
 title: Partial voting for on chain governance
-author: michelle-aptos, xingdingw
+author: wintertoro, michelle-aptos, xingdingw
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/117
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
@@ -29,15 +29,17 @@ Previously, the minimum stake requirement and therefore minimum requirement to p
 1. Delegators can only vote if the delegation pool’s lockup cycle ends after the governance voting period (lockup cannot be reset)
 2. Any delegator with locked stake can participate in governance and does not have to be part of an active pool
 3. All new delegation pools will have the partial voting functionality at creation 
-4. On existing delegation pools, any user can submit a transaction to enable partial voting as a one time action
-5. Voters of delegation pools will be managed by delegation_pool module. Delegators can delegate their vote to another wallet address. 
-6. **When a delegator voter votes, it cannot change its votes once used.**
-7. If there are unused votes, OR staker adds stake, OR the pool earns staking rewards, the VOTER **can vote a second time (or third etc.) with new stake/votes**
-8. **If change voter, Only take effect NEXT CYCLE**
-9. A staker can keep changing voter multiple times during one cycle, but the very last decision will be what is implemented in the next cycle
-10. Implication is that now **Staking_contract** will have two changes
-    1. Can vote multiple times
-    2. Can split the votes within the staking pool towards Yes, No, or just partially un-used
+4. Existing delegation pools, any user can submit a transaction to enable partial voting as a one time action
+5. Voters of delegation pools will be managed by delegation_pool module.
+6. As default, all delegators have the voting power by default if they don't explicitly delegate their voting power to someone else.
+7.  Delegators can delegate their vote to another wallet address. 
+    - If a delegator delegates their vote, or change the address which they delegate their vote to, the change will only take effect next unlock cycle.
+8. W**hen a delegated voter votes, it cannot change its votes once used.**
+9. If there are unused votes, OR staker adds stake, OR the pool earns staking rewards, the VOTER **can vote a second time (or third etc.) with new stake/votes**
+10. A staker can keep changing voter multiple times during one cycle, but the very last decision will be what is implemented in the next cycle
+11. Implication is that now **Staking_contract** will have two changes
+    - Can vote multiple times
+    - Can split the votes within the staking pool towards Yes, No, or just partially un-used
 
 **Alternative solutions:**
 
