@@ -43,15 +43,17 @@ Express here the potential negative ramifications of taking on this proposal. Wh
 
 Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in in one year? In five years?
 
-## Suggested implementation timeline
+## Timeline
+
+### Suggested implementation timeline
 
 Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
   
-## Suggested developer platform support timeline
+### Suggested developer platform support timeline
 
 Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
 
-## Suggested deployment timeline
+### Suggested deployment timeline
 
 When should community expect to see this deployed on devnet?
 
