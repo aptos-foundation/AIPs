@@ -5,7 +5,7 @@ author: joshlind
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/118
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: Blockchain core
+type: Informational
 created: 5/3/2023
 updated (*optional): 5/3/2023
 ---
@@ -49,6 +49,14 @@ A simple reference implementation exists in the `aptos-core` codebase today. Not
 - **Peer monitoring server**: [https://github.com/aptos-labs/aptos-core/tree/main/network/peer-monitoring-service/server](https://github.com/aptos-labs/aptos-core/tree/main/network/peer-monitoring-service/server)
 - **Peer monitoring types**: [https://github.com/aptos-labs/aptos-core/tree/main/network/peer-monitoring-service/types](https://github.com/aptos-labs/aptos-core/tree/main/network/peer-monitoring-service/types)
 
+## Risks and Drawbacks
+
+There are several risks and drawbacks of introducing the peer monitoring service:
+
+- **Privacy concerns**: The peer monitoring service will gather higher-level metadata about each node in the network. As a result, it is important to ensure that none of this metadata contains sensitive and/or confidential information that may affect the privacy of each node environment or node operator.
+- **Tolerating malicious responses**: Given the trust-less nature of decentralized peer-to-peer networks, it is important that the peer monitoring service defend against malicious and/or misleading responses from other peers. Failure to tolerate these responses could result in a number of attacks, e.g., DOS, traffic shaping and performance attacks.
+- **Increased complexity and resource usage:** As with all optimizations, it is important to understand the trade-offs around increased system complexity and resource usages that may arise from the modifications. In this case, considerations should be taken to manage this complexity, and reduce any such impacts.
+
 ## Future Potential
 
 The peer monitoring service offers many future extensions and improvements. For example:
@@ -57,7 +65,7 @@ The peer monitoring service offers many future extensions and improvements. For 
 - **Performance benchmarking**: The peer monitoring service could be extended to act as a benchmarking tool in our testing environments. For example, the service could be configured to send and receive messages across the network (with configurable message sizes and frequencies), to help benchmark and monitor the performance of the networking stack.
 - **Implementation consolidation**: There are various implementation extensions to the monitoring service that could help clean up and consolidate the Aptos core code. For example: (i) the dedicated node health checker could be removed and replaced by the monitoring service; and (ii) the application interfaces between the networking stack and each component could be further standardized.
 
-## Suggested implementation timeline
+## Suggested Implementation Timeline
 
 - (Complete) **Milestone 1**: Implement a basic monitoring client and server framework.
 - (Complete) **Milestone 2**: Extend the framework to support peer and topology information.
@@ -65,8 +73,16 @@ The peer monitoring service offers many future extensions and improvements. For 
 - **Milestone 4**: Extend the framework to support peer discovery and integrate this information directly into the network stack (e.g., during node connecting dialing and startup).
 - **Milestone 5**: Extend the framework to support system and component information and integrate this metadata into the various applications.
 
-## Suggested deployment timeline
+## Suggested Deployment Timeline
 
-- (In progress) **Deployment step 1**: Implement milestones 1, 2 and 3 and cut them into release v1.5.
-- **Deployment step 2**: Implement and release milestone 4 (TBD).
-- **Deployment step 3**: Implement and release milestone 5 (TBD).
+- (In progress) **Deployment step 1**: Implement milestones 1 and 2 and cut them into release v1.5.
+- (In progress) **Deployment step 2**: Implement milestone 3 and cut it into release v1.6.
+- **Deployment step 3**: Implement and release milestone 4 (TBD).
+- **Deployment step 4**: Implement and release milestone 5 (TBD).
+
+## Stakeholder Impact
+
+The peer monitoring service will impact various stakeholders within the Aptos ecosystem. For example:
+
+- **Node operators**: Node operators will see improved node performance, reliability and operational quality. For example: (i) lower latencies and higher throughput when state synchronizing and processing transactions; (ii) less performance impact when direct (or-indirect) peers fail in the surrounding network; (iii) improved node connectivity and network discovery; and (iv) improved network and peer visibility.
+- **Applications and clients**: Applications and clients will see lower end-to-end transaction latencies, thus helping to improve the user experience. For example: (i) end-to-end transaction latencies will be much less affected by peer or network failures; and (ii) transactions will have lower tail latencies overall, thus helping to provide a more predictable and stable experience for applications and clients submitting transactions.
