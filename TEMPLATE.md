@@ -46,6 +46,10 @@ Think through the evolution of this proposal well into the future. How do you se
 ## Suggested implementation timeline
 
 Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
+  
+## Suggested developer platform support timeline
+
+Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
 
 ## Suggested deployment timeline
 
