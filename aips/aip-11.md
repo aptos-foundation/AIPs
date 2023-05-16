@@ -3,8 +3,8 @@ aip: 11
 title: Tokens as Objects
 author: davidiw, movekevin, lightmark, capcap, kslee8224, neoul
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/31
-Status: Draft
-last-call-end-date (*optional:
+Status: Accepted
+last-call-end-date (*optional):
 type: Standard (Framework)
 created: 2023/1/9
 updated: 2023/3/18

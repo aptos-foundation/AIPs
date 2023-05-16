@@ -11,17 +11,21 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-(AIP number or TBD) - (AIP title)
+# AIP-X - (AIP title)
   
 (Please give a temporary file name to your AIP when first drafting it, AIP manager will assign a number to it after reviewing)
 
 ## Summary
 
-Include a brief description summarizing the intended change. This should be no more than a couple of sentences.
+Include a brief description summarizing the intended change. This should be no more than a couple of sentences. Discuss the business impact and business value this change would impact.
 
 ## Motivation
 
 Describe the impetus for this change. What does it accomplish? What might occur if we do not accept this proposal?
+
+## Impact
+
+Which audiences are impacted by this change? What type of action does the audience need to take?
 
 ## Rationale
 
@@ -60,3 +64,14 @@ When should community expect to see this deployed on devnet?
 On testnet?
 
 On mainnet?
+
+## Security Considerations
+
+Any potential scams? What are the mitigation strategies?
+Any security implications/considerations?
+Any security design docs or auditing materials that can be shared?
+
+## Testing (optional)
+
+What is the testing plan? How is this being tested?
+
