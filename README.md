@@ -20,7 +20,7 @@ Aptos Improvement Proposals (AIP) describe standards for the Aptos Network inclu
 This table contains an overview of all created and tracked AIPs. It should be updated with each new AIP.
 
 | Number | Layer | Title  | Type | Status
-|--|--|--|--|--|
+|:---|:---|:---|:---|:---|
 | AIP 0 | | [Aptos Improvement Proposals](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-0.md) | Informational | Active |
 | [AIP 1](https://github.com/aptos-foundation/AIPs/issues/9) | Core | [Proposer selection improvements](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-1.md) | Standard | Accepted |
 | [AIP 2](https://github.com/aptos-foundation/AIPs/issues/2) | Framework | [Multiple Token Changes](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-2.md) | Standard | Accepted |
@@ -60,17 +60,23 @@ This table contains an overview of all created and tracked AIPs. It should be up
 
 
 ## Types of AIPs
-* Standard
-* Informational
+* Standard: AIPs focusing on the changes to the Aptos blockchain.
+* Informational: AIPs for the purpose of providing additional information, context, supporting details about Aptos blockchain.
 
 ## AIP Statuses
-* Draft
-* In Review
-* Accepted
-* Rejected
-* On Hold
+| Status | Description|
+|:--|:--|
+| `Draft` | Drafts are currently in process and not ready for review. No corresponding GH Issue will be created.|
+| `In Review` | AIPs are ready for community review and feedback. See suggestions on providing feedback below. |
+| `Accepted `| AIPs has been accepted and will be implemented soon. |
+| `Rejected` | A community decision has been made to not move forward with an AIP at this time.| 
+| `On Hold` | Some information is missing or prerequisites have not yet been completed. | 
 
 ## Layer
-* Move Language
 * Framework
 * Core (Blockchain)
+
+## Providing Feedback on an AIP
+* Follow the discussion in the corresponding AIP issue
+* If you were designing this change, what would you want to communicate? Is it being communicated in the AIP?
+* As a community member, how are you impacted by this change? Does it provide enough information about the design and implementation details to assist with decision making? 
