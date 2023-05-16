@@ -60,8 +60,9 @@ Note that because min_inclusion_price = 100 for non-full blocks, observing non-f
 
 ## Reference Implementation
 
-No implementation yet, WIP. The implementation will include config options to make the gas unit price estimation flexible at fullnodes without having to rebuild.
-
+* https://github.com/aptos-labs/aptos-core/pull/8186
+* Compatible changes after AIP-33: https://github.com/aptos-labs/aptos-core/pull/8208
+  
 ## Risks and Drawbacks
 
 - We are being very conservative with how small a full block is classified. This could result in gas fees rising despite moderate load.
