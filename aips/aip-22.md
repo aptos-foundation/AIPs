@@ -3,7 +3,7 @@ aip: 22
 title: No-Code Tokens Objects
 author: davidiw, movekevin, lightmark, capcap
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/31
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional:
 type: Standard (Framework)
 created: 2023/3/18

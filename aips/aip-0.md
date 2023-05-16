@@ -2,7 +2,7 @@
 aip: 0
 title: Aptos Improvement Proposals
 authors: aptos-foundation
-status: draft
+status: Accepted
 type: Informational
 created: 12/05/2022
 updated: 12/07/2022

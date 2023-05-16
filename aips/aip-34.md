@@ -1,11 +1,11 @@
 ---
 aip: 34
 title: Unit Gas Price Estimation
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
-discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: <Draft | Last Call | Accepted | Final | Rejected>
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
+author: bchocho
+discussions-to (*optional): 
+Status: Draft
+last-call-end-date (*optional):
+type: Standard
 created: <mm/dd/yyyy>
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>

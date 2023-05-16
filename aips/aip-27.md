@@ -2,7 +2,7 @@
 aip: 27
 title: Sender Aware Transaction Shuffling
 author: skedia@aptoslabs.com
-Status: Draft
+Status: Accepted
 last-call-end-date: 04/19/2023
 type: Execution
 created: 04/18/2023

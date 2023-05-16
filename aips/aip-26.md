@@ -2,7 +2,7 @@
 aip: 26
 title: Quorum Store
 author: bchocho
-Status: Draft
+Status: Accepted
 last-call-end-date: 04/19/2023
 type: Consensus
 created: 04/18/2023
