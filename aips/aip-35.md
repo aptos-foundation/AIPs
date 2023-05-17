@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 35
 title: Charging Invariant Violation Errors 
 author: runtian@aptoslabs.com
 discussions-to (*optional): <a url pointing to the official discussion thread>
