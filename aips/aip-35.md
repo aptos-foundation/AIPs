@@ -12,25 +12,25 @@ created: 05/17/2023
   
 ## Summary
 
-Charge transactions that triggered invariant violation error instead of discarding them.
+Charge transactions that trigger invariant violation errors instead of discarding them.
 
 ## Motivation
 
-Invariant violation error is a special type of errors that gets triggered in the Aptos VM where some unexpected invariants are being violated. Right now transactions that triggered such error will be marked as discarded which could potentially be a DDoS vector for our network as it leaves users to be able to submit computations without being charged.
+An _invariant violation error_ is a special type of error that gets triggered in the Aptos VM when some unexpected invariants are being violated. Right now, transactions that trigger such errors will be marked as discarded, which could potentially be a DDoS vector for our network as it allows users to submit computations without being charged.
 
-Examples of transactions that could trigger an invariant violation errors are transactions that violates MoveVM's paranoid type checker.
+An example of transactions that could trigger an invariant violation error are transactions that violate MoveVM's paranoid type checker.
 
 ## Impact
 
-User shouldn't be expecting any impact as this is just a precautionary change. We expect that transactions that are compiled from Move compiler shouldn't be affected this change.
+User shouldn't be expecting any impact as this is just a precautionary change. We expect that transactions that are compiled from Move compiler to not be affected by this change.
 
 ## Rationale
 
-The concern that this AIP is trying to address is that if user find a way to create invariant violation error deterministically (which usually indicates a bug in our own implementation), users can send a number of transactions that triggered this behavior without being charged and this would easily consume our computation resource and potentially cause the network to halt. 
+The concern that this AIP is trying to address is that if user finds a way to create an invariant violation error deterministically (which usually indicates a bug in our own implementation), users can send a number of transactions that trigger this behavior without being charged. This would easily consume our computation resources and potentially cause the network to halt. 
 
 ## Specification
 
-The change itself should be straightforward. We jsut need to change the status of invariant violation transactions from discard to keep and make sure we invoke the proper epilogue. The only thing we need to make sure is that we don't mess up with the error translation logic in other error categories, which may cause backward compatibility issue,
+The change itself should be straightforward. We just need to change the status of invariant violation transactions from `discard` to `keep` and make sure we invoke the proper epilogue. The only thing we need to make sure is that we don't mess up with the error translation logic in other error categories, which may cause backward compatibility issues.
 
 ## Reference Implementation
 
@@ -38,7 +38,7 @@ https://github.com/aptos-labs/aptos-core/pull/8213/files
 
 ## Risks and Drawbacks
 
-The potential risk is on the overall maintainablity of the node software. Now that we start to persist those txns, we will need to reproduce the "error" behavior when there is such error. This is mitigatable though as we can mark those transactions to be no longer reproduceable in our testing pipeline.
+The potential risk is on the overall maintainablity of the node software. Now that we start to persist TXNs that cause invariant violation errors, we will need to reproduce the "error" behavior when there is such error. This is mitigatable though as we can mark such transactions to be no longer reproduceable in our testing pipeline.
 
 ## Future Potential
 
@@ -48,7 +48,7 @@ N/A
 
 ### Suggested implementation timeline
 
-Plan to fix it with https://github.com/aptos-labs/aptos-core/pull/8213/files
+We plan to fix it with https://github.com/aptos-labs/aptos-core/pull/8213/files.
   
 ### Suggested developer platform support timeline
 
@@ -56,7 +56,7 @@ N/A
 
 ### Suggested deployment timeline
 
-We are looking into activate this change in 1.5 release on testnet/mainnet.
+We are looking to activate this change in the 1.5 release on testnet/mainnet.
 
 ## Security Considerations
 
@@ -64,5 +64,5 @@ The change will be gated under a feature flag so it won't be activated until a g
 
 ## Testing (optional)
 
-See PRs testing section. A failpoint injection was used to make sure the change is protected by a feature flag.
+See the [PR's](https://github.com/aptos-labs/aptos-core/pull/8213/files) testing section. A failpoint injection was used to make sure the change is protected by a feature flag.
 
