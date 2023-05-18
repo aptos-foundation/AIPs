@@ -4,11 +4,10 @@ title: Tokens as Objects
 author: davidiw, movekevin, lightmark, capcap, kslee8224, neoul
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/31
 Status: Accepted
-last-call-end-date (*optional):
 type: Standard (Framework)
 created: 2023/1/9
 updated: 2023/3/18
-requires: [AIP-10](Move Objects)
+requires: "AIP-10: Move Objects"
 ---
 
 # AIP-11 - Tokens as Objects
