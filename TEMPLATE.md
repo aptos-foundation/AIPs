@@ -67,6 +67,7 @@ On mainnet?
 
 ## Security Considerations
 
+Has this change being audited by any auditing firm? 
 Any potential scams? What are the mitigation strategies?
 Any security implications/considerations?
 Any security design docs or auditing materials that can be shared?
