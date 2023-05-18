@@ -44,7 +44,9 @@ We take into account if blocks are “full”; if blocks are not full, then we s
 
 ### Minimum gas unit price for inclusion in block
 
-Each block has a minimum gas unit price (min_price), i.e., the lowest gas unit price of all transactions in the block. If a transaction had been submitted at the same time as the block with minimum gas unit price for inclusion min_inclusion_price = min_price + 1, then it would have been included in the block; we use this formula for full blocks. For non-full blocks, we simply set min_inclusion_price = 100, which is the minimum system gas price.
+Each block has a minimum inclusion price (min_inclusion_price), i.e., the lowest gas unit price that would have guaranteed inclusion in the block. For non-full blocks, we simply set min_inclusion_price = 100, which is the minimum system gas unit price. This is because a transaction would have been included regardless of the gas unit price.
+
+For full blocks, we take the smallest gas unit price in the block and then bump up the gas bucket, taking the minimum end of the next gas bucket. This is because transactions are batched within buckets during dissemination, both at mempool and Quorum Store, so the minimum guaranteed inclusion is a higher bucket.
 
 ### Objectives and formulas
 
@@ -54,9 +56,31 @@ We define the following loose objectives, and their formulas below. A call to th
 - Market: Take the p50 of the min_inclusion_price across the last 30 blocks.
 - Aggressive: Take the p90 of the min_inclusion_price across the last 120 blocks. Additionally, round up to the next gas bucket.
 
-The more aggressive values look at a larger time window and take a higher percentile, to increase confidence that the transactions will be included in the next few blocks. The most aggressive value also takes into account gas buckets, which are used to prioritize dissemination in mempool and Quorum Store — so this adds confidence that the transaction dissemination will not be delayed.
+The more aggressive values look at a larger time window and take a higher percentile, to increase confidence that the transactions will be included in the next few blocks. The most aggressive value also bumps up an additional gas bucket, adding confidence that the transaction dissemination will not be delayed.
 
 Note that because min_inclusion_price = 100 for non-full blocks, observing non-full blocks will reset all three values regardless of the gas fees used in the transactions, e.g., low will reset with any non-full block in the past 10 blocks, market will reset when 15 out of the last 30 blocks are non-full, and aggressive will reset when 108 out of the last 120 blocks are non-full.
+
+### Examples
+
+We illustrate how this works in different scenarios, we present some simple examples, using the current system configs.
+
+(A) The blockchain is lightly loaded, so has no full blocks within the last 120 blocks. The estimation is:
+
+- Low: 100 (= minimum system gas unit price)
+- Market: 100
+- Aggressive: 150 (= minimum of next bucket)
+
+(B) The blockchain is heavily loaded, with only full blocks within the last 120 blocks, but with all transactions using the lowest gas unit price. The estimation is:
+
+- Low: 150 (= minimum of next bucket > 100)
+- Market: 150
+- Aggressive: 300 (= minimum of next bucket > 150)
+
+(B) The blockchain is moderately loaded, similar to above, but at least one non-full block in the last 10 blocks. The estimation is:
+
+- Low: 100 (= minimum system gas unit price)
+- Market: 150 (= minimum of next bucket > 100)
+- Aggressive: 300 (= minimum of next bucket > 150)
 
 ## Reference Implementation
 
