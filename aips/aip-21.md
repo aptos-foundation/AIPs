@@ -11,21 +11,21 @@ created: 04/11/2022
 
 ## Summary
 
-This AIP proposes a standard for Fungible Assets (FA) using Move Objects. In this model, any on-chain asset represented as an object can also be expressed as a fungible asset allowing for a single object to be represented by many distinct, yet interchangeable units of ownership.
+This AIP proposes a standard for Fungible Assets (FA) using [Move Objects](/aips/aip-10.md). In this model, any on-chain asset represented as an object can also be expressed as a fungible asset allowing for a single object to be represented by many distinct, yet interchangeable units of ownership.
 
 ## Motivation
 
-Deriving fungible assets out of objects allows for both a seamless developer experience but also simplifies application development time. This standard supports potential applicatoins like
+Deriving fungible assets out of objects allows for both a seamless developer experience but also simplifies application development time. This standard supports potential applications like
 
 - The tokenization of securities and commodities provides fractional ownership.
 - Ownership of real estate, enabling fractional ownership and providing liquidity to the traditionally illiquid market.
 - In-game assets such as virtual currencies and characters can be tokenized, enabling players to own and trade their assets, creating new revenue streams for game developers and players.
 
-Besides aforementioned features, a fungible asset provides a super set of existing Aptos Coin standard concepts along with properties, common to objects, that ensure that healthy ecosystems can be formed around these assets.
+Besides aforementioned features, a fungible asset provides a superset of existing Aptos Coin standard concepts along with properties, common to objects, that ensure that healthy ecosystems can be formed around these assets.
 
 ## Rationale
 
-The rationale is two-folds:
+The rationale is two-fold:
 
 Since Mainnet launch, the existing coin module has been deemed insufficient for current and future needs due to the rigidity of Move structs and the inherently poor extensibility. For example, there's no mechanism that enforces transfers take a certain path or that only certain parties may own said assets. In short, the existing model of authorization management is not flexible enough to enable creative innovations of fungible asset policy.
 
@@ -91,7 +91,7 @@ Each account can own multiple `FungibleStore`s but only one is primary and the r
 
 The key features of a primary store are:
 
-1. The primary store object address is deterministic so that transactions cam seamlessly access with knowledage of owner's account address.
+1. The primary store object address is deterministic so that transactions can seamlessly access with knowledge of owner's account address.
 2. Primary stores will be created upon transferring of assets if they do not exist.
 3. A primary store cannot be deleted.
 
@@ -147,7 +147,7 @@ public entry fun transfer<T: key>(sender: & signer, metadata: Object<T>, recipie
 
 - Making an asset fungible is not an irreversible operation and there is no way to clear the fungible asset data if not
   needed any more. Though one could burn all representations of that fungible asset.
-- The use of primary stores has some implication on performance as the application must perform a sha-256 hashing algorithm to access each asset in a transaction. At the same time, object indexers are still in their infancy and secondary stores are not readily available.
+- The use of primary stores has some implication on performance as the application must perform a SHA-256 hashing algorithm to access each asset in a transaction. At the same time, object indexers are still in their infancy and secondary stores are not readily available.
 
 ## Future Potential
 
@@ -155,4 +155,4 @@ As this standard stabilizies, we anticipate SDK and indexing solutions to elimin
 
 ## Suggested deployment timeline
 
-on Devnet by early April, on Testnet by mid April and Mainnet by early May.
+On Devnet by early April, on Testnet by mid April and Mainnet by early May.
