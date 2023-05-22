@@ -120,7 +120,7 @@ const verifyCode = async (address, moduleName, compiler, network, file) => {
 
 ## Future Potential
 
-Acceptance of this proposal will be a positive step in fostering the growth and maturity of the Aptos network. As many developers are already utilizing code verification on Etherscan, introducing such a feature to the Aptos network will benefit its users as well.
+Acceptance of this proposal will be a positive step in fostering the growth and maturity of the Aptos network. In the case of Ethereum, it has been proven that most developers are already utilizing code verification on explorer. Therefore, introducing such a feature to the Aptos network will also benefit its users.
 
 Once the API is widely adopted, all smart contracts operating on the Aptos network will be verified through it. This will enable both developers and users to have a higher level of confidence in the safety of smart contracts.
 
