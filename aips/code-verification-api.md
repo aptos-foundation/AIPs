@@ -49,7 +49,6 @@ For verification of the smart contract code, developers must send a **`POST`** r
 
 - **`address`**: The address where the smart contract to be verified is deployed.
 - **`moduleName`**: The name of the module to be verified.
-- **`file`**: The Move.toml file of the smart contract to be verified.
 - **`compilerVersion`**: The version of the Move compiler used for compilation.
 - **`network`**: The name of the network where the smart contract is deployed.
 
@@ -68,7 +67,7 @@ The API returns the verification result in JSON format. The response body includ
 ## Operation Details(example)
 
 - Users request verification for a specific module in the explorer.
-- When making a request, parameters such as account, module, compiler version, and Move.toml file are sent together.
+- When making a request, parameters such as address, network, module name, and compiler version are sent together.
 - The API server compiles the on-chain metadata based on user information and compares it to the on-chain bytecode.
 - Results such as isMatched, isImmutable, etc., are returned.
 - The explorer stores the verification status in the Database for utilization.
@@ -82,18 +81,18 @@ import axios from 'axios';
 
 const API_ENDPOINT = 'https://your-api-url.com/verification';
 
-const verifyCode = async (address, moduleName, compiler, network, file) => {
-  const formData = new FormData();
-  formData.append('address', address);
-  formData.append('moduleName', moduleName);
-  formData.append('file', file);
-  formData.append('compilerVersion', compiler);
-  formData.append('network', network);
+const verifyCode = async (address, moduleName, compiler, network) => {
+  const data = {
+    address: address,
+    moduleName: moduleName,
+    compilerVersion: compiler,
+    network: network
+  };
 
   try {
     const response = await axios.post(API_ENDPOINT, formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        'Content-Type': 'application/json',
       },
     });
 
