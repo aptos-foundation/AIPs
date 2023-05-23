@@ -108,7 +108,7 @@ const verifyCode = async (address, moduleName, compiler, network) => {
 ```tsx
 {
   "address": "0xf85abc9014147f788f3151e900ef835d5d083ff5e1844382a8b1a488dcb5440e",
-  "chainId": "devnet",
+  "network": "devnet",
   "isMatched": true,
   "isImmutable": true,
   "module": "BasicCoin1",
