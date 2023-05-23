@@ -50,7 +50,7 @@ For verification of the smart contract code, developers must send a **`POST`** r
 - **`address`**: The address where the smart contract to be verified is deployed.
 - **`moduleName`**: The name of the module to be verified.
 - **`file`**: The Move.toml file of the smart contract to be verified.
-- **`compilerVerion`**: The version of the Move compiler used for compilation.
+- **`compilerVersion`**: The version of the Move compiler used for compilation.
 - **`network`**: The name of the network where the smart contract is deployed.
 
 ### **Response**
@@ -58,7 +58,7 @@ For verification of the smart contract code, developers must send a **`POST`** r
 The API returns the verification result in JSON format. The response body includes the following fields:
 
 - **`address`**: The address of the verified smart contract.
-- **`chainId`**: The name of the network where the verification took place.
+- **`network`**: The name of the network where the verification took place.
 - **`isMatched`**: Whether the smart contract code matches the deployed bytecode.
 - **`isImmutable`**: Whether the smart contract is immutable.
 - **`module`**: The name of the verified module.
@@ -87,7 +87,7 @@ const verifyCode = async (address, moduleName, compiler, network, file) => {
   formData.append('address', address);
   formData.append('moduleName', moduleName);
   formData.append('file', file);
-  formData.append('compilerVerion', compiler);
+  formData.append('compilerVersion', compiler);
   formData.append('network', network);
 
   try {
