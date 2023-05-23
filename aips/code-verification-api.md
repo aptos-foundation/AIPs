@@ -7,7 +7,7 @@ Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Informational
 created: 5/22/2023
-updated (*optional): <mm/dd/yyyy>
+updated (*optional): 5/23/2023
 requires (*optional): <AIP number(s)>
 ---
 
@@ -59,7 +59,6 @@ The API returns the verification result in JSON format. The response body includ
 - **`address`**: The address of the verified smart contract.
 - **`network`**: The name of the network where the verification took place.
 - **`isMatched`**: Whether the smart contract code matches the deployed bytecode.
-- **`isImmutable`**: Whether the smart contract is immutable.
 - **`module`**: The name of the verified module.
 - **`package`**: The name of the verified package.
 - **`txHash`**: The hash value of the smart contract deployment transaction.
@@ -69,7 +68,7 @@ The API returns the verification result in JSON format. The response body includ
 - Users request verification for a specific module in the explorer.
 - When making a request, parameters such as address, network, module name, and compiler version are sent together.
 - The API server compiles the on-chain metadata based on user information and compares it to the on-chain bytecode.
-- Results such as isMatched, isImmutable, etc., are returned.
+- Results such as isMatched are returned.
 - The explorer stores the verification status in the Database for utilization.
 
 ## Reference Implementation
@@ -110,7 +109,6 @@ const verifyCode = async (address, moduleName, compiler, network) => {
   "address": "0xf85abc9014147f788f3151e900ef835d5d083ff5e1844382a8b1a488dcb5440e",
   "network": "devnet",
   "isMatched": true,
-  "isImmutable": true,
   "module": "BasicCoin1",
   "package": "BasicCoin1",
   "txHash": "0xb8b5ec79703b9a31a03c47572f7a2aff6906ddc4a980948429ef04dda960d291"
