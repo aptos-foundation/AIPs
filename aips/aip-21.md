@@ -44,19 +44,19 @@ Fungible assets addresses these issues.
 #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
 /// Define the metadata required of an metadata to be fungible.
 struct Metadata has key {
-/// The current supply of the fungible asset.
-supply: u64,
-/// The maximum supply limit where `option::none()` means no limit.
-maximum: Option<u64>,
-/// Name of the fungible metadata, i.e., "USDT".
-name: String,
-/// Symbol of the fungible metadata, usually a shorter version of the name.
-/// For example, Singapore Dollar is SGD.
-symbol: String,
-/// Number of decimals used for display purposes.
-/// For example, if `decimals` equals `2`, a balance of `505` coins should
-/// be displayed to a user as `5.05` (`505 / 10 ** 2`).
-decimals: u8,
+    /// The current supply of the fungible asset.
+    supply: u64,
+    /// The maximum supply limit where `option::none()` means no limit.
+    maximum: Option<u64>,
+    /// Name of the fungible metadata, i.e., "USDT".
+    name: String,
+    /// Symbol of the fungible metadata, usually a shorter version of the name.
+    /// For example, Singapore Dollar is SGD.
+    symbol: String,
+    /// Number of decimals used for display purposes.
+    /// For example, if `decimals` equals `2`, a balance of `505` coins should
+    /// be displayed to a user as `5.05` (`505 / 10 ** 2`).
+    decimals: u8,
 }
 ```
 
@@ -69,12 +69,12 @@ a [hot potato](https://medium.com/@borispovod/move-hot-potato-pattern-bbc48a48d9
 #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
 /// The store object that holds fungible assets of a specific type associated with an account.
 struct FungibleStore has key {
-/// The address of the base metadata object.
-metadata: Object<Metadata>,
-/// The balance of the fungible metadata.
-balance: u64,
-/// If true, owner transfer is disabled that only `TransferRef` can move in/out from this store.
-frozen: bool,
+    /// The address of the base metadata object.
+    metadata: Object<Metadata>,
+    /// The balance of the fungible metadata.
+    balance: u64,
+    /// If true, owner transfer is disabled that only `TransferRef` can move in/out from this store.
+    frozen: bool,
 }
 
 /// FungibleAsset can be passed into function for type safety and to guarantee a specific amount.
