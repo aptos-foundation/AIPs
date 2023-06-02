@@ -2,13 +2,13 @@
 aip: 36
 title: Universally Unique Identifiers
 authors: satya@aptoslabs.com, ikabiljo@aptoslabs.com
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/154
 Status: Draft
 type: Standard
 created: 06/01/2023
 ---
 
-# AIP X - Universally Unique Identifiers
+# AIP 36 - Universally Unique Identifiers
 
 ## Summary
 
