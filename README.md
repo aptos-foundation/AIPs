@@ -56,6 +56,8 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 32](https://github.com/aptos-foundation/AIPs/issues/127) | Core | [Storage Deletion Refund](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-32.md) | Standard | Draft |
 | [AIP 33](https://github.com/aptos-foundation/AIPs/issues/132) | Core | [Block Gas Limit](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-33.md) | Standard | Draft |
 | [AIP 34](https://github.com/aptos-foundation/AIPs/issues/134)| Core | [Unit Gas Price Estimation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-34.md) | Standard | Draft |
+| [AIP 35](https://github.com/aptos-foundation/AIPs/issues/144)| Core | [Charging Invariant Violation Errors](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-35.md) | Standard | Draft |
+| [AIP 36](https://github.com/aptos-foundation/AIPs/issues/154)| Core | [Universally Unique Identifiers](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-36.md) | Standard | Draft |
 | ... | ... |
 
 
