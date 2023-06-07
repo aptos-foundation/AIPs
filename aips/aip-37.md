@@ -1,6 +1,6 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: (AIP title)
+aip: 37
+title: Filter duplicate transactions within a block
 author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: <Draft | Last Call | Accepted | Final | Rejected>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Filter duplicate transactions within a block
+# AIP-37 - Filter duplicate transactions within a block
 
 ## Motivation
 
