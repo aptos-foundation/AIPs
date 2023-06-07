@@ -2,7 +2,7 @@
 aip: 21
 title: Fungible Assets
 author: lightmark, movekevin, davidiw
-Status: Draft
+Status: Accepted
 type: Standard (Framework)
 created: 04/11/2022
 ---

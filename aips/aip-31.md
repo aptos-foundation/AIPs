@@ -3,7 +3,7 @@ aip: 31
 title: Allowlisting for delegation pool
 author: wintertoro, michelle-aptos, xingdingw
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+Status: On Hold
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Framework
 created: 5/3/2023
