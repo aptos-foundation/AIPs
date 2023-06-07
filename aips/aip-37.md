@@ -5,7 +5,7 @@ author: bchocho
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
+type: Standard Core
 created: 06/06/2023
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
