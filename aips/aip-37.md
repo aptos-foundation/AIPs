@@ -1,12 +1,12 @@
 ---
 aip: 37
 title: Filter duplicate transactions within a block
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
+author: bchocho
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: <Draft | Last Call | Accepted | Final | Rejected>
+Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
-created: <mm/dd/yyyy>
+created: 06/06/2023
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
