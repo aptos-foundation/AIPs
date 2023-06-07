@@ -1,5 +1,5 @@
 ---
-aip: 
+aip: 38
 title: Deprecate Storage Gas Curve
 author: msmouse
 discussions-to (*optional):
@@ -8,7 +8,7 @@ type: Core
 created: 06/07/2023
 ---
 
-# AIP-X - Deprecate storage gas curves
+# AIP-38 - Deprecate storage gas curves
 
 ## Summary
 
