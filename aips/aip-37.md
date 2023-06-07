@@ -4,11 +4,10 @@ title: Filter duplicate transactions within a block
 author: bchocho
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard Core
 created: 06/06/2023
 updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+requires (*optional): AIP-26
 ---
 
 # AIP-37 - Filter duplicate transactions within a block

@@ -42,7 +42,7 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 18](https://github.com/aptos-foundation/AIPs/issues/82) | Framework | [Introducing SmartVector and SmartTable to apto_std](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-18.md) | Standard | Accepted |
 | [AIP 19](https://github.com/aptos-foundation/AIPs/issues/85) | Framework | [Enable updating commission_percentage in staking_contract module](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-19.md) | Standard | Accepted |
 | [AIP 20](https://github.com/aptos-foundation/AIPs/issues/94) | Framework | [Generic Cryptography Algebra and BLS12-381 Implementation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-20.md) | Standard | Accepted |
-| [AIP 21](https://github.com/aptos-foundation/AIPs/issues/95) | Framework | [Fungible Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-21.md) | Standard | Draft |
+| [AIP 21](https://github.com/aptos-foundation/AIPs/issues/95) | Framework | [Fungible Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-21.md) | Standard | Accepted |
 | [AIP 22](https://github.com/aptos-foundation/AIPs/issues/101) | Framework | [No-Code Token Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-22.md) | Standard | Accepted |
 | [AIP 23](https://github.com/aptos-foundation/AIPs/issues/102) | Framework | [Make Ed25519 public key validation native return `false` if key has the wrong length](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-23.md) | Standard | Accepted |
 | [AIP 24](https://github.com/aptos-foundation/AIPs/issues/103) | Framework | [Move Library Updates](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-24.md) | Standard | Accepted |
@@ -50,14 +50,16 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 26](https://github.com/aptos-foundation/AIPs/issues/108) | Core | [Quorum Store](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-26.md) | Standard | Accepted |
 | [AIP 27](https://github.com/aptos-foundation/AIPs/issues/109) | Core | [Sender Aware Transaction Shuffling](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-27.md) | Standard | Accepted |
 | [AIP 28](https://github.com/aptos-foundation/AIPs/issues/1170) | Framework | [Partial voting for on chain governance](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-28.md) | Standard | Draft |
-| [AIP 29](https://github.com/aptos-foundation/AIPs/issues/118) | Core | [Peer monitoring service](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-29.md) | Informational | Draft |
+| [AIP 29](https://github.com/aptos-foundation/AIPs/issues/118) | Core | [Peer monitoring service](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-29.md) | Informational | Accepted |
 | [AIP 30](https://github.com/aptos-foundation/AIPs/issues/119) | Framework | [Implement decrease in staking rewards](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-30.md) | Standard | Draft |
-| [AIP 31](https://github.com/aptos-foundation/AIPs/issues/121) | Framework | [Allowlisting for delegation pool](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-31.md) | Standard | Draft |
-| [AIP 32](https://github.com/aptos-foundation/AIPs/issues/127) | Core | [Storage Deletion Refund](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-32.md) | Standard | Draft |
+| [AIP 31](https://github.com/aptos-foundation/AIPs/issues/121) | Framework | [Allowlisting for delegation pool](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-31.md) | Standard | On Hold |
+| [AIP 32](https://github.com/aptos-foundation/AIPs/issues/127) | Core | [Storage Deletion Refund](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-32.md) | Standard | On Hold |
 | [AIP 33](https://github.com/aptos-foundation/AIPs/issues/132) | Core | [Block Gas Limit](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-33.md) | Standard | Draft |
 | [AIP 34](https://github.com/aptos-foundation/AIPs/issues/134)| Core | [Unit Gas Price Estimation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-34.md) | Standard | Draft |
-| [AIP 35](https://github.com/aptos-foundation/AIPs/issues/144)| Core | [Charging Invariant Violation Errors](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-35.md) | Standard | Draft |
+| [AIP 35](https://github.com/aptos-foundation/AIPs/issues/144)| Core | [Charging Invariant Violation Errors](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-35.md) | Standard | Accepted |
 | [AIP 36](https://github.com/aptos-foundation/AIPs/issues/154)| Core | [Universally Unique Identifiers](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-36.md) | Standard | Draft |
+| [AIP 37](https://github.com/aptos-foundation/AIPs/issues/160)| Core | [Filter duplicate transactions within a block](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-37.md) | Standard | Draft |
+| [AIP 38](https://github.com/aptos-foundation/AIPs/issues/154)| Core | [Deprecate Storage Gas Curves](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-38.md) | Standard | Draft |
 | ... | ... |
 
 
