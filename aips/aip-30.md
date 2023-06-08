@@ -14,11 +14,20 @@ updated (*optional): 5/3/2023
 
 ## Summary
 
-This AIP proposes a 1.5% yearly decrease in staking rewards, which is part of the Aptos tokenomics requirement. 
+Currently, the maximum staking reward rate is a constant annualized rate of 7%. This AIP proposes a 1.5% yearly decrease in staking rewards:
+- The maximum reward rate declines by 1.5% yearly until a lower bound of 3.25% annually (expected to take over 50 years).
+- 
+
+For example:
+- Maximum reward rate in the 1st year(year starts from genesis timestam 2023/10/12): $7\%$
+- Maximum reward rate in the 2nd year: $7\% * (100\%-1.5\%) = 6.895\%$
+- Maximum reward rate in the 3rd year: $7\% * (100\%-1.5\%)^2 = 6.791575\%$
+- ...
+- Maximum reward rate in the 52nd year: $max\{3.25\%, 7\% * (100\%-1.5\%)^{51}\} = 3.25\%$
 
 ## Motivation
 
-Currently, the maximum reward rate starts at 7% annually and is evaluated at every epoch. The maximum reward rate declines by 1.5% annually until a lower bound of 3.25% annually (expected to take over 50 years).
+To fully align with [Aptos tokenomics overview](https://aptosfoundation.org/currents/aptos-tokenomics-overview).
 
 ## Rationale
 
@@ -29,7 +38,7 @@ Currently, the maximum reward rate starts at 7% annually and is evaluated at eve
 
 **Alternative solutions:**
 
-1. We can compute gradual decreases throughout the year, but this would make rewards calculations more complex 
+1. We can compute gradual decreases throughout the year(e.g. every 30 days), but this would make rewards calculations more complex 
 
 ## Reference Implementation
 
