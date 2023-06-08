@@ -17,9 +17,9 @@ requires (*optional):
 
 This is a bundle of 3 intended changes:
 
- - add support for computing the [Blake2b-256 hash function](https://github.com/aptos-labs/aptos-core/pull/5436) in Move smart contracts
- - add support for computing [SHA2-512, SHA3-512 and RIPEMD-160 hash functions](https://github.com/aptos-labs/aptos-core/pull/4181) in Move smart contracts
- - upgraded [MultiEd25519 PK validation](https://github.com/aptos-labs/aptos-core/pull/5822) to V2 address a bug where a PK with 0 sub-PKs would've been considered valid by our 
+ - Add support for computing the [Blake2b-256 hash function](https://github.com/aptos-labs/aptos-core/pull/5436) in Move smart contracts
+ - Add support for computing [SHA2-512, SHA3-512 and RIPEMD-160 hash functions](https://github.com/aptos-labs/aptos-core/pull/4181) in Move smart contracts
+ - Upgraded [MultiEd25519 PK validation](https://github.com/aptos-labs/aptos-core/pull/5822) to address a bug where a PK with 0 sub-PKs would've been considered valid. Specifically:
    - deprecates `0x1::multi_ed25519::public_key_validate` API
    - deprecates `0x1::multi_ed25519::new_validated_public_key_from_bytes` API
    - introduces `0x1::multi_ed25519::public_key_validate_v2` API
@@ -34,7 +34,7 @@ Support for the new hash functions will be useful when building bridges to other
 For example, computing Bitcoin addresses requires evaluating a RIPEMD-160 hash (see [here](https://en.bitcoin.it/wiki/Protocol_documentation#Addresses)).
 If we do not accept this proposal, building bridges to other chains (as well other cryptographic applications) will be costly gas-wise, as per conversations with companies like Composable.Finance.
 
-### MultiEd25519 V2 PK validation
+### MultiEd25519 PK validation V2
 
 The PK validation bug would've broken the type safety of our `0x1::multi_ed25519::ValidatedPublicKey` struct type, which is supposed to guaranteed that a PK is well-formed which among, other things, requires that the # of sub-PKs be greater than 0.
 
@@ -70,11 +70,13 @@ Although this example is far-fetched (since developers will likely rely on `0x1:
 
 **Q:** Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
 
-**A:** The hash functions just adds new functionality, so no alternatives were considered. The MultiEd25519 change is a bugfix. The alternative would have been not to fix it which, as argued above, is not ideal.
+**A:** Regarding the new hash functions, we are merely adding new functionality. No alternatives needed to be considered. 
+
+The MultiEd25519 change is a bugfix. The alternative would have been not to fix it which, as argued above, is not ideal.
 
 ## Specification
 
-The hash function and MultiEd25519 APIs are properly documented as part of the reference implementation below.
+The hash function APIs and the MultiEd25519 APIs are properly documented as part of the reference implementation below.
 
 ## Reference Implementation
 
@@ -92,7 +94,7 @@ The hash function and MultiEd25519 APIs are properly documented as part of the r
 
 ## Future Potential
 
-The hash functions could be used for many cryptographic applications on chains (e.g., verifying zk-STARK proofs).
+The hash functions could be used for many cryptographic applications on-chain (e.g., verifying zk-STARK proofs).
 
 ## Suggested implementation timeline
 
