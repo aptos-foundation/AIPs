@@ -16,7 +16,7 @@ Now that **[AIP-17](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-
 
 ## Motivation
 
-The storage gas curves are no longer necessary (see Rationale), and keeping them will still make the state read / write related gas charges increase with the growth of the global state storage, which makes the pricing unnecessarily unstable without a meaningful effect of protect the DB. The motivation of deprecating the cureves is to remove the unstablizing effects on the gas pricing from them.
+The storage gas curves are no longer necessary (see Rationale), and keeping them will still make the state read / write related gas charges increase with the growth of the global state storage, which makes the pricing unnecessarily unstable without a meaningful effect of protect the DB. The motivation of deprecating the curves is to remove the unstablizing effects on the gas pricing from them.
 
 ## Impact
 
