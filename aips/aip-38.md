@@ -40,7 +40,7 @@ Notice that we don’t distinguish a new allocation and a modification of an exi
 
 ## Reference Implementation
 
-[TBD]
+https://github.com/aptos-labs/aptos-core/pull/8605
 
 ## Risks and Drawbacks
 
