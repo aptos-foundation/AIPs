@@ -36,10 +36,10 @@ The cleanest solution proposed here is to extend the multi-agent transaction sem
 
 The main benefit of this approach is minimal code changes required both in the Aptos VM (where gas is charged) and in SDK. This approach is more of an extension to multi-agent transactions than a new transaction type. The developer flow works as below:
 
-1. To send a transfer of USDC from 0xsender to 0xreceiver where a separate account 0xpayer pays for gas, the app can first construct a multi-agent transaction with the standard payload (entry function 0x1::aptos_account::transfer_coins where the sender is 0xsender). The address 0xpayer needs to be inserted to the list of sender addresses to indicate that 0xpayer is the gas payer. Note that 0x1::aptos_account::transfer_coins takes a singer signer, which would be 0xsender.
+1. To send a transfer of USDC from 0xsender to 0xreceiver where a separate account 0xpayer pays for gas, the app can first construct a multi-agent transaction with the standard payload (entry function 0x1::aptos_account::transfer_coins where the sender is 0xsender). The address 0xpayer needs to be inserted to the list of sender addresses to indicate that 0xpayer is the gas payer. Note that 0x1::aptos_account::transfer_coins takes a single signer, which would be 0xsender.
 2. The app can prompt the user to sign the transaction payload with their account 0xsender
 3. The payload and the signature can then be passed to the server side where 0xpayer will review and sign the transaction.
-4. The transaction is now complete. 0xsender can send the transaction themselves or passes back to the client side for the user to submit it themselves. Either way, gas will be deducted from 0xpayer and the transaction will be executed in the context of 0xsender, using their account’s nonce and signer.
+4. The transaction is now complete. 0xpayer can send the transaction themselves or passes back to the client side for the user (0xsender) to submit it themselves. Either way, gas will be deducted from 0xpayer and the transaction will be executed in the context of 0xsender, using their account’s nonce and signer.
 
 The implementation is relatively straightforward:
 
