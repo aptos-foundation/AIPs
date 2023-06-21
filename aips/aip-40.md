@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 40
 title: Address Standard v1
 author: banool
 discussions-to (*optional):
@@ -11,7 +11,7 @@ updated (*optional):
 requires (*optional):
 ---
 
-# AIP-X - Address Standard v1
+# AIP-40 - Address Standard v1
 
 ## Summary
 This standard defines the following:
