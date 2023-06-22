@@ -140,7 +140,7 @@ Each object is stored in its own address represented by `Object<T>`. The underly
     - Abilities: `drop, store`
     - Data layout `{ self: ObjectId }`
 - `LinearTransferRef`
-    - Used to perform transferss.
+    - Used to perform transfers.
     - Enforces an entity can only transfer once, assuming that they do not have direct access to `TransferRef`
     - Abilities: `drop`
     - Data layout `{ self: ObjectId, owner: address }`

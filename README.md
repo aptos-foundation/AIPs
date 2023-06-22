@@ -49,9 +49,9 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 25](https://github.com/aptos-foundation/AIPs/issues/104) | Framework | [Transaction Argument Support for Structs](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-25.md) | Standard | Accepted |
 | [AIP 26](https://github.com/aptos-foundation/AIPs/issues/108) | Core | [Quorum Store](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-26.md) | Standard | Accepted |
 | [AIP 27](https://github.com/aptos-foundation/AIPs/issues/109) | Core | [Sender Aware Transaction Shuffling](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-27.md) | Standard | Accepted |
-| [AIP 28](https://github.com/aptos-foundation/AIPs/issues/1170) | Framework | [Partial voting for on chain governance](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-28.md) | Standard | Draft |
+| [AIP 28](https://github.com/aptos-foundation/AIPs/issues/1170) | Framework | [Partial voting for on chain governance](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-28.md) | Standard | Accepted |
 | [AIP 29](https://github.com/aptos-foundation/AIPs/issues/118) | Core | [Peer monitoring service](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-29.md) | Informational | Accepted |
-| [AIP 30](https://github.com/aptos-foundation/AIPs/issues/119) | Framework | [Implement decrease in staking rewards](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-30.md) | Standard | Draft |
+| [AIP 30](https://github.com/aptos-foundation/AIPs/issues/119) | Framework | [Implement decrease in staking rewards](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-30.md) | Standard | Accepted |
 | [AIP 31](https://github.com/aptos-foundation/AIPs/issues/121) | Framework | [Allowlisting for delegation pool](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-31.md) | Standard | On Hold |
 | [AIP 32](https://github.com/aptos-foundation/AIPs/issues/127) | Core | [Storage Deletion Refund](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-32.md) | Standard | On Hold |
 | [AIP 33](https://github.com/aptos-foundation/AIPs/issues/132) | Core | [Block Gas Limit](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-33.md) | Standard | Draft |
@@ -60,6 +60,8 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 36](https://github.com/aptos-foundation/AIPs/issues/154)| Core | [Universally Unique Identifiers](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-36.md) | Standard | Draft |
 | [AIP 37](https://github.com/aptos-foundation/AIPs/issues/160)| Core | [Filter duplicate transactions within a block](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-37.md) | Standard | Draft |
 | [AIP 38](https://github.com/aptos-foundation/AIPs/issues/154)| Core | [Deprecate Storage Gas Curves](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-38.md) | Standard | Draft |
+| [AIP 39](https://github.com/aptos-foundation/AIPs/issues/173)| Core | [Separate gas payer](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-39.md) | Standard | Draft |
+| AIP 40| Core | [Address Standard v1](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-40.md) | Standard | Draft |
 | ... | ... |
 
 

@@ -1,6 +1,6 @@
 ---
 aip: 38
-title: Deprecate Storage Gas Curve
+title: Deprecate Storage Gas Curves
 author: msmouse
 discussions-to (*optional):
 Status: Draft
@@ -12,23 +12,24 @@ created: 06/07/2023
 
 ## Summary
 
-Now that **[AIP-17](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-17.md)** has deployed, it’s no longer necessary to leverage the [storage gas curves](https://github.com/aptos-labs/aptos-core/blob/0a2aba9f2b1755356caa21d31a56742518a9e327/aptos-move/framework/aptos-framework/sources/storage_gas.move#L1) to protect the storage from being filled quickly due to gas prices going super cheap. Proposing here to deprecate the curves and make IO gas prices stable.
+Now that **[AIP-17](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-17.md)** has deployed, storage space cost (the storage fee) is decoupled from gas pricing, it’s no longer necessary to leverage the [storage gas curves](https://github.com/aptos-labs/aptos-core/blob/0a2aba9f2b1755356caa21d31a56742518a9e327/aptos-move/framework/aptos-framework/sources/storage_gas.move#L1) to dynamically increase storage gas charges according to total state storage usage in order to protect against state explosion. Proposing here to deprecate the curves and make IO gas prices stable.
 
 ## Motivation
 
-To stabilize IO gas charges, free of price increments due to the existence of the curves. 
+The storage gas curves are no longer necessary (see Rationale), and keeping them will still make the state read / write related gas charges increase with the growth of the global state storage, which makes the pricing unnecessarily unstable without a meaningful effect of protect the DB. The motivation of deprecating the curves is to remove the unstablizing effects on the gas pricing from them.
 
 ## Impact
 
-The mainnet haven’t had a large enough state to trigger the initial price increment from the curves. Proposed is to set IO related gas charges that used to be governed dynamically by the curves to static values in the global gas schedule, mostly same values with the initial values on the curves (but a bit lower, see the specification section).
+The mainnet haven’t had a large enough state to trigger the initial price increment from the curves. Proposed is to set IO related gas charges that used to be governed dynamically by the curves to static values in the global gas schedule, mostly same values with the initial values on the curves (but a bit lower, see the specification section). 
+
+The testnet had the curve kicked in already but will be realigned with mainnet after this deprecation is applied.
 
 ## Rationale
-
-Read the storage curve [documentation](https://github.com/aptos-labs/aptos-core/blob/0a2aba9f2b1755356caa21d31a56742518a9e327/aptos-move/framework/aptos-framework/sources/storage_gas.move#L1) for the rationale of it. But in spirit back then when storage allocation cost was governed by gas price changes just like other aspects of the transaction cost, lowering the overall gas price put the storage to the danger of being filled for cheap. The gas curves were a defensive mechanism protecting the DB in case we lower the gas pricing. After AIP-17, such needs are gone in that: 1. the storage allocation are now governed by the storage fees which are decoupled from gas pricing, and 2. the IO gas charges are still under the control of the curves which doesn’t make sense anymore. So, we are cleaning it up, with the added benefit of a more stable gas schedule.
+At Aptos launch, storage allocation and access are both charged according to the regular user specified gas pricing, which is expected to be low while the network throughput is low, which makes it possible to fill the blockchain storage space for cheap. The [storage curves](https://github.com/aptos-labs/aptos-core/blob/0a2aba9f2b1755356caa21d31a56742518a9e327/aptos-move/framework/aptos-framework/sources/storage_gas.move#L1) were put in place to dynamically increase the storage gas prices with the growth of the global state storage, providing economic pressure against allocating new storage space. **[AIP-17](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-17.md)** were proposed and implemented so that an additional category of charges, i.e. the storage fees, were imposed which are priced in absolute native token values hence decoupled from the user specified gas unit price. Now storage gas charges (excluding for the storage fees) cover only the transient aspects of storage accesss costs (IO and bandwidth), and should not increase according to storage space usage growth. However they are still being changed dynamically according to the storage gas curves in place.
 
 ## Specification
 
-Adding these dimensions to the global gas schedule, and setting to initial (and current) values on the curves (all of these are in gas units):
+Adding these dimensions to the global gas schedule, and setting to initial (and current) values on the mainnet curves (all of these are in gas units):
 
 - storage_io_per_state_slot_write
 - storage_io_per_state_byte_write
@@ -39,7 +40,7 @@ Notice that we don’t distinguish a new allocation and a modification of an exi
 
 ## Reference Implementation
 
-[TBD]
+https://github.com/aptos-labs/aptos-core/pull/8605
 
 ## Risks and Drawbacks
 
