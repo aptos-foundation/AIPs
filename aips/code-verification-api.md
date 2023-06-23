@@ -7,7 +7,7 @@ Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Informational
 created: 5/22/2023
-updated (*optional): 5/23/2023
+updated (*optional): 6/23/2023
 requires (*optional): <AIP number(s)>
 ---
 
@@ -18,6 +18,8 @@ requires (*optional): <AIP number(s)>
 ## Summary
 
 This API proposal seeks to introduce a standard protocol for the verification of Aptos Move smart contract code. This API is designed to ensure the safety and trustworthiness of smart contract code, assisting developers in effectively verifying their code. The standard suggests the common rules that should be followed by all parties building and operating smart contract code verification API servers within the Aptos network.
+
+Notice that this standard does not cover certification of provider of this API. Establishing trustworthiness of providers of this API is out of scope in this AIP, and left to community processes, possibly backed up by decentralized governance.
 
 ## Motivation
 
@@ -49,7 +51,6 @@ For verification of the smart contract code, developers must send a **`POST`** r
 
 - **`address`**: The address where the smart contract to be verified is deployed.
 - **`moduleName`**: The name of the module to be verified.
-- **`compilerVersion`**: The version of the Move compiler used for compilation.
 - **`network`**: The name of the network where the smart contract is deployed.
 
 ### **Response**
@@ -66,8 +67,8 @@ The API returns the verification result in JSON format. The response body includ
 ## Operation Details(example)
 
 - Users request verification for a specific module in the explorer.
-- When making a request, parameters such as address, network, module name, and compiler version are sent together.
-- The API server compiles the on-chain metadata based on user information and compares it to the on-chain bytecode.
+- When making a request, parameters such as address, network, and module name are sent together.
+- The API server identifies the on-chain package metadata which declares the module and compiles this package. The resulting bytecode is compared with the bytecode on-chain.
 - Results such as isMatched are returned.
 - The explorer stores the verification status in the Database for utilization.
 
@@ -80,16 +81,15 @@ import axios from 'axios';
 
 const API_ENDPOINT = 'https://your-api-url.com/verification';
 
-const verifyCode = async (address, moduleName, compiler, network) => {
+const verifyCode = async (address, moduleName, network) => {
   const data = {
     address: address,
     moduleName: moduleName,
-    compilerVersion: compiler,
     network: network
   };
 
   try {
-    const response = await axios.post(API_ENDPOINT, formData, {
+    const response = await axios.post(API_ENDPOINT, data, {
       headers: {
         'Content-Type': 'application/json',
       },
