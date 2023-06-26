@@ -85,19 +85,15 @@ Addresses are considered special if the first 63 characters of the hex string af
 
 This is explained in greater detail in the [reference implementation](https://github.com/aptos-labs/aptos-core/pull/8727).
 
-### Request Format
+### Acceptable Input Formats
 - APIs and other input fields (e.g. in wallets, sites, etc.) MUST accept addresses in the following formats:
-    - `LONG`
-    - `SHORT` for special addresses
-    - `LONG` without leading 0x
-    - `SHORT` without leading 0x for special addresses
+    - `LONG` (with or without leading 0x)
+    - `SHORT` for special addresses (with or without leading 0x)
     - Binary (see Binary Representation below)
 - They SHOULD NOT accept addresses in the following formats:
-    - `SHORT` for non-special addresses
-    - `SHORT` without leading 0x for non-special addresses
-- Clients SHOULD use the `LONG` representation when building requests.
+    - `SHORT` for non-special addresses (with or without leading 0x)
 
-The principle here is things accepting addresses as input should accept all valid representations of addresses that do not introduce phishing concerns / potential for mistakes. This is why `SHORT` is not allowed for non-special addresses, it is too easy to make a mistake (e.g. miss a single leading zero) and interact with the wrong address.
+The principle is things accepting addresses as input should accept all valid representations of addresses that do not introduce phishing concerns / potential for mistakes. This is why `SHORT` is not allowed for non-special addresses, it is too easy to make a mistake (e.g. miss a single leading zero) and interact with the wrong address.
 
 ### Display Format
 This describes how addresses should be displayed. Display here refers to any time an address is shown to a user, including in web UIs, logs, compiler output, etc.
@@ -118,10 +114,10 @@ Some systems, such as the indexer processors when writing to storage, store addr
 Note: Binary representation of addresses at rest is preferred.
 
 ### Binary Format
-When using a binary representation, addresses MUST be encoded as BCS.
+When using a binary representation, addresses MUST be encoded as BCS in the [canonical format](https://github.com/move-language/move/blob/8f5303a365cf9da7554f8f18c393b3d6eb4867f2/language/move-core/types/src/account_address.rs#L58).
 
 ## Reference Implementation
-https://github.com/aptos-labs/aptos-core/pull/8727
+This PR implements a function called `to_standard_string` that formats addresses as a string in a way that conforms to the standard: https://github.com/aptos-labs/aptos-core/pull/8727. The `from_str` implementation on that class is already compliant with the standard.
 
 ## Risks and Drawbacks
 Given different tools, sites, etc. represent / accept addresses in different ways already, this standard should not further fracture the ecosystem, but rather bring it together. Additionally, we are not planning on making breaking changes to existing APIs. So the risks should be minimal.
