@@ -28,7 +28,6 @@ We additionally create `object::create_object` and `token::create_token` functio
 
 We additionally propose to add `create_uuid` Move function, which calls the `create_unique_address` function and outputs a struct UUID containing the unique address. The address field of the UUID struct cannot be modified by other Move modules, nor the struct can be copied. As the only way of creating a UUID struct is by calling the `create_uuid` method, any code that receives a UUID struct as input can be confident that the underlying address is uniquely generated, and no two instances of UUID will match.
 
-We additionally propose to add `create_uuid` Move function, which calls the `create_unique_address` function and outputs a struct UUID containing the unique address. The address field of the UUID struct cannot be modified by other Move modules. As the only way of creating a UUID struct is by calling the `create_uuid` method, any code that receives a UUID struct as input can be confident that the underlying address is uniquely generated.
 ## Specification
 
 The Aptos Framework contains a `transaction_context` module, which can be used by MOVE modules to retrieve information related to the current transaction being executed. When a transaction is executed, the session first creates a context. The context contains, amongst other things, `NativeTransactionContext` . The `transaction_context` module provides an API interface to answer questions on `NativeTransactionContext` . 
