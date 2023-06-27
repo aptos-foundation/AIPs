@@ -2,7 +2,7 @@
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Move module for randomness generation
 author: Alin Tomescu (alin@aptoslabs.com)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/185
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
