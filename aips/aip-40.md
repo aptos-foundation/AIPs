@@ -81,7 +81,7 @@ Same as `LONG`, but without the `0x` prefix.
 Same as `SHORT`, but without the `0x` prefix.
 
 ### Special Addresses
-Addresses are considered special if the first 63 characters of the hex string after the 0x prefix are zero. In other words, an address is special if the first 31 bytes are zero and the last byte is smaller than than 0b10000 (15). In other words, special is defined as an address that matches the following regex: ^0x0{63}[0-9a-f]$. In short form this means the addresses in the range from 0x0 to 0xf (inclusive) are special.
+Addresses are considered special if the first 63 characters of the hex string after the 0x prefix are zero. In other words, an address is special if the first 31 bytes are zero and the last byte is smaller than than `0b10000` (15). In other words, special is defined as an address that matches the following regex: `^0x0{63}[0-9a-f]$`. In short form this means the addresses in the range from `0x0` to `0xf` (inclusive) are special.
 
 This is explained in greater detail in the [reference implementation](https://github.com/aptos-labs/aptos-core/pull/8727).
 
