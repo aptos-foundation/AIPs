@@ -59,17 +59,17 @@ The API returns the verification result in JSON format. The response body includ
 
 - **`address`**: The address of the verified smart contract.
 - **`network`**: The name of the network where the verification took place.
-- **`isMatched`**: Whether the smart contract code matches the deployed bytecode.
+- **`bytecodeMatches`**: Whether the smart contract code matches the deployed bytecode.
 - **`module`**: The name of the verified module.
 - **`package`**: The name of the verified package.
-- **`txHash`**: The hash value of the smart contract deployment transaction.
+- **`txnHash`**: The hash value of the smart contract deployment transaction.
 
-## Operation Details(example)
+## Operation Details (example)
 
 - Users request verification for a specific module in the explorer.
 - When making a request, parameters such as address, network, and module name are sent together.
 - The API server identifies the on-chain package metadata which declares the module and compiles this package. The resulting bytecode is compared with the bytecode on-chain.
-- Results such as isMatched are returned.
+- Results such as bytecodeMatches are returned.
 - The explorer stores the verification status in the Database for utilization.
 
 ## Reference Implementation
@@ -108,10 +108,10 @@ const verifyCode = async (address, moduleName, network) => {
 {
   "address": "0xf85abc9014147f788f3151e900ef835d5d083ff5e1844382a8b1a488dcb5440e",
   "network": "devnet",
-  "isMatched": true,
+  "bytecodeMatches": true,
   "module": "BasicCoin1",
   "package": "BasicCoin1",
-  "txHash": "0xb8b5ec79703b9a31a03c47572f7a2aff6906ddc4a980948429ef04dda960d291"
+  "txnHash": "0xb8b5ec79703b9a31a03c47572f7a2aff6906ddc4a980948429ef04dda960d291"
 }
 ```
 
