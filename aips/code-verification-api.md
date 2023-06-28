@@ -17,7 +17,7 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
-This API proposal seeks to introduce a standard protocol for the verification of Aptos Move smart contract code. This API is designed to ensure the safety and trustworthiness of smart contract code, assisting developers in effectively verifying their code. The standard suggests the common rules that should be followed by all parties building and operating smart contract code verification API servers within the Aptos network.
+This API proposal seeks to introduce a standard protocol for the verification of Aptos Move smart contract code. This API is designed to ensure the safety and trustworthiness of smart contract code, assisting developers in effectively verifying their code. The standard suggests the common rules that should be followed by all parties building and operating smart contract code verification API servers within the Aptos ecosystem.
 
 Notice that this standard does not cover certification of provider of this API. Establishing trustworthiness of providers of this API is out of scope in this AIP, and left to community processes, possibly backed up by decentralized governance.
 
