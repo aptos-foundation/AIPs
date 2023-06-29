@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 41
 title: Move module for randomness generation
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/185
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Move module for randomness generation
+# AIP-41 - Move module for randomness generation
 
 ## Summary
 
