@@ -123,15 +123,52 @@ This PR implements a function called `to_standard_string` that formats addresses
 Given different tools, sites, etc. represent / accept addresses in different ways already, this standard should not further fracture the ecosystem, but rather bring it together. Additionally, we are not planning on making breaking changes to existing APIs. So the risks should be minimal.
 
 ## Timeline
+In this section I outline the order we must implement changes. I leave determining specific dates as a later exercise.
 
-### Suggested implementation timeline
-As below, this is largely a developer platform focused AIP.
+### Ensure standard-compliant address libraries exist
+In the main languages we support (TypeScript, Rust, and Python), we must ensure that there are Address classes that conform to the standard. We should also strive to support other important languages like C#. This essentially means the following functions must exist:
+- A function that outputs an address as a string that conforms to the standard.
+- A function that parses an address from a string in a way that conforms to the standard.
+- A function that checks for equality of addresses (effectively combining the two prior functions).
 
-### Suggested developer platform support timeline
-N/A, we are not making any changes to existing APIs on the display side. On the ingestion side the node API is already compliant. The indexer API is not, but the v2 indexer stack is coming out soon and we will take this into consideration.
+The reference implementation implements this for Rust. TypeScript and Python will be fast follows given the changes are minor.
 
-### Suggested deployment timeline
-As above.
+### Release a guide that explains how to work with addresses
+Largely speaking this guide would be a condensed, code-focused version of this AIP, referring to the libraries we added and the migration timeline suggested below.
+
+We will reach out to builders in the ecosystem with a list of clear action items. Odds are good that many tools are already standard compliant in some / all ways, so the changes needed should be minor. In other cases it will be a simple matter of updating dependencies to use newer versions of the SDKs.
+
+### Update products that accept addresses as input to conform to the standard
+Prior to any changes to how addresses are display / returned / stored, we must update everywhere that accepts addresses as input to be standards compliant. In all cases what addresses are accepted should be permissive than what they had before, as the goal of the standard is to be permissive on the input side.
+
+Examples of things that might need to change:
+- APIs
+  - Node APIs
+  - Indexer APIs
+  - Any other APIs run by ecosystem players
+- CLIs
+  - The `aptos` CLI
+- Wallets
+- Dapps
+  - Explorers
+  - Marketplaces
+  - Analytics platforms
+- SDKs
+  - TypeScript
+  - Rust
+  - Python
+- Configuration
+  - Node configs
+  - CLI configs
+  - Processor configs
+
+In the general case if one tool accepts an address in only certain formats and another submits addresses in a different format then that might cause problems. This is why it is essential that anything that accepts addresses as input is made more permissive first, throughout the whole ecosystem, before we change output formats.
+
+### Update products that deal with addresses to use the new address equality functions
+One of the key motivators for this AIP is problems that arise from comparing addresses in different formats. Any product (see the list above) that does this must migrate to the new equality functions, which will handle addresses in any of the acceptable input formats described above.
+
+### Update products that return / display addresses to conform to the standard
+At this point it should be safe to update all products to display (in the case of graphical tools) or return (in the case of programmatic tools that return addresses as strings) addresses in a standard compliant way.
 
 ## Security Considerations
 By disallowing accepting SHORT addresses for non-special addresses, we make phishing / mistakes harder (e.g. by attempting to trick users by omitting leading zeroes). I'm not aware of any notable security drawbacks to this AIP.
