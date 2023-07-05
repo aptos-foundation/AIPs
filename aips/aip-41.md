@@ -59,7 +59,7 @@ module aptos_std::random {
     public fun amplify(r: Randomness, n: u64): vector<Randomness> { /* ... */ }
 
     /// Consumes a `Randomness` object so as to securely generate a random integer $n \in [min_incl, max_excl)$
-    public fun number(r: Randomness, min_incl: u64, max_excl: u64): vector<Randomness> { /* ... */ }
+    public fun number(r: Randomness, min_incl: u64, max_excl: u64): u64 { /* ... */ }
 
     /// Consumes a `Randomness` object so as to securely pick a random element from a vector.
     public fun pick<T>(r: Randomness, vec: &vector<T>): &T { /* ... */ }
@@ -83,15 +83,24 @@ module aptos_std::random {
 
  > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in in one year? In five years?
 
+1. This proposal could give rise to chance-based games (e.g., lotteries, turn-based strategy games, etc.)
+2. This proposal could provide a trustworthy randomness beacon for external entities
+
 ## Timeline
 
 ### Suggested implementation timeline
 
  > Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
+
+This AIP is strictly about the proposed API, and not its implementation.
   
 ### Suggested developer platform support timeline
 
- > Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
+> Describe the plan to have SDK, API, CLI, Indexer support for this feature, if applicable.
+
+I am not sure if it is applicable.
+
+It may be worth investigating if randomness calls (and their outputs) need to be indexed (e.g., should events be emitted?).
 
 ### Suggested deployment timeline
 
@@ -101,14 +110,29 @@ module aptos_std::random {
 > 
 > On mainnet?
 
+This AIP is strictly about the proposed API, and not its implementation nor deployment.
+
 ## Security Considerations
 
-> Has this change being audited by any auditing firm? 
+> Has this change being audited by any auditing firm?
+
+No.
+
 > Any potential scams? What are the mitigation strategies?
 > Any security implications/considerations?
+
+When instantiating this distributed randomness API with a secret-based approach (e.g., a threshold verifiable random function, or t-VRF) rather than a delayed-based approach (e.g., a verifiable delay function, or VDF), a majority of the stake can collude to predict the randomness ahead of time and/or bias it.
+
+To mitigate against this, contracts can (carefully) incorporate external randomness (e.g., `drand`).
+
 > Any security design docs or auditing materials that can be shared?
+
+No. It is up to the community to refine this API to make it easier & safer to use.
 
 ## Testing (optional)
 
 > What is the testing plan? How is this being tested?
 
+This AIP is strictly about the proposed API, and not its implementation. 
+
+Therefore, the testing plan is to gather feedback from Move developers and the wider ecosystem on whether this API is "right," via the AIP process.
