@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 42
 title: Aptos TypeScript SDK V2
 author: 0xmaayan
 discussions-to (*optional):
@@ -11,7 +11,7 @@ updated (*optional):
 requires (*optional):
 ---
 
-# AIP-X - Aptos TypeScript SDK V2
+# AIP-42 - Aptos TypeScript SDK V2
 
 ## Summary
 
