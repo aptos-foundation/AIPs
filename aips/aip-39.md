@@ -30,8 +30,6 @@ We can properly support separating the gas payer account from the sender while p
 - The nonce of the sender account should be used, not the gas payer’s. This allows for easier scaling of gas paying operations
 - Transactions with a separate gas payer should use the same payload as a normal transaction (both entry function and script calls) and should not require intermediate proxy code to deal with multiple signers.
 
-The cleanest solution proposed here is to extend the multi-agent transaction semantics to allow appending an extra gas payer address to the list of sender addresses. Gas can be deducted from this address without a signer being constructed when the destination code (entry function call or script) is invoked. In the future we can also extend the Authenticator part of a transaction to add more metadata if we want to further enrich gas paying functionalities.
-
 ### Generalizing multi-agent transactions
 
 Multi-agent transactions have been useful in the past as a primitive construct for extending a standard transaction (with a list of secondary signers). Specifically, multi-agent transactions introduce [RawTransactionWithData](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/mod.rs#L421) - a wrapper data construct around a standard SignedTransaction that adds more data to it. This allows signature verification to then verify that a signed transaction from the user also contains extra data (e.g. secondary signers). We can leverage this same data structure to extend a transaction with data related to paying gas:
