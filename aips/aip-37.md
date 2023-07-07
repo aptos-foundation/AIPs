@@ -3,7 +3,7 @@ aip: 37
 title: Filter duplicate transactions within a block
 author: bchocho
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+Status: Accepted
 type: Standard Core
 created: 06/06/2023
 updated (*optional): <mm/dd/yyyy>
