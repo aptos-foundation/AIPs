@@ -1,7 +1,7 @@
 ---
 aip: 39
 title: Separate gas payer
-author: gerben-stavenga, movekevin
+author: gerben-stavenga, movekevin, davidiw
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/173
 Status: Draft
 last-call-end-date: TBD
@@ -30,21 +30,35 @@ We can properly support separating the gas payer account from the sender while p
 - The nonce of the sender account should be used, not the gas payer’s. This allows for easier scaling of gas paying operations
 - Transactions with a separate gas payer should use the same payload as a normal transaction (both entry function and script calls) and should not require intermediate proxy code to deal with multiple signers.
 
-The cleanest solution proposed here is to extend the multi-agent transaction semantics to allow appending an extra gas payer address to the list of sender addresses. Gas can be deducted from this address without a signer being constructed when the destination code (entry function call or script) is invoked. In the future we can also extend the Authenticator part of a transaction to add more metadata if we want to further enrich gas paying functionalities.
+### Generalizing multi-agent transactions
 
-### Extending multi-agent transactions
+Multi-agent transactions have been useful in the past as a primitive construct for extending a standard transaction (with a list of secondary signers). Specifically, multi-agent transactions introduce [RawTransactionWithData](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/mod.rs#L421) - a wrapper data construct around a standard SignedTransaction that adds more data to it. This allows signature verification to then verify that a signed transaction from the user also contains extra data (e.g. secondary signers). We can leverage this same data structure to extend a transaction with data related to paying gas:
 
-The main benefit of this approach is minimal code changes required both in the Aptos VM (where gas is charged) and in SDK. This approach is more of an extension to multi-agent transactions than a new transaction type. The developer flow works as below:
+```
+pub enum RawTransactionWithData {
+    MultiAgent {
+        raw_txn: RawTransaction,
+        secondary_signer_addresses: Vec<AccountAddress>,
+    },
+    MultiAgentWithFeePayer {
+        raw_txn: RawTransaction,
+        secondary_signer_addresses: Vec<AccountAddress>,
+        fee_payer_address: AccountAddress,
+    },
+}
+```
 
-1. To send a transfer of USDC from 0xsender to 0xreceiver where a separate account 0xpayer pays for gas, the app can first construct a multi-agent transaction with the standard payload (entry function 0x1::aptos_account::transfer_coins where the sender is 0xsender). The address 0xpayer needs to be inserted to the list of sender addresses to indicate that 0xpayer is the gas payer. Note that 0x1::aptos_account::transfer_coins takes a single signer, which would be 0xsender.
-2. The app can prompt the user to sign the transaction payload with their account 0xsender
+This can be thought of as a generalization of MultiAgent transaction data, allowing an encompassing new transaction data type that can add a separate fee payer address and signature to all kinds of transactions, including MultiAgent. The flow works as below:
+
+1. To send a transfer of USDC from 0xsender to 0xreceiver where a separate account 0xpayer pays for gas, the app can first construct a multi-agent transaction with the standard payload (entry function 0x1::aptos_account::transfer_coins where the sender is 0xsender). 0xsender is also specified as the fee_payer_address in RawTransactionWithData::MultiAgentWithFeePayer. All of this can be done easily with SDK support.
+2. The app can prompt the user to sign the transaction payload with their account 0xsender. The user can clearly see they're signing a transaction with a separate gas fee payer address.
 3. The payload and the signature can then be passed to the server side where 0xpayer will review and sign the transaction.
 4. The transaction is now complete. 0xpayer can send the transaction themselves or passes back to the client side for the user (0xsender) to submit it themselves. Either way, gas will be deducted from 0xpayer and the transaction will be executed in the context of 0xsender, using their account’s nonce and signer.
 
 The implementation is relatively straightforward:
 
-1. Create new multi_agent prologue and epilogue functions where nonce/gas validation and final gas charge should be applied on the separate gas payer account instead of the sender.
-2. Update aptos_vm to correctly detect a separate gas payer (extra address at the end means there are more senders than the number of signers the invoked function takes) and call the new prologue/epilogue flow instead
+1. Create new multi_agent prologue and epilogue functions where nonce/gas validation and final gas charge should be applied on the separate gas payer account instead of the sender. The execution flow should also verify that the gas payer signature is valid and both the sender and gas payer signed over the newly introduced RawTransactionWithData::MultiAgentWithFeePayer transaction data.
+2. Update aptos_vm to correctly call the new prologue/epilogue flow instead when a separate gas payer address is present.
 3. Update the SDK to support adding a separate gas payer at the end of the sender address list.
 4. Changes to the coin_model used in the default coin processor in Indexer to correctly attribute the gas burn activity to the gas payer, instead of the sender
 
@@ -54,7 +68,7 @@ In either approach, the coin processor/model would need to be updated to correct
 
 ## Reference Implementation
 
-WIP
+[WIP](https://github.com/aptos-labs/aptos-core/pull/8904)
 
 ## Risks and Drawbacks
 
