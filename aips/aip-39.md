@@ -68,7 +68,7 @@ In either approach, the coin processor/model would need to be updated to correct
 
 ## Reference Implementation
 
-[WIP](https://github.com/aptos-labs/aptos-core/pull/8904)
+https://github.com/aptos-labs/aptos-core/pull/8904
 
 ## Risks and Drawbacks
 
