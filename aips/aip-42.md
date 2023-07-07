@@ -2,7 +2,7 @@
 aip: 42
 title: Aptos TypeScript SDK V2
 author: 0xmaayan
-discussions-to (*optional):
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/193
 Status: Draft
 last-call-end-date (*optional):
 type: Standard
