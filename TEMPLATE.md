@@ -23,8 +23,8 @@ requires (*optional): <AIP number(s)>
 
 ### Goals
 
-- What are the goals and what is in scope? Any KPI’s/metrics?
-- What is the business impact and value of this solution (immediate and long term future)?
+- What are the goals and what is in scope? Any KPIs/metrics?
+- What is the network and ecosystem impact and value of this solution (immediate and long term future)?
 
 ### Non-Goals
 
@@ -87,7 +87,7 @@ requires (*optional): <AIP number(s)>
 
 ## Security Considerations
 
-- Has this change being audited by an auditing firm?
+- Has this change been audited?
 - Are there potential scams?
     - What are the mitigation strategies?
 - What are the security implications/considerations?
