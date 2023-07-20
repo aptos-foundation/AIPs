@@ -3,7 +3,7 @@ aip: 40
 title: Address Standard v1
 author: banool
 discussions-to (*optional):
-Status: Accepted
+Status: Draft
 last-call-end-date (*optional): 07/10/2023
 type: Standard
 created: 06/18/2023
