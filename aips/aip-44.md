@@ -7,7 +7,7 @@ type: Standard (Core, Interface, Framework)
 created: 07/20/2023
 ---
 
-# AIP-43 - Module Events
+# AIP-44 - Module Events
 
 ## Summary
 
