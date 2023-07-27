@@ -37,7 +37,7 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 8](https://github.com/aptos-foundation/AIPs/issues/33) | Framework | [Higher-Order Inline Functions for Collections](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-8.md) | Standard | Accepted |
 | [AIP 9](https://github.com/aptos-foundation/AIPs/issues/26) | Interface/ Framework | [Resource Groups](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-9.md) | Standard | Accepted
 | [AIP 10](https://github.com/aptos-foundation/AIPs/issues/27) | Framework | [Move Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-10.md) | Standard | Accepted | 
-| [AIP 11](https://github.com/aptos-foundation/AIPs/issues/31) | Framework | [Digital Assets (Tokens as Objects)](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-11.md) | Standard | Accepted |
+| [AIP 11](https://github.com/aptos-foundation/AIPs/issues/31) | Framework | [Digital Assets: Tokens as Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-11.md) | Standard | Accepted |
 |[AIP 12](https://github.com/aptos-foundation/AIPs/issues/50) | Framework | [Multisig Accounts v2](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-12.md) | Standard | Accepted |
 | [AIP 13](https://github.com/aptos-foundation/AIPs/issues/24) | Framework | [Coin Standard Improvements](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-13.md) | Standard | Accepted |
 | AIP 14 | Framework | [Update vesting contract](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-14.md) | Standard | Accepted | 
@@ -69,10 +69,9 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 40](https://github.com/aptos-foundation/AIPs/issues/178)| Core | [Address Standard v1](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-40.md) | Standard | Draft |
 | [AIP 41](https://github.com/aptos-foundation/AIPs/issues/185)| Framework | [Move module for randomness generation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md) | Standard | Draft |
 | AIP 42 | Core | [Aptos TypeScript SDK V2](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-42.md) | Standard | Draft |
-| AIP 43 | Framework | [Token V2 Throughput Improvement](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-43.md) | Standard | Draft |
+| AIP 43 | Framework | [Digital Asset](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-43.md) | Standard | Draft |
 | [AIP 44](https://github.com/aptos-foundation/AIPs/issues/200) | Core | [Module Events](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-44.md) | Standard | Draft |
 | ... | ... |
-
 
 ## Types of AIPs
 * Standard: AIPs focusing on the changes to the Aptos blockchain.
@@ -93,7 +92,6 @@ This table contains an overview of all created and tracked AIPs. It should be up
 * Core (Blockchain)
 * Gas
 * Cryptography
-* Interface
 * Platform
 
 ## Providing Feedback on an AIP
@@ -104,6 +102,3 @@ This table contains an overview of all created and tracked AIPs. It should be up
 ## Notice regarding rejected or stale AIPs
 * If an AIP Author is not actively engaging in their PR's and Issues, they will be closed after 14 days due to inactivity.
 * If an AIP has been rejected, please review the feedback provided for further guidance.
-
-## Renaming AIPs
-* If AIP needs to be renamed at a later date, the format will be New AIP Name (Old AIP Name)
