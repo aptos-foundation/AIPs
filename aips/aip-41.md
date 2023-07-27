@@ -41,13 +41,13 @@ The impetus for this change is two-fold:
 > What might occur if we do not accept this proposal?
 
 1. **No (secure) randapps**: randomized dapps will either (1) not be easily-enabled on Aptos, hampering ecosystem growth and/or (2) not be securely-enabled, due to the subtleness of importing external randomness on-chain (see discussion in [“Rationale”](#Rationale) below).
-2. **Stifled innovation:** Not accepting this proposal could be short-sighted as it would be closin the door to other MPC use cases, which other blockchains support, as hinted above
+2. **Stifled innovation:** Not accepting this proposal could be short-sighted as it would be closing the door to other MPC use cases, which other blockchains support, as hinted above
 
 ## Impact
 
 > Which audiences are impacted by this change? What type of action does the audience need to take?
 
-Only **Move developers** are “affected”: they need to learn how to use this new module.
+Only **Move developers** are “affected”: they need to learn how to use this new `randomness` module, which is designed to be easy to understand & use.
 
 ## Rationale
 
@@ -55,15 +55,15 @@ Only **Move developers** are “affected”: they need to learn how to use this 
 
 Instead of having a dedicated module for **on-chain randomness**, as part of the Aptos framework, we could provide Move APIs for verifying **external randomness** from off-chain beacons like [`drand`](https://drand.love) or oracles like Chainlink.
 
-(In fact, these approaches are **not mutually exclusive** and we’ve already implemented Move cryptographic APIs that enable verifying `drand` randomness. See this example of a [simple Move lottery](https://github.com/aptos-labs/aptos-core/tree/ad3b32a7686549b567deb339296749b10a9e4e0e/aptos-move/move-examples/drand/sources) that relies on `drand`.)
+In fact, we have already done this! We implemented Move cryptographic APIs that enable verifying `drand` randomness. See this example of a [simple Move lottery](https://github.com/aptos-labs/aptos-core/tree/ad3b32a7686549b567deb339296749b10a9e4e0e/aptos-move/move-examples/drand/sources) that relies on `drand`.
 
 Nonetheless, **relying on an external beacon has several disadvantages**:
 
-1. It is very **easy to “misuse”** an external randomness beacon
+1. It is very **easy to misuse** an external randomness beacon
    1. e.g., contract writers could fail to commit to a future `drand` round # whose randomness will be used in the contract and instead accept any randomness for any round #, which creates a fatal biasing attack.
-   2. e.g., for external randomness beacons that produce randomness at a fixed interval such as `drand`, clock drift between the beacon and the underlying blockchain forces developers to commit to a far-enough-in-the-future round #, which adds delay before the underlying dapp can use the randomness
+   2. e.g., for external randomness beacons that produce randomness at a fixed interval such as `drand`, clock drift between the beacon and the underlying blockchain forces developers to commit to a far-enough-in-the-future round #. In other words, this adds delay before the underlying dapp can use the randomness.
 2. **Randomness is too pricy or produced too slowly **: It is not far fetched to imagine a world where many dapps are actually randapps. In this world, randomness would need to be produced very fast & very cheaply, which is not the case for existing beacons.
-3. The external **randomness has to be shipped** to the contract via a TXN, making it more awkward by users to use (e.g., in the [simple Move lottery](https://github.com/aptos-labs/aptos-core/tree/ad3b32a7686549b567deb339296749b10a9e4e0e/aptos-move/move-examples/drand/sources) example above, someone, perhaps the winning user, would have to “close” the lottery by shipping in the `drand` randomness).
+3. The external **randomness has to be shipped** to the contract via a TXN, making it more awkward by users to use (e.g., in the [simple Move lottery](https://github.com/aptos-labs/aptos-core/tree/ad3b32a7686549b567deb339296749b10a9e4e0e/aptos-move/move-examples/drand/sources) example above, someone, perhaps the winning user, would have to “close” the lottery by shipping in the `drand` randomness with a TXN).
 
 ## Specification
 
@@ -94,7 +94,7 @@ module aptos_std::randomness {
     /// Consumes a `Randomness` object so as to securely pick a random element from a vector.
     public fun pick<T>(r: Randomness, vec: &vector<T>): &T { /* ... */ }
     
-    /// Consumes a `Randomness` object so as to securely generate random permutation of `[0, 1, ..., n-1]`
+    /// Consumes a `Randomness` object so as to securely generate a random permutation of `[0, 1, ..., n-1]`
     public fun permutation<T>(r: Randomness, n: u64): vector<u64> { /* ... */ }
 
     //
@@ -135,7 +135,7 @@ module lottery::lottery {
         // The 1st winner
       	let w1 = p.pop_back();
 				
-				// The 2nd winner
+        // The 2nd winner
       	let w2 = p.pop_back();
 				
       	// The 3rd winner
@@ -164,11 +164,11 @@ In this case, the API would look like:
 
 This begs the question of what should happen when `generate()` is called twice in the same Aptos transaction? Possibilities are:
 
- a. Maintain the same behavior: `generate` returns the same randomness across repeated calls in the same TXN
+ a. Maintain the same behavior: `generate` returns the same randomness across repeated calls in the same TXN.
 
  b. Abort upon repeated calls: `generate` returns randomness `r` in the 1st call and aborts if ever called again. This prevents developers from misusing `generate` by assuming different calls return different results.
 
- c. Return different randomness upon different calls. This also prevents developers from misusing `generate`. I am not sure if this would make it harder for external applications to track from which `generate` call a piece of randomness was produced.
+ c. Return different randomness for different calls. This also prevents developers from misusing `generate`. I am not sure if this would make it harder for external applications to track from which `generate` call a piece of randomness was produced.
 
 ## Reference Implementation
 
@@ -202,6 +202,8 @@ In addition, this proposal could provide a trustworthy randomness beacon for ext
 
 It may be worth investigating whether randomness calls (and their outputs) need to be indexed (e.g., should events be emitted?).
 
+This could be important to make it easier to **publicly-verify** our randomness. Specifically, anyone could look at the `randomness`-related events emitted by a contract to fetch its history of generated randomness and the auxiliary inputs that were used to derive it (e.g., the block #, TXN hash, module name, calling function name, etc.).
+
 ### Suggested deployment timeline
 
 > When should community expect to see this deployed on devnet?
@@ -216,7 +218,7 @@ See [“Suggested implementation timeline”](#Suggested%20implementation%20time
 
 > Has this change being audited by any auditing firm?
 
-No, and it would be wise for security firms to look over the API and reason through how it might be mis-used.
+No, and it would be wise for security firms to look over the `randomness` API and reason through how it might be mis-used.
 
 > Any potential scams? What are the mitigation strategies?
 > Any security implications/considerations?
