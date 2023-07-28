@@ -10,14 +10,13 @@ created: <07/21/2023>
 # AIP-X - Ristretto255, Bulletproofs, and ElGamal Move Stdlib Modules
   
 (Please give a temporary file name to your AIP when first drafting it, AIP manager will assign a number to it after reviewing)
-
 ## Summary
 
-This AIP proposes three new Move standard library cryptography modules, one implementing the [Ristretto255](https://ristretto.group/) elliptic curve (technically the Curve25519 curve with additional techniques applied on top), another implementing a [Bulletproofs](https://eprint.iacr.org/2017/1066.pdf) range proof verifier, and a third implementing ElGamal encryption. All three modules can be used for various applications, and are implemented with underlying native functions written in Rust.
+This AIP proposes two new Move standard library cryptography modules, one implementing the [Bulletproofs](https://eprint.iacr.org/2017/1066.pdf) range proof verifier, and another implementing ElGamal encryption. Both modules can be used for various applications, and are implemented with underlying native functions written in Rust. In addition, this AIP also proposes additional functions to be added to the already existing Ristretto255 elliptic curve module. These functions include natives for point cloning and double scalar multiplications, in addition to non-natives for creating scalars from u32 values, serializing compressed points, and getting the hash-to-point value of the Ristretto255 basepoint. 
 
 ## Motivation
 
-This AIP provides a more robust suite of cryptography tools for Move developers. Bulletproofs in particular may be useful for confidential transactions, such as those done on Monero. Ristretto255 mayb e useful to any developer needing a relatively efficient and secure curve without pairing functionality. ElGamal can also be useful for confidential transactions, or any other application needing private homomorphically additive values. 
+This AIP provides a more robust suite of cryptography tools for Move developers. Bulletproofs in particular may be useful for confidential transactions, such as those done on Monero.  ElGamal can also be useful for confidential transactions, or any other application needing private homomorphically additive values. Ristretto255 may be useful to any developer needing a relatively efficient and secure curve without pairing functionality - the new functions added make its module easier to use. 
 
 ## Impact
 
@@ -25,15 +24,16 @@ The above benefits aside, this will marginally increase the Move standard librar
 
 ## Rationale
 
-Ristretto255 combines the efficiency of non-prime order curves with the ease of implementation at the protocol level of prime order curves. This makes it ideal for many applications. 
-
 Bulletproofs is a simple and efficient protocol for range proofs over private values. It has also been well-studied and adapted in the literature, making it likely to be secure. 
 
 ElGamal encryption done in the exponent allows for homomorphic addition of ciphertexts, i.e. encrypted values can be added together without revealing them. 
 
+Ristretto255 combines the efficiency of non-prime order curves with the ease of implementation at the protocol level of prime order curves. This makes it ideal for many applications. Adding functions for point cloning and double scalar multiplications makes the pre-existing module easier to use. 
+
+
 ## Specification
 
-All three modules have already been implemented:
+Both new modules and the additions to the Ristretto255 module have already been implemented:
 
 [Ristretto255](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-stdlib/sources/cryptography/ristretto255.move)
 
