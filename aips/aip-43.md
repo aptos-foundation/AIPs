@@ -1,8 +1,8 @@
 ---
 aip: 43
-title: Digital Assets (Token V2 Throughput Improvement)
+title: Parallelize Digital Assets (Token V2) minting/burning
 author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/209
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
@@ -40,15 +40,16 @@ AIP 36 removed one serialization point. We can remove the rest with:
 ## Rationale
 
 Alternative would be to stop tracking supply/giving indices, but that wouldn't work for NFT collections that require limited supply.
-We could use a sharded counter (i.e. split the supply into 10 separate counters), to enforce limited supply, but NFTs wouldn't get monotonic indices (i.e. a later mint can get an earlier index).
+We could use a sharded counter (i.e. split the supply into 10 separate counters), to enforce limited supply, but NFTs wouldn't get monotonic indices (i.e. a later mint can get an earlier index). ( [Prototype implementation](https://github.com/aptos-labs/aptos-core/compare/main...igor-aptos:aptos-core:igor/bucketed_counter) )
 
-Alternatively, we could change NFT minting to first require getting a couping (index in line), 
+Alternatively, we could change NFT minting to first require getting a coupon (index in line), 
 and then be able to mint with that coupon in a separate transaction, reducing the scope of what is sequential. 
 But that is much harder to use in smart contracts, and requries submitting 2 transactions to mint an NFT
 
 ## Reference Implementation
 
-This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. IDeally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
+- [Draft change](https://github.com/aptos-labs/aptos-core/compare/main...igor-aptos:aptos-core:igor/use_aggregators_for_event_seq_num) to enable event creation to be parallel. Unnecessary after [AIP-44](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-44.md)
+- [Draft change](https://github.com/igor-aptos/aptos-core/compare/igor/use_aggregators_for_event_seq_num...igor-aptos:aptos-core:igor/token_v2_using_aggregators) to token v2 to use aggregators and concurrent events. 
 
 ## Risks and Drawbacks
 
