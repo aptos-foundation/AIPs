@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-43 - Digital Assets (Token V2 Throughput Improvement)
+# AIP-43 - Parallelize Digital Assets (Token V2) minting/burning
   
 ## Summary
 
