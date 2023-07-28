@@ -1,6 +1,6 @@
 ---
 aip: 11
-title: Tokens as Objects
+title: Digital Assets: Tokens as Objects
 author: davidiw, movekevin, lightmark, capcap, kslee8224, neoul
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/31
 Status: Accepted
@@ -10,7 +10,7 @@ updated: 2023/3/18
 requires: "AIP-10: Move Objects"
 ---
 
-# AIP-11 - Tokens as Objects
+# AIP-11 - Digital Assets: Tokens as Objects
 
 ## Summary
 

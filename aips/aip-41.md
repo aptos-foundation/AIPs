@@ -212,7 +212,7 @@ This could be important to make it easier to **publicly-verify** our randomness.
 > 
 > On mainnet?
 
-See [“Suggested implementation timeline”](#Suggested%20implementation%20timeline): the implementation is complex and will be the scope of a different, future AIP.
+See [“Suggested implementation timeline”](#suggested-implementation-timeline): the implementation is complex and will be the scope of a different, future AIP.
 
 ## Security Considerations
 
@@ -235,6 +235,6 @@ Not really applicable; this document is self-contained. We leave it up to the co
 
 > What is the testing plan? How is this being tested?
 
-See [“Suggested implementation timeline”](#Suggested%20implementation%20timeline): the implementation is complex and will be the scope of a different, future AIP.
+See [“Suggested implementation timeline”](#suggested-implementation-timeline): the implementation is complex and will be the scope of a different, future AIP.
 
 Instead, the “testing” plan is to gather feedback from Move developers and the wider ecosystem on whether this API is "right" via AIP discussions.
