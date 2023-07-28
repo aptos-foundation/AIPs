@@ -1,6 +1,6 @@
 ---
 aip: 43
-title: Token V2 Throughput Improvement
+title: Digital Assets (Token V2 Throughput Improvement)
 author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-43 - Token V2 Throughput Improvement
+# AIP-43 - Digital Assets (Token V2 Throughput Improvement)
   
 ## Summary
 

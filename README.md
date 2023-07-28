@@ -18,6 +18,7 @@ To vote on AIPs impacting the state of the Blockchain, go to https://governance.
     - Follow the template guidelines to the best of your ability
  4. Commit these changes to your repo
  5. Submit a pull request on GitHub to this repo.
+ 6. To start discussing your AIP, create a GH Issue for your AIP using the default Issue template
 
 ## AIP Overview
 
@@ -36,10 +37,10 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 8](https://github.com/aptos-foundation/AIPs/issues/33) | Framework | [Higher-Order Inline Functions for Collections](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-8.md) | Standard | Accepted |
 | [AIP 9](https://github.com/aptos-foundation/AIPs/issues/26) | Interface/ Framework | [Resource Groups](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-9.md) | Standard | Accepted
 | [AIP 10](https://github.com/aptos-foundation/AIPs/issues/27) | Framework | [Move Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-10.md) | Standard | Accepted | 
-| [AIP 11](https://github.com/aptos-foundation/AIPs/issues/31) | Framework | [Tokens as Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-11.md) | Standard | Accepted |
+| [AIP 11](https://github.com/aptos-foundation/AIPs/issues/31) | Framework | [Digital Assets: Tokens as Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-11.md) | Standard | Accepted |
 |[AIP 12](https://github.com/aptos-foundation/AIPs/issues/50) | Framework | [Multisig Accounts v2](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-12.md) | Standard | Accepted |
 | [AIP 13](https://github.com/aptos-foundation/AIPs/issues/24) | Framework | [Coin Standard Improvements](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-13.md) | Standard | Accepted |
-| AIP 14 | Framwork | [Update vesting contract](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-14.md) | Standard | Accepted | 
+| AIP 14 | Framework | [Update vesting contract](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-14.md) | Standard | Accepted | 
 | [AIP 15](https://github.com/aptos-foundation/AIPs/issues/28) | Framework | [Update and rename token_standard_reserved_properties](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-15.md) | Standard | Accepted |
 | [AIP 16](https://github.com/aptos-foundation/AIPs/issues/57) | Framework | [New cryptography natives for hashing and MultiEd25519 PK validation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-16.md) | Standard | Accepted |
 | [AIP 17](https://github.com/aptos-foundation/AIPs/issues/79) | Core | [Reducing Execution Costs by Decoupling Transaction Storage and Execution Charges](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-17.md) | Standard | Accepted |
@@ -47,7 +48,7 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 19](https://github.com/aptos-foundation/AIPs/issues/85) | Framework | [Enable updating commission_percentage in staking_contract module](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-19.md) | Standard | Accepted |
 | [AIP 20](https://github.com/aptos-foundation/AIPs/issues/94) | Framework | [Generic Cryptography Algebra and BLS12-381 Implementation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-20.md) | Standard | Accepted |
 | [AIP 21](https://github.com/aptos-foundation/AIPs/issues/95) | Framework | [Fungible Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-21.md) | Standard | Accepted |
-| [AIP 22](https://github.com/aptos-foundation/AIPs/issues/101) | Framework | [No-Code Token Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-22.md) | Standard | Accepted |
+| [AIP 22](https://github.com/aptos-foundation/AIPs/issues/101) | Framework | [No-Code Digital Assets (Token Objects)](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-22.md) | Standard | Accepted |
 | [AIP 23](https://github.com/aptos-foundation/AIPs/issues/102) | Framework | [Make Ed25519 public key validation native return `false` if key has the wrong length](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-23.md) | Standard | Accepted |
 | [AIP 24](https://github.com/aptos-foundation/AIPs/issues/103) | Framework | [Move Library Updates](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-24.md) | Standard | Accepted |
 | [AIP 25](https://github.com/aptos-foundation/AIPs/issues/104) | Framework | [Transaction Argument Support for Structs](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-25.md) | Standard | Accepted |
@@ -68,8 +69,9 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 40](https://github.com/aptos-foundation/AIPs/issues/178)| Core | [Address Standard v1](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-40.md) | Standard | Draft |
 | [AIP 41](https://github.com/aptos-foundation/AIPs/issues/185)| Framework | [Move APIs for randomness generation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md) | Standard | Draft |
 | AIP 42 | Core | [Aptos TypeScript SDK V2](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-42.md) | Standard | Draft |
+| AIP 43 | Framework | [Digital Asset](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-43.md) | Standard | Draft |
+| [AIP 44](https://github.com/aptos-foundation/AIPs/issues/200) | Core | [Module Events](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-44.md) | Standard | Draft |
 | ... | ... |
-
 
 ## Types of AIPs
 * Standard: AIPs focusing on the changes to the Aptos blockchain.
@@ -80,6 +82,7 @@ This table contains an overview of all created and tracked AIPs. It should be up
 |:--|:--|
 | `Draft` | Drafts are currently in process and not ready for review. No corresponding GH Issue will be created.|
 | `In Review` | AIPs are ready for community review and feedback. See suggestions on providing feedback below. |
+| `Ready for Review` | AIPs are ready for Gatekeeper review and feedback. |
 | `Accepted `| AIPs has been accepted and will be implemented soon. |
 | `Rejected` | A community decision has been made to not move forward with an AIP at this time.| 
 | `On Hold` | Some information is missing or prerequisites have not yet been completed. | 
@@ -87,8 +90,15 @@ This table contains an overview of all created and tracked AIPs. It should be up
 ## Layer
 * Framework
 * Core (Blockchain)
+* Gas
+* Cryptography
+* Platform
 
 ## Providing Feedback on an AIP
 * Follow the discussion in the corresponding AIP issue
 * If you were designing this change, what would you want to communicate? Is it being communicated in the AIP?
 * As a community member, how are you impacted by this change? Does it provide enough information about the design and implementation details to assist with decision making? 
+
+## Notice regarding rejected or stale AIPs
+* If an AIP Author is not actively engaging in their PR's and Issues, they will be closed after 14 days due to inactivity.
+* If an AIP has been rejected, please review the feedback provided for further guidance.
