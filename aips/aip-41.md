@@ -78,10 +78,13 @@ The module should have a simple & hard-to-misuse interface. The current proposal
 ```rust
 module aptos_std::randomness {
 
-    /// A _random number generator (RNG)_ object that stores entropy from the on-chain randomness beacon. This RNG object can be used to produce one or more random numbers, random permutation, etc.
+    /// A _random number generator (RNG)_ object that stores entropy from the on-chain randomness beacon. 
+    /// This RNG object can be used to produce one or more random numbers, random permutation, etc.
     struct RandomNumberGenerator has drop { /* ... */ };
 
-    /// Returns an RNG for the current TXN and calling Move module. Repeated calls to this function in the same TXN context will return the same RNG: i.e., its entropy reflects the effects of previous mutating calls. This is to prevent developers from accidentally calling `rng` twice and generating the same randomness.
+    /// Returns an RNG for the current TXN and calling Move module. Repeated calls to this function 
+    /// in the same TXN context will return the same RNG: i.e., its entropy reflects the effects of previous calls. This is to prevent developers from accidentally calling
+    /// `rng` twice and generating the same randomness.
     public fun rng<T>(): RandomNumberGenerator { /* ... */ }
 
     /// Generates a number uniformly at random.
