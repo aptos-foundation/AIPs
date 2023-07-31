@@ -153,9 +153,11 @@ module lottery::lottery {
 }
 ```
 
-### Open questions
+## Open questions
 
 **O1:** Should we abort upon a second call to `randomness::rng()` in the same TXN or should we allow it, as described in [“Risks and drawbacks” ](#risks-and-drawbacks) below?
+
+**O2:** Should the `randomness` module be part of `aptos_framework` rather than `aptos_std`?
 
 ## Reference Implementation
 
