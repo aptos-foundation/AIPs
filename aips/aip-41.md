@@ -82,7 +82,8 @@ module aptos_std::randomness {
     /// `Randomness` objects via `randomness_amplify`.
     struct Randomness { /* ... */ };
 
-    /// Generates different randomness based on the given seed and the calling contract's address. Will return the same `Randomness` object if called with the same seed.
+    /// Generates different randomness based on the given seed and the calling contract's address.
+    /// **WARNING:** Will return the same `Randomness` object if called with the same seed.
     public fun generate<T>(seed: &T): Randomness { /* ... */ }
 
     /// Amplifies the generated randomness object into multiple objects.
