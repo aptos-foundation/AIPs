@@ -83,8 +83,9 @@ module aptos_std::randomness {
     struct RandomNumberGenerator has drop { /* ... */ };
 
     /// Returns an RNG for the current TXN and calling Move module. Repeated calls to this function 
-    /// in the same TXN context will return the same RNG: i.e., its entropy reflects the effects of previous calls. This is to prevent developers from accidentally calling
-    /// `rng` twice and generating the same randomness.
+    /// in the same TXN context will return the same RNG: i.e., its entropy reflects the effects of 
+    /// previous calls. This is to prevent developers from accidentally calling `rng` twice and 
+    /// generating the same randomness.
     public fun rng<T>(): RandomNumberGenerator { /* ... */ }
 
     /// Generates a number uniformly at random.
