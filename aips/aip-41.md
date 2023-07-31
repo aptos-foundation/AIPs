@@ -151,8 +151,6 @@ module lottery::lottery {
 }
 ```
 
-
-
 ### Open questions
 
 **O1:** We could eliminate the `seed` argument to `generate` and instead rely on `amplify` to produce multiple `Randomness` objects for different purposes (e.g., pick a random card game and a random player by calling `amplify(generate(), 2)`).
@@ -170,6 +168,8 @@ This begs the question of what should happen when `generate()` is called twice i
  b. Abort upon repeated calls: `generate` returns randomness `r` in the 1st call and aborts if ever called again. This prevents developers from misusing `generate` by assuming different calls return different results.
 
  c. Return different randomness for different calls. This also prevents developers from misusing `generate`. I am not sure if this would make it harder for external applications to track from which `generate` call a piece of randomness was produced.
+
+**O2:** It is currently unclear if `generate` takes the calling point into consideration when called. e.g., should calls from different functions with the same `seed` return the same randomness?
 
 ## Reference Implementation
 
