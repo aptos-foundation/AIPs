@@ -11,7 +11,7 @@ updated (*optional): <07/28/2023>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-41 - Move module for randomness generation
+# AIP-41 - Move APIs for randomness generation
 
 ## Summary
 
