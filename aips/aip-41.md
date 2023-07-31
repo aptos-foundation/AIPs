@@ -94,12 +94,6 @@ module aptos_std::randomness {
 
     /* Similar methods for u8, u16, u32, u64, and u128. */
 
-    /// Selects an element from a vector uniformly at random.
-    public fun pick<T>(r: &mut RandomNumberGenerator, vec: &vector<T>): &T { /* ... */ }
-
-    /// Selects a *mutable* element from a vector uniformly at random.
-    public fun pick<T>(r: &mut RandomNumberGenerator, vec: &mut vector<T>): &mut T { /* ... */ }
-
     /// Generate a permutation of `[0, 1, ..., n-1]` uniformly at random.
     public fun permutation<T>(r: &mut RandomNumberGenerator, n: u64): vector<u64> { /* ... */ }
 
