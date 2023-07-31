@@ -169,7 +169,7 @@ This begs the question of what should happen when `generate()` is called twice i
 
  c. Return different randomness for different calls. This also prevents developers from misusing `generate`. I am not sure if this would make it harder for external applications to track from which `generate` call a piece of randomness was produced.
 
-**O2:** It is currently unclear if `generate` takes the calling point into consideration when called. e.g., should calls from different functions with the same `seed` return the same randomness?
+ **O2:** It is currently unclear if `generate` takes the calling point into consideration when called. e.g., should calls from different functions with the same `seed` return the same randomness?
 
 ## Reference Implementation
 
