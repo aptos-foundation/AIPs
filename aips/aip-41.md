@@ -189,7 +189,7 @@ Put more simply, the returned integers will be (likely) different.
 
 As a consequence, developers cannot make a mistake and accidentally generate the same randomness twice when they want different randomness.
 
-**Warning**: We say “likely” due to the underlying cryptographic implementation of the entropy mutation, which will have a negligible probability (i.e., $$< 1/2^{128}$$) of not actually mutating the entropy (e.g., due to collisions in hash functions).
+**Warning**: We say “likely” due to the underlying cryptographic implementation of the entropy mutation, which will have a negligible probability (i.e., $< 1/2^{128}$) of not actually mutating the entropy (e.g., due to collisions in hash functions).
 
 **Note:** As an alternative, the API could also **abort** upon seeing a second `randomness::rng()` call in the same TXN. However, it is unclear if this would prevent use-cases where two `entry` functions call each other yet both make calls to `randomness::rng()`.
 
