@@ -11,7 +11,7 @@ updated (*optional): <07/28/2023>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-41 - Move module for randomness generation
+# AIP-41 - Move APIs for randomness generation
 
 ## Summary
 
@@ -62,7 +62,7 @@ Nonetheless, **relying on an external beacon has several disadvantages**:
 1. It is very **easy to misuse** an external randomness beacon
    1. e.g., contract writers could fail to commit to a future `drand` round # whose randomness will be used in the contract and instead accept any randomness for any round #, which creates a fatal biasing attack.
    2. e.g., for external randomness beacons that produce randomness at a fixed interval such as `drand`, clock drift between the beacon and the underlying blockchain forces developers to commit to a far-enough-in-the-future round #. In other words, this adds delay before the underlying dapp can use the randomness.
-2. **Randomness is too pricy or produced too slowly **: It is not far fetched to imagine a world where many dapps are actually randapps. In this world, randomness would need to be produced very fast & very cheaply, which is not the case for existing beacons.
+2. **Randomness is too pricy or produced too slowly**: It is not far fetched to imagine a world where many dapps are actually randapps. In this world, randomness would need to be produced very fast & very cheaply, which is not the case for existing beacons.
 3. The external **randomness has to be shipped** to the contract via a TXN, making it more awkward by users to use (e.g., in the [simple Move lottery](https://github.com/aptos-labs/aptos-core/tree/ad3b32a7686549b567deb339296749b10a9e4e0e/aptos-move/move-examples/drand/sources) example above, someone, perhaps the winning user, would have to “close” the lottery by shipping in the `drand` randomness with a TXN).
 
 ## Specification
@@ -71,40 +71,43 @@ Nonetheless, **relying on an external beacon has several disadvantages**:
 
 We are proposing a new `aptos_std::randomness` Move module for generating publicly-verifiable randomness in Move smart contracts.
 
-The module would have a simple interface, e.g.,:
+The module should have a simple & hard-to-misuse interface. The current proposal is:
+
+### Rust-like randomness API
 
 ```rust
 module aptos_std::randomness {
 
-    /// An object that stores randomness and can be "consumed" to generate a randomn number, a random choice,
-    /// a random permutation, etc.
-    /// This object cannot be implicitly cloned, but can be converted (or "amplified") into two or more other
-    /// `Randomness` objects via `randomness_amplify`.
-    struct Randomness { /* ... */ };
+    /// A _random number generator (RNG)_ object that stores entropy from the on-chain randomness beacon. 
+    /// This RNG object can be used to produce one or more random numbers, random permutation, etc.
+    struct RandomNumberGenerator has drop { /* ... */ };
 
-    /// Generates different randomness based on the given seed and the calling contract's address. Will return the same `Randomness` object if called with the same seed.
-    public fun generate<T>(seed: &T): Randomness { /* ... */ }
+    /// Returns an RNG for the current TXN and calling Move module. Repeated calls to this function 
+    /// in the same TXN context will return the same RNG: i.e., its entropy reflects the effects of 
+    /// previous calls. This is to prevent developers from accidentally calling `rng` twice and 
+    /// generating the same randomness.
+    public fun rng<T>(): RandomNumberGenerator { /* ... */ }
 
-    /// Amplifies the generated randomness object into multiple objects.
-    public fun amplify(r: Randomness, n: u64): vector<Randomness> { /* ... */ }
+    /// Generates a number uniformly at random.
+    public fun u64(r: &mut RandomNumberGenerator): u64 { /* ... */ }
+    public fun u256(r: &mut RandomNumberGenerator): u256 { /* ... */ }
 
-    /// Consumes a `Randomness` object so as to securely generate a random integer $n \in [min_incl, max_excl)$
-    public fun number(r: Randomness, min_incl: u64, max_excl: u64): u64 { /* ... */ }
+    /// Generates a number $n \in [min_incl, max_excl)$ uniformly at random.
+    public fun u64_range(r: &mut RandomNumberGenerator, min_incl: u64, max_excl: u64): u64 { /* ... */ }
+    public fun u256_range(r: &mut RandomNumberGenerator, min_incl: u256, max_excl: u256): u256 { /* ... */ }
 
-    /// Consumes a `Randomness` object so as to securely pick a random element from a vector.
-    public fun pick<T>(r: Randomness, vec: &vector<T>): &T { /* ... */ }
-    
-    /// Consumes a `Randomness` object so as to securely generate a random permutation of `[0, 1, ..., n-1]`
-    public fun permutation<T>(r: Randomness, n: u64): vector<u64> { /* ... */ }
+    /* Similar methods for u8, u16, u32, u64, and u128. */
+
+    /// Generate a permutation of `[0, 1, ..., n-1]` uniformly at random.
+    public fun permutation<T>(r: &mut RandomNumberGenerator, n: u64): vector<u64> { /* ... */ }
 
     //
     // More functions can be added here to support other randomness generations operations
-    // (e.g., `public fun random_bytes(r: Randomness, size: u64): vector<u8>`)
     //
 }
 ```
 
-### How to use the `randomness` API
+#### A lottery example
 
 Imagine a lottery Move module that picks three random winners, once a certain amount of tickets have been bought. It could do so as follows:
 
@@ -126,11 +129,11 @@ module lottery::lottery {
         // Get the `Lottery` resource
         let lottery = borrow_global_mut<Lottery>(@lottery);
 
-      	// Generate some randomness using an empty seed
-      	let r = randomness::generate(vector::empty<u8>());
+        // Get the random number generator
+        let rng = randomness::rng();
       
         // Randomly shuffle the vector of players [0, 1, ..., n-1]
-        let p = randomness::permutation(r, vector::length(&lottery.tickets));
+        let p = randomness::permutation(&mut rng, vector::length(&lottery.tickets));
       
         // The 1st winner
       	let w1 = p.pop_back();
@@ -150,25 +153,11 @@ module lottery::lottery {
 }
 ```
 
+## Open questions
 
+**O1:** Should we abort upon a second call to `randomness::rng()` in the same TXN or should we allow it, as described in [“Risks and drawbacks” ](#risks-and-drawbacks) below?
 
-### Open questions
-
-**O1:** We could eliminate the `seed` argument to `generate` and instead rely on `amplify` to produce multiple `Randomness` objects for different purposes (e.g., pick a random card game and a random player by calling `amplify(generate(), 2)`).
-
-In this case, the API would look like:
-
-```rust
-    public fun generate(): Randomness { /* ... */ }
-```
-
-This begs the question of what should happen when `generate()` is called twice in the same Aptos transaction? Possibilities are:
-
- a. Maintain the same behavior: `generate` returns the same randomness across repeated calls in the same TXN.
-
- b. Abort upon repeated calls: `generate` returns randomness `r` in the 1st call and aborts if ever called again. This prevents developers from misusing `generate` by assuming different calls return different results.
-
- c. Return different randomness for different calls. This also prevents developers from misusing `generate`. I am not sure if this would make it harder for external applications to track from which `generate` call a piece of randomness was produced.
+**O2:** Should the `randomness` module be part of `aptos_framework` rather than `aptos_std`?
 
 ## Reference Implementation
 
@@ -179,6 +168,34 @@ This begs the question of what should happen when `generate()` is called twice i
 ## Risks and Drawbacks
 
  > Express here the potential negative ramifications of taking on this proposal. What are the hazards?
+
+There is a risk of proposing an **easy-to-misuse** API. One pitfall here would be for the API to somehow return the same randomness while developers wrongly assume different randomness is returned. The mutable RNG-based design avoids this.
+
+Importantly, even if a developer creates two RNG objects:
+
+```
+let rng1 = randomness::rng();
+let rng2 = randomness::rng();
+```
+
+...and uses each one to sample random `u256` integers `n1` and `n2` :
+
+```
+let n1 = randomness::u256(&mut rng1);
+let n2 = randomness::u256(&mut rng2);
+```
+
+...the entropy used to generate `n2` will be (likely) different than the one used to generate `n1` because the entropy underneath `rng2` will have (likely) been mutated by the previous call on `rng1`. In other words, the two RNG objects will point to the same mutable entropy underneath.
+
+Put more simply, the returned integers will be (likely) different.
+
+As a consequence, developers cannot make a mistake and accidentally generate the same randomness twice when they want different randomness.
+
+**Warning**: We say “likely” due to the underlying cryptographic implementation of the entropy mutation, which will have a negligible probability (i.e., $< 1/2^{128}$) of not actually mutating the entropy (e.g., due to collisions in hash functions).
+
+**Note:** As an alternative, the API could also **abort** upon seeing a second `randomness::rng()` call in the same TXN. However, it is unclear if this would prevent use-cases where two `entry` functions call each other yet both make calls to `randomness::rng()`.
+
+Another concern is the **API is not expressive enough**. For example, if there is no support for safely converting the `Randomness` object into a random shuffle (or a uniform integer, or a random choice from a vector, etc.), developers might implement this themselves but do it incorrectly.
 
 ## Future Potential
 
@@ -238,3 +255,43 @@ Not really applicable; this document is self-contained. We leave it up to the co
 See [“Suggested implementation timeline”](#suggested-implementation-timeline): the implementation is complex and will be the scope of a different, future AIP.
 
 Instead, the “testing” plan is to gather feedback from Move developers and the wider ecosystem on whether this API is "right" via AIP discussions.
+
+## Apendix 
+
+For posterity, this was the initial proposal of the randomness API:
+
+### Seeded-`generate` & `amplify` API
+
+```rust
+module aptos_std::randomness {
+
+    /// An object that stores randomness and can be "consumed" to generate a random number, a random choice,
+    /// a random permutation, etc.
+    /// This object cannot be implicitly cloned, but can be converted (or "amplified") into two or more other
+    /// `Randomness` objects via `randomness_amplify`.
+    struct Randomness { /* ... */ };
+
+    /// Generates different randomness based on the given seed and the calling contract's address.
+    /// **WARNING:** Will return the same `Randomness` object if called with the same seed.
+    public fun generate<T>(seed: &T): Randomness { /* ... */ }
+
+    /// Amplifies the generated randomness object into multiple objects.
+    public fun amplify(r: Randomness, n: u64): vector<Randomness> { /* ... */ }
+
+    /// Consumes a `Randomness` object so as to securely generate a random integer $n \in [min_incl, max_excl)$
+    public fun number(r: Randomness, min_incl: u64, max_excl: u64): u64 { /* ... */ }
+
+    /// Consumes a `Randomness` object so as to securely pick a random element from a vector.
+    public fun pick<T>(r: Randomness, vec: &vector<T>): &T { /* ... */ }
+
+    /// Consumes a `Randomness` object so as to securely generate a random permutation of `[0, 1, ..., n-1]`
+    public fun permutation<T>(r: Randomness, n: u64): vector<u64> { /* ... */ }
+
+    //
+    // More functions can be added here to support other randomness generations operations
+    // (e.g., `public fun random_bytes(r: Randomness, size: u64): vector<u8>`)
+    //
+}
+```
+
+The lottery example from above would look slightly different (see [the older code here](https://github.com/aptos-foundation/AIPs/blob/835cf893e1d7ae6ec180810d0cb26be64ff4c1b5/aips/aip-41.md#how-to-use-the-randomness-api)).
