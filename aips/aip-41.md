@@ -86,7 +86,7 @@ module aptos_std::randomness {
     /// in the same TXN context will return the same RNG: i.e., its entropy reflects the effects of 
     /// previous calls. This is to prevent developers from accidentally calling `rng` twice and 
     /// generating the same randomness.
-    public fun rng<T>(): RandomNumberGenerator { /* ... */ }
+    public fun rng(): RandomNumberGenerator { /* ... */ }
 
     /// Generates a number uniformly at random.
     public fun u64(r: &mut RandomNumberGenerator): u64 { /* ... */ }
@@ -100,6 +100,11 @@ module aptos_std::randomness {
 
     /// Generate a permutation of `[0, 1, ..., n-1]` uniformly at random.
     public fun permutation<T>(r: &mut RandomNumberGenerator, n: u64): vector<u64> { /* ... */ }
+
+    /// Test-only function to set the entropy in the RNG to a specific value, which is useful for
+    /// testing.
+    #[test_only]
+    public fun set_seed(seed: vector<u8>);
 
     //
     // More functions can be added here to support other randomness generations operations
