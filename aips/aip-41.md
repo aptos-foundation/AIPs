@@ -86,7 +86,7 @@ module aptos_std::randomness {
     /// in the same TXN context will return the same RNG: i.e., its entropy reflects the effects of 
     /// previous calls. This is to prevent developers from accidentally calling `rng` twice and 
     /// generating the same randomness.
-    public fun rng<T>(): RandomNumberGenerator { /* ... */ }
+    public fun rng(): RandomNumberGenerator { /* ... */ }
 
     /// Generates a number uniformly at random.
     public fun u64(r: &mut RandomNumberGenerator): u64 { /* ... */ }
