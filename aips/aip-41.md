@@ -101,6 +101,11 @@ module aptos_std::randomness {
     /// Generate a permutation of `[0, 1, ..., n-1]` uniformly at random.
     public fun permutation<T>(r: &mut RandomNumberGenerator, n: u64): vector<u64> { /* ... */ }
 
+    /// Test-only function to set the entropy in the RNG to a specific value, which is useful for
+    /// testing.
+    #[test_only]
+    public fun set_seed(seed: vector<u8>);
+
     //
     // More functions can be added here to support other randomness generations operations
     //
