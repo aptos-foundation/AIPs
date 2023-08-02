@@ -23,7 +23,9 @@ requires (*optional): <AIP number(s)>
 
 ## Motivation
 
- > Describe the impetus for this change. What does it accomplish? What might occur if we do not accept this proposal?
+ > Describe the impetus for this change. What does it accomplish?
+ 
+ >  What might occur if we do not accept this proposal?
 
 ## Impact
 
