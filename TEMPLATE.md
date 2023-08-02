@@ -15,7 +15,9 @@ requires (*optional): <AIP number(s)>
   
 (Please give a temporary file name to your AIP when first drafting it, AIP manager will assign a number to it after reviewing.)
 
-(Consider leaving the questions in the "quote box" and provide the answer directly below them, as opposed to removing the questions. This will leave more context for the reader to understand.)
+(Please leave the questions in the "quote box" and provide your answer(s) directly below them, as opposed to removing the questions and providing an answer without context to the reader.) 
+
+The additional context of the question being answered should be more helpful for the reader to understand.)
 
 ## Summary
 
