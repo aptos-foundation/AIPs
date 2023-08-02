@@ -25,7 +25,7 @@ This table contains an overview of all created and tracked AIPs. It should be up
 
 | Number | Layer | Title  | Type | Status|
 |:---|:---|:---|:---|:---|
-| AIP 0 | | [Aptos Improvement Proposals](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-0.md) | Informational | Active |
+| AIP 0 | | [Aptos Improvement Proposals](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-0.md) | Informational | Accepted |
 | [AIP 1](https://github.com/aptos-foundation/AIPs/issues/9) | Core | [Proposer selection improvements](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-1.md) | Standard | Accepted |
 | [AIP 2](https://github.com/aptos-foundation/AIPs/issues/2) | Framework | [Multiple Token Changes](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-2.md) | Standard | Accepted |
 | [AIP 3](https://github.com/aptos-foundation/AIPs/issues/3) | Framework | [Multi-step Governance Proposal](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-3.md) | Standard | Accepted |
