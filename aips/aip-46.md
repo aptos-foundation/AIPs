@@ -1,14 +1,18 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: Bulletproofs, Pedersen and ElGamal Move Stdlib Modules Over Ristretto255
+aip: 46
+title: New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255
 author: Michael Straka (michael@aptoslabs.com)
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/185
 Status: Draft
+last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
-created: <07/21/2023>
+created: 07/21/2023
+updated (*optional): <mm/dd/yyyy>
+requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Bulletproofs, Pedersen, and ElGamal Move Stdlib Modules Over Ristretto255
-  
+# AIP-46 - New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255
+
 (Please give a temporary file name to your AIP when first drafting it, AIP manager will assign a number to it after reviewing)
 ## Summary
 
