@@ -19,9 +19,9 @@ requires (*optional): <AIP number(s)>
 
 This AIP proposes three **new Move modules** for cryptographic operations as part of the Aptos framework.
 
-- A [Bulletproofs](https://crypto.stanford.edu/bulletproofs/) ZK range proof verifier (over Ristretto255)
-- [ElGamal encryption](https://en.wikipedia.org/wiki/ElGamal_encryption) (over Ristretto255)
-- [Pedersen commitments](https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment) (over Ristretto255)
+- A [Bulletproofs](https://crypto.stanford.edu/bulletproofs/) ZK range proof verifier (over Ristretto255), in `aptos_std::ristretto255_bulletproofs`
+- [ElGamal encryption](https://en.wikipedia.org/wiki/ElGamal_encryption) (over Ristretto255), in `aptos_std::ristretto255_elgamal`
+- [Pedersen commitments](https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment) (over Ristretto255), in `aptos_std::ristretto255_pedersen`
 
 All three modules can be used for various cryptographic applications. The Bulletproofs verifier is implemented as a native function, which could be slightly cheaper in terms of gas as opposed to implementing it on top of the [`ristretto255` module](https://aptos.dev/reference/move/?branch=mainnet&page=aptos-stdlib/doc/ristretto255.md#0x1_ristretto255).
 
@@ -41,13 +41,19 @@ Lastly, this AIP proposes **deprecating** two previous functions by renaming the
 
 ## Motivation
 
+> Describe the impetus for this change. What does it accomplish? What might occur if we do not accept this proposal?
+
 This AIP provides a more robust suite of cryptography tools for Move developers. Bulletproofs in particular may be useful for confidential transactions, such as those done on Monero.  ElGamal can also be useful for confidential transactions, or any other application needing private homomorphically additive values. Pedersen commitments also have applications for confidential transactions. Ristretto255 may be useful to any developer needing a relatively efficient and secure curve without pairing functionality - the new functions added make its module easier to use. 
 
 ## Impact
 
+> Which audiences are impacted by this change? What type of action does the audience need to take?
+
 The above benefits aside, this will marginally increase the Move standard library size. 
 
 ## Rationale
+
+> Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
 
 Bulletproofs is a simple and efficient protocol for range proofs over private values. It has also been well-studied and adapted in the literature, making it likely to be secure. 
 
@@ -57,6 +63,8 @@ Ristretto255 combines the efficiency of non-prime order curves with the ease of 
 
 
 ## Specification
+
+> Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
 Both the new modules and the additions to the Ristretto255 module have already been implemented:
 
@@ -84,29 +92,61 @@ The original academic papers for each scheme can be found below:
 
 Further information on Ristretto255 can be found [here](https://ristretto.group/).
 
+## Reference Implementation
+
+> This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. IDeally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
+
+**TODO:** include links to PR
+
 ## Risks and Drawbacks
 
+> Express here the potential negative ramifications of taking on this proposal. What are the hazards?
+
 Future obsolescence is often a risk when implementing cryptography primitives. As of writing this, both Ristretto255 and Bulletproofs have been in use for several years, making their continued used in the immediate future more likely than not. ElGamal encryption and Pedersen commitments have been in use for multiple decades.
+
+## Future Potential
+
+> Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in in one year? In five years?
+
+**TODO:** answer
+
 ## Timeline
+
+### Suggested implementation timeline
+
+> Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
+
+The implementation effort has already finished; see [PR 3444]().
+
+### Suggested developer platform support timeline
+
+> Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
 
 ### Suggested deployment timeline
 
-When should community expect to see this deployed on devnet?
+>  When should community expect to see this deployed on devnet?
 
-Reasonably soon.
+It should be avaiable now: e.g., see the devnet explorer view of [the Bulletproofs module](https://explorer.aptoslabs.com/account/0x1/modules/code/ristretto255_bulletproofs?network=devnet).
 
-On testnet?
+> On testnet?
 
-After devnet.
+Release 1.7
 
-On mainnet?
+> On mainnet?
 
-After testnet.
+Release 1.7
 
 ## Security Considerations
+
+> Has this change being audited by any auditing firm? 
+> Any potential scams? What are the mitigation strategies?
+> Any security implications/considerations?
+> Any security design docs or auditing materials that can be shared?
 
 The Move module implementations have not been audited directly. The dalek-cryptography Ristretto255 and Bulletproofs Rust libraries they leverage, however, have been audited by QuarksLabs [here](https://blog.quarkslab.com/resources/2019-08-26-audit-dalek-libraries/19-06-594-REP.pdf).
 
 ## Testing
+
+> What is the testing plan? How is this being tested?
 
 Multiple unit tests have been written in the Ristretto255 and Bulletproofs implementations linked above. The ElGamal and Pedersen modules are exercised in unit tests in the [veiled coin](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/move-examples/veiled_coin/sources/veiled_coin.move) Move example module.
