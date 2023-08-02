@@ -12,7 +12,7 @@ created: <07/21/2023>
 (Please give a temporary file name to your AIP when first drafting it, AIP manager will assign a number to it after reviewing)
 ## Summary
 
-This AIP proposes three new Move standard library cryptography modules, one implementing the [Bulletproofs](https://eprint.iacr.org/2017/1066.pdf) range proof verifier, another implementing ElGamal encryption, and a third implementing Pedersen commitment. All three modules can be used for various applications. Bulletproofs is implementing using underlying native functions written in Rust. In addition, this AIP also proposes additional functions to be added to the already existing Ristretto255 elliptic curve module. These functions include natives for point cloning and double scalar multiplications, in addition to non-natives for creating scalars from u32 values, serializing compressed points, and getting the hash-to-point value of the Ristretto255 basepoint. 
+This AIP proposes three new Move standard library cryptography modules, one implementing the [Bulletproofs](https://crypto.stanford.edu/bulletproofs/) range proof verifier, another implementing [ElGamal encryption](https://en.wikipedia.org/wiki/ElGamal_encryption), and a third implementing [Pedersen commitments](https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment). All three modules can be used for various applications. Bulletproofs is implementing using underlying native functions written in Rust. In addition, this AIP also proposes additional functions to be added to the already existing Ristretto255 elliptic curve module. These functions include natives for point cloning and double scalar multiplications, in addition to non-natives for creating scalars from u32 values, serializing compressed points, and getting the hash-to-point value of the Ristretto255 basepoint. 
 
 ## Motivation
 
@@ -49,22 +49,34 @@ The Bulletproofs module is implemented using the dalek cryptography [bulletproof
 
 The ElGamal encryption and Pedersen commitment modules are implemented without Move natives over the Ristretto255 Move module referenced above. 
 
+The original academic papers for each scheme can be found below:
+
+[Bulletproofs](https://eprint.iacr.org/2017/1066.pdf)
+
+[ElGamal Encryption](https://caislab.kaist.ac.kr/lecture/2010/spring/cs548/basic/B02.pdf)
+
+[Pedersen Commitments](https://link.springer.com/content/pdf/10.1007/3-540-46766-1_9.pdf)
+
+Further information on Ristretto255 can be found [here](https://ristretto.group/).
+
 ## Risks and Drawbacks
 
 Future obsolescence is often a risk when implementing cryptography primitives. As of writing this, both Ristretto255 and Bulletproofs have been in use for several years, making their continued used in the immediate future more likely than not. ElGamal encryption and Pedersen commitments have been in use for multiple decades.
 ## Timeline
 
-### Suggested developer platform support timeline
-
-Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
-
 ### Suggested deployment timeline
 
 When should community expect to see this deployed on devnet?
 
+Reasonably soon.
+
 On testnet?
 
+After devnet.
+
 On mainnet?
+
+After testnet.
 
 ## Security Considerations
 
