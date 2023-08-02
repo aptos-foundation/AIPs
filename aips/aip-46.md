@@ -19,13 +19,15 @@ requires (*optional): <AIP number(s)>
 
 This AIP proposes three **new Move modules** for cryptographic operations as part of the Aptos framework.
 
-- A [Bulletproofs](https://crypto.stanford.edu/bulletproofs/) ZK range proof verifier (over Ristretto255), in `aptos_std::ristretto255_bulletproofs`
+- A Bulletproofs[^bulletproofs] ZK range proof verifier (over Ristretto255), in `aptos_std::ristretto255_bulletproofs`
 - [ElGamal encryption](https://en.wikipedia.org/wiki/ElGamal_encryption) (over Ristretto255), in `aptos_std::ristretto255_elgamal`
 - [Pedersen commitments](https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment) (over Ristretto255), in `aptos_std::ristretto255_pedersen`
 
-All three modules can be used for various cryptographic applications. The Bulletproofs verifier is implemented as a native function, which could be slightly cheaper in terms of gas as opposed to implementing it on top of the [`ristretto255` module](https://aptos.dev/reference/move/?branch=mainnet&page=aptos-stdlib/doc/ristretto255.md#0x1_ristretto255).
+All three modules can be used for various cryptographic applications. 
 
-In addition, this AIP also proposes **adding new functions** to the [`ristretto255` elliptic curve module](https://aptos.dev/reference/move/?branch=mainnet&page=aptos-stdlib/doc/ristretto255.md#0x1_ristretto255) to support:
+**TODO:** MOVE: The Bulletproofs verifier is implemented as a native function, which could be slightly cheaper in terms of gas as opposed to implementing it on top of the [`ristretto255` elliptic curve  module](https://aptos.dev/reference/move/?branch=mainnet&page=aptos-stdlib/doc/ristretto255.md#0x1_ristretto255).
+
+In addition, this AIP also proposes **adding new functions** to the `ristretto255` module to support:
 
 1. A native function point cloning, called `point_clone`
 
@@ -41,25 +43,39 @@ Lastly, this AIP proposes **deprecating** two previous functions by renaming the
 
 ## Motivation
 
-> Describe the impetus for this change. What does it accomplish? What might occur if we do not accept this proposal?
+> Describe the impetus for this change. What does it accomplish?
 
-This AIP provides a more robust suite of cryptography tools for Move developers. Bulletproofs in particular may be useful for confidential transactions, such as those done on Monero.  ElGamal can also be useful for confidential transactions, or any other application needing private homomorphically additive values. Pedersen commitments also have applications for confidential transactions. Ristretto255 may be useful to any developer needing a relatively efficient and secure curve without pairing functionality - the new functions added make its module easier to use. 
+This AIP provides a more extensive suite of cryptographic tools for Move developers. 
+
+- **Bulletproofs** are useful for [confidential transactions](https://en.bitcoin.it/wiki/Confidential_transactions), digital identity systems (e.g., proving you are below 18 years old), proofs of solvency[^provisions], etc.
+- **ElGamal** are useful for confidential transactions, or any other application needing secret homomorphically-additive values, such as randomized shuffles in card-based games.
+- **Pedersen commitments** are useful for confidential transactions, for auctioning protocols, for RANDAO-like protocols to generate randomness, etc.
+- Lastly, the new functions added to the Ristretto255 module fix a few limitations in the code.
+
+>  What might occur if we do not accept this proposal?
+
+Not accepting this proposal, will preclude gas-efficient dapps that rely on ZK range proofs. It will also prevent the `ristretto255` module from being efficiently usable due to the lack of point cloning, as well as some other missing functionality.
 
 ## Impact
 
 > Which audiences are impacted by this change? What type of action does the audience need to take?
 
-The above benefits aside, this will marginally increase the Move standard library size. 
+This AIP affects Move developers:
+
+- Compilation times will increase due to the new modules added to the Move standard library
+- Developers must familiarize themselves with the new functions as well as the deprecated functions introduced in this AIP.
 
 ## Rationale
 
 > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
 
-Bulletproofs is a simple and efficient protocol for range proofs over private values. It has also been well-studied and adapted in the literature, making it likely to be secure. 
+This is a new features, so there aren’t meaningful “alternative solutions.” Nonetheless, we believe these new features will lead to good outcomes because:
 
-ElGamal encryption done in the exponent allows for homomorphic addition of ciphertexts, i.e. encrypted values can be added together without revealing them. 
+- Bulletproofs[^bulletproofs] has been well-studied in the academic literature and deployed in production-grade systems such as [Monero](https://web.getmonero.org/resources/moneropedia/bulletproofs.html). 
+- Bulletproofs offers small proofs that are fast to verify.
 
-Ristretto255 combines the efficiency of non-prime order curves with the ease of implementation at the protocol level of prime order curves. This makes it ideal for many applications. Adding functions for point cloning and double scalar multiplications makes the pre-existing module easier to use. 
+- The modules for ElGamal encryption and Pedersen commitments over `ristretto255` will help Move developers by (1) decreasing their developement time and (2) precluding implementation
+- Adding new functions for point cloning and double scalar multiplications in `ristretto255` makes this module easier and cheaper to use.
 
 
 ## Specification
@@ -150,3 +166,8 @@ The Move module implementations have not been audited directly. The dalek-crypto
 > What is the testing plan? How is this being tested?
 
 Multiple unit tests have been written in the Ristretto255 and Bulletproofs implementations linked above. The ElGamal and Pedersen modules are exercised in unit tests in the [veiled coin](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/move-examples/veiled_coin/sources/veiled_coin.move) Move example module.
+
+## References
+
+[^bulletproofs]: **Bulletproofs: Short Proofs for Confidential Transactions and More**, by B. Bünz and J. Bootle and D. Boneh and A. Poelstra and P. Wuille and G. Maxwell, *in 2018 IEEE Symposium on Security and Privacy (SP)*, 2018, [[URL]](https://ieeexplore.ieee.org/document/8418611)
+[^provisions]: **Provisions**, by Gaby G. Dagher and Benedikt Bünz and Joseph Bonneau and Jeremy Clark and Dan Boneh, *in Proceedings of the 22nd ACM SIGSAC Conference on Computer and Communications Security*, 2015, [[URL]](https://doi.org/10.1145%2F2810103.2813674)
