@@ -13,10 +13,31 @@ requires (*optional): <AIP number(s)>
 
 # AIP-46 - New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255
 
-(Please give a temporary file name to your AIP when first drafting it, AIP manager will assign a number to it after reviewing)
 ## Summary
 
-This AIP proposes three new Move standard library cryptography modules, one implementing the [Bulletproofs](https://crypto.stanford.edu/bulletproofs/) range proof verifier, another implementing [ElGamal encryption](https://en.wikipedia.org/wiki/ElGamal_encryption), and a third implementing [Pedersen commitments](https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment). All three modules can be used for various applications. Bulletproofs is implementing using underlying native functions written in Rust. In addition, this AIP also proposes additional functions to be added to the already existing Ristretto255 elliptic curve module. These functions include natives for point cloning and double scalar multiplications, in addition to non-natives for creating scalars from u32 values, serializing compressed points, and getting the hash-to-point value of the Ristretto255 basepoint. 
+> Include a brief description summarizing the intended change. This should be no more than a couple of sentences. Discuss the business impact and business value this change would impact.
+
+This AIP proposes three **new Move modules** for cryptographic operations as part of the Aptos framework.
+
+- A [Bulletproofs](https://crypto.stanford.edu/bulletproofs/) ZK range proof verifier (over Ristretto255)
+- [ElGamal encryption](https://en.wikipedia.org/wiki/ElGamal_encryption) (over Ristretto255)
+- [Pedersen commitments](https://crypto.stackexchange.com/questions/64437/what-is-a-pedersen-commitment) (over Ristretto255)
+
+All three modules can be used for various cryptographic applications. The Bulletproofs verifier is implemented as a native function, which could be slightly cheaper in terms of gas as opposed to implementing it on top of the [`ristretto255` module](https://aptos.dev/reference/move/?branch=mainnet&page=aptos-stdlib/doc/ristretto255.md#0x1_ristretto255).
+
+In addition, this AIP also proposes **adding new functions** to the [`ristretto255` elliptic curve module](https://aptos.dev/reference/move/?branch=mainnet&page=aptos-stdlib/doc/ristretto255.md#0x1_ristretto255) to support:
+
+1. A native function point cloning, called `point_clone`
+
+2. A native function for double scalar multiplications, called `double_scalar_mul`
+3. A non-native function for creating scalars from u32 values, called `new_scalar_from_u32`
+4. A non-native function for converting a [`CompressedRistretto`](https://aptos.dev/reference/move/?branch=mainnet&page=aptos-stdlib/doc/ristretto255.md#0x1_ristretto255_CompressedRistretto) to a sequence of bytes, called `compressed_point_to_bytes`
+5. A non-native function for return a point by hashing the Ristretto255 basepoint, called `hash_to_point_base`
+
+Lastly, this AIP proposes **deprecating** two previous functions by renaming them to be more clear:
+
+1. Deprecate `new_point_from_sha512` for  `new_point_from_sha2_512`
+2. Deprecate `new_scalar_from_sha512` for  `new_scalar_from_sha2_512`
 
 ## Motivation
 
