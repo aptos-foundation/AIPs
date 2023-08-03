@@ -42,7 +42,7 @@ Lastly, this AIP proposes **deprecating** two previous functions by renaming the
 
 The impetus for this change is to provide a **more extensive suite of cryptographic tools** for Move developers. Specifically: 
 
-- **ElGamal** is an additively-homomorphic, rerandomizable encryption scheme for “small” field elements (e.g. 40-bit wide).
+- **ElGamal** is an additively-homomorphic, rerandomizable encryption scheme for “small” field elements (e.g. 40-bit wide - larger elements can be used but will not be easily decryptable).
 - **Pedersen commitments** are information-theoretic hiding, computationally-binding, homomorphic commitments to field elements.
 - **Bulletproofs** is a **zero-knowledge range proofs (ZKRP)**: i.e., a zero-knowledge proof that a secret value $v$ in a Pedersen commitment $g^v h^r$ is in specific range $v\in [0, 2^n]$.
 
@@ -111,9 +111,9 @@ At a high-level, the proposal is to:
 
 ### Implementation Details
 
-- The changes to the `ristretto255` module continue to rely on th [`dalek-cryptography/curve25519`](https://github.com/dalek-cryptography/curve25519-dalek) crate.
+- The changes to the `ristretto255` module continue to rely on the [`dalek-cryptography/curve25519`](https://github.com/dalek-cryptography/curve25519-dalek) crate.
 
-- The Bulletproofs module is implemented using the [`zkcrypto/bulletproofs`](https://github.com/zkcrypto/bulletproofs) for of the [`dalek-cryptography/bulletproofs`](https://github.com/dalek-cryptography/bulletproofs) crate. (Unfortunately, the `dalek-cryptography/bulletproofs` crate relies on a much older version of the `curve25519-dalek` library and could not be used.)
+- The Bulletproofs module is implemented using the [`zkcrypto/bulletproofs`](https://github.com/zkcrypto/bulletproofs) fork of the [`dalek-cryptography/bulletproofs`](https://github.com/dalek-cryptography/bulletproofs) crate. (Unfortunately, the `dalek-cryptography/bulletproofs` crate relies on a much older version of the `curve25519-dalek` library and could not be used.)
   - The Bulletproof ZK range proof verification is implemented as a **Move native function**
 
 - The ElGamal encryption and Pedersen commitment modules are implemented directly in Move, **without native functions**, over the `ristretto255` Move module, showcasing its power.
