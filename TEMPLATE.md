@@ -43,7 +43,7 @@ requires (*optional): <AIP number(s)>
 
 ...
 
-## Rationale
+## Alternative solutions
 
  > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
 
@@ -89,7 +89,10 @@ requires (*optional): <AIP number(s)>
 
 ### Suggested deployment timeline
 
- > When should community expect to see this deployed on devnet?
+ > Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
+ > You are responsible for updating this AIP with a better estimate, if any, after the AIP passes the gatekeeper’s design review.
+ >
+ > On devnet?
 
 ...
 
