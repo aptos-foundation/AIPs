@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: AIP-47
 title: Aggregators V2
 author: George Mitenkov, Satya Vusirikala, Rati Gelashvili, Igor Kabiljo
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Aggregators V2
+# AIP-47 - Aggregators V2
 
 ## Summary
 
@@ -70,19 +70,19 @@ Explain why you submitted this proposal specifically over alternative solutions.
 Module structs and function signatures:
 ```
 module aptos_framework::aggregator_v2 {
-   struct Aggregator has store {
-      value: u128,
-      limit: u128,
+   struct Aggregator<Element> has store {
+      value: Element,
+      max_value: Element,
    }
    struct AggregatorSnapshot<Element> has store {
       value: Element,
    }
 
-   public native fun try_add(aggregator: &mut Aggregator, value: u128): bool;
+   public native fun try_add(aggregator: &mut Aggregator<Element>, value: Element): bool;
 
-   public native fun read(aggregator: &Aggregator): u128;
+   public native fun read(aggregator: &Aggregator<Element>): Element;
 
-   public native fun deferred_read(aggregator: &Aggregator): AggregatorSnapshot<u128>;
+   public native fun deferred_read(aggregator: &Aggregator<Element>): AggregatorSnapshot<Element>;
    
    public native fun read_snapshot<Element>(aggregator_snapshot: &AggregatorSnapshot<Element>): Element;
 }
@@ -174,13 +174,16 @@ WIP on aggregators_v2 branch.
 
 ## Risks and Drawbacks
 
-Express here the potential negative ramifications of taking on this proposal. What are the hazards?
+It adds complexity, which will need to be maintained. Most of the complexity is encapsulated in the AggregatorContext and BlockSTM/MVHashMap, the rest are called out explicitly in the implementation details.
 
 ## Future Potential
 
-Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in in one year? In five years?
+This builds a path towards explointing the same observation (that some variables that get concurrently changed often, 
+commonly don’t affect the rest of the computation) for other more complicated types - like string formatting snapshots, other collections - like sets, etc. This can increase parallelism that can be achieved on the real and complicated workloads.
 
 ## Timeline
+
+Tentatively targetted for aptos-release-v1.8
 
 ### Suggested implementation timeline
 
