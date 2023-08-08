@@ -69,7 +69,7 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 40](https://github.com/aptos-foundation/AIPs/issues/178)| Core | [Address Standard v1](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-40.md) | Standard | Draft |
 | [AIP 41](https://github.com/aptos-foundation/AIPs/issues/185)| Framework | [Move APIs for randomness generation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md) | Standard | Draft |
 | AIP 42 | Core | [Aptos TypeScript SDK V2](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-42.md) | Standard | Draft |
-| AIP 43 | Framework | [Digital Asset](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-43.md) | Standard | Draft |
+| [AIP 43](https://github.com/aptos-foundation/AIPs/issues/209) | Framework | [Parallelize Digital Assets (Token V2) minting/burning](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-43.md) | Standard | Draft |
 | [AIP 44](https://github.com/aptos-foundation/AIPs/issues/200) | Core | [Module Events](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-44.md) | Standard | Draft |
 | ... | ... |
 
