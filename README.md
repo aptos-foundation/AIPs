@@ -9,7 +9,7 @@ To vote on AIPs impacting the state of the Blockchain, go to https://governance.
 ## How to submit an AIP
 
  1. Fork this repo into your own GitHub
- 2. Copy `TEMPLATE.md` into your new AIP file in `aips/<your-feature-name-NO-AIP-#-here>.md`
+ 2. Copy [`TEMPLATE.md`](TEMPLATE.md) into your new AIP file in `aips/<your-feature-name-NO-AIP-#-here>.md`
     + Name your AIP file based on your feature, not the AIP number, which will be picked for your later.
     + e.g., `new-zero-knowledge-range-proof-verifiers.md` is a good name.
     - ...but `aip-14.md` or `14.md` is **NOT** a good name.
@@ -24,9 +24,9 @@ To vote on AIPs impacting the state of the Blockchain, go to https://governance.
 
 This table contains an overview of all created and tracked AIPs. It should be updated with each new AIP.
 
-| Number | Layer | Title  | Type | Status
+| Number | Layer | Title  | Type | Status|
 |:---|:---|:---|:---|:---|
-| AIP 0 | | [Aptos Improvement Proposals](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-0.md) | Informational | Active |
+| AIP 0 | | [Aptos Improvement Proposals](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-0.md) | Informational | Accepted |
 | [AIP 1](https://github.com/aptos-foundation/AIPs/issues/9) | Core | [Proposer selection improvements](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-1.md) | Standard | Accepted |
 | [AIP 2](https://github.com/aptos-foundation/AIPs/issues/2) | Framework | [Multiple Token Changes](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-2.md) | Standard | Accepted |
 | [AIP 3](https://github.com/aptos-foundation/AIPs/issues/3) | Framework | [Multi-step Governance Proposal](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-3.md) | Standard | Accepted |
@@ -71,7 +71,8 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 42 | Core | [Aptos TypeScript SDK V2](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-42.md) | Standard | Draft |
 | [AIP 43](https://github.com/aptos-foundation/AIPs/issues/209) | Framework | [Parallelize Digital Assets (Token V2) minting/burning](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-43.md) | Standard | Draft |
 | [AIP 44](https://github.com/aptos-foundation/AIPs/issues/200) | Core | [Module Events](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-44.md) | Standard | Draft |
-| ... | ... |
+| AIP 46 | Framework | [New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-46.md) | Standard | Draft |
+| ... | ... ||||
 
 ## Types of AIPs
 * Standard: AIPs focusing on the changes to the Aptos blockchain.
