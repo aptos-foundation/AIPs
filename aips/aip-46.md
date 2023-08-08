@@ -164,7 +164,10 @@ Release 1.7.
 
 > Has this change being audited by any auditing firm? 
 
-No.
+No, since the proposed changes are either:
+
+- New natives that wrap existing **audited** cryptographic libraries. 
+- New modules for **simple** cryptographic primitives: i.e., Pedersen comitments and ElGamal encryption are straightforward to implement.
 
 > Any potential scams? What are the mitigation strategies?
 
