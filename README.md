@@ -35,12 +35,12 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 6](https://github.com/aptos-foundation/AIPs/issues/20) | Framework| [Delegation pool for node operators](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-6.md) | Standard | Accepted |
 | [AIP 7](https://github.com/aptos-foundation/AIPs/issues/23) | Framework | [Transaction fee distribution](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-7.md) | Standard | Draft |
 | [AIP 8](https://github.com/aptos-foundation/AIPs/issues/33) | Framework | [Higher-Order Inline Functions for Collections](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-8.md) | Standard | Accepted |
-| [AIP 9](https://github.com/aptos-foundation/AIPs/issues/26) | Interface/ Framework | [Resource Groups](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-9.md) | Standard | Accepted
-| [AIP 10](https://github.com/aptos-foundation/AIPs/issues/27) | Framework | [Move Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-10.md) | Standard | Accepted | 
+| [AIP 9](https://github.com/aptos-foundation/AIPs/issues/26) | Interface/ Framework | [Resource Groups](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-9.md) | Standard | Accepted|
+| [AIP 10](https://github.com/aptos-foundation/AIPs/issues/27) | Framework | [Move Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-10.md) | Standard | Accepted |
 | [AIP 11](https://github.com/aptos-foundation/AIPs/issues/31) | Framework | [Digital Assets: Tokens as Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-11.md) | Standard | Accepted |
 |[AIP 12](https://github.com/aptos-foundation/AIPs/issues/50) | Framework | [Multisig Accounts v2](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-12.md) | Standard | Accepted |
 | [AIP 13](https://github.com/aptos-foundation/AIPs/issues/24) | Framework | [Coin Standard Improvements](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-13.md) | Standard | Accepted |
-| AIP 14 | Framework | [Update vesting contract](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-14.md) | Standard | Accepted | 
+| AIP 14 | Framework | [Update vesting contract](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-14.md) | Standard | Accepted |
 | [AIP 15](https://github.com/aptos-foundation/AIPs/issues/28) | Framework | [Update and rename token_standard_reserved_properties](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-15.md) | Standard | Accepted |
 | [AIP 16](https://github.com/aptos-foundation/AIPs/issues/57) | Framework | [New cryptography natives for hashing and MultiEd25519 PK validation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-16.md) | Standard | Accepted |
 | [AIP 17](https://github.com/aptos-foundation/AIPs/issues/79) | Core | [Reducing Execution Costs by Decoupling Transaction Storage and Execution Charges](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-17.md) | Standard | Accepted |
@@ -71,7 +71,7 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | AIP 42 | Core | [Aptos TypeScript SDK V2](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-42.md) | Standard | Draft |
 | [AIP 43](https://github.com/aptos-foundation/AIPs/issues/209) | Framework | [Parallelize Digital Assets (Token V2) minting/burning](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-43.md) | Standard | Draft |
 | [AIP 44](https://github.com/aptos-foundation/AIPs/issues/200) | Core | [Module Events](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-44.md) | Standard | Draft |
-| AIP 46 | Framework | [New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-46.md) | Standard | Draft |
+| [AIP 46](https://github.com/aptos-foundation/AIPs/issues/222) | Framework | [New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-46.md) | Standard | Draft |
 | ... | ... ||||
 
 ## Types of AIPs
