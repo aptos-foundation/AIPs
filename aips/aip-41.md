@@ -13,6 +13,8 @@ requires (*optional): <AIP number(s)>
 
 # AIP-41 - Move APIs for randomness generation
 
+**Version:** 1.2
+
 ## Summary
 
 > Include a brief description summarizing the intended change. This should be no more than a couple of sentences. 
@@ -71,7 +73,9 @@ Nonetheless, **relying on an external beacon has several disadvantages**:
 
 We are proposing a new `aptos_std::randomness` Move module for generating publicly-verifiable randomness in Move smart contracts.
 
-The module should have a simple & hard-to-misuse interface. The current proposal is:
+The module has a simple & hard-to-misuse interface.
+
+**TODO*:** Explain rng() intuition.
 
 ### Rust-like randomness API
 
@@ -82,10 +86,12 @@ module aptos_std::randomness {
     /// This RNG object can be used to produce one or more random numbers, random permutation, etc.
     struct RandomNumberGenerator has drop { /* ... */ };
 
-    /// Returns an RNG for the current TXN and calling Move module. Repeated calls to this function 
-    /// in the same TXN context will return the same RNG: i.e., its entropy reflects the effects of 
-    /// previous calls. This is to prevent developers from accidentally calling `rng` twice and 
+    /// Returns a uniquely-seeded RNG. Repeated calls to this function will return an RNG with a different
+  	/// seed. This is to prevent developers from accidentally calling `rng` twice and 
     /// generating the same randomness.
+    ///
+    /// Calls to this function can only be made from private entry functions in modules that have
+    /// no other functions. This is to prevent _test-and-abort_ attacks.
     public fun rng(): RandomNumberGenerator { /* ... */ }
 
     /// Generates a number uniformly at random.
@@ -120,22 +126,32 @@ Imagine a lottery Move module that picks three random winners, once a certain am
 module lottery::lottery {
     use std::vector;
     use aptos_std::randomness;
+  
+  	friend lottery::lottery_decider;
    
     struct Lottery has key {
         // A list of which users bought lottery tickets
         tickets: vector<address>
-    		
-      	// ...
+    }
+  
+  	fun init_module(resource_account: &signer) {
+        let dev_address = @DEV_ADDR;
+        let signer_cap = retrieve_resource_account_cap(resource_account, dev_address);
+        let lp = LiquidityPoolInfo { signer_cap: signer_cap, ... };
+        move_to(resource_account, lp);
+    }
+  
+    public entry fun buy_ticket(user: signer) {
     }
 
-    // Called by anyone to decide the winners
-    public entry fun decide_winners() acquires Lottery {
+    /// This function must NOT be callable from a script NOR from an external module: 
+    /// it must be a top-level call. This is why we mark it as `public(friend)` and only allow the 
+    /// `lottery::lottery_decider` contract to call it via a `private entry` function. See the
+    /// test-and-abort attack discussion in AIP-41.
+    public(friend) fun decide_winners(rng: &mut RandomNumberGenerator) acquires Lottery {
     {
         // Get the `Lottery` resource
         let lottery = borrow_global_mut<Lottery>(@lottery);
-
-        // Get the random number generator
-        let rng = randomness::rng();
       
         // Randomly shuffle the vector of players [0, 1, ..., n-1]
         let p = randomness::permutation(&mut rng, vector::length(&lottery.tickets));
@@ -156,13 +172,40 @@ module lottery::lottery {
       
     // ...
 }
+
+module lottery::lottery_decider {
+
+    /// Only this private entry function can call `lottery::lottery::decide_winners` 
+    /// to avoid test-and-abort attacks.
+    private entry fun decide_winners() {
+        // Get the random number generator
+        let rng = randomness::rng();
+
+        // Call the lottery module with the RNG
+        lottery::decide_winners(&mut rng)
+
+        // Nobody can abort here because this call cannot be wrapped around unless the `lottery::lottery` module is maliciously upgraded.
+    }
+}
 ```
+
+### Test-and-abort attacks
+
+Smart contract platforms are an inherently-adversarial environment to deploy randomness in.
+
+A smart contract function call `f()` can be done either directly in a TXN or indirectly by calling it from another contract’s call `g()` or from a [Move script](https://aptos.dev/move/move-on-aptos/move-scripts/). 
+
+As a result, calls with random outcomes, such as the `decide_winners` call above, could be “tested” for success and if they fail the test, the outcomes can be aborted via a Move `abort` call.
+
+We de
+
+TODO: Problem: module can be upgraded and new friend can be added
+
+
 
 ## Open questions
 
-**O1:** Should we abort upon a second call to `randomness::rng()` in the same TXN or should we allow it, as described in [“Risks and drawbacks” ](#risks-and-drawbacks) below?
-
-**O2:** Should the `randomness` module be part of `aptos_framework` rather than `aptos_std`?
+**O1:** Should the `randomness` module be part of `aptos_framework` rather than `aptos_std`?
 
 ## Reference Implementation
 
@@ -174,29 +217,29 @@ module lottery::lottery {
 
  > Express here the potential negative ramifications of taking on this proposal. What are the hazards?
 
-There is a risk of proposing an **easy-to-misuse** API. One pitfall here would be for the API to somehow return the same randomness while developers wrongly assume different randomness is returned. The mutable RNG-based design avoids this.
+There is a risk of proposing an **easy-to-misuse** API. For example, it would be bad if developers are able to misuse the API to return identical randomness across multiple invocations (excluding allowed collisions, of course). A **mutable RNG-based design** avoids this.
 
-Importantly, even if a developer creates two RNG objects:
+Specifically, if a developer creates two RNG objects:
 
 ```
 let rng1 = randomness::rng();
 let rng2 = randomness::rng();
 ```
 
-...and uses each one to sample random `u256` integers `n1` and `n2` :
+...and uses each one to sample two random, say, `u256` integers `n1` and `n2` :
 
 ```
 let n1 = randomness::u256(&mut rng1);
 let n2 = randomness::u256(&mut rng2);
 ```
 
-...the entropy used to generate `n2` will be (likely) different than the one used to generate `n1` because the entropy underneath `rng2` will have (likely) been mutated by the previous call on `rng1`. In other words, the two RNG objects will point to the same mutable entropy underneath.
+...then we would like that the entropy used to generate `n2` (via `rng2`) be (likely) different than the entropy used to generate `n1` (via `rng1`). 
 
-Put more simply, the returned integers will be (likely) different.
+This can be done by ensuring that the entropy underneath `rng2` will (likely) be different than the entropy  on `rng1`.
 
-As a consequence, developers cannot make a mistake and accidentally generate the same randomness twice when they want different randomness.
+As a consequence, developers **cannot make a mistake** and accidentally generate the same randomness twice while wanting different randomness.
 
-**Warning**: We say “likely” due to the underlying cryptographic implementation of the entropy mutation, which will have a negligible probability (i.e., $< 1/2^{128}$) of not actually mutating the entropy (e.g., due to collisions in hash functions).
+**Why only “likely” different?**: We say “likely” due to the underlying cryptographic implementation of the entropy mutation, which will have a negligible probability (i.e., $< 1/2^{128}$) of not actually mutating the entropy (e.g., due to collisions in hash functions).
 
 **Note:** As an alternative, the API could also **abort** upon seeing a second `randomness::rng()` call in the same TXN. However, it is unclear if this would prevent use-cases where two `entry` functions call each other yet both make calls to `randomness::rng()`.
 
@@ -240,7 +283,7 @@ See [“Suggested implementation timeline”](#suggested-implementation-timeline
 
 > Has this change being audited by any auditing firm?
 
-No, and it would be wise for security firms to look over the `randomness` API and reason through how it might be mis-used.
+Not yet, but it will be audited by the time it is deployed. Updates will be posted here.
 
 > Any potential scams? What are the mitigation strategies?
 > Any security implications/considerations?
@@ -263,40 +306,7 @@ Instead, the “testing” plan is to gather feedback from Move developers and t
 
 ## Apendix 
 
-For posterity, this was the initial proposal of the randomness API:
+For posterity, past versions of this AIP were:
 
-### Seeded-`generate` & `amplify` API
-
-```rust
-module aptos_std::randomness {
-
-    /// An object that stores randomness and can be "consumed" to generate a random number, a random choice,
-    /// a random permutation, etc.
-    /// This object cannot be implicitly cloned, but can be converted (or "amplified") into two or more other
-    /// `Randomness` objects via `randomness_amplify`.
-    struct Randomness { /* ... */ };
-
-    /// Generates different randomness based on the given seed and the calling contract's address.
-    /// **WARNING:** Will return the same `Randomness` object if called with the same seed.
-    public fun generate<T>(seed: &T): Randomness { /* ... */ }
-
-    /// Amplifies the generated randomness object into multiple objects.
-    public fun amplify(r: Randomness, n: u64): vector<Randomness> { /* ... */ }
-
-    /// Consumes a `Randomness` object so as to securely generate a random integer $n \in [min_incl, max_excl)$
-    public fun number(r: Randomness, min_incl: u64, max_excl: u64): u64 { /* ... */ }
-
-    /// Consumes a `Randomness` object so as to securely pick a random element from a vector.
-    public fun pick<T>(r: Randomness, vec: &vector<T>): &T { /* ... */ }
-
-    /// Consumes a `Randomness` object so as to securely generate a random permutation of `[0, 1, ..., n-1]`
-    public fun permutation<T>(r: Randomness, n: u64): vector<u64> { /* ... */ }
-
-    //
-    // More functions can be added here to support other randomness generations operations
-    // (e.g., `public fun random_bytes(r: Randomness, size: u64): vector<u8>`)
-    //
-}
-```
-
-The lottery example from above would look slightly different (see [the older code here](https://github.com/aptos-foundation/AIPs/blob/835cf893e1d7ae6ec180810d0cb26be64ff4c1b5/aips/aip-41.md#how-to-use-the-randomness-api)).
+- [v1.0](https://github.com/aptos-foundation/AIPs/blob/4577f34c8df6c52a213223cd62472ea59e3861ef/aips/aip-41.md), which included a more complicated `randomness` API
+- [v1.1](https://github.com/aptos-foundation/AIPs/blob/3e40b4e630eb8aa517b617799f8e578f5f937682/aips/aip-41.md), which failed to account for _test-and-abort_ attacks via Move scripts or external modules.
