@@ -1,14 +1,14 @@
 ---
 aip: 43
 title: Parallelize Digital Assets (Token V2) minting/burning
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
+author: igor-aptos (https://github.com/igor-aptos), vusirikala (https://github.com/vusirikala)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/209
-Status: Draft
+Status: In Review
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
-created: <mm/dd/yyyy>
+created: 07/20/2023
 updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+requires (*optional): AIP-47, AIP-44
 ---
 
 # AIP-43 - Parallelize Digital Assets (Token V2) minting/burning
@@ -35,7 +35,7 @@ This will enable higher throughput for Token V2 NFT minting/burning of a single 
 
 AIP 36 removed one serialization point. We can remove the rest with:
 - using Aggregators for total_supply and current_supply counters in the collection.move
-- parallelize event creation. Either use Aggregators for counter in the event.move, or remove sequence number from events altogether 
+- parallelize event creation. Either use Aggregators for counter in the event.move, or use module events that remove sequence number altogether 
 
 ## Rationale
 
@@ -63,28 +63,25 @@ Think through the evolution of this proposal well into the future. How do you se
 
 ### Suggested implementation timeline
 
-Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
-  
+Implementation of this AIP will be close to the drafts linked, and is simple. Majority of the complexity comes from depenedent AIPs.
+
 ### Suggested developer platform support timeline
 
-Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
+New structs are being added to Collection and Token, which will need to be indexed and usages updated in order to provide:
+- index for concurrent collections (different index field will be set)
+- supply for concurrent collections (different resource will contain supply of the collection)
+
+Indexer changes are being designed.
 
 ### Suggested deployment timeline
 
-When should community expect to see this deployed on devnet?
-
-On testnet?
-
-On mainnet?
+Tentative to be included in v1.8
 
 ## Security Considerations
 
-Has this change being audited by any auditing firm? 
-Any potential scams? What are the mitigation strategies?
-Any security implications/considerations?
-Any security design docs or auditing materials that can be shared?
+Design has been reviewed within the team, and any PRs will be carefully reviewed as well.
+This PR provides equivalent functionality that exists today, in a parallizable way, most security considerations will come from implementations of the dependent AIPs.
 
 ## Testing (optional)
 
-What is the testing plan? How is this being tested?
-
+Once implemented, and once the dependencies are implemented, testing will include move unit tests for correctness, as well as benchmark evaluation for performance implications.
