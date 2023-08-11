@@ -19,9 +19,9 @@ Proposed is to refund part of storage fee (introduce in [API-17](https://github.
 
 To reflect that freed storage slots no longer impose costs to the blockchain.
 
-Now that [AIP-17](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-17.md) has been implemented and deployed, storage allocation is charged on a per slot basis and according to native currency based pricing without being affected by the gas price. On top of that, we propose to track the original payer of storage slots, so that we will be able to refund on slot deallocation. This makes the storage fee charged for slot allocation become "storage deposit".
+Now that [AIP-17](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-17.md) has been implemented and deployed, storage allocation is charged on a per slot basis and according to native currency based pricing without being affected by the gas price. On top of that, we propose to keep a record of the amount paid for the allocation, so that we will be able to refund it. 
 
-Storage refund incentivizes cleaning up unused storage slots. The ratio of refund can be high or even 100% when the deletion happens soon after the creation and degrades over time to a certain ratio, further incentivizing timely cleaning up.
+Storage refund incentivizes cleaning up unused storage slots.
 
 ## Alternative - Ephemeral Slots
 
@@ -29,7 +29,7 @@ We can provide interfaces for a Move contract to allow a storage slot to go away
 
 Because the allowed life span can't be too short due to practicality and cost associated, it's fairly possible for one to fill up the storage for cheap if the upfront charge is too low, defeating the purpose. At the same time items that goes away automatically and permanently can result in user confusion and fraud.
 
-None the less this can be a user experience improvement but is a more intrusive semantic change for a developer and a user. Could be something to consider in the future.
+Nonetheless this can be a user experience improvement but is a more intrusive semantic change for a developer and a user. Could be something to consider in the future.
 
 ## Alternative - Rent
 
@@ -48,38 +48,29 @@ No visible change to how one writes Move. But the economics changes:
 
 ## Economics
 
-- Storage fee charged for slot allocation is now "storage deposit" and added to a global aggregator tracking the total storage deposit balance (much like how we track the global total supply).
-- The transaction sender's address, the current on-chain timestamp and the deposit paid for slot allocation (not that paid for excess bytes, see below) will be tracked as metadata attached to the slot.
-- For a deleted slot, a refund is deducted from said global aggregator and deposit to the original creator's account. The refund is calculated based on the original amount charged for the slot allocation, not including the excess bytes penalty, with a degrading refund ratio according to the original creation timestamp.
-- The global storage deposit, if not redistributed, will be always non-negative because a refund is never greater than the deposit. This adds a deflationary force to the economy and should be revisited when necessary in the future.
-
-## Configuration
-
-The following parameters will be added to the gas schedule (although this is not technically gas, this is to avoid yet another configuration that needs to be loaded separately):
-
-- `max_storage_slot_refund_ratio` (base points) Proportion of the refund given if a transaction in the same block deletes a slot created previously in the block. `10000` means 100%.
-- `min_storage_slot_refund_ratio` (base points) Proportion of the refund given if a slot to be deleted has lived longer than the following parameter, according to on-chain timestamp. `10000` means 100%.
-- `storage_refund_degrade_start` (microseconds) If a slot is deleted when younger than this, the maximum ratio is used for refund.
-- `storage_refund_degrade_period` (microseconds) Refund degrading period. Within the period the refund degrades linearly from the max ratio to the min ratio defined above;  after the period the min refund ratio is used.
-
-![deletion_refund_ratio](../diagrams/deletion_refund_ratio.jpeg)
+- The current on-chain timestamp and the amount paid for slot allocation will be tracked as metadata attached to the slot. For simplicity, the refundable part of the gas charge will be burnt even if other parts of the gas charge are redistributed, lowering the global supply of the native token.
+- For a deleted slot, a refund is mintted and issued to the transaction payer, increasing the global supply of the native token.
 
 # Reference Implementation
 
-https://github.com/aptos-labs/aptos-core/pull/6514
+[TBD]
 
 # Risks and Drawbacks
 
-- Cost from refunding to multiple accounts: a transaction releasing a lot of slots can potentially involve a lot of storage writes; this is protected by ensuring those writes are charged according to the normal gas schedule and write set size limits.
+1. Refunding to the deleter makes it profitable for a malicious module developer to update the code and delete user data.
+2. Refunding to the deleter makes it easy to resell storage slots, which promotes speculation on storage pricing.
+3. Full refund provides no protection against reserving storage for future usage or reselling. In expectation of higher storage pricing, one can speculatively reserve storage slots for long at virtually no cost (aside from locking up the value).
 
 # Future Potential
 
-## Billing accounts
+## Declining Refund Ratio Over Time
 
-Extra semantics can be implemented so that a party other than the transaction sender can pay for selective storage allocations involved in the transaction. This allows the contract developer to pay for shared storage slots. Because deletions are refunded, maintaining a small active set of shared slots, despite allocations and deallocations happen frequently, imposes minimal cost but smoothens user experience. It also enables various economic activities like subsidizing the cost between different contracts.
+To protect against speculation on storage pricing and incentivize timely storage clean up, the refund can be implemented as declining over time -- If deleted swiftly, the refund will be full, and over time the refund ratio declines to a configurable minimal.
 
-This is worth a separate AIP as a follow up.
+## Storage Deposit
+
+The refundable amount can be tracked globally or on a per acount basis (call it storage deposit), providing clarity and potentially enables incentivizing the validators for storing the onchain data by generating and redistributing interest from the deposit.
 
 # Suggested Implementation Timeline
 
-June to the testnet.
+Release 1.8

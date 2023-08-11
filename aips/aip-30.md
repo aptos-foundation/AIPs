@@ -1,13 +1,13 @@
 ---
 aip: 30
 title: Implement decrease in staking rewards
-author: michelle-aptos, xindingw
+author: michelle-aptos, xindingw, junkil-park
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/119
 Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Framework
 created: 5/3/2023
-updated (*optional): 5/3/2023
+updated (*optional): 7/28/2023
 ---
 
 # AIP-30 - Implement decrease in staking rewards
@@ -18,11 +18,12 @@ In [Aptos tokenomics overview](https://aptosfoundation.org/currents/aptos-tokeno
 - The maximum reward rate declines by 1.5% yearly until a lower bound of 3.25% annually (expected to take over 50 years).
 
 For example:
-- Maximum reward rate in the 1st year(year starts from genesis timestam 2023/10/12): $7\%$
-- Maximum reward rate in the 2nd year: $7\% * (100\%-1.5\%) = 6.895\%$
-- Maximum reward rate in the 3rd year: $7\% * (100\%-1.5\%)^2 = 6.791575\%$
+- Maximum reward rate in the 1st year(year starts from genesis timestam 2023/10/12): $`7\%`$
+- Maximum reward rate in the 2nd year: $`7\% * (100\%-1.5\%) = 6.895\%`$
+- Maximum reward rate in the 3rd year: $`7\% * (100\%-1.5\%)^2 = 6.791575\%`$
 - ...
-- Maximum reward rate in the 52nd year: $max\{3.25\%, 7\% * (100\%-1.5\%)^{51}\} = 3.25\%$
+- Maximum reward rate in the 51rd year: $`7\% * (100\%-1.5\%)^50 \approx 3.28783\%`$
+- Maximum reward rate in the 52nd year: $`max(3.25\%, 7\% * (100\%-1.5\%)^{51}) = 3.25\%`$
 
 ## Motivation
 
@@ -49,4 +50,4 @@ All rewards and reward mechanisms are also modifiable via on-chain governance
 
 ## Suggested implementation timeline
 
-Targeting end of Q2
+Targeting end of Q3 2023

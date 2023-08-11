@@ -1,6 +1,6 @@
 ---
 aip: 22
-title: No-Code Tokens Objects
+title: No-Code Digital Assets (Token Objects)
 author: davidiw, movekevin, lightmark, capcap
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/31
 Status: Accepted
@@ -11,7 +11,7 @@ updated:
 requires: [AIP-11](Tokens as Objects)
 ---
 
-# AIP-22 - No-Code Token Objects
+# AIP-22 - No-Code Digital Assets (Token Objects)
 
 ## Summary
 
