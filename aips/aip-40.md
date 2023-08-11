@@ -7,17 +7,19 @@ Status: Draft
 last-call-end-date (*optional): 07/10/2023
 type: Standard
 created: 06/18/2023
-updated (*optional):
+updated: 08/11/2023
 requires (*optional):
 ---
+
+todo: change the git hash for all links once the PR lands
 
 # AIP-40 - Address Standard v1
 
 ## Summary
 This standard defines the following:
 
-- What format APIs should return addresses in.
-- What formats APIs should accept addresses in.
+- What format APIs / tools should return addresses in.
+- What formats APIs / tools should accept addresses in.
 - How addresses should be displayed.
 - How addresses should be stored.
 
@@ -38,7 +40,7 @@ As such, those who need to take action based on this AIP are generally platform 
 Instead of defining a v1 standard we could immediately skip to a v2 standard. In this standard we could / would overhaul all identifiers (addresses, public keys, private keys, how we represent resources, bytes, etc). We could do this, but I suspect the discussion, implementation, and migration would take a very long time. So it is best to define a standard for what we have now and look into a v2 standard later.
 
 ### Alternative: Represent all addresses in LONG form
-In this alternative world we don't display special (see definition below) addresses differently, we just use the LONG form. This would make for a simpler standard but the UX would be poor, people are used to seeing addresses like 0x1. Indeed there is potential for malicious actors to display addresses that look like special addresses but are not, e.g. `0x0{62}1` vs `0x0{63}1`.
+In this alternative world we don't display special (see definition below) addresses differently, we just use the LONG form. This would make for a simpler standard but the UX would be poor, people are used to seeing special addresses (defined below) represented in short form, e.g. 0x1. In fact, there are benefits to allowing short form representation for special addresses, e.g. to avoid the potential for malicious actors displaying addresses that look like special addresses but are not, e.g. `0x0{62}1` vs `0x0{63}1`.
 
 ## Specification
 
@@ -83,17 +85,26 @@ Same as `SHORT`, but without the `0x` prefix.
 ### Special Addresses
 Addresses are considered special if the first 63 characters of the hex string after the 0x prefix are zero. In other words, an address is special if the first 31 bytes are zero and the last byte is smaller than than `0b10000` (16). In other words, special is defined as an address that matches the following regex: `^0x0{63}[0-9a-f]$`. In short form this means the addresses in the range from `0x0` to `0xf` (inclusive) are special.
 
-This is explained in greater detail in the [reference implementation](https://github.com/aptos-labs/aptos-core/pull/8727).
+This is explained in greater detail in the [reference implementation](https://github.com/aptos-labs/aptos-core/blob/78d2ec526453acc51437707b9fb9e38bcd3aafea/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L85).
 
 ### Acceptable Input Formats
-- APIs and other input fields (e.g. in wallets, sites, etc.) MUST accept addresses in the following formats:
-    - `LONG` (with or without leading 0x)
-    - `SHORT` for special addresses (with or without leading 0x)
-    - Binary (see Binary Representation below)
-- They SHOULD NOT accept addresses in the following formats:
-    - `SHORT` for non-special addresses (with or without leading 0x)
+Functions that parse / validate strings representing account addresses MUST accept the following formats (in which the leading 0x is mandatory):
 
-The principle is things accepting addresses as input should accept all valid representations of addresses that do not introduce phishing concerns / potential for mistakes. This is why `SHORT` is not allowed for non-special addresses, it is too easy to make a mistake (e.g. miss a single leading zero) and interact with the wrong address.
+a. LONG
+b. SHORT for special addresses
+
+Additionally, functions that parse / validate account addresses MAY accept the following:
+
+c. LONG with or without leading 0x
+d. SHORT with or without leading 0x for all addresses (not just special)
+
+The following correspond to representations actively in circulation. Implementations MAY accept these formats for the sake of backwards compatibility with the existing ecosystem. This is necessary since some tools return account addresses in these latter formats and cannot be updated without breaking backwards compatibility.
+
+Where possible, developers should avoid accepting these formats (e.g. when building APIs, wallets, tools, etc) but it is allowed in order to maintain compatibility.
+
+A reference implementation of this principle can be found in the v2 TypeScript SDK:
+- [fromString](https://github.com/aptos-labs/aptos-core/blob/78d2ec526453acc51437707b9fb9e38bcd3aafea/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L187): This stricter function only accepts addresses in formats `a` and `b`.
+- [fromStringRelaxed](https://github.com/aptos-labs/aptos-core/blob/78d2ec526453acc51437707b9fb9e38bcd3aafea/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L230): This more relaxed function accepts addresses in formats `a`, `b`, `c`, and `d`.
 
 ### Display Format
 This describes how addresses should be displayed. Display here refers to any time an address is shown to a user, including in web UIs, logs, compiler output, etc.
@@ -117,7 +128,9 @@ Note: Binary representation of addresses at rest is preferred.
 When using a binary representation, addresses MUST be encoded as BCS in the [canonical format](https://github.com/move-language/move/blob/8f5303a365cf9da7554f8f18c393b3d6eb4867f2/language/move-core/types/src/account_address.rs#L58).
 
 ## Reference Implementation
-This PR implements a function called `to_standard_string` that formats addresses as a string in a way that conforms to the standard: https://github.com/aptos-labs/aptos-core/pull/8727. The `from_str` implementation on that class is already compliant with the standard.
+The implementation of [toString](https://github.com/aptos-labs/aptos-core/blob/78d2ec526453acc51437707b9fb9e38bcd3aafea/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L105) in the v2 Typescript SDK returns account addresses as strings in a way that conforms to the standard.
+
+The `fromString` and `fromStringRelaxed` functions implement the parsing / validation side of the standard as described above.
 
 ## Risks and Drawbacks
 Given different tools, sites, etc. represent / accept addresses in different ways already, this standard should not further fracture the ecosystem, but rather bring it together. Additionally, we are not planning on making breaking changes to existing APIs. So the risks should be minimal.
@@ -126,9 +139,9 @@ Given different tools, sites, etc. represent / accept addresses in different way
 In this section I outline the order we must implement changes. I leave determining specific dates as a later exercise.
 
 ### Ensure standard-compliant address libraries exist
-In the main languages we support (TypeScript, Rust, and Python), we must ensure that there are Address classes that conform to the standard. We should also strive to support other important languages like C#. This essentially means the following functions must exist:
+In the main languages we support (TypeScript, Rust, and Python), we must ensure that there are AccountAddress classes that conform to the standard. We should also strive to support other important languages like C#. This essentially means the following functions must exist:
 - A function that outputs an address as a string that conforms to the standard.
-- A function that parses an address from a string in a way that conforms to the standard.
+- A function that parses an address from a string in a way that conforms to the standard (strict and relaxed).
 - A function that checks for equality of addresses (effectively combining the two prior functions).
 
 The reference implementation implements this for Rust. TypeScript and Python will be fast follows given the changes are minor.
