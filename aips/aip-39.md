@@ -1,7 +1,7 @@
 ---
 aip: 39
 title: Separate gas payer
-author: gerben-stavenga, movekevin, davidiw
+author: gerben-stavenga, movekevin, davidiw, kslee8224, neoul, styner32
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/173
 Status: Draft
 last-call-end-date: TBD
