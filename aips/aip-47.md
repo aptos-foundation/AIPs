@@ -1,14 +1,14 @@
 ---
 aip: AIP-47
 title: Aggregators V2
-author: George Mitenkov, Satya Vusirikala, Rati Gelashvili, Igor Kabiljo
-discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+author: georgemitenkov (https://github.com/georgemitenkov), vusirikala (https://github.com/vusirikala), gelash (https://github.com/gelash), igor-aptos (https://github.com/igor-aptos)
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/226
+Status: In Review
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core/Framework)
-created: <mm/dd/yyyy>
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+created: 08/09/2023
+updated (*optional): 
+requires (*optional): 
 ---
 
 # AIP-47 - Aggregators V2
@@ -16,9 +16,8 @@ requires (*optional): <AIP number(s)>
 ## Summary
 
 Abstraction for enabling efficient concurrent modifications of a counter, that has an optional limit defined, and be able to efficiently extract it's value and store it in another resource.
-It revamps and expands on current notion of Aggregators, and adds new notion of AggregatorSnapshots
+It revamps and expands on current notion of `Aggregators`, and adds new notion of `AggregatorSnapshots`.
 
-We currently have Aggregator Revamp aggregators to be usable for larger variety of needs, and to be more user-friendly.
 Specifically, allow aggregators to be used efficiently for control flow based on whether numeric operations would be executed or overflow/underflow, as well as allowing values from aggregators to be stored elsewhere, without incurring performance impact.
 
 ## Motivation
@@ -46,7 +45,7 @@ Above code would be translated into a code that can be executed in parallel:
 ```
 let a = borrow_global_mut<A>(shared_addr1);
 aggregator_v2::add(a.value, 1);                                       <-  concurrently changed often
-move_to(signer, B {value: aggregator_v2::delayed_read(a.value)});     <-  used for write only
+move_to(signer, B {value: aggregator_v2::snapshot(a.value)});     <-  used for write only
 ```
 
 In case value is needed for execution flow or something more complex, we can either:
@@ -82,14 +81,14 @@ module aptos_framework::aggregator_v2 {
 
    public native fun read(aggregator: &Aggregator<Element>): Element;
 
-   public native fun deferred_read(aggregator: &Aggregator<Element>): AggregatorSnapshot<Element>;
+   public native fun snapshot(aggregator: &Aggregator<Element>): AggregatorSnapshot<Element>;
    
    public native fun read_snapshot<Element>(aggregator_snapshot: &AggregatorSnapshot<Element>): Element;
 }
 ```
 
 Modification/write paths are efficient, read paths are expensive. 
-That means that `try_add` and `deferred_read` are efficient (except when `try_add` returns a different value from the last time it was called), 
+That means that `try_add` and `snapshot` are efficient (except when `try_add` returns a different value from the last time it was called), 
 while `read`/`read_snapshot` sequentialize the workload if called close to a modification. 
 Note, that means that `read_snapshot` is generally cheap if done not too close to `snapshot` call that created it.
 
@@ -187,28 +186,24 @@ Tentatively targetted for aptos-release-v1.8
 
 ### Suggested implementation timeline
 
-Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
-  
+Above design has been completed, and implementation is ongoing, and you can follow it on the aggregators_v2 branch
+
 ### Suggested developer platform support timeline
 
-Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
+This simplifies external support of aggregator values (compared to V1), as values are stored inline in the resources themselves.
+
+Values that depend on aggregators - now have a layer of indiraction - `AggregatorSnapshot`. We will have to appropriately work on this for usages of aggregators, i.e. in AIP-43, etc.
+
+We will also add more documentation/learning resources on how to use Aggregators correctly.
 
 ### Suggested deployment timeline
 
-When should community expect to see this deployed on devnet?
-
-On testnet?
-
-On mainnet?
+Tentatively with aptos-release-v1.8
 
 ## Security Considerations
 
-Has this change being audited by any auditing firm? 
-Any potential scams? What are the mitigation strategies?
-Any security implications/considerations?
-Any security design docs or auditing materials that can be shared?
+Main security consideration here is correctness of execution and determinism. Design components have been reviewed, and we are looking at extensive testing.
 
 ## Testing (optional)
 
-What is the testing plan? How is this being tested?
-
+Once completed, we will have extensive unit tests, as well as benchmarks to validate performance improvements, and comparisons to naive approaches.
