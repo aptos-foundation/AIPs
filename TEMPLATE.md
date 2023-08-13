@@ -19,20 +19,22 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
- > Include a brief description summarizing the intended change. This should be no more than a couple of sentences. 
+ > Summarize in 3-5 sentences what is the problem we’re solving for and how are we solving for it
 
-...
+### Goals
 
+ > What are the goals and what is in scope? Any metrics?
  > Discuss the business impact and business value this change would impact.
-
+ > 
 ...
+
+### Out of Scope
+
+ > What are we committing to not doing and why are they scoped out?
 
 ## Motivation
 
  > Describe the impetus for this change. What does it accomplish?
-
-...
- 
  > What might occur if we do not accept this proposal?
 
 ...
@@ -51,7 +53,7 @@ requires (*optional): <AIP number(s)>
 
 ## Specification
 
- > Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
+ > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
 ...
 
@@ -61,9 +63,19 @@ requires (*optional): <AIP number(s)>
 
 ...
 
+## Testing (Optional)
+
+ > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out)
+ > - When can we expect the results?
+ > - What are the test results and are they what we expected? If not, explain the gap.
+
+...
+
 ## Risks and Drawbacks
 
- > Express here the potential negative ramifications of taking on this proposal. What are the hazards?
+ > - Express here the potential negative ramifications of taking on this proposal. What are the hazards?
+ > - Any backwards compatibility issues we should be aware of?
+ > - If there are issues, how can we mitigate or resolve them?
 
 ...
 
@@ -92,39 +104,19 @@ requires (*optional): <AIP number(s)>
  > Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
  > You are responsible for updating this AIP with a better estimate, if any, after the AIP passes the gatekeeper’s design review.
  >
- > On devnet?
-
-...
-
- > On testnet?
-
-...
-
- > On mainnet?
+ > - On devnet?
+ > - On testnet?
+ > - On mainnet?
 
 ...
 
 ## Security Considerations
 
- > Has this change being audited by any auditing firm? 
+ > - Does this result in a change of security assumptions or our threat model?
+ > - Any potential scams? What are the mitigation strategies?
+ > - Any security implications/considerations?
+ > - Any security design docs or auditing materials that can be shared?
 
-...
+## Open Questions (Optional)
 
- > Any potential scams? What are the mitigation strategies?
-
-...
-
- > Any security implications/considerations?
-
-...
-
- > Any security design docs or auditing materials that can be shared?
-
-...
-
-## Testing (optional)
-
- > What is the testing plan? How is this being tested?
-
-...
-
+ > Q&A here, some of them can have answers some of those questions can be things we have not figured out but we should
