@@ -13,9 +13,9 @@ requires (*optional): <AIP number(s)>
 
 # AIP-X - (AIP title)
   
-(Please give a temporary file name to your AIP when first drafting it, AIP manager will assign a number to it after reviewing.)
+(Please give a temporary file name to your AIP when first drafting it, such as `aip-x.md`. The AIP manager will assign a number to it after reviewing.)
 
-(Please leave the questions in the "quote box" and provide your answer(s) directly below them, as opposed to removing the questions and providing an answer without context to the reader. Including the question being answered as additional context should be very helpful for the reader to understand.)
+(Please remove the questions in the "quote box". Provide complete context to the questions being asked in the content that you provide.)
 
 ## Summary
 
