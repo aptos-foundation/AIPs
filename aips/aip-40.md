@@ -11,8 +11,6 @@ updated: 08/11/2023
 requires (*optional):
 ---
 
-todo: change the git hash for all links once the PR lands
-
 # AIP-40 - Address Standard v1
 
 ## Summary
@@ -85,26 +83,26 @@ Same as `SHORT`, but without the `0x` prefix.
 ### Special Addresses
 Addresses are considered special if the first 63 characters of the hex string after the 0x prefix are zero. In other words, an address is special if the first 31 bytes are zero and the last byte is smaller than than `0b10000` (16). In other words, special is defined as an address that matches the following regex: `^0x0{63}[0-9a-f]$`. In short form this means the addresses in the range from `0x0` to `0xf` (inclusive) are special.
 
-This is explained in greater detail in the [reference implementation](https://github.com/aptos-labs/aptos-core/blob/78d2ec526453acc51437707b9fb9e38bcd3aafea/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L85).
+This is explained in greater detail in the [reference implementation](https://github.com/aptos-labs/aptos-core/blob/a470fe22158c2bb50c6363c02a0ffee8718475fd/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L86).
 
 ### Acceptable Input Formats
 Functions that parse / validate strings representing account addresses MUST accept the following formats (in which the leading 0x is mandatory):
 
-a. LONG
-b. SHORT for special addresses
+1. LONG
+2. SHORT for special addresses
 
 Additionally, functions that parse / validate account addresses MAY accept the following:
 
-c. LONG with or without leading 0x
-d. SHORT with or without leading 0x for all addresses (not just special)
+3. LONG with or without leading 0x
+4. SHORT with or without leading 0x for all addresses (not just special)
 
 The following correspond to representations actively in circulation. Implementations MAY accept these formats for the sake of backwards compatibility with the existing ecosystem. This is necessary since some tools return account addresses in these latter formats and cannot be updated without breaking backwards compatibility.
 
 Where possible, developers should avoid accepting these formats (e.g. when building APIs, wallets, tools, etc) but it is allowed in order to maintain compatibility.
 
 A reference implementation of this principle can be found in the v2 TypeScript SDK:
-- [fromString](https://github.com/aptos-labs/aptos-core/blob/78d2ec526453acc51437707b9fb9e38bcd3aafea/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L187): This stricter function only accepts addresses in formats `a` and `b`.
-- [fromStringRelaxed](https://github.com/aptos-labs/aptos-core/blob/78d2ec526453acc51437707b9fb9e38bcd3aafea/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L230): This more relaxed function accepts addresses in formats `a`, `b`, `c`, and `d`.
+- [fromString](https://github.com/aptos-labs/aptos-core/blob/a470fe22158c2bb50c6363c02a0ffee8718475fd/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L198): This stricter function only accepts addresses in formats `1` and `2`.
+- [fromStringRelaxed](https://github.com/aptos-labs/aptos-core/blob/a470fe22158c2bb50c6363c02a0ffee8718475fd/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L253): This more relaxed function accepts addresses in formats `1`, `2`, `3`, and `4`.
 
 ### Display Format
 This describes how addresses should be displayed. Display here refers to any time an address is shown to a user, including in web UIs, logs, compiler output, etc.
@@ -115,12 +113,12 @@ This describes how addresses should be displayed. Display here refers to any tim
 ### Response Format
 This section defines how to represent addresses in responses from APIs (such as those exposed by nodes and the indexer) and any other programming interface when using a hex representation.
 
-- Addresses MUST be formatted using the same rules as for [Display format](https://www.notion.so/Aptos-Address-Standard-44fcda44afb943188712339c818760ee?pvs=21).
+- Addresses MUST be formatted using the same rules as for [Display Format](#display-format).
 
 ### At Rest Format
 Some systems, such as the indexer processors when writing to storage, store addresses using a string representation.
 
-- Addresses SHOULD be formatted using the same rules as for [Display format](https://www.notion.so/Aptos-Address-Standard-44fcda44afb943188712339c818760ee?pvs=21).
+- Addresses SHOULD be formatted using the same rules as for [Display Format](#display-format).
 
 Note: Binary representation of addresses at rest is preferred.
 
@@ -128,7 +126,7 @@ Note: Binary representation of addresses at rest is preferred.
 When using a binary representation, addresses MUST be encoded as BCS in the [canonical format](https://github.com/move-language/move/blob/8f5303a365cf9da7554f8f18c393b3d6eb4867f2/language/move-core/types/src/account_address.rs#L58).
 
 ## Reference Implementation
-The implementation of [toString](https://github.com/aptos-labs/aptos-core/blob/78d2ec526453acc51437707b9fb9e38bcd3aafea/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L105) in the v2 Typescript SDK returns account addresses as strings in a way that conforms to the standard.
+The implementation of [toString](https://github.com/aptos-labs/aptos-core/blob/a470fe22158c2bb50c6363c02a0ffee8718475fd/ecosystem/typescript/sdk_v2/src/core/account_address.ts#L106) in the v2 Typescript SDK returns account addresses as strings in a way that conforms to the standard.
 
 The `fromString` and `fromStringRelaxed` functions implement the parsing / validation side of the standard as described above.
 
