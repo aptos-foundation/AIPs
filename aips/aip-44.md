@@ -41,15 +41,12 @@ change is not transparent to users either. Also, it fails to address other issue
 
 At move smart contract level, module event would be identified as a `struct` type with `#[event]` attribute which will be evaluated by the extended type checker.
 
-Besides, module event introduces a required field attribute `#[index]`, to be put on only one field, based on which aptos node will build secondary events index.
-
 Module Event Example:
 
 ```rust
 /// An example module event struct denotes a coin transfer.
 #[event]
 struct TransferEvent<Coin> {
-  #[indexed] // index by sender address
   sender: address,
   receiver: address,
   amount: u64
@@ -65,41 +62,15 @@ public fun emit<T>(event: &T) {
 }
 ```
 
-At storage level, new tables will be added to facilitate storing and basic indexing of module events.
+At storage level, no new tables will be added as we will reuse the main event table.
 
 ```rust
-//! table_event_struct_tag_hash_to_move_layout
-//! |<----------key-------->|<--------value------->|
-//! | event_struct_tag_hash |  event_move_layout   |
 //! table_event_data
-//! |<------key------>|<----------------value------------------>|
-//! | version | index | event_struct_tag_hash | bcs_event_bytes |
-//! table_event_primary_index
-//! |<------------------key------------------>|
-//! | event_struct_tag_hash | version | index |  
-//! table_event_secondary_index
-//! |<---------------------------key-------------------------------->|
-//! | event_struct_tag_hash | hashed_indexed_field | version | index |  
+//! |<------key------>|<------------value--------------->|
+//! | version | index | event_type_tag | bcs_event_bytes |
 ```
 
-where
-
-- `event_struct_tag_hash` is a 32-byte digest of event struct tag.
-- `version` is the version number of the txn that emits this event
-- `index` is the ordinal number of the occurrence of the event in that txn at version `version`.
-- `hashed_indexed_field` is the hash of the field with `#[index]`attribute.
-
-At API level, new API endpoint will be introduced for module events. The event identifier would be changed to the hash of the string format of event struct (address::module_name::EventStructName<T>).
-
-***Get events by event struct***
-
-https://fullnode.devnet.aptoslabs.com/v1/modules/{module_address}/events/{event_struct_tag_hash}**
-
-Query parameters:
-
-- limit(u64): Max number of events to retrieve.
-- start(u64, u64): Starting txn version number and intra-txn index of events.
-- Optional indexed_field: the hash of the queried index field value.
+At API level, new API endpoint will be introduced for module events. After indexer support, we will add new API for module events.
 
 ## Risks and Drawbacks
 
@@ -122,9 +93,8 @@ By end of Q3
 
 ### Suggested deployment timeline
 
-By end of Q3
+v1.7
 
 ## Security Considerations
 
-reconsider module event gas.
-
+None
