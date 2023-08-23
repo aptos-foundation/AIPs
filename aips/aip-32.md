@@ -50,15 +50,16 @@ No visible change to how one writes Move. But the economics changes:
 
 - The current on-chain timestamp and the amount paid for slot allocation will be tracked as metadata attached to the slot. For simplicity, the refundable part of the gas charge will be burnt even if other parts of the gas charge are redistributed, lowering the global supply of the native token.
 - For a deleted slot, a refund is mintted and issued to the transaction payer, increasing the global supply of the native token.
+- Note that refunds are only issued for removal of those slots allocated after timestamp and amount tracking are enabled.
 
 # Reference Implementation
 
-[TBD]
+[#9588](https://github.com/aptos-labs/aptos-core/pull/9588)
 
 # Risks and Drawbacks
 
 1. Refunding to the deleter makes it profitable for a malicious module developer to update the code and delete user data.
-2. Refunding to the deleter makes it easy to resell storage slots, which promotes speculation on storage pricing.
+2. Refunding to the deleter makes it easier to resell storage slots, because it can be easier made so that the buyer reclaims some cost by deleting the bought asset and have a stronger feeling of ownership.
 3. Full refund provides no protection against reserving storage for future usage or reselling. In expectation of higher storage pricing, one can speculatively reserve storage slots for long at virtually no cost (aside from locking up the value).
 
 # Future Potential
@@ -73,4 +74,4 @@ The refundable amount can be tracked globally or on a per acount basis (call it 
 
 # Suggested Implementation Timeline
 
-Release 1.8
+Release 1.7
