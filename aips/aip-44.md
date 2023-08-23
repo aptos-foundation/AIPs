@@ -2,7 +2,7 @@
 aip: 44
 title: Module Events
 author: lightmark
-Status: Draft
+Status: In Review
 type: Standard (Core, Interface, Framework)
 created: 07/20/2023
 ---
@@ -57,8 +57,8 @@ To emit event, a new native function `emit` (or whatever proper name) will be in
 
 ```rust
 /// Emit an event with payload `msg` in event stream identified by T. T must have #[event] attribute.
-public fun emit<T>(event: &T) {
-    write_to_module_event_store<T>(event);
+public fun emit<T: store + drop>(event: T) {
+write_to_module_event_store < T > (event);
 }
 ```
 
@@ -80,6 +80,10 @@ promote module events over instance events.
 ## Future Potential
 
 Aptos official indexer could support flexible indexing config to cater users' needs.
+
+## Acknowledgement
+
+Thanks to the individual contributors in this AIP’s [discussion](https://github.com/aptos-foundation/AIPs/issues/200).
 
 ## Timeline
 
