@@ -1,10 +1,9 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 45
 title: Safe Burning of User-Owned Objects
 author: davidiw, movekevin, lightmark, bowenyang007, capcap, kent-white
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/232
-Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+Status: In Review
 type: Standard Framework
 created: 08/13/2023
 ---
