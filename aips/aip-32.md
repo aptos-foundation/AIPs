@@ -59,8 +59,7 @@ No visible change to how one writes Move. But the economics changes:
 # Risks and Drawbacks
 
 1. Refunding to the deleter makes it profitable for a malicious module developer to update the code and delete user data.
-2. Refunding to the deleter makes it easier to resell storage slots, because it can be easier made so that the buyer reclaims some cost by deleting the bought asset and have a stronger feeling of ownership.
-3. Full refund provides no protection against reserving storage for future usage or reselling. In expectation of higher storage pricing, one can speculatively reserve storage slots for long at virtually no cost (aside from locking up the value).
+2. Full refund provides no protection against reserving storage for future usage or reselling. In expectation of higher storage pricing, one can speculatively reserve storage slots for long at virtually no cost (aside from locking up the value).
 
 # Future Potential
 
