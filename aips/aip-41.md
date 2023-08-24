@@ -31,6 +31,18 @@ The only thing this AIP does assume of the _on-chain randomness_ is that it is *
 
 We believe that easy-to-use, secure randomness inside Move smart contracts will open up new possibilities for **randomized dapps (randapps)**: dapps whose core functionality requires an unbiasable and unpredictable source of entropy (e.g., games, randomized NFTs airdrops, raffles).
 
+## Real randomness versus pseudo-randomness
+
+There is wide-spread confusion about whether **real randomness** should be preferred to (cryptographic) **pseudo-randomness**. 
+
+"Real" randomness comes from random events in the universe (e.g., [radioactive decay](https://www.fourmilab.ch/hotbits/)). 
+ 
+But the problem with "real" randomness is there is **no way** for a smart contract **to verify** that the provided "real" randomness is indeed real. In other words, a malicious randomness beacon could bias the "real" randomness in any way it wants and there would be no way for a smart contract to detect this. 
+
+This is where (cryptographic) pseudo-randomness shines. 
+ 
+Unlike "real" randomness, pseduo-randomness is **cryptographically-verifiable**. This means there is code that one can write in a smart contract to verify the validity of the pseudo-randomness. Furthermore, pseudo-randomness is **provably-indistinguishable** from real randomness, assuming the hardness of certain cryptographic assumptions. In simpler words, no one can tell it's not real randomness anyway (unless they have its associated cryptographic proof and can verify it as a valid pseudo-randomness, of course).
+
 ## Motivation
 
 > Describe the impetus for this change. What does it accomplish? 
