@@ -296,7 +296,7 @@ Specifically, it ensures that calls to `decide_winners` cannot be made from Move
 
 **O1:** Should the `randomness` module be part of `aptos_framework` rather than `aptos_std`? One reason to keep it in `aptos_std` is in case it might be needed by some of the cryptographic modules there (e.g., perhaps interactive ZKP verifiers that use public coins could use the `randomness` module).
 
-**O2:** Support for private `entry `functions might not be fully implemented: i.e., entry functions could still be wrapped around in a Move script potentially. Or perhaps they are not even callable from a TXN.
+**O2:** Support for private `entry `functions might not be fully implemented: i.e., private `entry` functions could still be callable from a Move script. Or perhaps they are not even callable from a TXN.
 
 ## Reference Implementation
 
