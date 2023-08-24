@@ -80,7 +80,7 @@ The proposed module has a simple yet hard-to-misuse interface:
 The module offers a suite functions for randomly-sampling a wide-variety of objects (integers, bytes, shuffles, etc). For example:
 
 - `randomness::u64_integer()` uniformly samples a 64-bit unsigned integer
-- `randomness::bytes(0, n)` uniformly samples a vector of `n` bytes.
+- `randomness::bytes(n)` uniformly samples a vector of `n` bytes.
 - `randomness::permutation(n)` returns a random shuffle of the vector `[0, 1, 2, ..., n-1]`.
 
 Contracts can safely sample multiple objects via repeated calls to these functions. For example, the code below samples two `u64`'s and one `u256`:
@@ -296,7 +296,7 @@ Specifically, it ensures that calls to `decide_winners` cannot be made from Move
 
 **O1:** Should the `randomness` module be part of `aptos_framework` rather than `aptos_std`? One reason to keep it in `aptos_std` is in case it might be needed by some of the cryptographic modules there (e.g., perhaps interactive ZKP verifiers that use public coins could use the `randomness` module).
 
-**O2:** Support for private `entry `functions might not be fully implemented: i.e., entry functions could still be wrapped around in a Move script potentially. Or perhaps they are not even callable from a TXN.
+**O2:** Support for private `entry `functions might not be fully implemented: i.e., private `entry` functions could still be callable from a Move script. Or perhaps they are not even callable from a TXN.
 
 ## Reference Implementation
 
