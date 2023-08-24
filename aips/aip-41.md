@@ -80,7 +80,7 @@ The proposed module has a simple yet hard-to-misuse interface:
 The module offers a suite functions for randomly-sampling a wide-variety of objects (integers, bytes, shuffles, etc). For example:
 
 - `randomness::u64_integer()` uniformly samples a 64-bit unsigned integer
-- `randomness::bytes(0, n)` uniformly samples a vector of `n` bytes.
+- `randomness::bytes(n)` uniformly samples a vector of `n` bytes.
 - `randomness::permutation(n)` returns a random shuffle of the vector `[0, 1, 2, ..., n-1]`.
 
 Contracts can safely sample multiple objects via repeated calls to these functions. For example, the code below samples two `u64`'s and one `u256`:
