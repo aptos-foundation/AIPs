@@ -8,7 +8,7 @@ type: Standard Framework
 created: 08/13/2023
 ---
 
-# AIP-X - Safe Burning of User-Owned Objects
+# AIP-45 - Safe Burning of User-Owned Objects
   
 ## Summary
 
