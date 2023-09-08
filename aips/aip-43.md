@@ -39,6 +39,20 @@ AIP 36 removed one serialization point. We can remove the rest with:
 - using Aggregators for total_supply and current_supply counters in the collection.move
 - parallelize event creation, using module events that remove sequence number altogether 
 
+In addition, we will add new API to mint tokens:
+```
+  public fun create_with_index_in_name(
+        creator: &signer,
+        collection_name: String,
+        description: String,
+        name_with_index_preffix: String,
+        name_with_index_suffix: String,
+        royalty: Option<Royalty>,
+        uri: String,
+    ): ConstructorRef {
+```
+which allows minting of the token, where index is part of the name, while still allowing it to happen concurrently.
+
 ## Rationale
 
 Alternative would be to stop tracking supply/giving indices, but that wouldn't work for NFT collections that require limited supply.
@@ -50,7 +64,7 @@ But that is much harder to use in smart contracts, and requries submitting 2 tra
 
 ## Reference Implementation
 
-- [PR](https://github.com/aptos-labs/aptos-core/pull/9971) to token v2 to use aggregators and module events.
+- [PR](https://github.com/aptos-labs/aptos-core/pull/9971) to token v2 to use aggregators and module events, including new create_with_index_in_name method.
 - [PR](https://github.com/aptos-labs/aptos-core/pull/9972) to fungible assets to use aggregators
 
 ## Risks and Drawbacks
