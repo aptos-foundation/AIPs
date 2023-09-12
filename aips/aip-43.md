@@ -41,7 +41,7 @@ AIP 36 removed one serialization point. We can remove the rest with:
 
 In addition, we will add new API to mint tokens:
 ```
-  public fun create_with_index_in_name(
+  public fun create_numbered_token(
         creator: &signer,
         collection_name: String,
         description: String,
@@ -64,7 +64,7 @@ But that is much harder to use in smart contracts, and requries submitting 2 tra
 
 ## Reference Implementation
 
-- [PR](https://github.com/aptos-labs/aptos-core/pull/9971) to token v2 to use aggregators and module events, including new create_with_index_in_name method.
+- [PR](https://github.com/aptos-labs/aptos-core/pull/9971) to token v2 to use aggregators and module events, including new create_numbered_token method.
 - [PR](https://github.com/aptos-labs/aptos-core/pull/9972) to fungible assets to use aggregators
 
 ## Risks and Drawbacks
