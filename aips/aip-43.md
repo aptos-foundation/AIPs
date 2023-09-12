@@ -1,6 +1,6 @@
 ---
 aip: 43
-title: Parallelize Digital Assets (Token V2) minting/burning
+title: Parallelize Digital Assets (Token V2) and Fungible Assets minting/burning
 author: igor-aptos (https://github.com/igor-aptos), vusirikala (https://github.com/vusirikala)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/209
 Status: In Review
@@ -11,11 +11,11 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): AIP-47, AIP-44
 ---
 
-# AIP-43 - Parallelize Digital Assets (Token V2) minting/burning
+# AIP-43 - Parallelize Digital Assets (Token V2) and Fungible Assets minting/burning
   
 ## Summary
 
-Change Token V2 minting and burning to be parallelizable during execution, allowing higher throughput/peak for minting from an individual collection.
+Change Token V2 and fungible assets minting and burning to be parallelizable during execution, allowing higher throughput/peak for minting from an individual collection / asset.
 
 ## Motivation
 
@@ -25,17 +25,33 @@ current_supply, total_supply and sequence number in the event handles.
 That translates into minting from a single collection having 5-8x 
 lower throughput than minting from multiple collections simultaneously. 
 
-Goal is to remove/optimize operations that make Token V2 operations sequential 
+Similarly, minting and burning Fungible Asset touch supply field, making them sequential. 
+
+Goal is to remove/optimize operations that make Token V2 and Fungible Asset operations sequential 
 
 ## Impact
 
-This will enable higher throughput for Token V2 NFT minting/burning of a single collection, providing better experience when there is high demand for a single collection.
+This will enable higher throughput for Token V2 NFT minting/burning of a single collection, or minting/burning of a single Fungible Asset, providing better experience when there is high demand for a single collection/fungible asset.
 
 ## Specification
 
 AIP 36 removed one serialization point. We can remove the rest with:
 - using Aggregators for total_supply and current_supply counters in the collection.move
-- parallelize event creation. Either use Aggregators for counter in the event.move, or use module events that remove sequence number altogether 
+- parallelize event creation, using module events that remove sequence number altogether 
+
+In addition, we will add new API to mint tokens:
+```
+  public fun create_numbered_token(
+        creator: &signer,
+        collection_name: String,
+        description: String,
+        name_with_index_preffix: String,
+        name_with_index_suffix: String,
+        royalty: Option<Royalty>,
+        uri: String,
+    ): ConstructorRef {
+```
+which allows minting of the token, where index is part of the name, while still allowing it to happen concurrently.
 
 ## Rationale
 
@@ -48,8 +64,8 @@ But that is much harder to use in smart contracts, and requries submitting 2 tra
 
 ## Reference Implementation
 
-- [Draft change](https://github.com/aptos-labs/aptos-core/compare/main...igor-aptos:aptos-core:igor/use_aggregators_for_event_seq_num) to enable event creation to be parallel. Unnecessary after [AIP-44](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-44.md)
-- [Draft change](https://github.com/igor-aptos/aptos-core/compare/igor/use_aggregators_for_event_seq_num...igor-aptos:aptos-core:igor/token_v2_using_aggregators) to token v2 to use aggregators and concurrent events. 
+- [PR](https://github.com/aptos-labs/aptos-core/pull/9971) to token v2 to use aggregators and module events, including new create_numbered_token method.
+- [PR](https://github.com/aptos-labs/aptos-core/pull/9972) to fungible assets to use aggregators
 
 ## Risks and Drawbacks
 
@@ -67,10 +83,13 @@ Implementation of this AIP will be close to the drafts linked, and is simple. Ma
 
 ### Suggested developer platform support timeline
 
-New structs are being added to Collection and Token, which will need to be indexed and usages updated in order to provide:
-- index for concurrent collections (different index field will be set)
+New structs are being added to Collection, Token and Fungible Asset, which will need to be indexed and usages updated in order to provide. 
+For Token V2:
+- new index/name for all collections (deprecating old index and name fields, which will stop being populated after CONCURRENT_TOKEN_V2_ENABLED feature flag is enabled)
 - supply for concurrent collections (different resource will contain supply of the collection)
-
+For Fungible Asset:
+- supply for concurrent fungible assets (different resource will contain total supply of the fungible asset) 
+  
 Indexer changes are being designed.
 
 ### Suggested deployment timeline
