@@ -64,7 +64,7 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 35](https://github.com/aptos-foundation/AIPs/issues/144)| Core | [Charging Invariant Violation Errors](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-35.md) | Standard | Accepted |
 | [AIP 36](https://github.com/aptos-foundation/AIPs/issues/154)| Core | [Universally Unique Identifiers](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-36.md) | Standard | Draft |
 | [AIP 37](https://github.com/aptos-foundation/AIPs/issues/160)| Core | [Filter duplicate transactions within a block](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-37.md) | Standard | Accepted |
-| [AIP 38](https://github.com/aptos-foundation/AIPs/issues/154)| Core | [Deprecate Storage Gas Curves](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-38.md) | Standard | Draft |
+| [AIP 38](https://github.com/aptos-foundation/AIPs/issues/163)| Core | [Deprecate Storage Gas Curves](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-38.md) | Standard | Draft |
 | [AIP 39](https://github.com/aptos-foundation/AIPs/issues/173)| Core | [Separate gas payer](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-39.md) | Standard | Draft |
 | [AIP 40](https://github.com/aptos-foundation/AIPs/issues/178)| Core | [Address Standard v1](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-40.md) | Standard | Draft |
 | [AIP 41](https://github.com/aptos-foundation/AIPs/issues/185)| Framework | [Move APIs for randomness generation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md) | Standard | Draft |
