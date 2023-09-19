@@ -351,7 +351,7 @@ script {
 
         let old_balance = coin::balance<aptos_coin::AptosCoin>(attacker_addr);
 
-				// For this attack to fail, `decide_winners` needs to be marked as a *private* entry function
+        // For this attack to fail, `decide_winners` needs to be marked as a *private* entry function
         lottery::lottery::decide_winners();
 
         let new_balance = coin::balance<aptos_coin::AptosCoin>(attacker_addr);
@@ -446,7 +446,7 @@ A linter check could be implemented to ensure that the `randomness` function cal
 For example, this is the case in the `lottery` example, where:
 
 - The winner is picked via `randomness::u64_range`,
-- ...which is called from the `public(friend)` function `decide_winners_internal`, 
+- ...which is called from the private function `decide_winners_internal`, 
 - ...which in turn is only callable from the private `entry ` function `decide_winners`.
 
 **Advantages:**
