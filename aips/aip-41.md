@@ -452,7 +452,7 @@ To make it more explicit that the transaction's outcome might not be the same on
 
 The defense discussed in [“Test-and-abort attacks”](#test-and-abort-attacks) assumed that developers make proper use of **private** entry functions as the only entry point into their randapp. Unfortuantely, developers are fallible. Therefore, it is important to prevent **accidentally-introduced bugs**.
 
-We discuss two defenses below that could be used to enforce the proper usage of **private** `entry` functions as the only gateway into randapps.
+We discuss two defenses below that we plan to use to enforce the proper usage of **private** `entry` functions as the only gateway into randapps.
 
 #### Linter-based checks
 
