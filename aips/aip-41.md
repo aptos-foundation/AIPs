@@ -296,7 +296,11 @@ Specifically, it ensures that calls to `decide_winners` cannot be made from Move
 
 **O1:** Should the `randomness` module be part of `aptos_framework` rather than `aptos_std`? One reason to keep it in `aptos_std` is in case it might be needed by some of the cryptographic modules there (e.g., perhaps interactive ZKP verifiers that use public coins could use the `randomness` module).
 
-**O2:** Support for private `entry `functions might not be fully implemented: i.e., private `entry` functions could still be callable from a Move script. Or perhaps they are not even callable from a TXN.
+**O2:** Support for private `entry `functions might not be fully implemented: i.e., private `entry` functions could still be callable from a Move script. Or perhaps they are not even callable from a TXN. Or perhaps there are current SDK limitations on creating TXNs that call private entry functions.
+
+**O3:** Would it be useful to have events emmitted when `randomness` APIs are called (e.g., to help with [non-deterministic transaction preview issues](#security-consideration-non-deterministic-transaction-outcomes-in-wallet-previews) in wallets)?
+
+**O4:** Should we use a single generic `randomnes::integer<T>(): T` function, which aborts if given a non-integer type, instead of separate `u32_integer`, `u64_integer` (and so on) functions?
 
 ## Reference Implementation
 
@@ -351,7 +355,7 @@ script {
 
         let old_balance = coin::balance<aptos_coin::AptosCoin>(attacker_addr);
 
-				// For this attack to fail, `decide_winners` needs to be marked as a *private* entry function
+        // For this attack to fail, `decide_winners` needs to be marked as a *private* entry function
         lottery::lottery::decide_winners();
 
         let new_balance = coin::balance<aptos_coin::AptosCoin>(attacker_addr);
@@ -393,7 +397,7 @@ In addition, this proposal could provide a trustworthy randomness beacon for ext
 
 > Describe the plan to have SDK, API, CLI, Indexer support for this feature, if applicable.
 
-It may be worth investigating whether randomness calls (and their outputs) need to be indexed (e.g., should events be emitted?).
+It may be worth investigating whether randomness calls (and their outputs) need to be indexed (e.g., it appears useful to have events emitted after calls to `randomness` APIs).
 
 This could be important to make it easier to **publicly-verify** the randomness produced by randapps. Specifically, anyone could look at the `randomness`-related events emitted by a contract to fetch its verifiable history of generated randomness.
 
@@ -433,11 +437,22 @@ When implementing on-chain randomness with a **secrecy-based approach** (e.g., a
 
 While contracts can mitigate against this by (carefully) incorporating external randomness or delay functions, this defeats many of the advantages of on-chain randomness.
 
+### Security consideration: Non-deterministic transaction outcomes in wallet previews
+
+When sending a transaction to a randapp, wallets will display a _preview_ of the outcome of this TXN (e.g., how many coins will the transacting user be sending out of their account).
+Of course, this preview depends on the randomn outcome of the `randomness` API calls and therefore **must** not be trusted as final.
+
+Indeed, users **should** already be aware that their wallet transaction previews are not finalized on chain due to their potential dependencies.
+For example, a transaction's execution outcome might change from what was displayed as the preview because the blockchain state that the execution depended on changed.
+Similarly, perhaps the execution depended on a call to [`aptos_framework::timestamp::now_seconds()`](https://aptos.dev/reference/move/?branch=mainnet&page=aptos-framework/doc/timestamp.md#0x1_timestamp_now_seconds).
+
+To make it more explicit that the transaction's outcome might not be the same on-chain as previewed in the wallet, a wallet implementation could check if `randomness` events are emitted by that TXN and display an appropriate message to the user.
+
 ### Security consideration: Preventing test-and-abort attacks
 
 The defense discussed in [“Test-and-abort attacks”](#test-and-abort-attacks) assumed that developers make proper use of **private** entry functions as the only entry point into their randapp. Unfortuantely, developers are fallible. Therefore, it is important to prevent **accidentally-introduced bugs**.
 
-We discuss two defenses below that could be used to enforce the proper usage of **private** `entry` functions as the only gateway into randapps.
+We discuss two defenses below that we plan to use to enforce the proper usage of **private** `entry` functions as the only gateway into randapps.
 
 #### Linter-based checks
 
@@ -446,7 +461,7 @@ A linter check could be implemented to ensure that the `randomness` function cal
 For example, this is the case in the `lottery` example, where:
 
 - The winner is picked via `randomness::u64_range`,
-- ...which is called from the `public(friend)` function `decide_winners_internal`, 
+- ...which is called from the private function `decide_winners_internal`, 
 - ...which in turn is only callable from the private `entry ` function `decide_winners`.
 
 **Advantages:**
@@ -459,7 +474,7 @@ For example, this is the case in the `lottery` example, where:
 
 #### Callstack-based checks
 
-The check described above could also be done at runtime by (somehow) introspecting on the Move VM callstack when a function call such as `randomness::u64_integer` is made. 
+We can inspect the Move VM callstack to check if a `randomness` **native** function was called from outside a `private entry` function, thereby actively preventing test-and-abort attacks.
 
 **Advantages:** 
 
@@ -468,7 +483,8 @@ The check described above could also be done at runtime by (somehow) introspecti
 
 **Disadvantages:**
 
-- This defense is rather aggresive as it interferes with the semantics of the Move language by aborting the execution of vulnerable randomness function calls, which would normally proceed without issue.
+- <strike>This defense is rather aggresive as it interferes with the semantics of the Move language by aborting the execution of vulnerable randomness function calls, which would normally proceed without issue.</strike>
+   + The randomness functions are native functions. It is perfectly fine to define custom abort semantics for them. It does not break any of the semantics of the Move language.
 
 ## Testing (optional)
 
