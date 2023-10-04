@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 49
 title: Secp256k1 Ecdsa for Transaction Authentication
 author: davidiw
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/247
@@ -12,24 +12,24 @@ updated (*optional): <mm/dd/yyyy>
 
 # AIP-49 - Secp256k1 Ecdsa for Transaction Authentication
   
-Despite our desire to see more diverse key algorithms supported in hardware cryptographic platforms, the primary Aptos key algorithm, Ed25519, has yet to be adopted broadly across the ecosystem. Secp256k1 Ecdsa remains the incument and is broadly supported. This AIP introduces support Secp256k1 Ecdsa as a transaction authenticator for Aptos.
+Despite our desire to see more diverse key algorithms supported in hardware cryptographic platforms, the primary Aptos key algorithm, Ed25519, has yet to be adopted broadly across the ecosystem. `secp256k1` ECDSA remains the incumbent and is broadly supported. This AIP introduces support `secp256k1` ECDSA as a transaction authenticator for Aptos.
 
 ## Summary
 
-In Aptos, each transacation contains a transaction authenticator that includes a signature and a public key, while the transaction itself contains the sender of the transaction. To verify that a transaction is properly signed, the verifier validates that the public key verifies the signature across the transaction and that the hash of the public key is stored on-chain in a hashed form under the account. By completing this verification, the verifier can be certain that the owner of the account indeed authorizes this transaction. This AIP adds support for Secp256k1 Ecdsa for transaction authentication.
+In Aptos, each transacation contains a transaction authenticator that includes a signature and a public key, while the transaction itself contains the sender of the transaction. To verify that a transaction is properly signed, the verifier validates that the public key verifies the signature across the transaction and that the hash of the public key is stored on-chain in a hashed form under the account. By completing this verification, the verifier can be certain that the owner of the account indeed authorizes this transaction. This AIP adds support for `secp256k1` ECDSA for transaction authentication.
 
 ## Motivation
 
-* Many organizations already have support for Secp256k1 Ecdsa but not Ed25519
-* Hardware crypto has not broadly adopted Ed25519 yet rmain compatible with Secp256k1 Ecdsa
+* Many organizations already have support for `secp256k1` Ecdsa but not Ed25519
+* Hardware crypto has not broadly adopted Ed25519 yet rmain compatible with `secp256k1` ECDSA
 
 ## Specification
 
-While most of this is a straighforward application of Secp256k1 Ecdsa, the following are distinct aspects as related to Aptos:
+While most of this is a straighforward application of `secp256k1` ECDSA, the following are distinct aspects as related to Aptos:
 
 * All signatures are normalized, that is s is set to be low order.
 * Signatures that are not normalized are rejected.
-* As Secp256k1 Ecdsa signs and verifies 32-byte messages. Our framework produces a 32-byte message digests by applying Sha3-256 to the message.
+* As `secp256k1` ECDSA signs and verifies 32-byte messages. Our framework produces a 32-byte message digests by applying Sha3-256 to the message.
 
 ## Reference Implementation
 
