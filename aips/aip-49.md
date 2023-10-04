@@ -1,6 +1,6 @@
 ---
 aip: 49
-title: Secp256k1 Ecdsa for Transaction Authentication
+title: secp256k1 ECDSA for Transaction Authentication
 author: davidiw
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/247
 Status: Draft
