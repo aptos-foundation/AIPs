@@ -16,7 +16,7 @@ Despite our desire to see more diverse key algorithms supported in hardware cryp
 
 ## Summary
 
-In Aptos, each transacation contains a transaction authenticator that includes a signature and a public key, while the transaction itself contains the sender of the transaction. To verify that a transaction is properly signed, the verifier validates that the public key verifies the signature across the transaction and that the hash of the public key is stored on-chain in a hashed form under the account. By completing this verification, the verifier can be certain that the owner of the account indeed authorizes this transaction. This AIP adds support for `secp256k1` ECDSA for transaction authentication.
+In Aptos, each transaction contains a transaction authenticator that includes a signature and a public key, while the transaction itself contains the sender of the transaction. To verify that a transaction is properly signed, the verifier validates that the public key verifies the signature across the transaction and that the hash of the public key is stored on-chain in a hashed form under the account. By completing this verification, the verifier can be certain that the owner of the account indeed authorizes this transaction. This AIP adds support for `secp256k1` ECDSA for transaction authentication.
 
 ## Motivation
 
