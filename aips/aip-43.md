@@ -33,7 +33,7 @@ Goal is to remove/optimize operations that make Token V2 and Fungible Asset oper
 
 This will enable higher throughput for Token V2 NFT minting/burning of a single collection, or minting/burning of a single Fungible Asset, providing better experience when there is high demand for a single collection/fungible asset.
 
-There is a breaking change for anyone accessing raw resources - like indexer or directly through the RestAPI.
+There is a **breaking change** for anyone accessing raw resources - like indexers or directly through the RestAPI.
 Two fields inside Digital Assets `Token` struct (from [token.move](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token-objects/sources/token.move)) will be deprecated - name and index, and instead `TokenConcurrentFieldsAppendix` will contain them. `Token.name` will be replaced with `TokenConcurrentFieldsAppendix.name.value`, and similarly for `index` field.
 
 Additionally, new variants will be added to:
