@@ -33,6 +33,15 @@ Goal is to remove/optimize operations that make Token V2 and Fungible Asset oper
 
 This will enable higher throughput for Token V2 NFT minting/burning of a single collection, or minting/burning of a single Fungible Asset, providing better experience when there is high demand for a single collection/fungible asset.
 
+There is a **breaking change** for anyone accessing raw resources - like indexers or directly through the RestAPI.
+Two fields inside Digital Assets `Token` struct (from [token.move](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token-objects/sources/token.move)) will be deprecated - name and index, and instead `TokenConcurrentFieldsAppendix` will contain them. `Token.name` will be replaced with `TokenConcurrentFieldsAppendix.name.value`, and similarly for `index` field.
+
+Additionally, new variants will be added to:
+- Digital Asset (Token) Collection ([collection.move](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token-objects/sources/collection.move)), namely `ConcurrentSupply` (in addition to current `FixedSupply` and `UnlimitedSupply`), which will now store current, total and max supply
+- Fungible Asset ([fungible_asset.move](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-framework/sources/fungible_asset.move)), namely `ConcurrentSupply` (in addition to current `Supply`), which will now store current and total supply.
+
+Indexer changes will be provided to return correct values for Token name (i.e. `COALESCE(TokenConcurrentFieldsAppendix.name.value, Token.name)`), and supply related fields to both 
+
 ## Specification
 
 AIP 36 removed one serialization point. We can remove the rest with:
@@ -69,11 +78,11 @@ But that is much harder to use in smart contracts, and requries submitting 2 tra
 
 ## Risks and Drawbacks
 
-Express here the potential negative ramifications of taking on this proposal. What are the hazards?
+Other than needing to be careful with deployment, due to the breaking changes mentioned above, only other nuance is making sure that gas charges for the new flow are comparable to the previous gas charges.
 
 ## Future Potential
 
-Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in in one year? In five years?
+We will further look into any sequential bottlenecks in the framework, and see if they can be addressed one way, or another.
 
 ## Timeline
 
@@ -83,18 +92,16 @@ Implementation of this AIP will be close to the drafts linked, and is simple. Ma
 
 ### Suggested developer platform support timeline
 
-New structs are being added to Collection, Token and Fungible Asset, which will need to be indexed and usages updated in order to provide. 
-For Token V2:
-- new index/name for all collections (deprecating old index and name fields, which will stop being populated after CONCURRENT_TOKEN_V2_ENABLED feature flag is enabled)
-- supply for concurrent collections (different resource will contain supply of the collection)
-For Fungible Asset:
-- supply for concurrent fungible assets (different resource will contain total supply of the fungible asset) 
-  
-Indexer changes are being designed.
+Indexer changes are being developed
 
 ### Suggested deployment timeline
 
-Tentative to be included in v1.8
+Planned deployment timeline:
+- with v1.8 framework and feature flags upgrade, new `TokenConcurrentFieldsAppendix` (with `name` and `index`) will start to be populated (in addition to current fields)
+- few weeks later, CONCURRENT_ASSETS_ENABLED feature flag will be enabled, and with it:
+  - `name` and `index` fields in `Token` struct will be deprecated, and will be empty ("" and 0 respectively) for any new token mint
+  - any new Digital Asset collection or Fungible Asset will be created to be "concurrent" - using new ConcurrentSupply variant, and providing performance/throughput benefits
+  - any old Digital Asset collection or Fungible Asset will be able to call upgrade_to_concurrent(&ExtendRef) function, and switch to "concurrent" mode, enabling performance/throughput benefits
 
 ## Security Considerations
 
