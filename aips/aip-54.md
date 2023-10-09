@@ -1,6 +1,6 @@
 ---
 aip: 54
-title: Object deployment
+title: Object code deployment
 author: movekevin, xbtmatt
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/259
 Status: Draft
@@ -8,7 +8,7 @@ type: Standard (Framework)
 created: 10/09/2023
 ---
 
-# AIP-54 - Object deployment
+# AIP-54 - Object code deployment
 
 ## Summary
 
