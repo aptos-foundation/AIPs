@@ -29,7 +29,7 @@ While there are a few discussions on refactoring the transaction layout to elimi
 
 Currently, when signing a transaction, the fee payer's address is included within the data to be signed. As a result, all parties must first know the fee payer's address prior to being able to submit a transaction.
 
-This AIP dictates that the fee payer's address may either be set to the actual address or to `0x0`, a non-allocated address within Move. As a result, during verification, each signature must be compared against the raw transaction computed with the actual fee payer's address and that of `0x0`.
+This AIP dictates that for non-fee payer signers, the fee payer's address may either be set to the actual address or to `0x0`, a non-allocated address within Move. The fee payer must still sign their address to ensure the intent to be the fee payer. As a result, during verification, each signature besides the fee payer's must be compared against the raw transaction computed with the actual fee payer's address and that of `0x0`.
 
 ## Reference Implementation
 
