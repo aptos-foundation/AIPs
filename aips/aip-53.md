@@ -41,7 +41,7 @@ Verified via end-to-end tests.
 
 ## Risks and Drawbacks
 
-There may be a slight performance degradation for sponsored transactions as now many formats need to be checked. These tend to be cheap and at worst case double the cost of verification. As most SDKs will likely conform to the simpler method of using `0x0`, this will inevitably become a negligible cost. Once we update to transaction v2, this check can be eliminated.
+There may be a slight performance degradation for sponsored transactions as now many formats need to be checked. These tend to be cheap and at worst case double the cost of verification. As most SDKs will likely conform to the simpler method of using `0x0`, this will inevitably become a negligible cost.
 
 ## Security Considerations
 
