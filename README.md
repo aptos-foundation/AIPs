@@ -72,6 +72,13 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 43](https://github.com/aptos-foundation/AIPs/issues/209) | Framework | [Parallelize Digital Assets (Token V2) minting/burning](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-43.md) | Standard | Draft |
 | [AIP 44](https://github.com/aptos-foundation/AIPs/issues/200) | Core | [Module Events](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-44.md) | Standard | Draft |
 | [AIP 46](https://github.com/aptos-foundation/AIPs/issues/222) | Framework | [New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-46.md) | Standard | Draft |
+| [AIP 47](https://github.com/aptos-foundation/AIPs/issues/226) | Framework | [Aggregators V2 ](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-47.md) | Standard | Draft |
+| [AIP 48](https://github.com/aptos-foundation/AIPs/issues/237) | Framework | [](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-48.md) | Standard | Draft |
+| [AIP 49](https://github.com/aptos-foundation/AIPs/issues/247) | Framework | [secp256k1 ECDSA for Transaction Authentication](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-49.md) | Standard | Draft |
+| [AIP 50](https://github.com/aptos-foundation/AIPs/issues/249) | Framework | [Change Commission rates in delegation pools](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-50.md) | Standard | Draft |
+| [AIP 51](https://github.com/aptos-foundation/AIPs/issues/251) | Framework | [Changing beneficiaries for operators ](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-51.md) | Standard | Draft |
+| [AIP 52](https://github.com/aptos-foundation/AIPs/issues/258) | Framework | [Automated Account Creation for Sponsored Transactions](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-52.md) | Standard | Draft |
+| [AIP 32](https://github.com/aptos-foundation/AIPs/issues/257) | Framework | [Make Fee Payer Address Optional in Transaction Authenticator](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-53.md) | Standard | Draft |
 | ... | ... ||||
 
 ## Types of AIPs

@@ -15,7 +15,7 @@ requires (*optional): 39
 
 ## Summary
 
-When submitting sponsored transactions to the blockchain, a client may not know the actual fee payer and likely does not care. The existing mechanism to generate these transactions requires the client to know prior to sending the transaction to the blockchain the payer. This impedes developer experience for limited value. This AIP proposes making the knowledge of the ultimate payer optional.
+When submitting sponsored transactions to the blockchain, a client-side user may not know who is the actual fee payer. The current way these transactions are generated requires the client-side user to know who will be the fee payer for each transaction submitted to the blockchain. This AIP proposes making the knowledge of the fee payer optional enabling a better user and developer experience.
 
 ### Goals
 

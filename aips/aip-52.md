@@ -15,7 +15,7 @@ requires (*optional): <AIP number(s)>
   
 ## Summary
 
-This AIP proposes to allow sponsored transactions, one in which the gas payer is not the primary signer of the transaction, to create accounts for the primary signer if it does not exist. Currently when submitting a sponsored transaction an account must first exist. This is an unnecessary friction for using gas fee payer accounts for new accounts. As it means that the gas fee payer solution must first submit an independent transaction to the blockchain.
+Currently, client-side users must create an account before making transactions on the blockchain. In effort to simplify and speed-up account creation processes, this AIP proposes allowing sponsored transactions when the gas payer is not the primary signer of the transaction to create an account if the primary signer does not exist. 
 
 ### Goals
 

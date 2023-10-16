@@ -15,7 +15,9 @@ requires (*optional): AIP-47, AIP-44
   
 ## Summary
 
-Change Token V2 and fungible assets minting and burning to be parallelizable during execution, allowing higher throughput/peak for minting from an individual collection / asset.
+This AIP proposes a solution to speedup minting and burning Token v2 and Fungible Assets by parallelizing the processes (single thread to multithread). Currently, Token v2 and Fungible Assets are single threaded and sequential when minting from individual collection or asset, by parallelizing this we can expect a higher throughput/peak.
+
+Please note, this AIP introduces a breaking change! Please read the rest of the AIP for details.
 
 ## Motivation
 
