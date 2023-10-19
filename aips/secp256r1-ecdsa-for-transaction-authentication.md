@@ -26,8 +26,10 @@ In Aptos, each transaction contains a transaction authenticator that includes a 
 
 Passkeys built on the WebAuthn standard supports `secp256r1`. The following OS platforms support ECDSA over `secp256r1`:
 
-*TODO: this
-*TODO: yep also this
+* iOS
+* MacOS
+* Android
+* Windows 11
 
 ## Specification
 
