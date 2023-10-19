@@ -1,8 +1,8 @@
 ---
-aip: ??
+aip: X
 title: secp256r1 ECDSA for Transaction Authentication
 author: mstraka100
-discussions-to (*optional): <link>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/266
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Interface
@@ -10,7 +10,7 @@ created: 10/18/2023
 updated (*optional): <mm/dd/yyyy>
 ---
 
-# AIP-?? - Secp256r1 Ecdsa for Transaction Authentication
+# AIP-X - Secp256r1 Ecdsa for Transaction Authentication
 
 Passkeys are a novel form of authentication utilizing signing with cryptographic private keys in trusted execution envirionments, built on the WebAuthn standard, meant to replace passwords. 
 They have already been adopted by many large consumer-facing tech companies, such as Apple and Google. 
