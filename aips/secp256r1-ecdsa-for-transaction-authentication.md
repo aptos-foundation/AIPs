@@ -10,7 +10,7 @@ created: 10/18/2023
 updated (*optional): <mm/dd/yyyy>
 ---
 
-# AIP-X - Secp256r1 Ecdsa for Transaction Authentication
+# AIP-X - `secp256r1` ECDSA for Transaction Authentication
 
 Passkeys are a novel form of authentication utilizing signing with cryptographic private keys in trusted execution environments, built on [the WebAuthn standard](https://webauthn.guide/), meant to replace passwords. 
 They have already been adopted by many large consumer-facing tech companies, such as Apple and Google. 
@@ -24,7 +24,7 @@ In Aptos, each transaction contains a transaction authenticator that includes a 
 
 ## Motivation
 
-Passkeys built on the WebAuthn standard supports `secp256r1`. The following OS platforms support ECDSA over `secp256r1`:
+Passkeys built on the WebAuthn standard support `secp256r1`. The following OS platforms support ECDSA over `secp256r1`:
 
 * iOS
 * MacOS
@@ -33,12 +33,12 @@ Passkeys built on the WebAuthn standard supports `secp256r1`. The following OS p
 
 ## Specification
 
-While most of this is a straighforward implementation of `secp256r1` ECDSA, the following are distinct aspects as related to Aptos, in order to ensure that every message has only one canonical signature that will be accepted on-chain:
+While most of this is a straighforward implementation of `secp256r1` ECDSA, the following are distinct aspects as related to Aptos, in order to ensure that every message has only one **canonical** signature that will be accepted on-chain:
 
-* All signatures are normalized, that is s is set to be low order. If a signature `(r,s)` is generated during signing, the valid signature `(r,n-s)` is returned where `n` is the order of the `secp256r1`scalar field.
-* Signatures that are not normalized are rejected. If a signature `(r,s)` is received where `s > (n/2)`, the signature is rejected. 
+* Signatures that are not canonical are rejected. Specifically, if a signature `(r, s)` is received with `s > n/2`, the signature is rejected. Here `n` is the order of the `secp256r1` scalar field.
+* When signing, all signatures are made canonical. Specifically, if signing produces a signature `(r, s)` with `s > n/2`, then the canonical signature `(r, n - s)` is returned instead.
 
-The above steps are done to prevent malleability attacks. 
+The above steps are done to prevent [malleability attacks](https://bitcoin.stackexchange.com/questions/89873/transaction-malleability). 
 
 ## Reference Implementation
 
@@ -58,6 +58,7 @@ Completely implemented, pending any external feedback.
 
 * Verify API support
 * Update indexer code
+* Update Move framework with native functions for verifying `secp256r1` signatures
 * Update SDK
 
 ### Suggested deployment timeline
