@@ -12,7 +12,7 @@ updated (*optional): <mm/dd/yyyy>
 
 # AIP-X - Secp256r1 Ecdsa for Transaction Authentication
 
-Passkeys are a novel form of authentication utilizing signing with cryptographic private keys in trusted execution environments, built on the WebAuthn standard, meant to replace passwords. 
+Passkeys are a novel form of authentication utilizing signing with cryptographic private keys in trusted execution environments, built on [the WebAuthn standard](https://webauthn.guide/), meant to replace passwords. 
 They have already been adopted by many large consumer-facing tech companies, such as Apple and Google. 
 Passkeys may be useful for a more streamlined way of signing transactions on Aptos.
 However, the WebAuthn standard currently supports a limited range of signing algorithms and curves, including ECDSA over `secp256r1`.
