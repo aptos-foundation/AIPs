@@ -78,7 +78,7 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 50](https://github.com/aptos-foundation/AIPs/issues/249) | Framework | [Change Commission rates in delegation pools](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-50.md) | Standard | Draft |
 | [AIP 51](https://github.com/aptos-foundation/AIPs/issues/251) | Framework | [Changing beneficiaries for operators ](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-51.md) | Standard | Draft |
 | [AIP 52](https://github.com/aptos-foundation/AIPs/issues/258) | Framework | [Automated Account Creation for Sponsored Transactions](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-52.md) | Standard | Draft |
-| [AIP 32](https://github.com/aptos-foundation/AIPs/issues/257) | Framework | [Make Fee Payer Address Optional in Transaction Authenticator](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-53.md) | Standard | Draft |
+| [AIP 53](https://github.com/aptos-foundation/AIPs/issues/257) | Framework | [Make Fee Payer Address Optional in Transaction Authenticator](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-53.md) | Standard | Draft |
 | ... | ... ||||
 
 ## Types of AIPs
