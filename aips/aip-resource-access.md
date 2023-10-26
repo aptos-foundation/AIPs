@@ -26,13 +26,13 @@ This AIP intends to achieve the following:
 
 ### Out of Scope
 
-This feature will only be supported in the upcoming Aptos Move compiler ("compiler v2").
+This feature will only be supported in the upcoming Aptos Move compiler (AMC, aka "compiler v2").
 
 Static analysis of access control will initially not be implemented, but is expected to be ready when AMC gets out of beta.
 
 ## Motivation
 
-A Move function can read, write, and create arbitrary resources as long as it has access to the module APIs which allow this, and/or is in possession of a signer. There are multiple problems with this:
+A Move function can read, write, and create arbitrary resources as long as it has access to the module APIs which allow this, and is in possession of a signer. There are multiple problems with this:
 
 - It has been identified in the past as a security risk. For example, a transaction that obtains a
   signer and then delegates to some other well-known contract -- a 'helper' wrapper offered to some user -- can create arbitrary resources, including deploying code, without the user's knowledge, under the users account.
@@ -66,7 +66,8 @@ fun f() acquires !0x1::* { .. }                // negation
 fun f() pure { .. }                            // pure function, no accesses
 ```
 
-If a function has multiple access clauses the interpretation is as follows: positive (non-negated) clauses build a union, and negative clauses an intersection. This in `reads A !writes B reads C !writes D` access is allowed if it is either a read of `A` or of `B`, _and_ if it is not a write of C and D.
+If a function has multiple access clauses the interpretation is as follows: positive (non-negated) clauses build a union, and negative clauses an intersection. Therefore, in `reads A !writes B reads C !writes D`, access is allowed if it is a read of either `A` or of `B`, _and_ if it is not a write to `C` and `D`. For details, see the [Semantics](#semantics) section.
+
 
 ### File Format
 
@@ -79,51 +80,55 @@ The existing `FunctionHandle` is extended by a field which contains an optional 
 The conceptual syntax of access specifiers is as follows:
 
 ```
-AccessSpecifiers := { AccessSpecifier } 
-AccessSpecifier := [ ! ] Kind ResourceSpecifier AddressSpecifier
+AccessSpecifier := { AccessSpecifierClause } 
+AccessSpecifierClause := [ ! ] Kind ResourceSpecifier AddressSpecifier
 ResourceSpecifier := * | Address::* | Address::Module::* | Address::Module::Resource [ TypeArgs ]
 AddressSpecifier := * | Address | Parameter | Function Parameter
 Kind := acquires | reads | writes
 ```
 
-The basic function specifying the semantics of access specifiers is _subsumption_ (denoted as `>=` here). One list of access specifier subsumes another one if all access allowed in the other are also allowed in the subsuming one. For `ResoureSpecifier` this looks as below. Notice that transitivity of subsumption is assumed:
-```
-*         >=     _
-A::*      >=     A::M::*
-A::M::*   >=     A::M::R
-A::M::R   >=     A::M::R<TS>
-```
-
-Subsumption for `AddressSpecifier` is similar but depends on an environment to obtain values for parameters and specific functions for them. Assume this environment is called `E`:
+The basic function specifying the semantics of access specifiers is _containment_ (denoted as `in` here). For the semantics, it is assumed that address specifiers depending on parameters or functions over parameters have been resolved to a concrete address, based on the concrete arguments of the function. In the below definition, `K` stands for an access kind (reads, writes, acquires), `A` for a module address, `M` for a module name, `R` for a resource name, `<T>` for a type instantiation, and `X` for a resource address. Moreover, small letter `a` for a full access, and `s1` and `t1` for access specifier clauses:
 
 ```
-*         >=     _
-x         >=     y       iff E(x) == E(y)
-f(x)      >=     g(y)    iff E(f(x)) == E(g(y))
+K A::M::R<T>(X)   in *
+K A::M::R<T>(X)   in A::*           
+K A::M::R<T>(X)   in A::M::*       
+K A::M::R<T>(X)   in A::M::R      
+K A::M::R<T>(X)   in A::M::R<T>
+K A::M::R<T>(X)   in A::M::R<T>(X)
+a                 in s1, s2, .., !t1, !t2, ..
+                    iff (a in s1 or a in s2 or ..) 
+                         and not (a in t1) and not (a in t2) and not ..
 ```
 
-Notice that the functions which are allowed in address specifiers are selected from a small set of well-known builtins, like e.g. obtaining the address of a signer or of an Aptos object. No arbitrary Move code is executed.
 
-Given the subsumption, one can now define a function to test whether given pair of resource and address is covered by an access specifier:
+
+Based on containment, two other operators are of relevance: join (denoted as `*`) and subsumption (denoted as `>=`). In set-oriented terms, join is intersection, and subsumption superset. The definition is as follows:
 
 ```
-(R, A) in S  iff  S.resource >= R  &&  S.address >= A        where S is a ResourceSpecifier  
+forall s1, s2:     s1 >= s2       <==> (forall a: a in a2 ==> a in a1)
+forall s1, s2, s:  s == s1 * s2   <==> (forall a: a in s <==> a in s1 and a in s2) 
 ```
+
 
 #### Runtime Evaluation
 
-At runtime, a stack of saved access specifiers is maintained as well as an active access specifier. When a function which has access specifiers is entered, the current active set is saved to the stack. Then its value is _joined_ (denoted here as `*`) with that of the current function. If the result of the join does not subsume the specifier of the called function, execution aborts, as the called function has accesses which are not allowed in the context. Otherwise, the resulting join is the new active access specifier.: 
+At runtime, a stack of saved access specifiers is maintained as well as an active current access specifier. When a function which has access specifiers is entered, the current active set is saved to the stack. Then its value is _joined_ (the `*` operator above) with that of the current function. If the result of the join does not subsume the specifier of the called function, execution aborts:
 
 ```
 access_stack.push(active_accces)
-active_access = active_access * function_access
-let call_allowed = new_access.subsumes(function_access)
+active_access := active_access * function_access
+let call_allowed := active_access.subsumes(function_access)
 if !(active_access >= function_access) {
     abort
 }
 ```
+Notice that we cannot just always abort when entering a function which potentially has disallowed accesses for two reasons:
 
-Whenever a resource is accessed (move_to, move_from, exists, borrow_global, borrow_global_mut), this operation is compared to the currently active access specifier set, and execution aborts if the access is not allowed.
+- The function many not have any specifiers at all. In this case, the `active_access` stays unmodified at function entry, and the actual accesses are checked as they occur.
+- The implementation of subsumption (`>=`) is allowed to be an over-approximation. This stems from the presence of negation in specifiers, for which subsumption check is hard. Thus, we may not be able to decide `active_access >= function_access`. This case is semantically still sound because, similar with functions with no specifiers at all, accesses are still checked as they occur.
+
+During execution, whenever a resource is accessed (move_to, move_from, exists, borrow_global, borrow_global_mut), this operation is checked against the currently active access specifier, and execution aborts if the access is not allowed.
 
 Note that unless trust boundaries are concerned (transactions and public functions), we rarely expect users to write access specifiers, so the stack is not expected to become very deep in average. 
 
