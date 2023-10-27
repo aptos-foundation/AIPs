@@ -1,7 +1,7 @@
 ---
-aip: 
+aip: 56
 title: Resource Access Control
-author: wg@aptoslabs.com, brian.murphy@aptoslabs.com, runtian@aptoslabs.com
+author: wg@aptoslabs.com
 discussions-to (*optional): TODO
 Status: Draft 
 last-call-end-date (*optional): <mm/dd/yyyy TBD>
@@ -9,7 +9,7 @@ type: Standard
 created: <10/11/2023>
 ---
 
-# AIP-X - Resource Access Control
+# AIP-56 - Resource Access Control
   
 ## Summary
 
