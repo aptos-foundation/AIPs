@@ -23,7 +23,7 @@ This AIP introduces a new `TransactionAuthenticator` called `SingleSender` that 
 
 ### Goals
 
-* Eliminate duplication of code across `TransactionAuthenticator`, `AccountAuthenticator`, and `AuthencticationKey` by providing a single means to represent the identity therein.
+* Eliminate duplication of code across `TransactionAuthenticator`, `AccountAuthenticator`, and `AuthenticationKey` by providing a single means to represent the identity therein.
 * Make adding new cryptographic protocols consistent across multi-sender and single-sender transactions. Current single-sender transactions expect a specific type of cryptographic algorithm in the `TransactionAuthenticator` where as multi-sender transactions expect them in the `AccountAuthenticator`.
 * Deliver a unified framework for MultiKey authentication that works across both single and multi-sender transactions.
 
@@ -113,7 +113,7 @@ This does increase the number of ways a key can be used, which in turn makes it 
 
 As one of the goals is to have distinct devices using a common device. This poses problem of how does a new device enumerate all public keys currently contained within a `MultiKey`. The problem also arises for `MultiEd25519` keys and is unaddressed in this AIP.
 
-The existing means of representing every public key in the `TransactionAuthenticator` can result in storage inefficiencies as a single trtansaction of 255 65-byte Secp256k1 Ecdsa keys is over 16KB. This could be made more efficient through Merkle trees or other forms of where only a subset of the data is required for making a proof and the remainder of authenticating completeness. This is currently not explored and can be addressed in updates as the application of these primitive takes shape.
+The existing means of representing every public key in the `TransactionAuthenticator` can result in storage inefficiencies as a single transaction of 255 65-byte Secp256k1 Ecdsa keys is over 16KB. This could be made more efficient through Merkle trees or other forms of where only a subset of the data is required for making a proof and the remainder of authenticating completeness. This is currently not explored and can be addressed in updates as the application of these primitives takes shape.
 
 ## Security Considerations
 

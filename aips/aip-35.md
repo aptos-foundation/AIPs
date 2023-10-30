@@ -8,7 +8,7 @@ type: Informational
 created: 05/17/2023
 ---
 
-# AIP-X - Charging Invariant Violation Errors 
+# AIP-35 - Charging Invariant Violation Errors
   
 ## Summary
 

@@ -21,7 +21,7 @@ In Aptos, each transaction contains a transaction authenticator that includes a 
 ## Motivation
 
 * Many organizations already have support for `secp256k1` Ecdsa but not Ed25519
-* Hardware crypto has not broadly adopted Ed25519 yet rmain compatible with `secp256k1` ECDSA
+* Hardware crypto has not broadly adopted Ed25519 yet remain compatible with `secp256k1` ECDSA
 
 ## Specification
 

@@ -22,7 +22,7 @@ The performance of BlockSTM (our parallel execution framework) heavily depends o
 
 We define `conflict window size` as the size of the window within which transactions can conflict with each other.  The shuffler maintains a set of senders added to the block in the last `conflict_window_size` transactions. When trying to select a new transaction to the block, the shuffler tries to find a transaction that is not part of the conflicting senders in the window. If it does, it adds the first non-conflicting transaction it finds to the block, if it doesn't then it preserves the order and adds the first transaction in the remaining block. It always maintains the following invariant in terms of ordering
 
-1. The relative ordering of all transactions from the same before and after shuffling is the same
+1. The relative ordering of all transactions from the same sender before and after shuffling is the same.
 2. The relative ordering of all transactions across different senders will also be maintained if they are non-conflicting. In other words, if the input block has only one transaction per sender, the output order will remain unchanged.
 
 The shuffling algorithm is O(n) and the following is its pseudo-code.
@@ -37,7 +37,7 @@ The shuffling algorithm is O(n) and the following is its pseudo-code.
          else we add it to the block
   else
       take the first transaction from the pending transactions and add it to the block
-   ```
+```
 
 
 ## Reference Implementation

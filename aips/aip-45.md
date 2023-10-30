@@ -12,7 +12,7 @@ created: 08/13/2023
   
 ## Summary
 
-As a byproduct of the objects, users can acquired undesirable and unmovable content associated with their account address on Aptos. Currently, most applications on Aptos will typically share all [Digital Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-11.md) and [Fungible Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-21.md) associated with an account both to the account holder and those viewing the account. Because objects can be rendered undeletable, also known as *soul bound*, a user may be victim to undesired airdrops. To mitigate this issue, we propose leveraging a mechanism that allows users to unilaterally transfer any owned-object to a global burn address.
+As a byproduct of the objects, users can acquire undesirable and unmovable content associated with their account address on Aptos. Currently, most applications on Aptos will typically share all [Digital Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-11.md) and [Fungible Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-21.md) associated with an account both to the account holder and those viewing the account. Because objects can be rendered undeletable, also known as *soul bound*, a user may be victim to undesired airdrops. To mitigate this issue, we propose leveraging a mechanism that allows users to unilaterally transfer any owned-object to a global burn address.
 
 ### Goals
 
