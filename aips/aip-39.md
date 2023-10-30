@@ -27,7 +27,7 @@ Although this could achieve the desired effect of a separate gas payer, this app
 
 We can properly support separating the gas payer account from the sender while preserving the same effects as if the sender sends the transaction themselves. This means:
 
-- The nonce of the sender account should be used, not the gas payer’s. This allows for easier scaling of gas paying operations
+- The nonce of the sender account should be used, not the gas payer’s. This allows for easier scaling of gas paying operations.
 - Transactions with a separate gas payer should use the same payload as a normal transaction (both entry function and script calls) and should not require intermediate proxy code to deal with multiple signers.
 
 ### Generalizing multi-agent transactions
@@ -50,7 +50,7 @@ pub enum RawTransactionWithData {
 
 This can be thought of as a generalization of MultiAgent transaction data, allowing an encompassing new transaction data type that can add a separate fee payer address and signature to all kinds of transactions, including MultiAgent. The flow works as below:
 
-1. To send a transfer of USDC from 0xsender to 0xreceiver where a separate account 0xpayer pays for gas, the app can first construct a multi-agent transaction with the standard payload (entry function 0x1::aptos_account::transfer_coins where the sender is 0xsender). 0xsender is also specified as the fee_payer_address in RawTransactionWithData::MultiAgentWithFeePayer. All of this can be done easily with SDK support.
+1. To send a transfer of USDC from 0xsender to 0xreceiver where a separate account 0xpayer pays for gas, the app can first construct a multi-agent transaction with the standard payload (entry function 0x1::aptos_account::transfer_coins where the sender is 0xsender). 0xpayer is specified as the fee_payer_address in RawTransactionWithData::MultiAgentWithFeePayer. All of this can be done easily with SDK support.
 2. The app can prompt the user to sign the transaction payload with their account 0xsender. The user can clearly see they're signing a transaction with a separate gas fee payer address.
 3. The payload and the signature can then be passed to the server side where 0xpayer will review and sign the transaction.
 4. The transaction is now complete. 0xpayer can send the transaction themselves or passes back to the client side for the user (0xsender) to submit it themselves. Either way, gas will be deducted from 0xpayer and the transaction will be executed in the context of 0xsender, using their account’s nonce and signer.
