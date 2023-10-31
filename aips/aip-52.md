@@ -15,7 +15,7 @@ requires (*optional): <AIP number(s)>
   
 ## Summary
 
-Currently, client-side users must create an account before making transactions on the blockchain. In effort to simplify and speed-up account creation processes, this AIP proposes allowing sponsored transactions when the gas payer is not the primary signer of the transaction to create an account if the primary signer does not exist. 
+Currently, client-side users must create an account before making transactions on the blockchain. In an effort to simplify and speed-up account creation processes, this AIP proposes allowing sponsored transactions when the gas payer is not the primary signer of the transaction to create an account if the primary signer does not exist. 
 
 ### Goals
 
