@@ -49,6 +49,8 @@ In the current model, everyone knows who the fee payer is. This gives a false se
 
 This does, however, empower the user to generate a single transaction that can then be wrapped by distinct fee payers. From a visible perspective, this is not entirely different than what exists today. In either case, the Aptos Mempool design prevents two transactions with the same sequence number from being registered or executed, hence there is no consequence that comes from this change as extra transactions will be discarded prior to charging the fee payer.
 
+At the same time, it is possible that two fee payers could compete for a paying for a transaction. The current mempool design will only support a single variant at a time. Therefore a malicious entity could intercept the transaction and replace it with a faulty fee payer. As a result, the transaction could be discarded in consensus resulting in a form of censorship. While the likelihood is small due to the inherent trust model and network dynamics, this still remains a risk. As a result, application developers are recommended to specify the fee payer when possible rather than leveraging the optional fee payer model.
+
 ## Timeline
 
 The intended timeline for this AIP is release 1.8.
