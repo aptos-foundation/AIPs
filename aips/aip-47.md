@@ -181,7 +181,7 @@ commonly don’t affect the rest of the computation) for other more complicated 
 
 ## Timeline
 
-Tentatively targetted for aptos-release-v1.8
+Tentatively targetted for aptos-release-v1.10
 
 ### Suggested implementation timeline
 
