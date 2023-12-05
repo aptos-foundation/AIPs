@@ -7,7 +7,7 @@ Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core, Networking, Interface, Application, Framework)
 created: 12/01/2023
-updated (*optional): 12/04/2023
+updated (*optional): 12/05/2023
 requires (*optional): 10, 11, 21, 43, 44, 47
 ---
 
@@ -37,7 +37,7 @@ The reasons is because such limitation allows us to focus on developing the core
 
 ## Motivation
 
-creators are now able to create a digital asset that is a combination of multiple digital assets and funigible assets using ni-code solutions.
+creators are now able to create a digital asset that is a combination of multiple digital and funigible assets using no-code solutions.
 
 The current lack of standardization creates several challenges for creators and the overall ecosystem:
 
