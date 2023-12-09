@@ -13,29 +13,31 @@ requires (*optional): <AIP number(s)>
 
 # AIP-X - Gas Schedule Adjustments
 
-There is a high discrepancy in current gas calibration. Manually adjust schedule for largest discrepancies, while fully automated gas calibration is being developed.
+There is a high discrepancy in current gas calibration. Adjust schedule based on high-level calibration (based on grouping into intrinsic, execution, io-read and io-write), while fully automated gas calibration is being developed.
 
 ## Summary
 
- > Summarize in 3-5 sentences what is the problem we’re solving for and how are we solving for it
+Current gas schedule doesn't correspond well with validator throughput. In perfect case, gas/s should be constant, for any workload.
+
+We are going to take a set of representative workloads, run validator throughput benchmarks to measure their TPS, and then calibrate re-weighting 4 groups of charges to minimize square error against a target gas/s.
+Four groups of charges we will look at here will be intrinsic, execution, io-read and io-write.
 
 ### Goals
 
- > What are the goals and what is in scope? Any metrics?
- > Discuss the business impact and business value this change would impact.
- > 
-...
+Reduce discrepancy between largest and smallest gas/s throughput across different workloads.
 
 ### Out of Scope
 
- > What are we committing to not doing and why are they scoped out?
+- anything related to storage fees, as those are not for throughput, but for permanent storage charges.
+- perfect gas calibration
+- complete gas coverage
+
 
 ## Motivation
 
- > Describe the impetus for this change. What does it accomplish?
- > What might occur if we do not accept this proposal?
-
-...
+When gas/s throughput varies across workloads, block gas limit is ineffective as we either need to:
+- set it too aggressively, and limiting throughput of workloads that have high gas/s
+- set it too loosely, and have single block execution last too long for workloads that have low gas/s, in turn causing high latencies
 
 ## Impact
 
@@ -44,10 +46,6 @@ There is a high discrepancy in current gas calibration. Manually adjust schedule
 ...
 
 ## Alternative solutions
-
- > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
-
-...
 
 ## Specification
 
