@@ -68,6 +68,7 @@ Read gas is still governed by these two gas parameters:
 
 On the write side:
 * `free_write_bytes_quota`: ignored
+* `storage_io_per_state_byte_write`: much lowered since it's now not subject to the free quota.
 
 Reletive weights between reads and writes, and between IO and compute will be tuned.
 
