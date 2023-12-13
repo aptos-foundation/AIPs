@@ -41,78 +41,43 @@ When gas/s throughput varies across workloads, block gas limit is ineffective as
 
 ## Impact
 
- > Which audiences are impacted by this change? What type of action does the audience need to take?
-
-...
+- concrete gas charges should change. Overall, we expect to reduce average gas prices, while some individual transactions might see an increase in gas cost (if they were undercharged today)
 
 ## Alternative solutions
 
+- wait for full automated calibration (of all parameters independently). This leaves us longer with the issues of purely calibrated gas schedule.
+
 ## Specification
 
- > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
-
-...
+Based on current workloads, on a single core, on the given workloads we see a ratio of 23 between lowest and highest g/s. After calibration we see ratio droping to 3-4.
 
 ## Reference Implementation
 
- > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
+* [https://github.com/aptos-labs/aptos-core/pull/11318](Python script to perform mass modifications of the gas schedule entries)
+* [https://github.com/aptos-labs/aptos-core/pull/11237](Addition of new workloads, used for benchmarking)
+* [https://github.com/aptos-labs/aptos-core/pull/11114](Tooling to do gas profiling on given workloads)
+* [https://github.com/aptos-labs/aptos-core/pull/11215](Tool to optimize multipliers based on gas profiling and throughput)
 
-...
 
 ## Testing (Optional)
 
- > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out)
- > - When can we expect the results?
- > - What are the test results and are they what we expected? If not, explain the gap.
-
-...
+Evaluating throughput and gas/s of various workloads, as well as looking at absolute price changes.
 
 ## Risks and Drawbacks
 
- > - Express here the potential negative ramifications of taking on this proposal. What are the hazards?
- > - Any backwards compatibility issues we should be aware of?
- > - If there are issues, how can we mitigate or resolve them?
-
-...
+Risk is that we overfit - i.e. that for some specific workload, that we haven't included, recalibration produces significantly worse results.
+We don't think this is likely, as we are calibrating only on few dimensions, while trying to have a representative set of workloads in the suite.
 
 ## Future Potential
 
- > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in in one year? In five years?
 
-...
 
 ## Timeline
 
-### Suggested implementation timeline
-
- > Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
-
-...
-
-### Suggested developer platform support timeline
-
- > Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
-
-...
-
-### Suggested deployment timeline
-
- > Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
- > You are responsible for updating this AIP with a better estimate, if any, after the AIP passes the gatekeeper’s design review.
- >
- > - On devnet?
- > - On testnet?
- > - On mainnet?
-
-...
+deployment with 1.9
 
 ## Security Considerations
 
- > - Does this result in a change of security assumptions or our threat model?
- > - Any potential scams? What are the mitigation strategies?
- > - Any security implications/considerations?
- > - Any security design docs or auditing materials that can be shared?
-
-## Open Questions (Optional)
-
- > Q&A here, some of them can have answers some of those questions can be things we have not figured out but we should
+this AIP will only change gas constants, and the only effect it can have on security is potential “denial of service” with small amount of funds, if something is undercharged. (no values are set to 0, only multiplier is applied, so there is an upper bound on the issues). 
+Overall, this resolves a few already present “undercharged” scenarios - it should only be beneficial in practice.
+And gas market will continue to operate, limiting the effects of the issue as well.
