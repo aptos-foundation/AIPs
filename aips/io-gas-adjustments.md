@@ -15,7 +15,7 @@ requires (*optional):
   
 ## Summary
 
-Proposing here is to fine fine tune the logic of charging gas for both storage reads and writes in order to make the cost structure more fair and reflect better the system resource consumption from different transaction workloads. Specifically:
+Proposing here is to fine tune the logic of charging gas for both storage reads and writes in order to make the cost structure more fair and reflect better the system resource consumption from different transaction workloads. Specifically:
 
 1. Charge the state read size at 4KB (dubbed "Page" onwards) intervals.
 2. Tune the relative weight of per read charge over the size of the read (in pages).
