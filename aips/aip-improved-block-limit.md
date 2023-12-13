@@ -51,6 +51,8 @@ As a consequence, information about whether block limit is reached would not be 
 ## Reference Implementation
 
 [PR 10943](https://github.com/aptos-labs/aptos-core/pull/10943)
+[PR 11287](https://github.com/aptos-labs/aptos-core/pull/11287)
+[PR 11298](https://github.com/aptos-labs/aptos-core/pull/11298)
 
 ## Testing (Optional)
 
