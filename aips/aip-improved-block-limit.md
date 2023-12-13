@@ -71,11 +71,9 @@ To be included in 1.9 release
 
 ## Security Considerations
 
- > - Does this result in a change of security assumptions or our threat model?
- > - Any potential scams? What are the mitigation strategies?
- > - Any security implications/considerations?
- > - Any security design docs or auditing materials that can be shared?
+This AIP only modifies when does a block ends - to better bound how long a single block should be allowed to execute. It doesn’t affect transaction execution.
 
-## Open Questions (Optional)
-
- > Q&A here, some of them can have answers some of those questions can be things we have not figured out but we should
+With that, only effect on security would be:
+- “denial of service” if people can fill blocks with low gas. Practically - from testing - we already have workloads that can unfairly pay small fees to do so, and this AIP is there address it. So as long is operates correctly on the comprehensive workloads we use in testing, I think risk is low it will make things worse for other workloads. And gas market should still operate, it just might ask people to pay unfairly larger costs to use blockchain resources
+- bug could cause a halt - if we have a bug in computation of values compared against the limits, and validators don’t agree. This AIP introduces check on two new things - approximate output size, and conflict coefficient from read/write sets. Correctness tests are included in the PRs, and forge runs fail if there is a halt.
+- One complex implementation detail specifically to call out: we are moving where StateCheckpoint is created, and (with a flag) replace StateCheckpoint with BlockPrologue (which just contains additional info). There should be nothing user can do to impact it, so this is a "halt" concern. Tests and replay verify should give us confidence this works correctly.
