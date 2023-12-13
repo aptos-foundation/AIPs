@@ -17,46 +17,36 @@ requires (*optional): <AIP number(s)>
 
 This builds on top of [AIP-33](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-33.md), to improve latency predictability during arbitrary workload.
 It includes:
+* adding block output limit, ending a block when predefined output size is reached. 
+* adding conflict-awareness to block gas limit.
+
+As a consequence, information about whether block limit is reached would not be able to be infered onchain, so we are going to introduce a new type for StateCheckpoint transaction (i.e. replacing it with BlockEpilogue transaction), which will contain additional information
+
+### Goals
+
+Make execution of a single block have a more predictable and better bounded expected time (calibrated to 250ms-750ms range)
+
+## Motivation
+
+If single block can take arbitrary amount of time, it makes latency of any transactions submitted during that time arbitrarily large. So it is required to control single block execution time to be strictly sub-second, to allow for predictable end to end latency.
+
+## Impact
+
+It should enable us to have a predictable and consistent latency, no matter what the workload is. (if the chain is overloaded, low fee transaction will incur latency, but high fee transactions should go through.
+
+Once the flag for it is enabled, StateCheckpoint transaction will be replaced with BlockEpilogue, which has a flexible payload, and will contain more information about how the block was ended in it.
+
+## Alternative solutions
+
+## Specification
+
+It includes:
 * adding block output limit, ending a block when predefined output size is reached. This allows having predictable bandwidth requirements needed for state-sync, allowing downstream nodes - VFNs/PFNs/indexers/etc to have predictable and small lag.
 * improving block gas limit:
   * adding conflict-awareness. Gas of individual transactions is currently not dependent on other transctions, but it's execution speed depends on it. In order to have predictable execution time of the block, gas used from individual transactions are going to multiplied by a "conflict coefficient"
   * adding a flexible compute vs io multipliers, for a bit more flexibility, without the need to change the gas schedule as frequently.
   
-### Goals
-
- > What are the goals and what is in scope? Any metrics?
- > Discuss the business impact and business value this change would impact.
- > 
-...
-
-### Out of Scope
-
- > What are we committing to not doing and why are they scoped out?
-
-## Motivation
-
- > Describe the impetus for this change. What does it accomplish?
- > What might occur if we do not accept this proposal?
-
-...
-
-## Impact
-
- > Which audiences are impacted by this change? What type of action does the audience need to take?
-
-...
-
-## Alternative solutions
-
- > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
-
-...
-
-## Specification
-
- > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
-
-...
+As a consequence, information about whether block limit is reached would not be able to be infered onchain, so we are going to introduce a new type for StateCheckpoint transaction (i.e. replacing it with BlockEpilogue transaction), which will contain additional information
 
 ## Reference Implementation
 
@@ -64,49 +54,18 @@ It includes:
 
 ## Testing (Optional)
 
- > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out)
- > - When can we expect the results?
- > - What are the test results and are they what we expected? If not, explain the gap.
-
-...
+Preparing a variety of workloads, and running real-network forge tests, measuring change in latency and throughput. 
 
 ## Risks and Drawbacks
 
 * This doesn't help with the incentives - as this computation is on top of and doesn't change what gas transactions are charged with. In addition to this, improvement to gas schedule should follow, to fairly charge users for chain utilization.
-* As-is, this removes ability to see from onchain information whether blocks are full or not (which is for example used for gas estimation). So we need to follow-up with adding to StateCheckpoint transactions block-level information about it.
-
-...
 
 ## Future Potential
 
- > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in in one year? In five years?
-
-...
 
 ## Timeline
 
-### Suggested implementation timeline
-
- > Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
-
-...
-
-### Suggested developer platform support timeline
-
- > Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
-
-...
-
-### Suggested deployment timeline
-
- > Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
- > You are responsible for updating this AIP with a better estimate, if any, after the AIP passes the gatekeeper’s design review.
- >
- > - On devnet?
- > - On testnet?
- > - On mainnet?
-
-...
+To be included in 1.9 release
 
 ## Security Considerations
 
