@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 57
 title: Block Output Size Limit and Conflict-Aware Block Gas Limit
 author: igor-aptos (https://github.com/igor-aptos)
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Block Output Size Limit and Conflict-Aware Block Gas Limit
+# AIP-57 - Block Output Size Limit and Conflict-Aware Block Gas Limit
   
 ## Summary
 
