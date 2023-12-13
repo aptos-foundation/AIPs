@@ -24,7 +24,7 @@ As a consequence, information about whether block limit is reached would not be 
 
 ### Goals
 
-Make execution of a single block have a more predictable and better bounded expected time (calibrated to 250ms-750ms range)
+Make execution of a single block have a more predictable and better bounded expected time (calibrated to 250ms-750ms range), and have a bounded output (so that state-sync of VFN/PFNs can predictably operate)
 
 ## Motivation
 
