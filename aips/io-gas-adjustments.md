@@ -25,23 +25,17 @@ Proposing here is to fine tune the logic of charging gas for both storage reads 
 
 ### Goals
 
- > What are the goals and what is in scope? Any metrics?
- > Discuss the business impact and business value this change would impact.
-
 Make the amount of IO gas charged a better indication of total IO latency of transactions carrying different workloads. The goal is suposed to be achieved by making the gas cost a more faithful reflection of the actual resource cost.
 
 
 ### Out of Scope
 
- > What are we committing to not doing and why are they scoped out?
 
 We limit the scope of this proposal to the area of IO gas, not including "Storage Fee". "Gas" measures the time or latency side of the transaction cost while the storage fee reflects the storage space side of things.
 
 ## Motivation
 
- > Describe the impetus for this change. What does it accomplish?
- > What might occur if we do not accept this proposal?
- 
+
 The current IO gas cost doesn't track the latency impacts over different workloads perfectly.
 
 On the read side, loading a 50 bytes item from the state storage is virtually the same with loading one that's 2KB, while a 500 bytes item and a 20KB item makes a big difference. In most systems and at multiple levels of the software stack, bytes beyond 4KB might mean a second memory page, cache item, or even a separate random IO fetch to the filesystem.
