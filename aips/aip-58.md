@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 58
 title: Gas Schedule Adjustments
 author: igor-aptos (https://github.com/igor-aptos), vgao1996 (https://github.com/vgao1996)
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Gas Schedule Adjustments
+# AIP-58 - Gas Schedule Adjustments
 
 There is a high discrepancy in current gas calibration. Adjust schedule based on high-level calibration (based on grouping into intrinsic, execution, io-read and io-write), while fully automated gas calibration is being developed.
 
