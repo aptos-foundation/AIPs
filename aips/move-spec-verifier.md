@@ -30,17 +30,17 @@ This AIP intends to achieve the following:
 
 Two notable things are out of scope for this AIP:
 - The Move Specification Testing tools will not help and point out the missing parts of the Move specifications. It will only check if the specifications are complete.
-- The generated mutants cannot be used to check test suites, although extending the tools to support this feature is possible.
+  The generated mutants could also be used to check the thoroughness of test suites, albeit manually. Extending the tools to automatically do this is possible as a follow-up.
 
 ## Motivation
 
-The developers write formal specifications in Move, which can be incomplete. The specifications are constraints, such as a predicate `x > 0`, which doesn't specify a particular value for x but merely constrains it. There is a need for a way of checking if those constraints are complete and restricted specification in the most proper way.
+The developers write formal specifications in Move, which can be imprecise. The specifications are constraints, such as a predicate `x > 0`, which doesn't specify a particular value for x but merely constrains it. There is a need for a way of checking if those constraints are sufficiently precise and specification is not too "loose".
 
 ## Impact
 
 As the proposed toolset verifies Move specifications, the target audience will be mainly the Move developers.
 
-Smart contract developers will be able to perform additional action - contract specification verification, allowing them to improve the quality of their contracts before deploying them on the network.
+Smart contract developers will be able to perform additional action - contract specification testing, allowing them to improve the quality of their contracts before deploying them on the network.
 
 ## Alternative solutions
 
@@ -54,7 +54,7 @@ Similar tools for testing specifications are available for other languages, such
 
 The specification verification tool is placed inside the `aptos-core` repository, providing two additional `aptos` subcommands - `spec-verify` and `mutate`.
 
-The `mutate` command is responsible for generating mutants from the Move source code. The Move mutator tool takes the source code as input and generates mutants by introducing small changes in the code. The changes are based on the mutation operators. Basically, the `mutate` command traverses the source files and applies mutation operators (making new mutants) to all possible places. Each mutant is saved in a separate file - one mutation per file. Before saving, the mutant can be checked by trying to compile it to avoid passing to the Move Prover invalid mutants.
+The `mutate` command is responsible for generating mutants from the Move source code. The Move mutator tool takes the source code as input and generates mutants by introducing small changes in the code. The changes are based on the mutation operators. Basically, the `mutate` command traverses the source files and applies mutation operators (making new mutants) to all possible places. Each mutant is saved in a separate file - one mutation per file. Before saving, the mutant can be checked by trying to compile it to avoid passing invalid mutants to the Move Prover.
 
 1. Binary operator replacement - replaces binary operators with other binary operators. For example, the `+` operator can be replaced with the `-` operator. Operators are grouped into the following categories (operators are replaced within the same category. For example, the `+` operator can be replaced with the `-` operator but not the `<<` operator):
    - arithmetic operators: `+`, `-`, `*`, `/`, `%`
@@ -79,21 +79,22 @@ The report contains information about the generated mutants as well as the kille
 
 ## Reference Implementation
 
-TBD
+It's still in progress. The verification tool is developed in the following repository and branch:
+https://github.com/eigerco/aptos-core/tree/eiger/move-spec-verifier
 
 ## Risks and Drawbacks
 
 There are the following risks and drawbacks of this proposal:
-- The set of mutation operators may be complete, as it is hard to predict all possible ways of introducing changes in the code. However, the tool is designed to be easily extendable, so it will be possible to add new operators in the future.
-- Verifying the Move specifications can be time-consuming, as it requires running the Move compiler (check if the mutant is valid) and then Move Prover for each mutant. The more mutation operators are enabled and the longer the file is, the more time is required to verify the specifications. There are two ways to mitigate this issue:
+- The set of mutation operators will not be complete, as it is hard to predict all possible ways of introducing changes in the code. However, the tool is designed to be easily extendable, so it will be possible to add new operators in the future.
+- Verifying the Move specifications can be time-consuming, as it requires running the Move compiler (to check if the mutant is valid) and then Move Prover for each mutant. The more mutation operators are enabled and the longer the file is, the more time is required to verify the specifications. There are two ways to mitigate this issue:
  - The tool can be run in parallel, as each mutant is verified independently.
  - The tool's parameters can be adjusted to, e.g., run only a subset of mutation operators or downsample the number of mutants.
 
 ## Future Potential
 
-Parts of this project, such as the Move Mutator tool, can be used to create mutants for other purposes. For example, it can be used to create a set of mutants and check if the test cases can detect them. So, there is a significant potential to become a test suite verification tool. The main difference would be calling tests instead of the Move Prover.
+Parts of this project, such as the Move Mutator tool, can be used to create mutants for other purposes. For example, it can be used to create a set of mutants and check if the test cases can detect them. So, there is a significant potential to become a mutation testing tool. The main difference would be calling tests instead of the Move Prover.
 
-Thanks to the modular design, the tool can be easily extended to support more mutation operators and categories. It should influence the community to introduce new ways of generating mutants, and therefore, it can increase verification capabilities. That's the potential to produce better specifications and test suites.
+Thanks to the modular design, the tool can be easily extended to support more mutation operators and categories. It should influence the community to introduce new ways of generating mutants, and therefore, it can increase mutation testing capabilities. That's the potential to produce better specifications and test suites.
 
 ## Timeline
 
