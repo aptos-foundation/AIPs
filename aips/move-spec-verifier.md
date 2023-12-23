@@ -11,19 +11,21 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Move Specification Testing Tools
+# AIP-X - Move Specification Testing Tool
 
 ## Summary
 
 The Move Specification Testing project aims to check whether the Move formal specifications are complete. As there is no standard solution for testing Move specifications, we propose to create a set of tools that will be able to test Move specifications.
 
-The Move Specification Verification tool (`spec-verify`) will be responsible for running The Move Mutator tool, which will be able to generate Move programs (mutants) by introducing small changes in the code. Then, they will be passed to the Move Prover and checked if they are valid according to the Move specifications. The number of mutants killed will measure how good the specification is. The tool will also generate appropriate reports.
+The Move Specification Testing tool (`spec-test`) will be responsible for running The Move Mutator tool, which will be able to generate Move programs (mutants) by introducing small changes in the code. Then, they will be passed to the Move Prover and checked if they are valid according to the Move specifications. The number of mutants killed will measure how good the specification is. The tool will also generate appropriate reports.
+
+Killing a mutant means that the mutant is not valid according to the Move specifications. The mutant is considered killed if the Move Prover returns an error. The more mutants are caught, the better and precise the specification is, as it's less possible to create a valid program that is not covered by the specification.
 
 ### Goals
 
 This AIP intends to achieve the following:
 - Create a tool (`mutate`) that will generate Move code with minor changes (mutants) compared to the original one.
-- Create a tool (`spec-verify`) to check if the mutants are valid according to the Move specifications and generate a report.
+- Create a tool (`spec-test`) to check if the mutants are valid according to the Move specifications and generate a report.
 - Integrate those tools within the Aptos repository - new commands will be added to the `aptos` tool.
 
 ### Out of Scope
@@ -38,7 +40,7 @@ The developers write formal specifications in Move, which can be imprecise. The 
 
 ## Impact
 
-As the proposed toolset verifies Move specifications, the target audience will be mainly the Move developers.
+As the proposed toolset tests Move specifications, the target audience will be mainly the Move developers.
 
 Smart contract developers will be able to perform additional action - contract specification testing, allowing them to improve the quality of their contracts before deploying them on the network.
 
@@ -52,7 +54,7 @@ Similar tools for testing specifications are available for other languages, such
 
 ## Specification
 
-The specification verification tool is placed inside the `aptos-core` repository, providing two additional `aptos` subcommands - `spec-verify` and `mutate`.
+The specification testing tool is placed inside the `aptos-core` repository, providing two additional `aptos` subcommands - `spec-test` and `mutate`.
 
 The `mutate` command is responsible for generating mutants from the Move source code. The Move mutator tool takes the source code as input and generates mutants by introducing small changes in the code. The changes are based on the mutation operators. Basically, the `mutate` command traverses the source files and applies mutation operators (making new mutants) to all possible places. Each mutant is saved in a separate file - one mutation per file. Before saving, the mutant can be checked by trying to compile it to avoid passing invalid mutants to the Move Prover.
 
@@ -69,7 +71,7 @@ The `mutate` command is responsible for generating mutants from the Move source 
 6. Return value replacement - replaces return values with other return values. For example, the concrete expressions can be replaced with concrete literals or other random literals.
 7. Break/continue replacement or deletion - replaces or deletes break/continue statements with other break/continue statements.
 
-The `spec-verify` command is responsible for running the Move mutator tool and then checking if the generated mutants are valid according to the Move specifications. It will do the following:
+The `spec-test` command is responsible for running the Move mutator tool and then checking if the generated mutants are valid according to the Move specifications. It will do the following:
 1. Take command line arguments both for the Move Prover tool and for the Move mutator tool. It can also read the configuration from the JSON configuration file.
 2. Run the Move mutator tool (`mutate`) to generate mutants with the previously specified parameters.
 3. Run the Move Prover tool, passing the generated mutants individually.
@@ -79,16 +81,17 @@ The report contains information about the generated mutants as well as the kille
 
 ## Reference Implementation
 
-It's still in progress. The verification tool is developed in the following repository and branch:
+It's still in progress. The specification test tool is developed in the following repository and branch:
 https://github.com/eigerco/aptos-core/tree/eiger/move-spec-verifier
 
 ## Risks and Drawbacks
 
 There are the following risks and drawbacks of this proposal:
 - The set of mutation operators will not be complete, as it is hard to predict all possible ways of introducing changes in the code. However, the tool is designed to be easily extendable, so it will be possible to add new operators in the future.
-- Verifying the Move specifications can be time-consuming, as it requires running the Move compiler (to check if the mutant is valid) and then Move Prover for each mutant. The more mutation operators are enabled and the longer the file is, the more time is required to verify the specifications. There are two ways to mitigate this issue:
- - The tool can be run in parallel, as each mutant is verified independently.
+- Testing the Move specifications can be time-consuming, as it requires running the Move compiler (to check if the mutant is valid) and then Move Prover for each mutant. The more mutation operators are enabled and the longer the file is, the more time is required to test the specifications. There are two ways to mitigate this issue:
+ - The tool can be run in parallel, as each mutant is tested independently.
  - The tool's parameters can be adjusted to, e.g., run only a subset of mutation operators or downsample the number of mutants.
+ - Modify directly the bytecode or a compiler IR instead of the source code.
 
 ## Future Potential
 
@@ -112,4 +115,6 @@ The Move Specification Testing tools are a part of the Move language ecosystem a
 
 ## Security Considerations
 
-This set of tools does not introduce any changes in the security model. Therefore, it does not have any security implications.
+This set of tools does not introduce any changes in the security model.
+
+However, the Move Specification Testing tools can be used to check the quality of the Move specifications also by the malicious actors. They can use the tools to find the weaknesses in the specifications and exploit them.
