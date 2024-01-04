@@ -2,7 +2,7 @@
 aip: 44
 title: Module Events
 author: lightmark
-Status: In Review
+Status: Accepted
 type: Standard (Core, Interface, Framework)
 created: 07/20/2023
 ---
@@ -46,7 +46,7 @@ Module Event Example:
 ```rust
 /// An example module event struct denotes a coin transfer.
 #[event]
-struct TransferEvent<Coin> {
+struct TransferEvent<Coin> has store, drop {
   sender: address,
   receiver: address,
   amount: u64

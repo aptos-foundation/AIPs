@@ -64,7 +64,7 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 35](https://github.com/aptos-foundation/AIPs/issues/144)| Core | [Charging Invariant Violation Errors](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-35.md) | Standard | Accepted |
 | [AIP 36](https://github.com/aptos-foundation/AIPs/issues/154)| Core | [Universally Unique Identifiers](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-36.md) | Standard | Draft |
 | [AIP 37](https://github.com/aptos-foundation/AIPs/issues/160)| Core | [Filter duplicate transactions within a block](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-37.md) | Standard | Accepted |
-| [AIP 38](https://github.com/aptos-foundation/AIPs/issues/154)| Core | [Deprecate Storage Gas Curves](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-38.md) | Standard | Draft |
+| [AIP 38](https://github.com/aptos-foundation/AIPs/issues/163)| Core | [Deprecate Storage Gas Curves](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-38.md) | Standard | Draft |
 | [AIP 39](https://github.com/aptos-foundation/AIPs/issues/173)| Core | [Separate gas payer](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-39.md) | Standard | Draft |
 | [AIP 40](https://github.com/aptos-foundation/AIPs/issues/178)| Core | [Address Standard v1](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-40.md) | Standard | Draft |
 | [AIP 41](https://github.com/aptos-foundation/AIPs/issues/185)| Framework | [Move APIs for randomness generation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md) | Standard | Draft |
@@ -72,6 +72,13 @@ This table contains an overview of all created and tracked AIPs. It should be up
 | [AIP 43](https://github.com/aptos-foundation/AIPs/issues/209) | Framework | [Parallelize Digital Assets (Token V2) minting/burning](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-43.md) | Standard | Draft |
 | [AIP 44](https://github.com/aptos-foundation/AIPs/issues/200) | Core | [Module Events](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-44.md) | Standard | Draft |
 | [AIP 46](https://github.com/aptos-foundation/AIPs/issues/222) | Framework | [New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-46.md) | Standard | Draft |
+| [AIP 47](https://github.com/aptos-foundation/AIPs/issues/226) | Framework | [Aggregators V2 ](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-47.md) | Standard | Draft |
+| [AIP 48](https://github.com/aptos-foundation/AIPs/issues/237) | Framework | [Allow direct commission change vesting contract](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-48.md) | Standard | Draft |
+| [AIP 49](https://github.com/aptos-foundation/AIPs/issues/247) | Framework | [secp256k1 ECDSA for Transaction Authentication](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-49.md) | Standard | Draft |
+| [AIP 50](https://github.com/aptos-foundation/AIPs/issues/249) | Framework | [Change Commission rates in delegation pools](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-50.md) | Standard | Draft |
+| [AIP 51](https://github.com/aptos-foundation/AIPs/issues/251) | Framework | [Changing beneficiaries for operators ](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-51.md) | Standard | Draft |
+| [AIP 52](https://github.com/aptos-foundation/AIPs/issues/258) | Framework | [Automated Account Creation for Sponsored Transactions](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-52.md) | Standard | Draft |
+| [AIP 53](https://github.com/aptos-foundation/AIPs/issues/257) | Framework | [Make Fee Payer Address Optional in Transaction Authenticator](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-53.md) | Standard | Draft |
 | ... | ... ||||
 
 ## Types of AIPs

@@ -15,10 +15,9 @@ requires (*optional):
 
 ## Summary
 
-Abstraction for enabling efficient concurrent modifications of a counter, that has an optional limit defined, and be able to efficiently extract it's value and store it in another resource.
-It revamps and expands on current notion of `Aggregators`, and adds new notion of `AggregatorSnapshots`.
-
-Specifically, allow aggregators to be used efficiently for control flow based on whether numeric operations would be executed or overflow/underflow, as well as allowing values from aggregators to be stored elsewhere, without incurring performance impact.
+This AIP revamps and expands upon the current concept of Aggregators (which are efficient concurrent counters). In addition to the current parallelism, these actions will not be requiring sequential execution any more when:
+- using aggregators for control flow (for example having transaction do an action if incrementing a counter doesn't exceed a limit)
+- storing values from aggregators elsewhere (through AggregatorSnapshot concept)
 
 ## Motivation
 
@@ -30,11 +29,11 @@ a.value += 1;                                  <-  concurrently changed often
 move_to(signer, B {value: a.value});           <-  used for write only
 ```
 
-If we call that code from multiple transactions, they all need to be executed one after the other, 
+If we call that code from multiple transactions, they all need to be executed one after the other,
 because above does a read and a write to a.value, and so each two transactions would generate a read/write conflict. 
 This basically limits transactions using the code above to a single-threaded performance.
 
-Aggregators and AggregatorSnapshots exploit observation that some variables that get concurrently changed often, 
+Aggregators and AggregatorSnapshots exploit the observation that some variables that get concurrently changed often,
 commonly don’t affect the rest of the computation, 
 and can be computed with a placeholder value during transaction execution by the VM, 
 and can instead be modified in place with an actual value in the post-processing stage, once the counter value is known.
