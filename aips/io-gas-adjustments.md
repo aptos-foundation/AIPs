@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 59
 title: Storage IO Gas Adjustments
 author: msmouse
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional):
 requires (*optional):
 ---
 
-# AIP-X - Storage IO Gas Adjustments
+# AIP-59 - Storage IO Gas Adjustments
   
 ## Summary
 
