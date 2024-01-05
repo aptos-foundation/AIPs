@@ -11,12 +11,12 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Reduce largest accepted transactions
+# AIP-X - Improve fairness of shared computation resources 
   
 ## Summary
 
-Currently per-transaction max_execution_gas and max_io_gas limits allow single transaction to take ~1s to execute.
-Proposal is to reduce the limits to <100ms short term, with target of <10ms longterm.
+Currently per-transaction max_execution_gas and max_io_gas limits allow single transaction to unfairly hog resources, and take ~1s to execute.
+Proposal is to reduce the limits to ~100ms short term, with target of 10ms mid-term.
 
 ### Out of Scope
 
@@ -25,12 +25,20 @@ This also doesn't touch overall transactions gas limit, which are much larger - 
 
 ## Motivation
 
-Allowing large individual transactions, makes chain less responsive and harder to farily share resources.
-From investiations, it is much more common that innefficient implementations lead to high-gas usage, and less common for it to be an actual need.
+Allowing large individual transactions, makes it easy for individual transactions to unfarily hog computation resources, makes it harder to fairly share resources, and makes chain less responsive.
+
+From investiations, most common causes for single transaction taking a lot of time to execute are:
+- innefficient implementations
+- batching of many individual operations into single transaction.
+
+Less commonly, and mostly on the lower end of around the ~10-30ms range is a set of usecases with actual need, for example using cryptographic expensive primitives.
 
 That suggests that reducing transaction limit should be overall beneficial:
-- innefficient contracts will get early information to optimize, 
+- innefficient contracts will get early information to optimize,
+- reducing batching allows for more parallelism and higher throughput
 - chain will be more responsive and fair
+
+We will work to understand usecases with real need - and see how they can be handled. Reach out if your transactions fall into this category.
 
 ## Impact, Risks and Drawbacks
 
@@ -45,8 +53,11 @@ modifying two configs in [transaction.rs](https://github.com/aptos-labs/aptos-co
 
 ### Suggested deployment timeline
 
-On mainnet, we will reduce limits soon, to what is being used in production, so it doesn't have a big impact.
-More aggressive reductions will be deployed more slowly, in collaboration with the ecosystem.
+By mid-January, reduce mainnet limits to 100ms, to improve fairness immediatelly. Less than 0.1% of mainnet transaction fall into this cateogry.
+
+Gradually, in collaboration with the ecosystem, reduce limits further down to 10ms, in the coming weeks/months.
+
+On devnet/testnet, we will more aggressively reduce limits, to help everyone understand impact on their applications, and do the mainnet transition more smoothly.
 
 ## Security Considerations
 
