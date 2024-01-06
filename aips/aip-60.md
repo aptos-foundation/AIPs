@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 60
 title: Improve fairness of shared computation resources 
 author: igor-aptos (https://github.com/igor-aptos), vgao1996 (https://github.com/vgao1996)
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Improve fairness of shared computation resources 
+# AIP-60 - Improve fairness of shared computation resources 
   
 ## Summary
 
