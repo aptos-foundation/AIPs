@@ -56,7 +56,7 @@ The current lack of standardization creates several challenges for creators and 
 
 
 If the proposed solution is not accepted, the following consequences are likely to occur:
-- **more complicated to use:** Creators will continue to face the burden of manually implementing composability features, limiting their ability to focus on other relevant aspects. 
+- **More complicated to use:** Creators will continue to face the burden of manually implementing composability features, limiting their ability to focus on other relevant aspects. 
 
 - **Elevated Security Risks:** The lack of standardization of composability logic will require creators to carfully handle references depending on their needs. Failing to do so could potentioally result in losing the ownership of the digital assets.
 
