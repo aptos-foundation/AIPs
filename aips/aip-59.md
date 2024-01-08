@@ -22,7 +22,6 @@ Proposing here is to fine tune the logic of charging gas for both storage reads 
 3. Remove the per state write op free quota in bytes.
 4. Lower the relative cost per byte write.
 
-
 ### Goals
 
 Make the amount of IO gas charged a better indication of total IO latency of transactions carrying different workloads. The goal is suposed to be achieved by making the gas cost a more faithful reflection of the actual resource cost.
@@ -57,14 +56,14 @@ N/A
 ## Specification
 
 Read gas is still governed by these two gas parameters:
-* `storage_io_per_state_slot_read`: tuned to about 2 4KB-sized page reads.
+* `storage_io_per_state_slot_read`: tuned.
 * `storage_io_per_state_byte_read`: while charging, the size of the state read is rounded up to 4KB boundaries and then charged this much per byte.
 
 On the write side:
 * `free_write_bytes_quota`: ignored
 * `storage_io_per_state_byte_write`: much lowered since it's now not subject to the free quota.
 
-Reletive weights between reads and writes, and between IO and compute will be tuned.
+Reletive weights between reads and writes, and between IO and computation are tuned. The final numbers will be shipped as part of [AIP-58](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-58.md)
 
 ## Reference Implementation
 
