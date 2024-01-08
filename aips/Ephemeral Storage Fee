@@ -40,22 +40,14 @@ Remove the per slot free quota and be more friendly to reasonable large items.
 
 ### Out of Scope
 
-We limit the scope of this proposal to the area of Storage Fee, irrelavent to "IO Gas". "Gas" measures the time or latency side of the transaction cost while the storage fee reflects the storage space side of things.
-
-## Motivation
-
-
-Notice that this AIP is about the Storage Fee which concerns disk space consumption. There's a related concern on the latency side of things which is covered by the Io Gas. Changes needed to be made on that front as well and that's covered by AIP-[TBD]
+Notice that this AIP is about the Storage Fee which concerns disk space consumption. There's a related concern on the latency side of things which is covered by the Io Gas. Changes needed to be made on that front as well and that's covered by (AIP-59)[https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-59.md]
 
 
 ...
 
 ## Impact
 
- > Which audiences are impacted by this change? What type of action does the audience need to take?
-
 Frequently updated larger state items are now cheaper. And when deleted, fees paid for the bytes are refundable. As a result, the developer can now straightforwardly decide on storage granularity according to the access (modification) pattern of things.
-
 
 
 ## Alternative solutions
@@ -64,12 +56,10 @@ N/A
 
 ## Specification
 
-
 1. The per slot "free bytes" quota is removed. Instead, all the bytes of a state item are priced uniformly for the permanent space occupation in the state DB.
 2. When the state item changes in size, the new target "deposit" is calculated according to the new size, and the difference between that and what's already paid is charged or refunded. On deletion, both the slot deposit and bytes deposit are refuned. 
 3. The ephemeral fee is charged according to the size of the entire item being created or updated, truthfully reflect the impact on the ledger history size and disk / network bandwidth consumption.
 4. A per transaction ephemeral fee quota is introduced and the reletive weights between the permenant and ephemeral storage fees are tuned so that commonly seen transaction types are reasonably affordable.
-
 
 
 ## Reference Implementation
@@ -78,7 +68,6 @@ https://github.com/aptos-labs/aptos-core/pull/11279
 https://github.com/aptos-labs/aptos-core/pull/11295
 
 ## Testing (Optional)
-
 
 ## Risks and Drawbacks
 
@@ -96,7 +85,7 @@ https://github.com/aptos-labs/aptos-core/pull/11295
 
 
 
-Release 1.9, early 2024
+Release 1.10, early 2024
 
 ## Security Considerations
 
