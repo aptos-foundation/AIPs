@@ -21,7 +21,7 @@ Proposed is an evolvement of the Strorage Fee charging scheme where permanent an
 # Background
 Generally speaking the Aptos nodes keep two categories of blockchain data on disk:
 
-1. Permanant storage: Items in the latest state and associated authentication data structures -- the network has to keep them around indefinitely until deleted. Such storage should be priced high and is subject to refunding once deleted.
+1. Permanant storage: Items in the latest state and associated authentication data structures -- the network has to keep them around indefinitely until a transaction deleted the relevant state. Such storage should be priced high and is subject to refunding once deleted.
 2. Ephemeral storage: the transaction itself and it's outputs, including the write set and the events -- they are part of the "ledger history" and subject to pruning. Large transactions and transactions with large outputs can consume the disk space on nodes rapidly despite being enventally pruned, and propagating the bytes across the network is another aspact of resource consumption. Net net, ephemeral storage should be charged expensive enough to retain the network's collective abitlity to keep reasonably long ledger history and propagate them efficiently among nodes, but might be at a lower rate than the permanent storage.
 
 When a state item is updated, and let's say, a large state item increases in size further slightly:
@@ -40,7 +40,8 @@ Remove the per slot free quota and be more friendly to reasonable large items.
 
 ### Out of Scope
 
- > What are we committing to not doing and why are they scoped out?
+We limit the scope of this proposal to the area of Storage Fee, irrelavent to "IO Gas". "Gas" measures the time or latency side of the transaction cost while the storage fee reflects the storage space side of things.
+
 ## Motivation
 
 
