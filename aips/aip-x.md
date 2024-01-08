@@ -37,7 +37,7 @@ The reasons is because such limitation allows us to focus on developing the core
 
 ## Motivation
 
-creators are now able to create a digital asset that is a combination of multiple digital and funigible assets using no-code solutions.
+Creators are now able to create a digital asset that is a combination of multiple digital and funigible assets using no-code solutions.
 
 The current lack of standardization creates several challenges for creators and the overall ecosystem:
 
