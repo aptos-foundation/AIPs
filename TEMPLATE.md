@@ -26,7 +26,7 @@ requires (*optional): <AIP number(s)>
 ### Goals
 
  > What are the goals and what is in scope? Any metrics?
- > Discuss the business impact and business value this change would impact. 
+ > Discuss the business impact and business value this change would impact.
 
 ...
 
