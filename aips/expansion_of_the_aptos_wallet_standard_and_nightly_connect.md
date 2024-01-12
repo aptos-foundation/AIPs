@@ -2,6 +2,7 @@
 aip:
 title: Expansion of the Aptos Wallet Standard and the expansion of Nightly Connect on Aptos.
 author: NB, Kimi82
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/27
 Status: Draft
 type: Interface
 created: 01/12/2024
