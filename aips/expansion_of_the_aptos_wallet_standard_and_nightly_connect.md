@@ -1,14 +1,10 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: (AIP title)
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
-discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: <Draft | Last Call | Accepted | Final | Rejected>
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
-created: <mm/dd/yyyy>
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+aip:
+title: Expansion of the Aptos Wallet Standard and the expansion of Nightly Connect on Aptos.
+author: NB, Kimi82
+Status: Draft
+type: Interface
+created: 01/12/2024
 ---
 
 # AIP-54 - Expansion of the Aptos Wallet Standard and the expansion of Nightly Connect on Aptos.
@@ -65,7 +61,7 @@ We will achieve the above-mentioned goals by expanding the existing Aptos Wallet
 
 ...
 
-## Reference Implementation
+### Aptos Wallet Standard
 
 The standard defines methods for a wallet to implement and introduces an injection method for the wallet to implement so it can be discovered on the browser.
 
@@ -229,7 +225,8 @@ signMessage()
 signTransaction()
 
 ```
-## Nightly Connect
+
+### Nightly Connect
 
 Nightly Connect is a fully permissionless and automated wallet adapter that takes advantage of the benefits provided by the extended Wallet Standard.
 
@@ -241,23 +238,17 @@ Apart from that, Nightly Connect can serve as a starting point for dApps buildin
 
  Moreover, applications can freely modify the Nightly Connect Model UI in a simple and fast manner using components prepared by us.
 
-## dApp implementation
+### dApp implementation
 
 To take advantage of the changes, a dApp will need to implement Nightly Connect or another Wallet Adapter that is compatible with an expanded wallet standard. This can be done in two ways. The first one is to completely replace the current solution with Nightly Connect. The second is to add Nightly Connect as one of the options to the current solution.
  The entire process of implementing Nightly Connect is quick and well described in [our documentation](https://connect.nightly.app/docs/).
 
-## Wallets implementation
+### Wallets implementation
 
 For the currently existing Aptos wallets to become compatible with the extended standard and take advantage of the benefits it offers, they will need to make changes that will make them compatible with the extended standard.
 
 To use the functions offered by Nightly Connect, such as establishing a connection through deep links and QR codes, as well as other tools, they will need to implement the code described in the [documentation](https://connect.nightly.app/docs/).
 ...
-
-## Risks and Drawbacks
-
- > - Express here the potential negative ramifications of taking on this proposal. What are the hazards?
- > - Any backwards compatibility issues we should be aware of?
- > - If there are issues, how can we mitigate or resolve them?
 
 ## Reference Implementation
 
