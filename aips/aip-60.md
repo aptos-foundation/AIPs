@@ -49,6 +49,8 @@ Valid use cases that want to do larger amount of work will need to be split acro
 
 Modifying two configs in [transaction.rs](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/aptos-gas-schedule/src/gas_schedule/transaction.rs#L176)
 
+[PR](https://github.com/aptos-labs/aptos-core/pull/11581) to apply changes and create mainnet proposal 
+
 ## Timeline
 
 ### Suggested deployment timeline
