@@ -3,7 +3,7 @@ aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: OpenID blockchain (OIDB) accounts
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/297
-Status: <*Draft* | Last Call | Accepted | Final | Rejected>
+Status: Draft
 last-call-end-date (*optional): 02/15/2024
 type: <Standard (Core, Framework)>
 created: 01/04/2024
