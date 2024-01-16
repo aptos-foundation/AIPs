@@ -79,7 +79,7 @@ The purpose of this AIP will be to demonstrate how this signed JWT can be used t
 
 #### Zero-knowledge proofs
 
-We assume familiarity with zero-knowledge proof (ZKP) systems: i.e., a ZKP system for a **relation** $R$ allows a **prover** to convince a **verifier**, who has a **public input** $$x$$,  that the prover knows a **private input** $w$ such that $$R(x; w) = 1$$ (i.e., “it holds”) without leaking any information about $w$ to the verifier, beyond the fact that the relation holds.
+We assume familiarity with zero-knowledge proof (ZKP) systems: i.e., a ZKP system for a **relation** $R$ allows a **prover** to convince a **verifier**, who has a **public input** $x$,  that the prover knows a **private input** $w$ such that $R(x; w) = 1$ (i.e., “it holds”) without leaking any information about $w$ to the verifier, beyond the fact that the relation holds.
 
 Other ZKP terms:
 
@@ -207,15 +207,17 @@ Below, we explain the key concepts behind how OIDB accounts are implemented:
 
 The **public key** of an OIDB account consists of:
 
-1. The OIDC provider’s identity, as it appears in a JWT’s `iss` field (e.g., `https://accounts.google.com`), denoted by $\mathsf{iss\_val}$
+1. The OIDC provider’s identity, as it appears in a JWT’s `iss` field (e.g., `https://accounts.google.com`), denoted by $\mathsf{iss\\_val}$
 2. An **identity commitment (IDC)**, which is a <u>hiding</u> commitment to:
-   - The owning user’s identifier issued by the OIDC provider (e.g., `alice@gmail.com`), denoted by $\mathsf{uid\_val}$.
-   - The name of the JWT field that stores the user identifier, denoted by $\mathsf{uid\_key}$. Currently, we only allow `sub` or `email`[^jwt-email-field].
-   - The managing application’s identifier issued to it during registration with the OIDC provider (i.e., an OAuth `client_id` stored in the JWT’s `aud` field), denoted by $\mathsf{aud\_val}$. 
+   - The owning user’s identifier issued by the OIDC provider (e.g., `alice@gmail.com`), denoted by $\mathsf{uid\\_val}$.
+   - The name of the JWT field that stores the user identifier, denoted by $\mathsf{uid\\_key}$. Currently, we only allow `sub` or `email`[^jwt-email-field].
+   - The managing application’s identifier issued to it during registration with the OIDC provider (i.e., an OAuth `client_id` stored in the JWT’s `aud` field), denoted by $\mathsf{aud\\_val}$. 
 
 A bit more formally (but ignoring complex implementation details), the IDC is computed by hashing the fields above using a SNARK-friendly hash function $H'$:
 
-$\begin{align}\mathsf{addr\_idc} = H'(\mathsf{uid\_key}, \mathsf{uid\_val}, \mathsf{aud\_val}; r),\ \text{where}\ r\stackrel{\$}{\gets} \{0,1\}^{256}\end{align}$
+```math
+\mathsf{addr\_idc} = H'(\mathsf{uid\_key}, \mathsf{uid\_val}, \mathsf{aud\_val}; r),\ \text{where}\ r\stackrel{\$}{\gets} \{0,1\}^{256}
+```
 
 #### Peppers
 
@@ -229,7 +231,7 @@ The pepper has two important properties:
 Put more simply:
 
 - If the **pepper is lost**, then access to the **account is lost**. 
-- If the **pepper is revealed** (e.g., stolen), then only **privacy of the account is lost** (i.e., the user and app identity in $\mathsf{addr\_idc}$ can be brute-forced and ultimately revealed).
+- If the **pepper is revealed** (e.g., stolen), then only **privacy of the account is lost** (i.e., the user and app identity in $\mathsf{addr\\_idc}$ can be brute-forced and ultimately revealed).
 
 Relying on users to remember their pepper $r$ would maintain the status-quo of easy-to-lose secret-key-based accounts and thus *defeat the point of OpenID-based blockchain accounts*.
 
@@ -239,7 +241,9 @@ Therefore, we introduce a **pepper service** that can help users recover their p
 
 Next, the **authentication key** of an OIDB account is simply the hash of its public key defined above. More formally, assuming any cryptographic hash function $H$, the authentication key is:
 
-$\begin{align}\mathsf{auth\_key} = H(\mathsf{iss\_val}, \mathsf{addr\_idc})\end{align}$
+```math
+\mathsf{auth\_key} = H(\mathsf{iss\_val}, \mathsf{addr\_idc})
+```
 
 **Note:** In practice, a domain separator is also hashed in above, but for simplicity of exposition, we ignore such details.
 
@@ -249,31 +253,33 @@ After defining the “public key” above, a natural question arises:
 
 > What is the secret key associated with this public key?
 
-The answer is there is no additional secret key that the user has to write down. Instead, the “secret key”, consists of the user’s ability to sign in to the OIDC account via the managing application committed in the $\mathsf{auth\_key}$ above.
+The answer is there is no additional secret key that the user has to write down. Instead, the “secret key”, consists of the user’s ability to sign in to the OIDC account via the managing application committed in the $\mathsf{auth\\_key}$ above.
 
 Put differently, the “secret key” can be thought of as the user’s password for that account, which the user already knows, or a pre-installed HTTP cookie which precludes the need for the user to re-enter the password. Although, this **password is not sufficient**: the managing application must be available: it must allow the user to sign in to their OIDC account and receive the OIDC signature. (We discuss [how to deal with disappearing apps](#alternative-recovery-paths-for-when-managing-applications-disappear) later on.)
 
-More formally, if a user can successfully use the application identified by $\mathsf{aud\_val}$ to sign in (via OAuth) to their OIDC account identified by $(\mathsf{uid\_key}, \mathsf{uid\_val})$ and issued by the OIDC provider identified by $\mathsf{iss\_val}$, then that ability acts as that users “secret key.”
+More formally, if a user can successfully use the application identified by $\mathsf{aud\\_val}$ to sign in (via OAuth) to their OIDC account identified by $(\mathsf{uid\\_key}, \mathsf{uid\\_val})$ and issued by the OIDC provider identified by $\mathsf{iss\\_val}$, then that ability acts as that users “secret key.”
 
 #### _Warm-up_: Leaky signatures that reveal the user’s and app’s identity
 
-Before describing our fully privacy-preserving TXN signatures, we warm-up by describing **leaky signatures** that reveal the identity of the user and the app: i.e., they leak $\mathsf{uid\_key}, \mathsf{uid\_val}$ and $\mathsf{aud\_val}$.
+Before describing our fully privacy-preserving TXN signatures, we warm-up by describing **leaky signatures** that reveal the identity of the user and the app: i.e., they leak $\mathsf{uid\\_key}, \mathsf{uid\\_val}$ and $\mathsf{aud\\_val}$.
 
-A **leaky signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf{txn}$ for an address with authentication key $\mathsf{auth\_key}$ is defined as:
+A **leaky signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf{txn}$ for an address with authentication key $\mathsf{auth\\_key}$ is defined as:
 
-$\begin{align}\sigma_\mathsf{txn} = (\mathsf{uid\_key}, \mathsf{jwt}, \mathsf{header}, \mathsf{epk},\sigma_\mathsf{eph}, \sigma_\mathsf{oidc}, \mathsf{exp\_date}, \mathsf{exp\_horizon}, \rho, r)\end{align}$
+```math
+\sigma_\mathsf{txn} = (\mathsf{uid\_key}, \mathsf{jwt}, \mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \sigma_\mathsf{oidc}, \mathsf{exp\_date}, \mathsf{exp\_horizon}, \rho, r)
+```
 
 where:
 
-1. $\mathsf{uid\_key}$, the JWT field’s name that stores the user’s identity, whose value is committed in the address IDC
+1. $\mathsf{uid\\_key}$, the JWT field’s name that stores the user’s identity, whose value is committed in the address IDC
 2. $\mathsf{jwt}$, the JWT payload (e.g., see [an example here](#JWT-header-and-payload-example))
 3. $\mathsf{header}$, the JWT header; indicates the OIDC signature scheme and the JWK’s key ID, which are needed to verify the OIDC signature under the correct PK
 4. $\mathsf{epk}$, an **ephemeral public key (EPK)** generated by the managing application (its associated $\mathsf{esk}$ is kept secret on the managing application side)
 5. $\sigma_\mathsf{eph}$, an **ephemeral signature** over the transaction $\mathsf{txn}$
 6. $\sigma_\mathsf{oidc}$, the OIDC signature over the full JWT (i.e.,  over the $\mathsf{header}$ and $\mathsf{jwt}$ payload)
-7. $\mathsf{exp\_date}$, a timestamp past which $\mathsf{epk}$ is considered expired and cannot be used to sign TXN.
-8. $\mathsf{exp\_horizon}$, the $\mathsf{exp\_date}$ must be between $\mathsf{jwt}[\texttt{"iat"}]$ and $\mathsf{jwt}[\texttt{"iat"}]+\mathsf{exp\_horizon}$
-9. $\rho$, a high-entropy **EPK blinding factor** used to create an **EPK commitment** to $\mathsf{epk}$ and $\mathsf{exp\_date}$ that is stored in the $\mathsf{jwt}[\texttt{"nonce"}]$ field
+7. $\mathsf{exp\\_date}$, a timestamp past which $\mathsf{epk}$ is considered expired and cannot be used to sign TXN.
+8. $\mathsf{exp\\_horizon}$, the $\mathsf{exp\\_date}$ must be between $\mathsf{jwt}[\texttt{"iat"}]$ and $\mathsf{jwt}[\texttt{"iat"}]+\mathsf{exp\\_horizon}$
+9. $\rho$, a high-entropy **EPK blinding factor** used to create an **EPK commitment** to $\mathsf{epk}$ and $\mathsf{exp\\_date}$ that is stored in the $\mathsf{jwt}[\texttt{"nonce"}]$ field
 10. $r$, the pepper for the address IDC, which is assumed to be zero in this “leaky mode
 
 **tl;dr**: To **verify the $\sigma_\mathsf{txn}$ signature**, validators check that the OIDC provider (1) signed the user and app IDs that are committed in the address IDC and (2) signed the EPK which, in turn, signed the transaction, while enforcing some expiration date on the EPK.
@@ -281,22 +287,22 @@ where:
 In more detail, signature verification involves the following:
 
 1. If using `email`-based IDs, ensure the email has been verified:
-   1. If $\mathsf{uid\_key}\stackrel{?}{=}\texttt{"email"}$, assert $\mathsf{jwt}[\texttt{"email\_verified"}] \stackrel{?}{=} \texttt{"true"}$
+   1. If $\mathsf{uid\\_key}\stackrel{?}{=}\texttt{"email"}$, assert $\mathsf{jwt}[\texttt{"email\\_verified"}] \stackrel{?}{=} \texttt{"true"}$
 2. Reconstruct the authentication key:
-   1. Let $\mathsf{uid\_val}\gets\mathsf{jwt}[\mathsf{uid\_key}]$
-   2. Let $\mathsf{aud\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
-   3. Let $\mathsf{addr\_idc} \gets H'(\mathsf{uid\_key}, \mathsf{uid\_val}, \mathsf{aud\_val}; r)$, using the pepper $r$ from the signature
-   4. Let $\mathsf{iss\_val}\gets\mathsf{jwt}[\texttt{"iss"}]$
-   5. Assert $\mathsf{auth\_key} \stackrel{?}{=} H(\mathsf{iss\_val}, \mathsf{addr\_idc})$
+   1. Let $\mathsf{uid\\_val}\gets\mathsf{jwt}[\mathsf{uid\\_key}]$
+   2. Let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
+   3. Let $\mathsf{addr\\_idc} \gets H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$, using the pepper $r$ from the signature
+   4. Let $\mathsf{iss\\_val}\gets\mathsf{jwt}[\texttt{"iss"}]$
+   5. Assert $\mathsf{auth\\_key} \stackrel{?}{=} H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$
 3. Check the EPK is committed in the JWT’s `nonce` field:
-   1. Assert $\mathsf{jwt}[\texttt{"nonce"}] \stackrel{?}{=} H’(\mathsf{epk},\mathsf{exp\_date};\rho)$
+   1. Assert $\mathsf{jwt}[\texttt{"nonce"}] \stackrel{?}{=} H’(\mathsf{epk},\mathsf{exp\\_date};\rho)$
 4. Check the expiration date horizon is within bounds:
-   1. Assert $\mathsf{exp\_horizon} \in (0, \mathsf{max\_exp\_horizon})$, where $\mathsf{max\_exp\_horizon}$ is an on-chain parameter
+   1. Assert $\mathsf{exp\\_horizon} \in (0, \mathsf{max\\_exp\\_horizon})$, where $\mathsf{max\\_exp\\_horizon}$ is an on-chain parameter
 5. Check the EPK expiration date is not too far off into the future (we detail this below):
-   1. Assert $\mathsf{exp\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\_horizon}$
-   2. We do not assert the expiration date is not in the past (i.e., assert $\mathsf{exp\_date} > \mathsf{jwt}[\texttt{"iat"}]$). Instead, we assume that the JWT’s issued-at timestamp (`iat`) field is correct and therefore close to the current block time. So if an application mis-sets $\mathsf{exp\_date} < \mathsf{jwt}[\texttt{"iat"}]$, then the EPK will be expired and useless.
+   1. Assert $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\\_horizon}$
+   2. We do not assert the expiration date is not in the past (i.e., assert $\mathsf{exp\\_date} > \mathsf{jwt}[\texttt{"iat"}]$). Instead, we assume that the JWT’s issued-at timestamp (`iat`) field is correct and therefore close to the current block time. So if an application mis-sets $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}]$, then the EPK will be expired and useless.
 6. Check the EPK is not expired:
-   1. Assert $\texttt{current\_block\_time()} < \mathsf{exp\_date}$
+   1. Assert $\texttt{current\\_block\\_time()} < \mathsf{exp\\_date}$
 7. Verify the ephemeral signature $\sigma_\mathsf{eph}$ under $\mathsf{epk}$ over the transaction $\mathsf{txn}$
 8. Fetch the correct PK of the OIDC provider, denoted by $\mathsf{jwk}$, which is identified via the `kid` field in the JWT $\mathsf{header}$.
 9. Verify the OIDC signature $\sigma_\mathsf{oidc}$ under $\mathsf{jwk}$ over the JWT $\mathsf{header}$ and payload $\mathsf{jwt}$.
@@ -305,9 +311,9 @@ In more detail, signature verification involves the following:
 
 The process by which Aptos validators reach consensus on the JWKs of all supported OIDC providers will be the subject of a different AIP. For now, this AIP assumes such a mechanism is in place for validators to fetch a provider’s current JWKs via a Move module in `aptos_framework::jwks`.
 
-**The need for an expiration date horizon:** We believe it would be risky for clueless dapps to set an $\mathsf{exp\_date}$ that is too far into the future. This would create a longer time window for an attacker to compromise the signed JWT (and its associated ESK). As a result, we enforce that the expiration date is not too far into the future based on the `iat` JWT field and an “expiration horizon” $\mathsf{exp\_horizon}$ (e.g., 5-10 hours): i.e, we ensure that $\mathsf{exp\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\_horizon}$.
+**The need for an expiration date horizon:** We believe it would be risky for clueless dapps to set an $\mathsf{exp\\_date}$ that is too far into the future. This would create a longer time window for an attacker to compromise the signed JWT (and its associated ESK). As a result, we enforce that the expiration date is not too far into the future based on the `iat` JWT field and an “expiration horizon” $\mathsf{exp\\_horizon}$ (e.g., 5-10 hours): i.e, we ensure that $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\\_horizon}$.
 
-An alternative would be to ensure that $\mathsf{exp\_date} < \texttt{current\_block\_time()} + \mathsf{exp\_horizon}$. However, this is not ideal. An attacker might create an $\mathsf{exp\_date}$ that fails the check for the current time $t_1 = \texttt{current\_block\_time()}$ (i.e., $\mathsf{exp\_date} \ge t_1 + \mathsf{exp\_horizon}$) but passes the check later on when the time becomes $t_2 > t_1$ (i.e., $\mathsf{exp\_date} < t_2 + \mathsf{exp\_horizon}$). This design would therefore allow for signed JWTs that appear invalid (and therefore harmless) to later become valid (and therefore attack-worthy). Relying on the `iat` avoids this issue.
+An alternative would be to ensure that $\mathsf{exp\\_date} < \texttt{current\\_block\\_time()} + \mathsf{exp\\_horizon}$. However, this is not ideal. An attacker might create an $\mathsf{exp\\_date}$ that fails the check for the current time $t_1 = \texttt{current\\_block\\_time()}$ (i.e., $\mathsf{exp\\_date} \ge t_1 + \mathsf{exp\\_horizon}$) but passes the check later on when the time becomes $t_2 > t_1$ (i.e., $\mathsf{exp\\_date} < t_2 + \mathsf{exp\\_horizon}$). This design would therefore allow for signed JWTs that appear invalid (and therefore harmless) to later become valid (and therefore attack-worthy). Relying on the `iat` avoids this issue.
 
 **Leaky mode caveats** that will be addressed next:
 
@@ -320,56 +326,69 @@ An alternative would be to ensure that $\mathsf{exp\_date} < \texttt{current\_bl
 
 This gets us to the _essence of this AIP_: we are now ready to describe how privacy-preserving signatures work for our OIDB accounts. These signatures leak _nothing_ about the user’s OIDC account nor the managing app’s ID associated with the accessed OIDB account.
 
-A **zero-knowledge signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf{txn}$ for an address with authentication key $\mathsf{auth\_key}$ is defined as:
+A **zero-knowledge signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf{txn}$ for an address with authentication key $\mathsf{auth\\_key}$ is defined as:
 
-$\begin{align}\sigma_\mathsf{txn} = (\mathsf{iss\_val}, \mathsf{addr\_idc}, \mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \mathsf{exp\_date}, \mathsf{exp\_horizon}, \pi)\end{align}$
+```math
+\sigma_\mathsf{txn} = (\mathsf{iss\_val}, \mathsf{addr\_idc}, \mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \mathsf{exp\_date}, \mathsf{exp\_horizon}, \pi)
+```
 
 where:
 
-1. $\mathsf{iss\_val}$, hashed in the $\mathsf{auth\_key}$
-2. $\mathsf{addr\_idc}$, the address IDC hashed in the $\mathsf{auth\_key}$
-3. $(\mathsf{header}$, $\mathsf{epk}$, $\sigma_\mathsf{eph}$, $\mathsf{exp\_date}$, and $\mathsf{exp\_horizon})$, as before
+1. $\mathsf{iss\\_val}$, hashed in the $\mathsf{auth\\_key}$
+2. $\mathsf{addr\\_idc}$, the address IDC hashed in the $\mathsf{auth\\_key}$
+3. $(\mathsf{header}$, $\mathsf{epk}$, $\sigma_\mathsf{eph}$, $\mathsf{exp\\_date}$, and $\mathsf{exp\\_horizon})$, as before
 4. $\pi$, a **zero-knowledge proof of knowledge (ZKPoK)** for the the ZK relation $\mathcal{R}$ (defined below).
 
-Note that it no longer contains any identifying user information (beyond the identity of the OIDC provider in $\mathsf{iss\_val}$)
+Note that it no longer contains any identifying user information (beyond the identity of the OIDC provider in $\mathsf{iss\\_val}$)
 
 **tl;dr**: To **verify the $\sigma_\mathsf{txn}$ signature**, validators verify a ZKPoK of an OIDC signature over (1) the user and app IDs that are committed in the authentication key and (2) the EPK which, in turn, signed the transaction, while enforcing some expiration date on the EPK.
 
 In more detail, signature verification involves the following:
 
-1. Assert $\mathsf{auth\_key} \stackrel{?}{=} H(\mathsf{iss\_val}, \mathsf{addr\_idc})$, as before.
+1. Assert $\mathsf{auth\\_key} \stackrel{?}{=} H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$, as before.
 2. Check the expiration date horizon is within bounds:
-   1. Assert $\mathsf{exp\_horizon} \in (0, \mathsf{max\_exp\_horizon})$, where $\mathsf{max\_exp\_horizon}$ is an on-chain parameter, as before.
+   1. Assert $\mathsf{exp\\_horizon} \in (0, \mathsf{max\\_exp\\_horizon})$, where $\mathsf{max\\_exp\\_horizon}$ is an on-chain parameter, as before.
 3. Check the EPK is not expired:
-   1. Assert $\mathsf{exp\_date} < \texttt{current\_block\_time()}$, as before.
+   1. Assert $\mathsf{exp\\_date} < \texttt{current\\_block\\_time()}$, as before.
 4. Verify the ephemeral signature $\sigma_\mathsf{eph}$ under $\mathsf{epk}$ over the transaction $\mathsf{txn}$, as before.
 5. Fetch the correct PK of the OIDC provider, denoted by $\mathsf{jwk}$, as before.
-6. Verify the ZKPoK $\pi$, which agues that $\exists$ a *private input* $\textbf{w}=[(\mathsf{aud\_val}, \mathsf{uid\_key}, \mathsf{uid\_val}, r),(\sigma_\mathsf{oidc}, \mathsf{jwt}), \rho]$ such that the relation $\mathcal{R}(\textbf{x}; \textbf{w})=1$ for the *public input* $\textbf{x} = [(\mathsf{iss\_val}, \mathsf{jwk}, \mathsf{header}), (\mathsf{epk},    \mathsf{exp\_date}), \mathsf{addr\_idc}, \mathsf{exp\_horizon}]$
+6. Verify the ZKPoK $\pi$, which agues that $\exists$ a *private input* $`\textbf{w}=[(\mathsf{aud\\_val}, \mathsf{uid\\_key}, \mathsf{uid\\_val}, r),(\sigma_\mathsf{oidc}, \mathsf{jwt}), \rho]`$ such that the relation $\mathcal{R}(\textbf{x}; \textbf{w})=1$ for the *public input* $\textbf{x} = [(\mathsf{iss\\_val}, \mathsf{jwk}, \mathsf{header}), (\mathsf{epk},    \mathsf{exp\\_date}), \mathsf{addr\\_idc}, \mathsf{exp\\_horizon}]$
    - Importantly, the proof $\pi$ leaks nothing about the privacy-sensitive inputs in $\textbf{w}$.
 
 The **ZK relation $\mathcal{R}$** simply **performs the privacy-sensitive part of the verification** from the **leaky mode** above:
 
 Specifically, the relation is satisfied; i.e., 
 
-$\mathcal{R}\begin{pmatrix}
-	\textbf{x} = [(\mathsf{iss\_val}, \mathsf{jwk}, \mathsf{header}), (\mathsf{epk},    \mathsf{exp\_date}), \mathsf{addr\_idc}, \mathsf{exp\_horizon}],\\ \textbf{w} =  [(\mathsf{aud\_val}, \mathsf{uid\_key}, \mathsf{uid\_val}, r),(\sigma_\mathsf{oidc}, \mathsf{jwt}), \rho]\end{pmatrix} = 1$,
+```math
+\mathcal{R}\begin{pmatrix}
+	\textbf{x} = [
+        (\mathsf{iss\_val}, \mathsf{jwk}, \mathsf{header}), 
+        (\mathsf{epk}, \mathsf{exp\_date}), 
+        \mathsf{addr\_idc}, \mathsf{exp\_horizon}
+    ],\\ 
+    \textbf{w} = [
+        (\mathsf{aud\_val}, \mathsf{uid\_key}, \mathsf{uid\_val}, r),
+        (\sigma_\mathsf{oidc}, \mathsf{jwt}), 
+    \rho]
+\end{pmatrix} = 1
+```
 
 if and only if:
 
 1. Check the OIDC provider ID in the JWT:
-   1.  Assert $\mathsf{iss\_val}\stackrel{?}{=}\mathsf{jwt}[\texttt{"iss"}]$
+   1.  Assert $\mathsf{iss\\_val}\stackrel{?}{=}\mathsf{jwt}[\texttt{"iss"}]$
 2. If using `email`-based IDs, ensure the email has been verified:
-   1. If $\mathsf{uid\_key}\stackrel{?}{=}\texttt{"email"}$, assert $\mathsf{jwt}[\texttt{"email\_verified"}] \stackrel{?}{=} \texttt{"true"}$
+   1. If $\mathsf{uid\\_key}\stackrel{?}{=}\texttt{"email"}$, assert $\mathsf{jwt}[\texttt{"email\\_verified"}] \stackrel{?}{=} \texttt{"true"}$
 3. Check the user’s ID in the JWT:
-   1. Assert $\mathsf{uid\_val}\stackrel{?}{=}\mathsf{jwt}[\mathsf{uid\_key}]$
+   1. Assert $\mathsf{uid\\_val}\stackrel{?}{=}\mathsf{jwt}[\mathsf{uid\\_key}]$
 4. Check the managing application’s ID in the JWT:
-   1. Assert $\mathsf{aud\_val}\stackrel{?}{=}\mathsf{jwt}[\texttt{"aud"}]$
+   1. Assert $\mathsf{aud\\_val}\stackrel{?}{=}\mathsf{jwt}[\texttt{"aud"}]$
 5. Check the address IDC uses the correct values from the JWT:
-   1. Assert $\mathsf{addr\_idc} \stackrel{?}{=} H'(\mathsf{uid\_key}, \mathsf{uid\_val}, \mathsf{aud\_val}; r)$
+   1. Assert $\mathsf{addr\\_idc} \stackrel{?}{=} H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$
 6. Check the EPK is committed in the JWT’s `nonce` field:
-   1. Assert $\mathsf{jwt}[\texttt{"nonce"}] \stackrel{?}{=} H’(\mathsf{epk},\mathsf{exp\_date};\rho)$
+   1. Assert $\mathsf{jwt}[\texttt{"nonce"}] \stackrel{?}{=} H’(\mathsf{epk},\mathsf{exp\\_date};\rho)$
 7. Check the EPK expiration date is not too far off into the future:
-   1. Assert $\mathsf{exp\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\_horizon}$
+   1. Assert $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\\_horizon}$
 8. Verify the OIDC signature $\sigma_\mathsf{oidc}$ under $\mathsf{jwk}$ over the JWT $\mathsf{header}$ and payload $\mathsf{jwt}$.
 
 **Zero-knowledge mode caveats** that we address later:
@@ -504,7 +523,7 @@ To deal with this, we propose installing **alternative recovery paths**:
   - For **Twitter**, a user could prove they own their Twitter account by tweeting a specially-crafted message
   - Similarly, for **GitHub**, users could do the same by posting a gist.
   - Given an HTTPS oracle, validators could verify such a tweet or a gist and allow the user to rotate their account's key. This would **not** be **privacy-preserving** since, at minimum, the validators would learn the user’s identity from the HTTPS URL.
-- Alternatively, all OIDB accounts could be set up as a 1-out-of-2[^multiauth] with a **recovery [passkey](#Passkeys)** sub-account. This way, the passkey, if backed up automatically (e.g., on Apple platforms), then it could be used to restore access to the account.
+- Alternatively, all OIDB accounts could be set up as a 1 out of 2[^multiauth] with a **recovery [passkey](#Passkeys)** sub-account. This way, the passkey, if backed up automatically (e.g., on Apple platforms), then it could be used to restore access to the account.
   - A traditional SK sub-account could also be used but this would require the managing application to giver users the option to write the SK, which defeats the user-friendliness goals.
 
 - Alternatively, for popular applications, we could consider **manual patches**: e.g., adding an override for their `client_id` in our ZK relation. (But this brings about a centralization risk.)
@@ -513,7 +532,7 @@ To deal with this, we propose installing **alternative recovery paths**:
 
 OIDB accounts rely on OAuth and OIDC, whose security in turn relies on the security of DNS and the X.509 certificate ecosystem.
 
-While we believe this to be acceptable for a large proportion of users and use-cases, power users and security-focused use-cases can be handled by deploying OIDB accounts in a $t$-out-of-$n$ fashion[^multiauth], with additional security factors.
+While we believe this to be acceptable for a large proportion of users and use-cases, power users and security-focused use-cases can be handled by deploying OIDB accounts in a $t$ out of $n$ fashion[^multiauth], with additional security factors.
 
 ### Compromised OIDC provider
 
@@ -522,7 +541,7 @@ Recall that “your blockchain account = your OIDC account.” In other words:
 - If your OIDC account is compromised, so is your OIDB account.
 - If your OIDC provider (e.g., Google) is compromised, so is your OIDB account associated with that provider.
 
-We stress that this is a **feature**, not a **bug**: we want Aptos users to leverage the security & user-friendliness of their OIDC accounts to transact easily. Nonetheless, for users who do not want to fully rely on the security of their OIDC account, they can upgrade to a $t$-out-of-$n$ approach, using a combination of different OIDC accounts and/or traditional SKs[^multiauth].
+We stress that this is a **feature**, not a **bug**: we want Aptos users to leverage the security & user-friendliness of their OIDC accounts to transact easily. Nonetheless, for users who do not want to fully rely on the security of their OIDC account, they can upgrade to a $t$ out of $n$ approach, using a combination of different OIDC accounts and/or traditional SKs[^multiauth].
 
 **Note**: We can deal with a compromised OIDC provider by revoking their JWK using an emergency governance proposal.
 
@@ -572,9 +591,9 @@ However, for webapps (e.g., dapps or web-wallets) there are two options:
 2. Use the OAuth authorization grant flow and store the ESK in the browser and the signed JWT in the backend.
    - Unfortunately, some OIDC providers allow refreshing the signed JWT from the backend on a new `nonce` field, without the user’s consent. This means a compromised backend can refresh the signed JWT on an EPK it controls and steal OIDB accounts (assuming the OAuth session has not expired). This can be done without the user’s involvement in accessing the compromised website.
 
-### What should $\mathsf{max\_exp\_horizon}$ be set to?
+### What should $\mathsf{max\\_exp\\_horizon}$ be set to?
 
-Recall that the $\mathsf{exp\_date}$ cannot exceed $\mathsf{jwt}[\texttt{"iat"}]+\mathsf{max\_exp\_horizon}$.
+Recall that the $\mathsf{exp\\_date}$ cannot exceed $\mathsf{jwt}[\texttt{"iat"}]+\mathsf{max\\_exp\\_horizon}$.
 
 Constraints:
 
@@ -584,7 +603,7 @@ Constraints:
 
 ### Zero-knowledge TXNs still leak the OIDC provider’s identity
 
-Currently, zero-knowledge TXNs leak which OIDC provider is involved by revealing the $\mathsf{iss\_val}$ field  (e.g., Google, GitHub).
+Currently, zero-knowledge TXNs leak which OIDC provider is involved by revealing the $\mathsf{iss\\_val}$ field  (e.g., Google, GitHub).
 
 However, we could modify our ZK relation to hide the OIDC provider too. Specifically, instead of taking in the $\mathsf{jwk}$ as a *public* input, the relation would take it as a *private* input, and then would verify membership of this JWK in a list of approved JWKs committed on chain. (Otherwise, users can input any JWK and forge TXN signatures.)
 
