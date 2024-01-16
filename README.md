@@ -24,7 +24,7 @@ To vote on AIPs impacting the state of the Blockchain, go to https://governance.
 
 ## AIP Index
 
-To see the full list of AIPs, please [click here](https://github.com/aptos-foundation/AIPs/wiki/Index-of-AIPs).
+Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [click here](https://github.com/aptos-foundation/AIPs/wiki/Index-of-AIPs).
 
 | Number | Theme | Title  | Author |
 |:---|:---|:---|:---
@@ -39,6 +39,11 @@ To see the full list of AIPs, please [click here](https://github.com/aptos-found
 | [AIP-53](https://github.com/aptos-foundation/AIPs/issues/257) | Core | [Make Fee Payer Address Optional in Transaction Authenticator](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-53.md)| davidiw |
 | [AIP-54](https://github.com/aptos-foundation/AIPs/issues/259) | Smart Contract | [Object code deployment](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-54.md)| movekevin, xbtmatt |
 | [AIP-55](https://github.com/aptos-foundation/AIPs/issues/267) | Smart Contract | [Generalize Transaction Authentication and Support Arbitrary K-of-N MultiKey Accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md)| davidiw, hariria |
+| [AIP-56](https://github.com/aptos-foundation/AIPs/issues/270) | Move Lang | [Resource Access Control](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-56.md)| wrwg |
+| [AIP-57](https://github.com/aptos-foundation/AIPs/issues/285) | Core | [Block Output Size Limit and Conflict-Aware Block Gas Limit](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-57.md)| igor-aptos |
+| [AIP-58](https://github.com/aptos-foundation/AIPs/issues/286) | Gas | [Gas Schedule Adjustments](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-58.md)| igor-aptos, vgao1996 |
+| [AIP-59](https://github.com/aptos-foundation/AIPs/issues/291) | Gas | [Storage IO Gas Adjustments](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-59.md)| msmouse |
+| [AIP-60](https://github.com/aptos-foundation/AIPs/issues/) | Gas | [Improve fairness of shared computation resources](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-60.md)| igor-aptos, vgao1996 |
 | ... | ... |||
 
 ## Types of AIPs
