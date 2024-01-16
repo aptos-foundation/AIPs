@@ -2,7 +2,7 @@
 aip: 59
 title: Storage IO Gas Adjustments
 author: msmouse
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/291
 Status: Draft
 last-call-end-date:
 type: Gas
@@ -21,7 +21,6 @@ Proposing here is to fine tune the logic of charging gas for both storage reads 
 2. Tune the relative weight of per read charge over the size of the read (in pages).
 3. Remove the per state write op free quota in bytes.
 4. Lower the relative cost per byte write.
-
 
 ### Goals
 
@@ -57,14 +56,14 @@ N/A
 ## Specification
 
 Read gas is still governed by these two gas parameters:
-* `storage_io_per_state_slot_read`: tuned to about 2 4KB-sized page reads.
+* `storage_io_per_state_slot_read`: tuned.
 * `storage_io_per_state_byte_read`: while charging, the size of the state read is rounded up to 4KB boundaries and then charged this much per byte.
 
 On the write side:
 * `free_write_bytes_quota`: ignored
 * `storage_io_per_state_byte_write`: much lowered since it's now not subject to the free quota.
 
-Reletive weights between reads and writes, and between IO and compute will be tuned.
+Reletive weights between reads and writes, and between IO and computation are tuned. The final numbers will be shipped as part of [AIP-58](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-58.md)
 
 ## Reference Implementation
 
