@@ -307,7 +307,7 @@ In more detail, signature verification involves the following:
 8. Fetch the correct PK of the OIDC provider, denoted by $\mathsf{jwk}$, which is identified via the `kid` field in the JWT $\mathsf{header}$.
 9. Verify the OIDC signature $\sigma_\mathsf{oidc}$ under $\mathsf{jwk}$ over the JWT $\mathsf{header}$ and payload $\mathsf{jwt}$.
 
-**JWK consensus:** This last step that verifies the OIDC signature requires that validators **agree on the latest JWKs** (i.e., public keys) of the OIDC provider, which are periodically-updated at a provider-specific **OpenID configuration URL**. 
+**JWK consensus:** This last step that verifies the OIDC signature requires that validators **agree on the latest JWKs** (i.e., public keys) of the OIDC provider, which are periodically-updated at a provider-specific **OpenID configuration URL** (see [the appendix](#jwk-consensus)).
 
 The process by which Aptos validators reach consensus on the JWKs of all supported OIDC providers will be the subject of a different AIP. For now, this AIP assumes such a mechanism is in place for validators to fetch a provider’s current JWKs via a Move module in `aptos_framework::jwks`.
 
@@ -667,7 +667,17 @@ Its design is outside the scope of this AIP, but here we highlight some of its k
 - It should be **oblivious** or **privacy-preserving**: it will not learn anything about the private input in the ZK relation (e.g., the identity of the user requesting a proof, the pepper for that user, etc.)
 - The proving service will be mostly “**stateless**”, in the sense that it will only store a public proving key needed to compute ZKPs for our ZK relation $\mathcal{R}$.
 
-#### Training wheels
+### JWK consensus
+
+Transaction signatures for OIDB accounts involve verifying an OIDC signature. This requires that validators **agree on the latest JWKs** (i.e., public keys) of the OIDC provider, which are periodically-updated at a provider-specific **OpenID configuration URL**. 
+
+The design and implementation of JWK consensus is outside the scope of this AIP, but here we highlight some of its key properties:
+
+- The validators will frequently scan for JWK changes at every supported provider’s **OpenID configuration URL**
+- When a change is detected by a validator, that validator will propose the change via a one-shot consensus mechanism
+- Once the validators agree, the new JWKs will be reflected in a public Move module in `aptos_framework::jwks`.
+
+### Training wheels
 
 In our initial deployment, we plan on having the prover service include an additional **training wheels signature** over the ZKP, after having verified the relation holds, before computing the proofs. This allows us to eliminate a single-point of failure (i.e., the ZK relation implementation) without giving extra power to the prover service to compromise accounts.
 
