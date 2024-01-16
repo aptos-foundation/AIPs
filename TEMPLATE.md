@@ -21,16 +21,20 @@ requires (*optional): <AIP number(s)>
 
  > Summarize in 3-5 sentences what is the problem we’re solving for and how are we solving for it
 
+...
+
 ### Goals
 
  > What are the goals and what is in scope? Any metrics?
  > Discuss the business impact and business value this change would impact.
- > 
+
 ...
 
 ### Out of Scope
 
  > What are we committing to not doing and why are they scoped out?
+
+...
 
 ## Motivation
 
@@ -81,7 +85,7 @@ requires (*optional): <AIP number(s)>
 
 ## Future Potential
 
- > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in in one year? In five years?
+ > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in one year? In five years?
 
 ...
 
@@ -117,6 +121,10 @@ requires (*optional): <AIP number(s)>
  > - Any security implications/considerations?
  > - Any security design docs or auditing materials that can be shared?
 
+...
+
 ## Open Questions (Optional)
 
  > Q&A here, some of them can have answers some of those questions can be things we have not figured out but we should
+
+...
