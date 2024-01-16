@@ -2,6 +2,7 @@
 aip:
 title: Expansion of the Aptos Wallet Standard and the expansion of Nightly Connect on Aptos.
 author: NB, Kimi82
+discussions-to: 
 Status: Draft
 type: Interface
 created: 01/12/2024
@@ -11,9 +12,20 @@ created: 01/12/2024
 
 ## Summary
 
-The process of adding new wallets to the dApp and then maintaining it currently creates too many conflicts and requires the involvement of too many people. Because of that, this process is complex and inefficient, hindering the development of wallets and consuming dApp builder time and resources. We will provide solutions that eliminate the need to manage wallets through dApps, making growth of the wallets easier and saving dApps time and resources.
+### Relieving dApps from the need to add and maintain wallets.
+The process of adding new wallets to the dApp and then maintaining it currently creates too many conflicts and requires the involvement of too many people. Because of that, this process is complex and inefficient, hindering the development of wallets and consuming dApp builder time and resources. 
 
-Also, the current entry barrier for new dApps, especially mobile ones, is too high. Due to the lack of available tools, dApps have to build everything from scratch, even the most universal, basic functions necessary for every dApp. This wastes an enormous amount of time and resources by necessitating the creation of tools that look the same for every application, instead of focusing on the key elements of each application. We will provide and maintain tools that will significantly facilitate the building of mobile applications.
+Thanks to the extension of the Aptos Wallet Standard and the expansion of Nightly Connect as a new Wallet Adapter, we will solve these problems by delivering tools that will, in a fully automated and permissionless way, serve all standard-compliant wallets for every dApp that integrates Nightly Connect. This solution will firstly integrate all the wallets (or just the chosen one) and then update each of them when a new version appears without requiring any action from the dApp side. 
+
+This will completely relieve dApp developers of the responsibility for integrating wallets and their subsequent maintenance, making the growth of wallets easier and saving dApps time and resources.
+
+### Providing a set of tools for mobile builders to lower the entry barrier.
+Current entry barrier for new mobile dApps is too high. Due to the lack of available tools, dApps have to build everything from scratch. 
+This wastes an enormous amount of time and resources by necessitating the creation of tools that look the same for every application, instead of focusing on the key elements of each application. 
+
+Thanks to the introduction of the changes proposed by us, which will serve as public goods for every app, their builders will be able to use them to establish every form of connection for their app instead of building and maintaining it. 
+
+This will offer an open, high-quality solution as a public good for everyone, effectively lowering the entry barrier for every mobile app.
 
 ### Goals
 
@@ -236,7 +248,8 @@ Nightly Connect also allows establishing a connection by scanning a QR Code and 
 
 Apart from that, Nightly Connect can serve as a starting point for dApps building applications on Aptos. By providing basic infrastructure for dApps and more complex infrastructure for mobile applications, it supports push notifications, persistent sessions, and allows dApps to edit parameters such as the session duration.
 
- Moreover, applications can freely modify the Nightly Connect Model UI in a simple and fast manner using components prepared by us.
+Moreover, applications can freely modify the Nightly Connect Model UI in a simple and fast manner using components prepared by us. Also, everyone is able to run a server for Nightly Connect on their own.
+
 
 ### dApp implementation
 
