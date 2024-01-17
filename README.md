@@ -43,7 +43,8 @@ Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [
 | [AIP-57](https://github.com/aptos-foundation/AIPs/issues/285) | Core | [Block Output Size Limit and Conflict-Aware Block Gas Limit](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-57.md)| igor-aptos |
 | [AIP-58](https://github.com/aptos-foundation/AIPs/issues/286) | Gas | [Gas Schedule Adjustments](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-58.md)| igor-aptos, vgao1996 |
 | [AIP-59](https://github.com/aptos-foundation/AIPs/issues/291) | Gas | [Storage IO Gas Adjustments](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-59.md)| msmouse |
-| [AIP-60](https://github.com/aptos-foundation/AIPs/issues/) | Gas | [Improve fairness of shared computation resources](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-60.md)| igor-aptos, vgao1996 |
+| [AIP-60](https://github.com/aptos-foundation/AIPs/issues/298) | Gas | [Improve fairness of shared computation resources](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-60.md)| igor-aptos, vgao1996 |
+| [AIP-61](https://github.com/aptos-foundation/AIPs/issues/) | Cryptography | [OpenID blockchain (OIDB) accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)| Alin Tomescu |
 | ... | ... |||
 
 ## Types of AIPs
@@ -55,7 +56,7 @@ Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [
 |:--|:--|
 | `Draft` | Drafts are currently in process and not ready for review. No corresponding GH Issue will be created.|
 | `In Review` | AIPs are ready for community review and feedback. See suggestions on providing feedback below. |
-| `Ready for Review` | AIPs are ready for Gatekeeper review and feedback. |
+| `Ready for Approval` | AIPs are ready for Gatekeeper approval and feedback. |
 | `Accepted `| AIPs has been accepted and will be implemented soon. |
 | `Rejected` | A community decision has been made to not move forward with an AIP at this time.| 
 | `On Hold` | Some information is missing or prerequisites have not yet been completed. | 
