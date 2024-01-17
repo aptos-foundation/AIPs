@@ -79,164 +79,110 @@ The standard defines methods for a wallet to implement and introduces an injecti
 
 **The standard interface**
 
-connect() method to establish a connection between a dapp and a wallet
-
+connect() method to establish a connection between a dapp and a wallet. Optional props:
+silent: boolean - gives ability to trigger connection without user prompt
+networkInfo: NetworkInfo - define network that app will use (shortcut for connect and change network)
 ```
- connect(silent?: boolean, networkInfo?: NetworkInfo): Promise\<Response\<AccountInfo\>\>;
-
+connect(silent?: boolean, networkInfo?: NetworkInfo): Promise<Response<AccountInfo>>;
 ```
 
 disconnect() method to disconnect a connection established between a dapp and a wallet
-
 ```
-
-disconnect(): Promise\<void\>;
-
+disconnect(): Promise<void>;
 ```
 
 getAccount() to get the current connected account in the wallet
-
 ```
-
-getAccount():Promise\<Response\<AccountInfo\>\>
-
+getAccount():Promise<Response<AccountInfo>>
 ```
 
 getNetwork() to get the current network in the wallet
-
+```
+getNetwork(): Promise<Response<NetworkInfo>>;
 ```
 
-getNetwork(): Promise\<Response\<NetworkInfo\>\>;
-
+signAndSubmitTransaction() method to sign and submit a transaction using the current connected account in the wallet. 
+Required props:
+transaction: AnyRawTransaction - a generated raw transaction created with Aptos’ SDK
+```
+signAndSubmitTransaction(transaction: AnyRawTransaction): Promise<Response<PendingTransactionResponse>>;
 ```
 
-signAndSubmitTransaction() method to sign and submit a transaction using the current connected account in the wallet
-
+signTransaction() for the current connected account in the wallet to sign a transaction using the wallet. 
+Required props:
+transaction: AnyRawTransaction - a generated raw transaction created with Aptos’ SDK
+```
+signTransaction(transaction: AnyRawTransaction):AccountAuthenticator
 ```
 
-signAndSubmitTransaction(transaction: AnyRawTransaction): Promise\<Response\<PendingTransactionResponse\>\>;
-
+signMessage() for the current connected account in the wallet to sign a message using the wallet.
+Required props:
+message: AptosSignMessageInput - a message to sign
+```
+signMessage(message: AptosSignMessageInput):Promise<Response<AptosSignMessageOutput>>;
 ```
 
-signTransaction() for the current connected account in the wallet to sign a transaction using the wallet
-
+onAccountChange() event for the wallet to fire when an account has been changed in the wallet.
+Required props:
+newAccount: AccountInfo -
+```
+onAccountChange(newAccount: AccountInfo): Promise<void>
 ```
 
-signTransaction(AnyRawTransaction):AccountAuthenticator
-
+onNetworkChange() event for the wallet to fire when the network has been changed in the wallet.
+Required props:
+newNetwork: NetworkInfo -
 ```
+onNetworkChange(newNetwork: NetworkInfo):Promise<void>
+``` 
 
-signMessage() for the current connected account in the wallet to sign a message using the wallet
-
+changeNetwork() event for the dapp to send to the wallet to change the wallet’s current network
 ```
-
-signMessage(message: AptosSignMessageInput):Promise\<Response\<AptosSignMessageOutput\>\>;
-
-```
-
-onAccountChange() event for the wallet to fire when an account has been changed in the wallet
-
-```
-
-onAccountChange(newAccount: AccountInfo): Promise\<void\>
-
-```
-
-onNetworkChange() event for the wallet to fire when the network has been changed in the wallet
-
-```
-
-onNetworkChange(newNetwork: NetworkInfo):Promise\<void\>
-
-```
-
-changeNetwork() event for the dapp to send to the wallet to change the wallet's current network
-
-```
-
-changeNetwork(network:NetworkInfo):Promise\<Response\<{success: boolean,reason?: string}\>\>
-
+changeNetwork(network:NetworkInfo):Promise<Response<{success: boolean,reason?: string}>>
 ```
 
 ```
+export interface UserApproval<TResponseArgs> {
+ status: 'approved'
+ args: TResponseArgs
+}
 
-// Rejected response
+export interface UserRejection {
+ status: 'rejected'
+}
 
-type export interface Rejected { status: 'rejected' reason?: string }
+export type UserResponse<TResponseArgs> = UserApproval<TResponseArgs> | UserRejection
 
-// Approved response
 
-type export interface Approved\<TArgs\> { status: 'approved' args: TArgs }
+export interface AccountInfo = { account: Account, ansName?: string } 
 
-// Unified Response
-
-type export type Response\<TArgs\> = Approved\<TArgs\> | Rejected
-
-export interface AccountInfo = { account: Account, ansName?: string }
-
-export interface NetworkInfo {
-
-name: string // Name of the network.
-
-chainId: string // Chain ID of the network.
-
+export interface NetworkInfo { 
+name: string // Name of the network. 
+chainId: string // Chain ID of the network. 
 url?: string // RPC URL of the network.
+ } 
 
+export type AptosSignMessageInput = { 
+address?: boolean 
+application?: boolean 
+chainId?: boolean 
+message: string 
+nonce: string 
+} 
+
+export type AptosSignMessageOutput = { 
+address?: string 
+application?: string 
+chainId?: number 
+fullMessage: string 
+message: string 
+nonce: string 
+prefix: 'APTOS' 
+signature: string | string[] 
+bitmap?: Uint8Array 
 }
-
-export type AptosSignMessageInput = {
-
-address?: boolean
-
-application?: boolean
-
-chainId?: boolean
-
-message: string
-
-nonce: string
-
-}
-
-export type AptosSignMessageOutput = {
-
-address?: string
-
-application?: string
-
-chainId?: number
-
-fullMessage: string
-
-message: string
-
-nonce: string
-
-prefix: 'APTOS'
-
-signature: string | string[]
-
-bitmap?: Uint8Array
-
-}
-
 ```
 
-**Required methods**
-
-The standard defines required methods for the wallet to support in order to be recognized as a wallet who supports the standard.
-
-```
-
-connect()
-
-signAndSubmitTransaction()
-
-signMessage()
-
-signTransaction()
-
-```
 
 ### Nightly Connect
 
@@ -254,7 +200,7 @@ Moreover, applications can freely modify the Nightly Connect Model UI in a simpl
 ### dApp implementation
 
 To take advantage of the changes, a dApp will need to implement Nightly Connect or another Wallet Adapter that is compatible with an expanded wallet standard. This can be done in two ways. The first one is to completely replace the current solution with Nightly Connect. The second is to add Nightly Connect as one of the options to the current solution.
- The entire process of implementing Nightly Connect is quick and well described in [our documentation](https://connect.nightly.app/docs/).
+The entire process of implementing Nightly Connect is quick and well described in [our documentation](https://connect.nightly.app/docs/).
 
 ### Wallets implementation
 
@@ -285,7 +231,7 @@ In the future we will also work on expanding Nightly Connect as a product with f
 
 After expanding the wallet standard, the implementation through wallets and Nightly Connect by dApps may take some time, which will extend the adoption time of the new solutions. However, these changes will not break or negatively impact existing solutions.
 
- In the case of wallets, if a wallet does not apply the changes required by the expanded Wallet Standard, Nightly Connect won't work with it.
+In the case of wallets, if a wallet does not apply the changes required by the expanded Wallet Standard, Nightly Connect won't work with it.
 
 Wallets need to migrate over to use the [new Aptos TypeScript SDK](https://github.com/aptos-labs/aptos-ts-sdk) to be compatible with both the extended wallet standard and Nightly Connect
 
@@ -315,8 +261,6 @@ We'll need 6 weeks to publish it on the devnet and between 8-10 weeks to deploy 
 
 ## Security Considerations
 
-Nightly Connect, functioning as a wallet adapter, is safer than the current solution because, in comparison to it, it is not susceptible to potential supply chain attacks.
-
-Nightly Connect, functioning as a wallet adapter, does not differ in terms of security from the currently existing Wallet Adapter.
+Nightly Connect, functioning as a wallet adapter, is safer than the current solution. In comparison to it, Nightly Connect is not susceptible to potential supply chain attacks because it uses only UI and Aptos dependencies. There are no other dependencies like those found in the current adapter, where every wallet has its own dependencies.
 
 Nightly Connect, serving as a bridge wallet for establishing connections via QR codes and deep links, potentially allows for transaction modification. However, the user will still need to approve it, and thanks to the simulation provided by most wallets, they can easily detect if the transaction has been altered.
