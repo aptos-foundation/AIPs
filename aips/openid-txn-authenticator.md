@@ -90,7 +90,7 @@ Other ZKP terms:
 
 Recall that in Aptos, an account is identified by its **address**, under which the account’s **authentication key** is stored. 
 
-The authentication key is a cryptographically-binding commitment to the account’s **public key**.
+The authentication key is a cryptographically-binding commitment to the account’s **public key (PK)** (e.g., a hash of the PK).
 
 Naturally, the **owning user** of the account will manage the corresponding **secret key**.
 
@@ -116,15 +116,18 @@ This AIP is concerned with:
 
  > What are we committing to not doing and why are they scoped out?
 
-1. Malicious wallet applications that impersonate a genuine wallet application
+1. Security of DNS and X.509 certificate ecosystem
+   - OIDB accounts rely on OAuth and OIDC, whose security in turn relies on the security of DNS and the X.509 certificate ecosystem.
+   - So does all the software on the Internet, so we consider this out-of-scope
+2. Malicious wallet applications that impersonate a genuine wallet application
    - We assume an attacker is **not** able to publish a mobile phone app in (say) Apple’s App Store that impersonates a wallet’s registered OAuth `client_id`
    - We assume an attacker is **not** able to trick a user into installing a malicious desktop app that impersonates another app’s OAuth `client_id`. For this reason, we do **not** recommend managing applications for OIDB accounts that are desktop apps, since they are very easy to impersonate.
-2. In-depth discussion of other components necessary for OIDB accounts:
-   - **Pepper service**: will be the scope of a future AIP
-   - **ZK proving service**: will be the scope of a future AIP
-   - **Consensus on JSON Web Keys (JWKs)**: will be the scope of a future AIP
-   - **Trusted setup ceremony** for our Groth16 ZKP
-3. Decentralization plans for the pepper and ZK proving service
+3. In-depth discussion of auxiliary backend components necessary for OIDB accounts:
+   - **Pepper service**: will be the scope of a future AIP (see [the appendix](#pepper-service))
+   - **ZK proving service**: will be the scope of a future AIP (see [the appendix](#(oblivious)-zk-proving-service))
+   - **Consensus on JSON Web Keys (JWKs)**: will be the scope of a future AIP (see [the appendix](#jwk-consensus))
+   - **Trusted setup MPC ceremony** for our Groth16 ZKP (see [Groth16 discussion](#choice-of-zkp-system-groth16))
+4. Decentralization plans for the pepper and ZK proving service
 
 ## Motivation
 
@@ -466,7 +469,7 @@ There are many components, all of which interact with one another, making it dif
 3. Centralized pepper service
 4. Centralized proving service (with [“training wheels”](#training-wheels))
 5. JWK consensus on top of the Aptos validators
-6. Trusted setup ceremony
+6. Trusted setup MPC ceremony
 
 ### Suggested developer platform support timeline
 
@@ -496,9 +499,13 @@ On testnet in sometimes in between.
  > - Any security implications/considerations?
  > - Any security design docs or auditing materials that can be shared?
 
-### “Training wheels” mode
+### Training wheels
 
-ZKP-based systems are complex and error-prone. We discuss a popular defense against bugs in our ZK relation implementation in [the appendix](#training-wheels).
+In our initial deployment, we plan on having the prover service include an additional **training wheels signature** over the ZKP, after having verified the relation holds, before computing the proofs. This allows us to eliminate a single-point of failure (i.e., the ZK relation implementation) without giving extra power to the prover service to compromise accounts.
+
+Specifically, with training wheels on, a break in our ZK relation implementation (currently, done in Circom[^circom], which is error prone) will not result in a catastrophic loss of funds for our users. At the same time, it remains that a compromised proving service on its own cannot steal funds: it must still compute (or forge) a valid ZKP for the victim account like everyone else. 
+
+An important **liveness consideration** of this is that if the proving service is down, users will not be able to access their accounts. Nonetheless, if outages do happen we expect them to be brief and a price worth paying for securing our initial deployment.
 
 ### Alternative recovery paths for when managing applications disappear
 
@@ -527,12 +534,6 @@ To deal with this, we propose installing **alternative recovery paths**:
   - A traditional SK sub-account could also be used but this would require the managing application to giver users the option to write the SK, which defeats the user-friendliness goals.
 
 - Alternatively, for popular applications, we could consider **manual patches**: e.g., adding an override for their `client_id` in our ZK relation. (But this brings about a centralization risk.)
-
-### OIDB account security is predicated on X.509 and DNS security
-
-OIDB accounts rely on OAuth and OIDC, whose security in turn relies on the security of DNS and the X.509 certificate ecosystem.
-
-While we believe this to be acceptable for a large proportion of users and use-cases, power users and security-focused use-cases can be handled by deploying OIDB accounts in a $t$ out of $n$ fashion[^multiauth], with additional security factors.
 
 ### Compromised OIDC provider
 
@@ -676,14 +677,6 @@ The design and implementation of JWK consensus is outside the scope of this AIP,
 - The validators will frequently scan for JWK changes at every supported provider’s **OpenID configuration URL**
 - When a change is detected by a validator, that validator will propose the change via a one-shot consensus mechanism
 - Once the validators agree, the new JWKs will be reflected in a public Move module in `aptos_framework::jwks`.
-
-### Training wheels
-
-In our initial deployment, we plan on having the prover service include an additional **training wheels signature** over the ZKP, after having verified the relation holds, before computing the proofs. This allows us to eliminate a single-point of failure (i.e., the ZK relation implementation) without giving extra power to the prover service to compromise accounts.
-
-Specifically, with training wheels on, a break in our ZK relation implementation (currently, done in Circom[^circom], which is error prone) will not result in a catastrophic loss of funds for our users. At the same time, it remains that a compromised proving service on its own cannot steal funds: it must still compute (or forge) a valid ZKP for the victim account like everyone else. 
-
-An important **liveness consideration** of this is that if the proving service is down, users will not be able to access their accounts. Nonetheless, if outages do happen we expect them to be brief and a price worth paying for securing our initial deployment.
 
 ## References
 
