@@ -429,9 +429,16 @@ We will link to our circuit code and Rust TXN authenticator here. **(TBA).**
  > - When can we expect the results?
  > - What are the test results and are they what we expected? If not, explain the gap.
 
-- Test that <u>past</u> [ZKPoKs of] OIDC signatures from supported providers work.
-- Test that [ZKPoKs of] OIDC signatures *without* an ephemeral signatures fail validation.
-- Test/ensure that the ZKPs are not malleable.
+### Correctness and soundness of signature verification
+
+- <u>Unexpired</u> [ZKPoKs of] OIDC signatures from supported providers 
+- <u>Expired</u> [ZKPoKs of] OIDC signatures from supported providers do NOT verify.
+- Signatures from **un**supported providers do NOT verify.
+- [ZKPoKs of] OIDC signatures *without* an ephemeral signatures fail validation.
+- ZKPs are not malleable.
+
+### Other tests
+
 - Test that transactions which include a large number of OIDC accounts validate quickly.
 
 We will expand later on the testing plan. **(TBA.)**
