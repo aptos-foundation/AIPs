@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 61
 title: OpenID blockchain (OIDB) accounts
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/297
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - OpenID blockchain (OIDB) accounts
+# AIP-61 - OpenID blockchain (OIDB) accounts
 
 ## Summary
 
