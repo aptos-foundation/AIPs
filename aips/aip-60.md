@@ -45,6 +45,8 @@ We will work to understand use cases with real need - and see how they can be ha
 Any transaction that exceeds reduced `max_execution_gas` or `max_io_gas` will be rejected.
 Valid use cases that want to do larger amount of work will need to be split across multiple transactions.
 
+Full framework upgrade is more expensive than new wanted limits, and so special handling will be added (similarly to special transaction size). In the meantime, our multi-step proposal is going to first be increasing the limit, then executing framework upgrade, then reducing the limit back down.
+
 ## Reference Implementation
 
 Modifying two configs in [transaction.rs](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/aptos-gas-schedule/src/gas_schedule/transaction.rs#L176)
