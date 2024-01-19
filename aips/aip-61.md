@@ -269,7 +269,7 @@ Before describing our fully privacy-preserving TXN signatures, we warm-up by des
 A **leaky signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf{txn}$ for an address with authentication key $\mathsf{auth\\_key}$ is defined as:
 
 ```math
-\sigma_\mathsf{txn} = (\mathsf{uid\_key}, \mathsf{jwt}, \mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \sigma_\mathsf{oidc}, \mathsf{exp\_date}, \mathsf{exp\_horizon}, \rho, r)
+\sigma_\mathsf{txn} = (\mathsf{uid\_key}, \mathsf{jwt}, \mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \sigma_\mathsf{oidc}, \mathsf{exp\_date}, \rho, r)
 ```
 
 where:
@@ -281,7 +281,6 @@ where:
 5. $\sigma_\mathsf{eph}$ is an **ephemeral signature** over the transaction $\mathsf{txn}$
 6. $\sigma_\mathsf{oidc}$ is the OIDC signature over the full JWT (i.e.,  over the $\mathsf{header}$ and $\mathsf{jwt}$ payload)
 7. $\mathsf{exp\\_date}$ is a timestamp past which $\mathsf{epk}$ is considered expired and cannot be used to sign TXN.
-8. $\mathsf{exp\\_horizon}$ is the $\mathsf{exp\\_date}$ must be between $\mathsf{jwt}[\texttt{"iat"}]$ and $\mathsf{jwt}[\texttt{"iat"}]+\mathsf{exp\\_horizon}$
 9. $\rho$ is a high-entropy **EPK blinding factor** used to create an **EPK commitment** to $\mathsf{epk}$ and $\mathsf{exp\\_date}$ that is stored in the $\mathsf{jwt}[\texttt{"nonce"}]$ field
 10. $r$ is the pepper for the address IDC, which is assumed to be zero in this "leaky mode"
 
@@ -292,30 +291,28 @@ In more detail, signature verification against the PK $(\mathsf{iss\\_val}, \mat
 1. If using `email`-based IDs, ensure the email has been verified:
    1. If $\mathsf{uid\\_key}\stackrel{?}{=}\texttt{"email"}$, assert $\mathsf{jwt}[\texttt{"email\\_verified"}] \stackrel{?}{=} \texttt{"true"}$
 1. Let $\mathsf{uid\\_val}\gets\mathsf{jwt}[\mathsf{uid\\_key}]$
-2. Let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
-3. Assert $\mathsf{addr\\_idc} \stackrel{?}{=} H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$, using the pepper $r$ from the signature
-2. Verify that the PK matches the authentication key on-chain:
+1. Let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
+1. Assert $\mathsf{addr\\_idc} \stackrel{?}{=} H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$, using the pepper $r$ from the signature
+1. Verify that the PK matches the authentication key on-chain:
    1. Assert $\mathsf{auth\\_key} \stackrel{?}{=} H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$
-3. Check the EPK is committed in the JWT’s `nonce` field:
+1. Check the EPK is committed in the JWT’s `nonce` field:
    1. Assert $\mathsf{jwt}[\texttt{"nonce"}] \stackrel{?}{=} H’(\mathsf{epk},\mathsf{exp\\_date};\rho)$
-4. Check the expiration date horizon is within bounds:
-   1. Assert $\mathsf{exp\\_horizon} \in (0, \mathsf{max\\_exp\\_horizon})$, where $\mathsf{max\\_exp\\_horizon}$ is an on-chain parameter
-5. Check the EPK expiration date is not too far off into the future (we detail this below):
-   1. Assert $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\\_horizon}$
-   2. We do not assert the expiration date is not in the past (i.e., assert $\mathsf{exp\\_date} > \mathsf{jwt}[\texttt{"iat"}]$). Instead, we assume that the JWT’s issued-at timestamp (`iat`) field is correct and therefore close to the current block time. So if an application mis-sets $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}]$, then the EPK will be expired and useless.
-6. Check the EPK is not expired:
+1. Check the EPK expiration date is not too far off into the future (we detail this below):
+   1. Assert $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{max\\_exp\\_horizon}$, where $\mathsf{max\\_exp\\_horizon}$ is an on-chain parameter
+   1. We do not assert the expiration date is not in the past (i.e., assert $\mathsf{exp\\_date} > \mathsf{jwt}[\texttt{"iat"}]$). Instead, we assume that the JWT’s issued-at timestamp (`iat`) field is correct and therefore close to the current block time. So if an application mis-sets $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}]$, then the EPK will be expired and useless.
+1. Check the EPK is not expired:
    1. Assert $\texttt{current\\_block\\_time()} < \mathsf{exp\\_date}$
-7. Verify the ephemeral signature $\sigma_\mathsf{eph}$ under $\mathsf{epk}$ over the transaction $\mathsf{txn}$
-8. Fetch the correct PK of the OIDC provider, denoted by $\mathsf{jwk}$, which is identified via the `kid` field in the JWT $\mathsf{header}$.
-9. Verify the OIDC signature $\sigma_\mathsf{oidc}$ under $\mathsf{jwk}$ over the JWT $\mathsf{header}$ and payload $\mathsf{jwt}$.
+1. Verify the ephemeral signature $\sigma_\mathsf{eph}$ under $\mathsf{epk}$ over the transaction $\mathsf{txn}$
+1. Fetch the correct PK of the OIDC provider, denoted by $\mathsf{jwk}$, which is identified via the `kid` field in the JWT $\mathsf{header}$.
+1. Verify the OIDC signature $\sigma_\mathsf{oidc}$ under $\mathsf{jwk}$ over the JWT $\mathsf{header}$ and payload $\mathsf{jwt}$.
 
 **JWK consensus:** This last step that verifies the OIDC signature requires that validators **agree on the latest JWKs** (i.e., public keys) of the OIDC provider, which are periodically-updated at a provider-specific **OpenID configuration URL** (see [the appendix](#jwk-consensus)).
 
 The process by which Aptos validators reach consensus on the JWKs of all supported OIDC providers will be the subject of a different AIP. For now, this AIP assumes such a mechanism is in place for validators to fetch a provider’s current JWKs via a Move module in `aptos_framework::jwks`.
 
-**The need for an expiration date horizon:** We believe it would be risky for clueless dapps to set an $\mathsf{exp\\_date}$ that is too far into the future. This would create a longer time window for an attacker to compromise the signed JWT (and its associated ESK). As a result, we enforce that the expiration date is not too far into the future based on the `iat` JWT field and an “expiration horizon” $\mathsf{exp\\_horizon}$ (e.g., 5-10 hours): i.e, we ensure that $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\\_horizon}$.
+**The need for an expiration date horizon:** We believe it would be risky for clueless dapps to set an $\mathsf{exp\\_date}$ that is too far into the future. This would create a longer time window for an attacker to compromise the signed JWT (and its associated ESK). As a result, we enforce that the expiration date is not too far into the future based on the `iat` JWT field and an “expiration horizon” $\mathsf{max\\_exp\\_horizon}$: i.e, we ensure that $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{max\\_exp\\_horizon}$.
 
-An alternative would be to ensure that $\mathsf{exp\\_date} < \texttt{current\\_block\\_time()} + \mathsf{exp\\_horizon}$. However, this is not ideal. An attacker might create an $\mathsf{exp\\_date}$ that fails the check for the current time $t_1 = \texttt{current\\_block\\_time()}$ (i.e., $\mathsf{exp\\_date} \ge t_1 + \mathsf{exp\\_horizon}$) but passes the check later on when the time becomes $t_2 > t_1$ (i.e., $\mathsf{exp\\_date} < t_2 + \mathsf{exp\\_horizon}$). This design would therefore allow for signed JWTs that appear invalid (and therefore harmless) to later become valid (and therefore attack-worthy). Relying on the `iat` avoids this issue.
+An alternative would be to ensure that $\mathsf{exp\\_date} < \texttt{current\\_block\\_time()} + \mathsf{max\\_exp\\_horizon}$. However, this is not ideal. An attacker might create an $\mathsf{exp\\_date}$ that fails the check for the current time $t_1 = \texttt{current\\_block\\_time()}$ (i.e., $\mathsf{exp\\_date} \ge t_1 + \mathsf{max\\_exp\\_horizon}$) but passes the check later on when the time becomes $t_2 > t_1$ (i.e., $\mathsf{exp\\_date} < t_2 + \mathsf{max\\_exp\\_horizon}$). This design would therefore allow for signed JWTs that appear invalid (and therefore harmless) to later become valid (and therefore attack-worthy). Relying on the `iat` avoids this issue.
 
 **Leaky mode caveats** that will be addressed next:
 
@@ -336,8 +333,9 @@ A **zero-knowledge signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf
 
 where:
 
-3. $(\mathsf{header}$, $\mathsf{epk}$, $\sigma_\mathsf{eph}$, $\mathsf{exp\\_date}$, and $\mathsf{exp\\_horizon})$ are as before
-4. $\pi$ is a **zero-knowledge proof of knowledge (ZKPoK)** for the the ZK relation $\mathcal{R}$ (defined below).
+3. $(\mathsf{header}$, $\mathsf{epk}$, $\sigma_\mathsf{eph}$, $\mathsf{exp\\_date}$ are as before
+4. $\mathsf{exp\\_horizon}$, which is $\le \mathsf{max\\_exp\\_horizon}$; the $\mathsf{exp\\_date}$ must be between $\mathsf{jwt}[\texttt{"iat"}]$ and $\mathsf{jwt}[\texttt{"iat"}]+\mathsf{exp\\_horizon}$
+5. $\pi$ is a **zero-knowledge proof of knowledge (ZKPoK)** for the the ZK relation $\mathcal{R}$ (defined below).
 
 Note that it no longer contains any identifying user information (beyond the identity of the OIDC provider in $\mathsf{iss\\_val}$)
 
@@ -390,6 +388,8 @@ if and only if:
 7. Check the EPK expiration date is not too far off into the future:
    1. Assert $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{exp\\_horizon}$
 8. Verify the OIDC signature $\sigma_\mathsf{oidc}$ under $\mathsf{jwk}$ over the JWT $\mathsf{header}$ and payload $\mathsf{jwt}$.
+
+**Note:** The additional $\mathsf{exp\\_horizon}$ variable is a layer of indirection: it ensures that when the $\mathsf{max\\_exp\\_horizon}$ parameter on chain changes ZKPs do not become stale since they take $\mathsf{exp\\_horizon}$ as public input, not $\mathsf{max\\_exp\\_horizon}$ .
 
 **Zero-knowledge mode caveats** that we address later:
 
