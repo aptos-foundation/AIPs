@@ -291,7 +291,7 @@ In more detail, signature verification involves the following:
 
 1. If using `email`-based IDs, ensure the email has been verified:
    1. If $\mathsf{uid\\_key}\stackrel{?}{=}\texttt{"email"}$, assert $\mathsf{jwt}[\texttt{"email\\_verified"}] \stackrel{?}{=} \texttt{"true"}$
-2. Reconstruct the authentication key:
+2. Verify that the PK matches the authentication key on-chain:
    1. Let $\mathsf{uid\\_val}\gets\mathsf{jwt}[\mathsf{uid\\_key}]$
    2. Let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
    3. Let $\mathsf{addr\\_idc} \gets H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$, using the pepper $r$ from the signature
