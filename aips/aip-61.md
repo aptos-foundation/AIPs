@@ -420,6 +420,8 @@ A consequence of this is that we cannot upgrade/bugfix our ZK relation implement
 
 We will link to our circuit code and Rust TXN authenticator here. **(TBA).**
 
+ - [PR that implements Rust authenticator for the leaky mode](https://github.com/aptos-labs/aptos-core/pull/11681)
+
 ## Testing (Optional)
 
  > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out)
