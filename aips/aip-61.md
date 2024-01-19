@@ -210,8 +210,8 @@ Below, we explain the key concepts behind how OIDB accounts are implemented:
 
 The **public key** of an OIDB account consists of:
 
-1. The OIDC provider’s identity, as it appears in a JWT’s `iss` field (e.g., `https://accounts.google.com`), denoted by $\mathsf{iss\\_val}$
-2. An **identity commitment (IDC)**, which is a <u>hiding</u> commitment to:
+1. $\mathsf{iss\\_val}$: the OIDC provider’s identity, as it appears in a JWT’s `iss` field (e.g., `https://accounts.google.com`), denoted by $\mathsf{iss\\_val}$
+2. $\mathsf{addr\\_idc}$: an **identity commitment (IDC)**, which is a <u>hiding</u> commitment to:
    - The owning user’s identifier issued by the OIDC provider (e.g., `alice@gmail.com`), denoted by $\mathsf{uid\\_val}$.
    - The name of the JWT field that stores the user identifier, denoted by $\mathsf{uid\\_key}$. Currently, we only allow `sub` or `email`[^jwt-email-field].
    - The managing application’s identifier issued to it during registration with the OIDC provider (i.e., an OAuth `client_id` stored in the JWT’s `aud` field), denoted by $\mathsf{aud\\_val}$. 
@@ -287,16 +287,15 @@ where:
 
 **tl;dr**: To **verify the $\sigma_\mathsf{txn}$ signature**, validators check that the OIDC provider (1) signed the user and app IDs that are committed in the address IDC and (2) signed the EPK which, in turn, signed the transaction, while enforcing some expiration date on the EPK.
 
-In more detail, signature verification involves the following:
+In more detail, signature verification against the PK $(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$ involves the following:
 
 1. If using `email`-based IDs, ensure the email has been verified:
    1. If $\mathsf{uid\\_key}\stackrel{?}{=}\texttt{"email"}$, assert $\mathsf{jwt}[\texttt{"email\\_verified"}] \stackrel{?}{=} \texttt{"true"}$
+1. Let $\mathsf{uid\\_val}\gets\mathsf{jwt}[\mathsf{uid\\_key}]$
+2. Let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
+3. Assert $\mathsf{addr\\_idc} \stackrel{?}{=} H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$, using the pepper $r$ from the signature
 2. Verify that the PK matches the authentication key on-chain:
-   1. Let $\mathsf{uid\\_val}\gets\mathsf{jwt}[\mathsf{uid\\_key}]$
-   2. Let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
-   3. Let $\mathsf{addr\\_idc} \gets H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$, using the pepper $r$ from the signature
-   4. Let $\mathsf{iss\\_val}\gets\mathsf{jwt}[\texttt{"iss"}]$
-   5. Assert $\mathsf{auth\\_key} \stackrel{?}{=} H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$
+   1. Assert $\mathsf{auth\\_key} \stackrel{?}{=} H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$
 3. Check the EPK is committed in the JWT’s `nonce` field:
    1. Assert $\mathsf{jwt}[\texttt{"nonce"}] \stackrel{?}{=} H’(\mathsf{epk},\mathsf{exp\\_date};\rho)$
 4. Check the expiration date horizon is within bounds:
