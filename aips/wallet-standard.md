@@ -19,11 +19,11 @@ A Wallet Standard is an interface a wallet implements. This AIP introduces a new
 
 Most web wallets today come in the form of browser extensions. These extensions interact with dApps by injecting code into every website the user visits. There are several issues with the way injection works today.
 
-1. While wallets often injected into their own designated namespace (e.g. window.aptos), there is nothing stopping another wallet from injecting into the same namespace. As a result, wallets can mimic themselves as a suspicious wallet and users who have multiple injected wallets can often experience unwanted interferences.
+1. While wallets are often injected into their designated namespace (e.g., window.aptos), there is nothing stopping another wallet from injecting into the same namespace. As a result, suspicious wallets can impersonate to another wallet and users with multiple injected wallets can often experience unwanted interference.
 2. Since wallets attach themselves to the window as global objects, dApps need to be made aware of how they can find these objects and must choose to support a limited number of wallets that may not be relevant to the user.
-3. The standard is deeply integrated within the Aptos wallet adapter and any change can cause breaking changes for dapps and wallets and creates endless maintenance work by requiring a dapp or wallet to implement these changes.
-4. Since each dapp needs to install and maintain a wallet plugin dependency, it is exposed to a potential supply chain attack.
-5. The standard supports only the legacy TS SDK input, types and logic. That means that it doesnt enjoy the features and enhancements of the new TS SDK has to offer. In addition, the legacy TS SDK does not get anymore support or new features.Moreover, the standard uses the `any` type which is less than optimal, we should use strong typing mechanism.
+3. The standard is deeply integrated within the Aptos wallet adapter, and any change can cause breaking changes for dApps and wallets, creating endless maintenance work by requiring a dApp or wallet to implement these changes.
+4. Since each dApp needs to install and maintain a wallet plugin dependency, it is exposed to a potential supply chain attack.
+5. The standard supports only the legacy TS SDK input, types, and logic. That means that it doesn't enjoy the features and enhancements of the new TS SDK. In addition, the legacy TS SDK does not receive any more support or new features. Moreover, the standard uses the `any` type, which is less than optimal; we should use a strong typing mechanism.
 
 In this proposal, we suggest bringing a new way of communication between a wallet and a dapp to Aptos that eliminates all the above issues.
 
@@ -282,9 +282,11 @@ The new standard uses the new TypeScript SDK types and therefore requires dapps 
 
 ## Future Potential
 
-1. This solution is a general implementation that has already being used by different chains and would hopefully get adopted by more chains. With that, the migration effort of a wallet from one chain to another is minimal. In addition, multi-chain dapps can easliy detect any wallet that conforms with the standard.
-2. Both dapps and wallets integration and implementation is straightforawrd and painless. Mostly each needs to use a provided method for registration/detection.
-3. The addition of any future features and/or enhancements should not introduce any breaking change as each wallet holds its own plugin code and any feature/method lives in its own context.
+This solution is a general implementation that has already been used by different chains and will hopefully be adopted by more chains. With that, the migration effort of a wallet from one chain to another is minimal. In addition, multi-chain dApps can easily detect any wallet that conforms to the standard.
+
+Both dApps' and wallets' integration and implementation are straightforward and painless. Mostly, each needs to use a provided method for registration/detection.
+
+The addition of any future features and/or enhancements should not introduce any breaking change, as each wallet holds its own plugin code, and any feature/method lives in its own context
 
 ## Timeline
 
