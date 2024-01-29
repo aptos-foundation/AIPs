@@ -30,14 +30,14 @@ In this proposal, we suggest bringing a new way of communication, events listene
 
 1. Dapp developers
 
-- Familiarize themselves with the new standard
+- Familiarize themselves with [the new standard](https://github.com/aptos-labs/wallet-standard/tree/main)
 - Migrate to the [new TypeScript SDK](https://github.com/aptos-labs/aptos-ts-sdk)
 - Support a wallet discoverable function and filter out non-aptos wallets
 - Once a Wallet has migrated to the new standard, can remove the wallet package dependency from the dapp
 
 2. Wallet developers
 
-- Familiarize themselves with the new standard
+- Familiarize themselves with [the new standard](https://github.com/aptos-labs/wallet-standard/tree/main)
 - Migrate to the [new TypeScript SDK](https://github.com/aptos-labs/aptos-ts-sdk)
   - Or hold a conversion layer from the new TypeScript SDK types to the legacy TypeScipt SDK types
 - Register the wallet so it will be discoverable by the dapp
