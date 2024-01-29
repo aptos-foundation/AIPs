@@ -19,13 +19,12 @@ A Wallet Standard is an interface a wallet implements. This AIP introduces a new
 
 Most web wallets today come in the form of browser extensions. These extensions interact with dApps by injecting code into every website the user visits. There are several issues with the way injection works today.
 
-1. While wallets are often injected into their designated namespace (e.g., window.aptos), there is nothing stopping another wallet from injecting into the same namespace. As a result, suspicious wallets can impersonate to another wallet and users with multiple injected wallets can often experience unwanted interference.
-2. Since wallets attach themselves to the window as global objects, dApps need to be made aware of how they can find these objects and must choose to support a limited number of wallets that may not be relevant to the user.
-3. The standard is deeply integrated within the Aptos wallet adapter, and any change can cause breaking changes for dApps and wallets, creating endless maintenance work by requiring a dApp or wallet to implement these changes.
-4. Since each dApp needs to install and maintain a wallet plugin dependency, it is exposed to a potential supply chain attack.
-5. The standard supports only the legacy TS SDK input, types, and logic. That means that it doesn't enjoy the features and enhancements of the new TS SDK. In addition, the legacy TS SDK does not receive any more support or new features. Moreover, the standard uses the `any` type, which is less than optimal; we should use a strong typing mechanism.
+1. Wallets inject themselves to the global window object and exepct a dapp to detect them by reading the window object. This method requires the dapp to be made aware of how they can find these objects and must choose to support a limited number of wallets that may not be relevant to the user. In addition, this method creates a race condition risk in the case the dapp loads before a wallet.
+2. The standard is deeply integrated within the Aptos wallet adapter, and any change can cause breaking changes for dApps and wallets, creating endless maintenance work by requiring a dApp or wallet to implement these changes.
+3. Since each dApp needs to install and maintain a wallet plugin dependency, it is exposed to a potential supply chain attack.
+4. The standard supports only the legacy TS SDK input, types, and logic. That means that it doesn't enjoy the features and enhancements of the new TS SDK. In addition, the legacy TS SDK does not receive any more support or new features. Moreover, the standard uses the `any` type, which is less than optimal; we should use a strong typing mechanism.
 
-In this proposal, we suggest bringing a new way of communication between a wallet and a dapp to Aptos that eliminates all the above issues.
+In this proposal, we suggest bringing a new way of communication, events listener/dispatcher based, between a wallet and a dapp to Aptos that eliminates all the above issues.
 
 ## Impact
 
@@ -293,3 +292,10 @@ The addition of any future features and/or enhancements should not introduce any
 ### Suggested implementation timeline
 
 Once the AIP is approved, dapps and wallets can implement the required changes to conform with the new standard.
+
+## Security Considerations
+
+With the new discovery method we aim to remove the dapp responsibility on installing and maintaining different wallet packages and therefore eliminate a supply chain attack risk.
+
+The new method has been implemented on [Solana](https://github.com/wallet-standard/wallet-standard) and [Sui](https://docs.sui.io/standards/wallet-standard), and the [Ethereum](https://eips.ethereum.org/EIPS/eip-6963) community recently proposed a similar solution.
+Additionally, differene wallets have already integrated and implemented the new standard such as Phantom, Nightly, Brave Wallet, Martian, etc.
