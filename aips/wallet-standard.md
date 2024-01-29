@@ -32,14 +32,14 @@ In this proposal, we suggest bringing a new way of communication between a walle
 1. Dapp developers
 
 - Familiarize themselves with the new standard
-- Migrate to the new TypeScript SDK
+- Migrate to the [new TypeScript SDK](https://github.com/aptos-labs/aptos-ts-sdk)
 - Support a wallet discoverable function and filter out non-aptos wallets
 - Once a Wallet has migrated to the new standard, can remove the wallet package dependency from the dapp
 
 2. Wallet developers
 
 - Familiarize themselves with the new standard
-- Migrate to the new TypeScript SDK
+- Migrate to the [new TypeScript SDK](https://github.com/aptos-labs/aptos-ts-sdk)
   - Or hold a conversion layer from the new TypeScript SDK types to the legacy TypeScipt SDK types
 - Register the wallet so it will be discoverable by the dapp
 - Implementation of a Wallet class that conforms with the new standard
@@ -278,7 +278,7 @@ const onConnect = () => {
 
 ## Risks and Drawbacks
 
-The new standard uses the new TypeScript SDK types and therefore requires dapps and wallets to use/migrate to the new TypeScript SDK or hold a conversion layer from the new TypeScript SDK types to the legacy TypeScript SDK types.
+The new standard uses the [new TypeScript SDK](https://github.com/aptos-labs/aptos-ts-sdk) types and therefore requires dapps and wallets to use/migrate to the new TypeScript SDK or hold a conversion layer from the new TypeScript SDK types to the legacy TypeScript SDK types.
 
 ## Future Potential
 
