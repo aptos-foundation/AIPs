@@ -2,7 +2,7 @@
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Wallet Standard
 author: 0xmaayan, hardsetting, NorbertBodziony
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/306
 Status: Draft
 last-call-end-date (*optional): 09/02/2024
 type: Standard
