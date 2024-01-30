@@ -3,7 +3,7 @@ aip:
 title: Ephemeral Storage Fee and Refundable State Bytes
 author: msmouse
 discussions-to (*optional): 
-Status: Draft
+Status: Withdrawn
 last-call-end-date (*optional):
 type: Gas
 created: 12/12/2023
