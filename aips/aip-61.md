@@ -418,9 +418,9 @@ A consequence of this is that we cannot upgrade/bugfix our ZK relation implement
 
 ### Reference implementation
 
-We will link to our circuit code and Rust TXN authenticator here. **(TBA).**
-
- - [PR that implements Rust authenticator for the leaky mode](https://github.com/aptos-labs/aptos-core/pull/11681)
+We will add more links to our circuit code and Rust TXN authenticator below:
+ - [Rust authenticator code for the leaky mode](https://github.com/aptos-labs/aptos-core/pull/11681)
+ - [Rust authenticator code for the Groth16-based ZKP mode](https://github.com/aptos-labs/aptos-core/pull/11772)
 
 ## Testing (Optional)
 
