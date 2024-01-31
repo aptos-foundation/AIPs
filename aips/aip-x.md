@@ -2,7 +2,7 @@
 aip: 
 title: Digital Assets Composability
 author: aladeenb
-TODO: discussions-to:  https://github.com/aptos-foundation/AIPs/pull/278#issue
+discussions-to:  https://github.com/aptos-foundation/AIPs/pull/278#issue
 Status: Draft
 last-call-end-date:
 type: Standard (Framework)
