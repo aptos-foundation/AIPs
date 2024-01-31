@@ -8,12 +8,7 @@ last-call-end-date:
 type: Standard (Framework)
 created: 12/01/2023
 updated: 31/01/2024
-requires: 
-"AIP-10: Move Objects", 
-"AIP-11: Token Objects", 
-"AIP-21: Fungible Assets", 
-"AIP-43: Parallelize Digital Assets (Token V2) minting/burning", 
-"AIP-44: Module Events",
+requires: "AIP-10: Move Objects", "AIP-11: Token Objects", "AIP-21: Fungible Assets", "AIP-43: Parallelize Digital Assets (Token V2) minting/burning", "AIP-44: Module Events"
 ---
 
 # AIP-X - Composable Digital Assets standard
