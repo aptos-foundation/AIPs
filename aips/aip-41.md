@@ -19,7 +19,7 @@ requires (*optional): <AIP number(s)>
 
 > Include a brief description summarizing the intended change. This should be no more than a couple of sentences. 
 
-This AIP proposes a new Move module called `aptos_std::randomness` which enables smart contracts to **easily** and **securely** generate publicly-verifiable randomness.
+This AIP proposes a new Move module called `aptos_framework::randomness` which enables smart contracts to **easily** and **securely** generate publicly-verifiable randomness.
 
 The proposed `randomness` module leverages an underlying _on-chain cryptographic randomness implementation_ run by the Aptos validators. This implementation, however, is **outside the scope** of this AIP and will be the focus of a different, future AIP. 
 
@@ -69,7 +69,7 @@ Only **Move developers** are “affected”: they need to learn how to use this 
 
 Instead of having a dedicated module for **on-chain randomness**, as part of the Aptos framework, we could provide Move APIs for verifying **external randomness** from off-chain beacons like [`drand`](https://drand.love) or oracles like Chainlink.
 
-In fact, we have already done this: see this example of a [simple Move lottery](https://github.com/aptos-labs/aptos-core/tree/ad3b32a7686549b567deb339296749b10a9e4e0e/aptos-move/move-examples/drand/sources) that relies on the `drand` randomness beacon.
+In fact, we have already done this: see this example of a [drand-based Move raffle](https://github.com/aptos-labs/aptos-core/tree/ad3b32a7686549b567deb339296749b10a9e4e0e/aptos-move/move-examples/drand/sources) that relies on the `drand` randomness beacon.
 
 Nonetheless, **relying on an external beacon has several disadvantages**:
 
@@ -77,13 +77,13 @@ Nonetheless, **relying on an external beacon has several disadvantages**:
    1. e.g., contract writers could fail to commit to a future `drand` round # whose randomness will be used in the contract and instead accept any randomness for any round #, which creates a fatal biasing attack.
    2. e.g., for external randomness beacons that produce randomness at a fixed interval such as `drand`, clock drift between the beacon and the underlying blockchain forces developers to commit to a far-enough-in-the-future round #. In other words, this adds delay before the underlying dapp can use the randomness.
 2. **Randomness is too pricy or produced too slowly**: It is not far fetched to imagine a world where many dapps are actually randapps. In this world, randomness would need to be produced very fast & very cheaply, which is not the case for existing beacons.
-3. The external **randomness has to be shipped** to the contract via a TXN, making it more awkward by users to use (e.g., in the [simple Move lottery](https://github.com/aptos-labs/aptos-core/tree/ad3b32a7686549b567deb339296749b10a9e4e0e/aptos-move/move-examples/drand/sources) example above, someone, perhaps the winning user, would have to “close” the lottery by shipping in the `drand` randomness with a TXN).
+3. The external **randomness has to be shipped** to the contract via a TXN, making it more awkward by users to use (e.g., in the [drand-based Move raffle](https://github.com/aptos-labs/aptos-core/tree/ad3b32a7686549b567deb339296749b10a9e4e0e/aptos-move/move-examples/drand/sources) example above, someone, perhaps the winning user, would have to “close” the raffle by shipping in the `drand` randomness with a TXN).
 
 ## Specification
 
 > Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
-We are proposing a new `aptos_std::randomness` Move module for generating publicly-verifiable randomness in Move smart contracts.
+We are proposing a new `aptos_framework::randomness` Move module for generating publicly-verifiable randomness in Move smart contracts.
 
 ### `randomness` API
 
@@ -106,7 +106,7 @@ let n3 = randomness::u256_integer();
 The full `randomness` module follows below:
 
 ```rust
-module aptos_std::randomness {
+module aptos_framework::randomness {
     use std::vector;
   
     /// Generates `n` bytes uniformly at random.
@@ -136,177 +136,108 @@ module aptos_std::randomness {
 }
 ```
 
-#### Example: A decentralized lottery
+#### Example: A decentralized raffle
 
-This `lottery` module picks a random winner, once a certain amount of tickets have been bought.
+This `raffle` module picks a random winner, once a certain amount of tickets have been bought.
 
 ```rust
-module lottery::lottery {
-    use aptos_framework::account;
+module raffle::raffle {
     use aptos_framework::aptos_coin::AptosCoin;
     use aptos_framework::coin;
-    use aptos_framework::resource_account;
-    use aptos_framework::timestamp;
-
-    use aptos_std::randomness;
-
-    use std::error;
+    use aptos_framework::randomness;
+    use aptos_std::smart_vector;
+    use aptos_std::smart_vector::SmartVector;
+    use aptos_framework::coin::Coin;
     use std::signer;
-    use std::vector;
 
-    /// Error code for when a user tries to initate the drawing but no users
-    /// bought any tickets.
+    // We need this friend declaration so our tests can call `init_module`.
+    friend raffle::raffle_test;
+
+    /// Error code for when a user tries to initate the drawing but no users bought any tickets.
     const E_NO_TICKETS: u64 = 2;
 
-    /// Error code for when a user tries to initiate the drawing too early
-    /// (enough time must've elapsed since the lottery started for users to
-    /// have time to register).
-    const E_LOTTERY_DRAW_IS_TOO_EARLY: u64 = 3;
+    /// Error code for when the somebody tries to draw an already-closed raffle
+    const E_RAFFLE_HAS_CLOSED: u64 = 3;
 
-    /// The minimum time between when a lottery is 'started' and when it's
-    /// closed & the randomized drawing can happen.
-    /// Currently set to (10 mins * 60 secs / min) seconds.
-    const MINIMUM_LOTTERY_DURATION_SECS : u64 = 10 * 60;
-
-    /// The minimum price of a lottery ticket, in APT.
+    /// The minimum price of a raffle ticket, in APT.
     const TICKET_PRICE: u64 = 10_000;
 
-    /// The address from which the developers created the resource account.
-    /// TODO: This needs to be updated before deploying. See the [resource account flow here](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-framework/sources/resource_account.move).
-    const DEVELOPER_ADDRESS: address = @0xcafe;
-
-    /// A lottery: a list of users who bought tickets and the time at which
-    /// it was started.
-    ///
-    /// The winning user will be randomly picked from this list.
-    struct Lottery has key {
-        // A list of users who bought lottery tickets (repeats allowed).
-        tickets: vector<address>,
-
-        // Blockchain time when the lottery started. Prevents closing it too "early."
-        started_at: u64,
+    /// A raffle: a list of users who bought tickets.
+    struct Raffle has key {
+        // A list of users who bought raffle tickets (repeats allowed).
+        tickets: SmartVector<address>,
+        coins: Coin<AptosCoin>,
+        is_closed: bool,
     }
 
-    /// Stores the signer capability for the resource account.
-    struct Credentials has key {
-        // Signer capability for the resource account storing the coins that can be won
-        signer_cap: account::SignerCapability,
-    }
-
-    /// Initializes a so-called "resource" account which will maintain the list
-    /// of lottery tickets bought by users.
-    ///
-    /// WARNING: For the `lottery` module to be secure, it must be deployed at
-    /// the same address as the created resource account. See an example flow
-    /// [here](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-framework/sources/resource_account.move).
-    fun init_module(resource_account: &signer) {
-        let signer_cap = resource_account::retrieve_resource_account_cap(
-            resource_account, DEVELOPER_ADDRESS
-        );
-
-        // Initialize an AptosCoin coin store there, which is where the lottery bounty will be kept
-        coin::register<AptosCoin>(resource_account);
-
-        // Store the signer cap for the resource account in the resource account itself
+    /// Initializes the `Raffle` resource, which will maintain the list of raffle tickets bought by users.
+    fun init_module(deployer: &signer) {
         move_to(
-            resource_account,
-            Credentials { signer_cap }
+            deployer,
+            Raffle {
+                tickets: smart_vector::empty(),
+                coins: coin::zero(),
+                is_closed: false,
+            }
         );
     }
 
-    /// The minimum time the lottery must be open for before anyone can call
-    /// `decide_winners`
-    public fun get_minimum_lottery_duration_in_secs(): u64 { MINIMUM_LOTTERY_DURATION_SECS }
+    #[test_only]
+    public(friend) fun init_module_for_testing(deployer: &signer) {
+        init_module(deployer)
+    }
 
-    /// The price of buying a lottery ticket.
+    /// The price of buying a raffle ticket.
     public fun get_ticket_price(): u64 { TICKET_PRICE }
 
-    /// Allows anyone to (re)start the lottery.
-    public entry fun start_lottery() acquires Credentials {
-        let info = borrow_global<Credentials>(@lottery);
-        let resource_account = account::create_signer_with_capability(&info.signer_cap);
+    /// Any user can call this to purchase a ticket in the raffle.
+    public entry fun buy_a_ticket(user: &signer) acquires Raffle {
+        let raffle = borrow_global_mut<Raffle>(@raffle);
 
-        let lottery = Lottery {
-            tickets: vector::empty<address>(),
-            started_at: timestamp::now_seconds(),
-        };
+        // Charge the price of a raffle ticket from the user's balance, and
+        // accumulate it into the raffle's bounty.
+        let coins = coin::withdraw<AptosCoin>(user, TICKET_PRICE);
+        coin::merge(&mut raffle.coins, coins);
 
-        // Create the Lottery resource, effectively 'starting' the lottery.
-        // NOTE: Will fail if a previous lottery has already started & hasn't ended yet.
-        move_to(&resource_account, lottery);
-
-        //debug::print(&string::utf8(b"Started a lottery at time: "));
-        //debug::print(&lottery.started_at);
+        // Issue a ticket for that user
+        smart_vector::push_back(&mut raffle.tickets, signer::address_of(user))
     }
 
-    /// Called by any user to purchase a ticket in the lottery.
-    public entry fun buy_a_ticket(user: &signer) acquires Lottery {
-        let lottery = borrow_global_mut<Lottery>(@lottery);
-
-        // Charge the price of a lottery ticket from the user's balance, and
-        // accumulate it into the lottery's bounty.
-        coin::transfer<AptosCoin>(user, @lottery, TICKET_PRICE);
-
-        // ...and issue a ticket for that user
-        vector::push_back(&mut lottery.tickets, signer::address_of(user))
+    /// Can only be called as a top-level call from a TXN, preventing **test-and-abort** attacks.
+    entry fun randomly_pick_winner() acquires Raffle {
+        randomly_pick_winner_internal();
     }
-  
-    /// Securely wraps around `decide_winners_internal` so it can only be called
-    /// as a top-level call from a TXN, preventing **test-and-abort** attacks (see
-    /// [AIP-41](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md)).
-    entry fun decide_winners() acquires Lottery, Credentials {
-        decide_winners_internal();
-    }
-  
-    /// Closes the lottery (if enough time has elapsed & more than 1 user bought
-    /// tickets) and draws a random winner.
-    fun decide_winners_internal(): address acquires Lottery, Credentials {
-        let lottery = borrow_global_mut<Lottery>(@lottery);
 
-        // Make sure the lottery is not being closed too early...
-        assert!(
-            timestamp::now_seconds() >= lottery.started_at + MINIMUM_LOTTERY_DURATION_SECS,
-            error::invalid_state(E_LOTTERY_DRAW_IS_TOO_EARLY)
-        );
+    /// Allows anyone to close the raffle (if enough time has elapsed & more than
+    /// 1 user bought tickets) and to draw a random winner.
+    public(friend) fun randomly_pick_winner_internal(): address acquires Raffle {
+        let raffle = borrow_global_mut<Raffle>(@raffle);
+        assert!(!raffle.is_closed, E_RAFFLE_HAS_CLOSED);
+        assert!(!smart_vector::is_empty(&raffle.tickets), E_NO_TICKETS);
 
-        // ...and that more than one person bought tickets.
-        if (vector::length(&lottery.tickets) < 2) {
-            abort(error::invalid_state(E_NO_TICKETS))
-        };
-
-        // Pick a random winner by permuting the vector [0, 1, 2, ..., n-1], and
-        // where n = |lottery.tickets|
-        let winner_idx = randomness::u64_range(
-            0,
-            vector::length(&lottery.tickets)
-        );
-        let winner = *vector::borrow(&lottery.tickets, winner_idx);
+        // Pick a random winner in [0, |raffle.tickets|)
+        let winner_idx = randomness::u64_range(0, smart_vector::length(&raffle.tickets));
+        let winner = *smart_vector::borrow(&raffle.tickets, winner_idx);
 
         // Pay the winner
-        let creds = borrow_global<Credentials>(@lottery);
-        let signer = account::create_signer_with_capability(&creds.signer_cap);
-        let balance = coin::balance<AptosCoin>(signer::address_of(&signer));
-
-        coin::transfer<AptosCoin>(
-            &signer,
-            winner,
-            balance
-        );
+        let coins = coin::extract_all(&mut raffle.coins);
+        coin::deposit<AptosCoin>(winner, coins);
+        raffle.is_closed = true;
 
         winner
     }
 }
 ```
 
-Note that the `lottery::decide_winners` function is marked as **private** `entry`. 
+Note that the `raffle::randomly_pick_winner` function is marked as **private** `entry`. 
 
 This is to prevent [test-and-abort attacks](#test-and-abort-attacks), which we discuss later.
 
-Specifically, it ensures that calls to `decide_winners` cannot be made from Move scripts nor from any other functions outside the `lottery` module. Such calls could test the outcome of `decide_winners` and abort, biasing the outcome of the lottery (see [“Test-and-abort attacks”](#test-and-abort-attacks)).
+Specifically, it ensures that calls to `randomly_pick_winner` cannot be made from Move scripts nor from any other functions outside the `raffle` module. Such calls could test the outcome of `randomly_pick_winner` and abort, biasing the outcome of the raffle (see [“Test-and-abort attacks”](#test-and-abort-attacks)).
 
 ## Open questions
 
-**O1:** Should the `randomness` module be part of `aptos_framework` rather than `aptos_std`? One reason to keep it in `aptos_std` is in case it might be needed by some of the cryptographic modules there (e.g., perhaps interactive ZKP verifiers that use public coins could use the `randomness` module).
+**O1:** Should the `randomness` module be part of `aptos_std` rather than `aptos_framework`? One reason to keep it in `aptos_std` is in case it might be needed by some of the cryptographic modules there (e.g., perhaps interactive ZKP verifiers that use public coins could use the `randomness` module).
 
 **O2:** Support for private `entry `functions might not be fully implemented: i.e., private `entry` functions could still be callable from a Move script. Or perhaps they are not even callable from a TXN. Or perhaps there are current SDK limitations on creating TXNs that call private entry functions.
 
@@ -318,26 +249,13 @@ Specifically, it ensures that calls to `decide_winners` cannot be made from Move
 
  > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
 
-There is a reference (albeit **dummy**) implementation of the proposed `aptos_std::randomness` API and an actual implementation of the `lottery` example [in this PR](https://github.com/aptos-labs/aptos-core/pull/9581) (which should merge and be available soon [here](https://github.com/aptos-labs/aptos-core/tree/main/aptos-move/move-examples/lottery).)
+ - The implementation of the `aptos_framework::randomness` API is [here](https://github.com/aptos-labs/aptos-core/blob/randomnet/aptos-move/framework/aptos-framework/sources/randomness.move).
+ - An implementation of the raffle example from this AIP is [here](https://github.com/aptos-labs/aptos-core/tree/randomnet/aptos-move/move-examples/raffle).
+ - An implementation of lottery example is here [here](https://github.com/aptos-labs/aptos-core/tree/randomnet/aptos-move/move-examples/lottery).
 
 ## Risks and Drawbacks
 
  > Express here the potential negative ramifications of taking on this proposal. What are the hazards?
-
-### Accidentally re-generating the same randomness
-
-It should be impossible to misuse the API to re-sample a previously-sampled piece of randomness (excluding naturally-arising collisions, of course).
-
-An example of this would be if a developer expects to sample two `u64` integers `n1` and `n2` , but the API only samples once. In other words, `n1` and `n2` always end up equal:
-
-```
-let n1 = randomness::u64_integer();
-let n2 = randomness::u64_integer();
-
-if (n1 != n2) {
-   // This code is never reached.
-}
-```
 
 ### Test-and-abort attacks
 
@@ -347,10 +265,10 @@ The **key problem** with having a Move function’s execution be influenced by o
 
 #### An example attack
 
-Concretely, suppose `lottery::decide_winners` were a `public entry` function instead of a **private** entry function:
+Concretely, suppose `raffle::randomly_pick_winner` were a `public entry` function instead of a **private** entry function:
 
 ```rust
-public entry fun decide_winners(): address acquires Lottery, Credentials { /* ... */}
+public entry fun randomly_pick_winner(): address acquires Raffle, Credentials { /* ... */}
 ```
 
 Then, a TXN that contains the following Move script could be used to attack it via **test-and-abort**:
@@ -367,13 +285,13 @@ script {
 
         let old_balance = coin::balance<aptos_coin::AptosCoin>(attacker_addr);
 
-        // For this attack to fail, `decide_winners` needs to be marked as a *private* entry function
-        lottery::lottery::decide_winners();
+        // For this attack to fail, `randomly_pick_winner` needs to be marked as a *private* entry function
+        raffle::raffle::randomly_pick_winner();
 
         let new_balance = coin::balance<aptos_coin::AptosCoin>(attacker_addr);
 
         // The attacker can see if his balance remained the same. If it did, then
-        // the attacker knows they did NOT win the lottery and can abort everything.
+        // the attacker knows they did NOT win the raffle and can abort everything.
         if (new_balance == old_balance) {
             abort(1)
         };
@@ -443,6 +361,21 @@ In this sense, randapps are just as susceptible to maliciously-introduced bugs a
 
 Yes. We discuss them below.
 
+### Security consideration: Accidentally re-generating the same randomness
+
+Beyond naturally-arising collisions, it should be impossible to misuse the API to re-sample a previously-sampled piece of randomness.
+
+For example, the code below will independently sample two `u64` integers `n1` and `n2`, which means they are likely to be different numbers, except for some small collision probability.
+
+```
+let n1 = randomness::u64_integer();
+let n2 = randomness::u64_integer();
+
+if (n1 == n2) {
+   // This code is not likely to be reached, except with probability 2^{-32}.
+}
+```
+
 ### Security consideration: API implementation 
 
 When implementing on-chain randomness with a **secrecy-based approach** (e.g., a threshold verifiable random function, or t-VRF) rather than a **delayed-based approach** (e.g., a verifiable delay function, or VDF), a majority of the stake can collude to predict the randomness ahead of time and/or bias it.
@@ -470,11 +403,11 @@ We discuss two defenses below that we plan to use to enforce the proper usage of
 
 A linter check could be implemented to ensure that the `randomness` function calls that sample objects, such as `randomness::u64_integer`, are only reachable via a call to a `private` entry function.
 
-For example, this is the case in the `lottery` example, where:
+For example, this is the case in the `raffle` example, where:
 
 - The winner is picked via `randomness::u64_range`,
-- ...which is called from the private function `decide_winners_internal`, 
-- ...which in turn is only callable from the private `entry ` function `decide_winners`.
+- ...which is called from the private function `randomly_pick_winner_internal`, 
+- ...which in turn is only callable from the private `entry ` function `randomly_pick_winner`.
 
 **Advantages:**
 
