@@ -19,7 +19,7 @@ requires (*optional): <AIP number(s)>
 
 > Include a brief description summarizing the intended change. This should be no more than a couple of sentences. 
 
-This AIP proposes a new Move module called `aptos_std::randomness` which enables smart contracts to **easily** and **securely** generate publicly-verifiable randomness.
+This AIP proposes a new Move module called `aptos_framework::randomness` which enables smart contracts to **easily** and **securely** generate publicly-verifiable randomness.
 
 The proposed `randomness` module leverages an underlying _on-chain cryptographic randomness implementation_ run by the Aptos validators. This implementation, however, is **outside the scope** of this AIP and will be the focus of a different, future AIP. 
 
@@ -83,7 +83,7 @@ Nonetheless, **relying on an external beacon has several disadvantages**:
 
 > Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
-We are proposing a new `aptos_std::randomness` Move module for generating publicly-verifiable randomness in Move smart contracts.
+We are proposing a new `aptos_framework::randomness` Move module for generating publicly-verifiable randomness in Move smart contracts.
 
 ### `randomness` API
 
@@ -106,7 +106,7 @@ let n3 = randomness::u256_integer();
 The full `randomness` module follows below:
 
 ```rust
-module aptos_std::randomness {
+module aptos_framework::randomness {
     use std::vector;
   
     /// Generates `n` bytes uniformly at random.
@@ -148,7 +148,7 @@ module lottery::lottery {
     use aptos_framework::resource_account;
     use aptos_framework::timestamp;
 
-    use aptos_std::randomness;
+    use aptos_framework::randomness;
 
     use std::error;
     use std::signer;
@@ -306,7 +306,7 @@ Specifically, it ensures that calls to `decide_winners` cannot be made from Move
 
 ## Open questions
 
-**O1:** Should the `randomness` module be part of `aptos_framework` rather than `aptos_std`? One reason to keep it in `aptos_std` is in case it might be needed by some of the cryptographic modules there (e.g., perhaps interactive ZKP verifiers that use public coins could use the `randomness` module).
+**O1:** Should the `randomness` module be part of `aptos_std` rather than `aptos_framework`? One reason to keep it in `aptos_std` is in case it might be needed by some of the cryptographic modules there (e.g., perhaps interactive ZKP verifiers that use public coins could use the `randomness` module).
 
 **O2:** Support for private `entry `functions might not be fully implemented: i.e., private `entry` functions could still be callable from a Move script. Or perhaps they are not even callable from a TXN. Or perhaps there are current SDK limitations on creating TXNs that call private entry functions.
 
@@ -318,7 +318,9 @@ Specifically, it ensures that calls to `decide_winners` cannot be made from Move
 
  > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
 
-There is a reference (albeit **dummy**) implementation of the proposed `aptos_std::randomness` API and an actual implementation of the `lottery` example [in this PR](https://github.com/aptos-labs/aptos-core/pull/9581) (which should merge and be available soon [here](https://github.com/aptos-labs/aptos-core/tree/main/aptos-move/move-examples/lottery).)
+ - The implementation of the `aptos_framework::randomness` API is [here](https://github.com/aptos-labs/aptos-core/blob/randomnet/aptos-move/framework/aptos-framework/sources/randomness.move).
+ - An implementation of the raffle example from this AIP is [here](https://github.com/aptos-labs/aptos-core/tree/randomnet/aptos-move/move-examples/raffle).
+ - An implementation of lottery example is here [here](https://github.com/aptos-labs/aptos-core/tree/randomnet/aptos-move/move-examples/lottery).
 
 ## Risks and Drawbacks
 
