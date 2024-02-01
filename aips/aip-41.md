@@ -257,21 +257,6 @@ Specifically, it ensures that calls to `randomly_pick_winner` cannot be made fro
 
  > Express here the potential negative ramifications of taking on this proposal. What are the hazards?
 
-### Accidentally re-generating the same randomness
-
-It should be impossible to misuse the API to re-sample a previously-sampled piece of randomness (excluding naturally-arising collisions, of course).
-
-An example of this would be if a developer expects to independently sample two `u64` integers `n1` and `n2` , but the API only samples once. In other words, `n1` and `n2` always end up equal:
-
-```
-let n1 = randomness::u64_integer();
-let n2 = randomness::u64_integer();
-
-if (n1 == n2) {
-   // This code is not likely to be reached, except with probability 2^{-32}.
-}
-```
-
 ### Test-and-abort attacks
 
 Smart contract platforms are an inherently-adversarial environment to deploy randomness in.
@@ -375,6 +360,21 @@ In this sense, randapps are just as susceptible to maliciously-introduced bugs a
 > Any security implications/considerations?
 
 Yes. We discuss them below.
+
+### Security consideration: Accidentally re-generating the same randomness
+
+Beyond naturally-arising collisions, it should be impossible to misuse the API to re-sample a previously-sampled piece of randomness.
+
+For example, the code below will independently sample two `u64` integers `n1` and `n2`, which means they are likely to be different numbers, except for some small collision probability.
+
+```
+let n1 = randomness::u64_integer();
+let n2 = randomness::u64_integer();
+
+if (n1 == n2) {
+   // This code is not likely to be reached, except with probability 2^{-32}.
+}
+```
 
 ### Security consideration: API implementation 
 
