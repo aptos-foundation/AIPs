@@ -318,7 +318,9 @@ Specifically, it ensures that calls to `decide_winners` cannot be made from Move
 
  > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
 
-There is a reference (albeit **dummy**) implementation of the proposed `aptos_std::randomness` API and an actual implementation of the `lottery` example [in this PR](https://github.com/aptos-labs/aptos-core/pull/9581) (which should merge and be available soon [here](https://github.com/aptos-labs/aptos-core/tree/main/aptos-move/move-examples/lottery).)
+ - The implementation of the proposed `aptos_std::randomness` API is currently [here](https://github.com/aptos-labs/aptos-core/tree/randomnet/).
+ - The randomness Move module is currently [here](https://github.com/aptos-labs/aptos-core/blob/randomnet/aptos-move/framework/aptos-framework/sources/randomness.move).
+ - The implementation of the `lottery` example is [here](https://github.com/aptos-labs/aptos-core/tree/dd9692f627a27151a0ed68d2671a414a24a86be1/aptos-move/move-examples/raffle) (merged from this PR [here](https://github.com/aptos-labs/aptos-core/pull/9581)).
 
 ## Risks and Drawbacks
 
