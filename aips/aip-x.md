@@ -206,17 +206,307 @@ struct Composable has key {
     struct Named has key {}
 ```
 
-### Apis
+### APIs
 
 The standard contains all viable APIs for accessing, transferring, composing, mutating, deleting tokens, and managing collections, and royalties. There are no entry functions as the composability standard leaves that to more specific implementations.
 
-#### Collection Data Apis
+#### Collection APIs
 
-#### DA Data Apis
+```move
+// Create a collection; 
+// this will create a collection resource, a collection object, 
+// and returns the constructor reference of the collection.
+public fun create_collection<SupplyType: key>(
+    signer_ref: &signer,
+    description: String,
+    max_supply: Option<u64>, // if the collection is set to haved a fixed supply.
+    name: String,
+    symbol: String,
+    uri: String,   
+    mutable_description: bool,
+    mutable_royalty: bool,
+    mutable_uri: bool,
+    mutable_token_description: bool,
+    mutable_token_name: bool,
+    mutable_token_properties: bool,
+    mutable_token_uri: bool,
+    tokens_burnable_by_creator: bool,
+    tokens_freezable_by_creator: bool,
+    royalty_numerator: Option<u64>,
+    royalty_denominator: Option<u64>
+): object::ConstructorRef
+```
 
-#### Trait Data Apis
+```move
+public fun is_mutable_collection_description<T: key>(collection: Object<T>): bool
+```
 
-#### Composable Data Apis
+```move
+public fun is_mutable_collection_royalty<T: key>(collection: Object<T>): bool
+```
+
+```move
+public fun is_mutable_collection_uri<T: key>(collection: Object<T>): bool
+```
+
+```move
+public fun is_mutable_collection_token_description<T: key>(collection: Object<T>): bool
+```
+
+```move
+public fun is_mutable_collection_token_name<T: key>(collection: Object<T>): bool
+```
+
+```move
+public fun is_mutable_collection_token_uri<T: key>(collection: Object<T>): bool
+```
+
+```move
+public fun is_mutable_collection_token_properties<T: key>(collection: Object<T>): bool
+```
+
+```move
+public fun are_collection_tokens_burnable<T: key>(collection: Object<T>): bool
+```
+
+```move
+public fun are_collection_tokens_freezable<T: key>(collection: Object<T>): bool
+```
+
+```move
+public fun get_collection_name(collection_object: Object<Collection>): String
+```
+
+```move
+public fun get_collection_symbol(collection_object: Object<Collection>): String
+```
+
+```move
+public fun get_collection_supply_type(collection_object: Object<Collection>): String
+```
+
+#### Token APIs
+
+This section contains APIs for tokens regardless of their type (whether they are composable, trait, or digital asset).
+
+```move
+// Create a token based on type. Either a trait or a composable;
+// this will create a token resource, a token object,
+// and returns the constructor reference of the token.
+public fun create_token<Type: key, NamingStyle: key>(
+    signer_ref: &signer,
+    collection: String,
+    description: String,
+    name: String,
+    name_with_index_prefix: String,
+    name_with_index_suffix: String,
+    uri: String,
+    royalty_numerator: Option<u64>,
+    royalty_denominator: Option<u64>,
+    property_keys: vector<String>,
+    property_types: vector<String>,
+    property_values: vector<vector<u8>>
+): object::ConstructorRef
+```
+
+```move
+// Composose a digital asset to a composable
+        public fun equip_digital_asset(
+            signer_ref: &signer,
+            composable_object: Object<Composable>,
+            da_object: Object<DA>,
+            new_uri: String
+        )
+```
+
+```move
+// equip fa; transfer fa to a token; token can be either composable or trait
+public fun equip_fa_to_token<FA: key, Token: key>(
+    signer_ref: &signer,
+    fa: Object<FA>,
+    token_obj: Object<Token>,
+    amount: u64
+)
+```
+
+```move
+// unequip fa; transfer fa from a token to the owner
+    public fun unequip_fa_from_token<FA: key, Token: key>(
+        signer_ref: &signer,
+        fa: Object<FA>,
+        token_obj: Object<Token>,
+        amount: u64
+    )
+```
+
+```move
+// transfer digital assets; from user to user.
+public fun transfer_token<Token: key>(
+    signer_ref: &signer,
+    token_addr: address,
+    new_owner: address
+)
+```
+
+```move
+// transfer fa from user to user.
+public fun transfer_fa<FA: key>(
+    signer_ref: &signer,
+    recipient: address,
+    fa: Object<FA>,
+    amount: u64
+)
+```
+
+```move
+public fun burn_token<Type: key>(owner: &signer, token: Object<Type>)
+```
+
+```move
+public fun freeze_transfer<T: key>(creator: &signer, token: Object<T>)
+```
+
+```move
+public fun unfreeze_transfer<T: key>(creator: &signer, token: Object<T>)
+```
+
+```move
+public fun set_description<T: key>(creator: &signer, token: Object<T>, description: String)
+```
+
+```move
+public fun set_name<T: key>(creator: &signer, token: Object<T>, name: String)
+```
+
+```move
+public fun set_trait_uri(owner: &signer, trait_obj: Object<Trait>, uri: String)
+```
+
+```move
+// set token properties
+public fun add_property<T: key>(
+    owner: &signer,
+    token: Object<T>,
+    key: String,
+    type: String,
+    value: vector<u8>
+)
+```
+
+```move
+public fun add_typed_property<T: key, V: drop>(
+    owner: &signer,
+    token: Object<T>,
+    key: String,
+    value: V,
+)
+```
+
+```move
+public fun remove_property<T: key>(
+    owner: &signer,
+    token: Object<T>,
+    key: String,
+)
+```
+
+```move
+// update token properties
+public fun update_property<T: key>(
+    owner: &signer,
+    token: Object<T>,
+    key: String,
+    value: vector<u8>,
+)
+```
+
+```move
+public fun get_index<T: key>(token_obj: Object<T>): u64
+```
+
+```move
+public fun are_properties_mutable<T: key>(token: Object<T>): bool
+```
+
+```move
+public fun is_burnable<T: key>(token: Object<T>): bool 
+```
+
+```move
+public fun is_mutable_description<T: key>(token: Object<T>): bool
+```
+
+```move
+public fun is_mutable_name<T: key>(token: Object<T>): bool
+```
+
+```move
+public fun is_mutable_uri<T: key>(token: Object<T>): bool
+```
+
+```move
+public fun get_token_signer<T: key>(token: Object<T>): signer
+```
+
+#### DA APIs
+
+#### Trait APIs
+
+```move
+// Compose a digital asset to a trait
+public fun equip_digital_asset_to_trait(
+    signer_ref: &signer,
+    trait_object: Object<Trait>,
+    da_object: Object<DA>,
+    new_uri: String
+)
+```
+
+```move
+// Decompose a digital asset from a trait
+public fun unequip_digital_asset_from_trait(
+    signer_ref: &signer,
+    trait_object: Object<Trait>,
+    da_object: Object<DA>,
+    new_uri: String
+)
+```
+
+#### Composable APIs
+
+```move
+// Compose trait to a composable token
+public fun equip_trait(
+    signer_ref: &signer,
+    composable_object: Object<Composable>,
+    trait_object: Object<Trait>,
+    new_uri: String
+)
+```
+
+```move
+// Decompose a digital asset from a composable
+public fun unequip_digital_asset_from_composable(
+    signer_ref: &signer,
+    composable_object: Object<Composable>,
+    da_object: Object<DA>,
+    new_uri: String
+)
+```
+
+```move
+// Decompose a trait from a composable token. Tests panic.
+public fun unequip_trait(
+    signer_ref: &signer,
+    composable_object: Object<Composable>,
+    trait_object: Object<Trait>,
+    new_uri: String
+)
+```
+
+```move
+public fun get_traits_from_composable(composable_object: Object<Composable>): vector<Object<Trait>> 
+```
 
 ## Reference Implementation
 
