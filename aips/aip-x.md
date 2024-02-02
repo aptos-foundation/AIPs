@@ -15,35 +15,61 @@ requires: "AIP-10: Move Objects", "AIP-11: Token Objects", "AIP-21: Fungible Ass
 
 ## Summary
 
-This AIP puts forward a framework for Token Objects, allowing developers to create composable tokens and collections without the need for writing Move code. It achieves this by handling decisions related to business logic, data layout, and providing entry functions.
+This AIP introduces a built-in composability mechanism designed for `AIP-11`, enabling developers to generate composable tokens without the necessity of crafting Move code. This is accomplished through the utilization of `AIP-10`.
+
+The solution not only addresses this aspect but also introduces supplementary features such as creator management, custom metadata, embedded migration, and event emission, thereby offering a comprehensive stack for composables.
 
 ## Motivation
 
-Digital asset creators encounter challenges due to the absence of a standardized approach to composability. This results in either manual implementation with restricted customization and potential security risks or overlooking the true advantages of the digital and fungible asset standards.
+The proposed solution introduces a hierarchical structure for the composability of digital assets. Within this framework, an NFT or token possesses the capability to own its own set of tokens, and each of these subsidiary tokens, in turn, can own tokens of their own, adhering to a unidirectional pathway. This strategic design is essential to mandate the composition of tokens of the same type in a specific manner and at a designated level.
 
-This standard takes serves as an enhancement to the `aptos-token` framework in addition to the following:
+For example, consider a player token that has ownership of a sword token, and the sword token, in turn, possesses a power token. The solution enforces a strict compositional hierarchy, ensuring that the sword token can only be composed with the player token, and the power token can exclusively be composed with either the sword token or the player token.
 
-* Collections have symbols.
-* Tokens can be created as named or numbered.
-* Tokens can hold fungible assets.
-* Entry functions to perform composition.
-* public functions for extensibility support.
-* View functions to read state.
-* A two-steps ownership transfer.
-* An migartion mechanism to migrate tokens from different standards.
-* A property map for storing data associated with a token, limited to the Move primitives, `vector<u8>`, and `0x1::string::String`.
-* A support for storing data associated with a token via custom resources.
-* Events are emitted with every function executed.
+The hierarchy consists of three layers:
+
+- `Composable`: A wrapper for a `token-object` that acts as the root and can contain traits, digital assets, and fungible assets.
+- `Trait`: A wrapper for a `token-object` that serves as the child of the Composable, capable of holding digital assets and fungible assets.
+- `DA` (Digital Asset): A wrapper for a `token-object` representing the leaf of the tree and positioned as the child of the Trait. It can hold fungible assets.
+
+The solution also embeds the composability mechanism, which entails transferring the token intended for composition to the target token for composition. This action freezes the transfer capability of the former and ultimately updates the uri of the parent token.
+
+Overall, a visual represenation can look something like this:
+![Alt text](image.png)
 
 ## Rationale
 
-This is intended to be a first attempt at defining no-code solutions for composability. The object model allows for new no-code solutions to be created without resulting in any discernable difference to the users, except for those seeking the new features. In fact, the solutions can live in parallel. For example, if fungibility or semi-fungibility becomes important, a new no-code solution on fungibility should be proposed and adopted into the Aptos framework.
+Composability was introduced in `AIP-10`, allowing objects to have ownership of other objects. However, it wasn't specifically crafted to facilitate hierarchical composition. This implies that objects could own other objects without a structured path and hierarchy to clearly define which ones should own others and which ones should not.
 
-The alternative is to not place it in the framework and to make an immutable contract. The greatest concern in that space is the potential risk for bugs or for additional functionality that may be desirable in this variant of no-code tokens.
+In the realm of tokens, creators willing to implement cNFTs will have to write the code for a defined-path composability mechanism. This might not be an issue for some, but some things need to be considered:
 
-## Alternatives
+- Composable NFT or cNFT data structure: The structure requires a clear path for composition, so not all tokens can be composed with each other. So a data structure is needed to enforce this.
+- Data accessibility: cNFTs need to be able to access the data of the tokens they own, and the tokens owned by their owned tokens. This is to ensure that tokens that are in a composition relation with the parent token have their metadata stored, accessable and should have their transfer capability disabled to not violate the composition rule.
+- Updating the `uri`: The `uri` of the parent token should be updated to reflect the composition of the child tokens. This is to ensure that the parent token `uri` reflects the child tokens it owns, while any change within the composition structure should be reflected
 
-A potential competitor would be `aptos-token`. But it lacks the following features:
+### Existing solutions
+
+#### AIP-22
+
+A potential competitor would be `aptos-token`. `aptos-token` is a no-code solution introduced in `AIP-22` that allows developers to create tokens and collections without writing any Move code. It makes decisions on business logic, data layout, and provides entry functions. It also supports creator management, custom metadata using `PropertyMap` and support composability. But it has some limitations:
+
+- No composability data structure: `aptos-token` does not enforce a clear path for composition, allowing any `AptosToken` to be composed with any `AptosToken`.
+- No data accessibility: `aptos-token` does not provide a way for tokens to access the data of the tokens they own, and the tokens owned by their owned tokens.
+- Updating `uri` accessibility: in `aptos-token`, the `uri` of a token can be updated by the creator in some case (if ` = true`). This is set during collection creation and it cannot be updated after. Updating the `uri` of a token manually can potentially pose a security risk, as it can be used to falsely claim ownership of a different digital assets.
+- NO extensibility support: `aptos-token` lacks storage for `ExtendRef` and returns the Object instead of the `ConstructorRef` of the wrapper object upon creation, preventing the addition of new resources after its initialization.
+
+#### AIP-21
+
+TODO: why fungibility is not the solution. We need a more standarised solution that support digital asset composability with the support of fungible assets.
+TODO: the purpose is to have a hirarchy structure of digital assets with the support of embedding fungible assets.
+
+### Our solution
+
+- Composability structure:
+- Data accessibility:
+- restricted `uri` update:
+- Extensibility support:
+
+### Summary comparison
 
 |   | aptos-token | studio
 | -- | -- | --
@@ -56,10 +82,6 @@ A potential competitor would be `aptos-token`. But it lacks the following featur
 | Indexed digital assets mint | ❌ | ✅
 | two-step ownership transfer | ❌ | ✅
 | Events emitted | ❌ | ✅
-
-Additionally, `aptos-token` poses a security risk by allowing creators to mutate `uri`, enabling the alteration of a token's `uri` to falsely claim ownership of a different digital asset.
-
-Moreover, `aptos-token` lacks storage for `ExtendRef` and returns the Object instead of the `ConstructorRef` of the wrapper object upon creation, preventing the addition of new resources after its initialization.
 
 ## Specification
 
@@ -98,9 +120,7 @@ traits can hold a list of DAs and fungible assets
 
 Composables can hold a list of traits, a list of digital_assets and fungible assets
 
-Overall, a visual represenation can look something like this:
 
-![Alt text](image.png)
 
 #### Composition
 
