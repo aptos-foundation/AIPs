@@ -33,9 +33,6 @@ The hierarchy consists of three layers:
 
 The solution also embeds the composability mechanism, which entails transferring the token intended for composition to the target token for composition. This action freezes the transfer capability of the former and ultimately updates the uri of the latter.
 
-Overall, a visual represenation can look something like this:
-![Alt text](image.png)
-
 ## Rationale
 
 Composability was introduced in `AIP-10`, allowing objects to have ownership of other objects. However, it wasn't specifically crafted to facilitate hierarchical composition. This implies that objects could own other objects without a structured path to clearly define which ones should own others and which ones should not.
@@ -65,41 +62,65 @@ Below is a visual example of how `hero.move` would look like using `aptos-token`
 TODO: why fungibility is not the solution. We need a more standarised solution that support digital asset composability with the support of fungible assets.
 TODO: the purpose is to have a hirarchy structure of digital assets with the support of embedding fungible assets.
 
-### Our solution
-
-- Composability structure:
-- Data accessibility:
-- restricted `uri` update:
-- Extensibility support:
-
-### Summary comparison
-
-|   | aptos-token | studio
-| -- | -- | --
-| Freezing/unfreezing transfers | ✅ | ✅
-| Creator management functionality | ✅ | ✅
-| Custom metadata (via PropertyMap) | ✅ | ✅
-| Custom metadata (via Resources) | ❌ | ✅
-| Embedded composability | ❌ | ✅
-| Embedded migration | ❌ | ✅
-| Indexed digital assets mint | ❌ | ✅
-| two-step ownership transfer | ❌ | ✅
-| Events emitted | ❌ | ✅
-
 ## Specification
 
 ### Overview
 
-The no-code solution consists of three components:
+#### Composability Data Structure
 
-1. *Collection* - a wrapper around collections.
-2. *DA* - a wrapper that serves as metadata for traits and composability, storing the list of fungible assets it holds.
-3. *Trait* - a wrapper acting as metadata for composability, storing the list of digital and fungible assets it holds.
-4. *Composable* - a token wrapper storing lists of traits, digital assets, and fungible assets it holds.
+The solution introduces a hierarchical setup for composing digital assets, which consists of three layers:
+
+1. *Composable* - a token wrapper storing lists of traits, digital assets, and fungible assets it holds.
+2. *Trait* - a wrapper acting as metadata for composability, storing the list of digital and fungible assets it holds.
+3. *DA* - a wrapper that serves as metadata for traits and composability, storing the list of fungible assets it holds.
+
+This hierarchical setup is designed based on the tree structure, where the Composable is the root, the Trait is the child of the Composable, and the DA is the child of the Trait. The depth of the tree is set to three by default but can be extended to any level. Additionally, the tree can have multiple branches.
+
+Overall, a visual represenation looks something like this:
+![Alt text](image.png)
+
+#### Data accessibility
+
+The solution allows for tokens to access the data of the tokens they own, and the tokens owned by their owned tokens. This is to ensure that tokens that are in a composition relation with the parent token have their metadata stored and accessable.
+
+[Refer to the data structure section for more details.](###Data-Structure)
+
+#### Updating the `uri`
+
+The `uri` of the parent token is updated to reflect the composition of the child tokens. This is to ensure that the parent token `uri` reflects the child tokens it owns, while any change within the composition structure should be reflected.
+
+#### Extensibility support
+
+The solution supports the addition of new resources post-creation, providing the flexibility to add extra resources to the token. This facilitates customization of metadata via resources. `property_map` can then potentially be used to store the static metadata of the token, and resources can be used to store the dynamic metadata of the token. Example: `property_map` can store the sword type: "wooden", and resources can store the sword power: "100".
+Extensibility can also be used to add more layers to the composability structure, but then creators will have to write the code to deal with the new layers.
+
+Below is a visual example of how `hero.move` would look like using the proposal.
+![Alt text](image-2.png)
+
+### Composability lifecycle
+
+Assuming a collection is created, and tokens with the different three sub types are created.
+
+- composing a trait token to a composable token:
+  1. An entity calls the equip function.
+  2. The trait token is transferred to the composable token.
+  3. The trait is disabled from being transferred (`allow_ungated_transfer = false`).
+  4. The trait object is copied to the traits list in the composable.
+  5. The composable's uri is updated.
+  6. An event is emitted.
+
+- decomposing a trait token from a composable token:
+  1. An entity calls the unequip function.
+  2. The trait object is removed from the traits list in the composable.
+  3. The trait is enabled for transfer (`allow_ungated_transfer = true`).
+  4. The trait token is transferred to the owner.
+  5. An event is emitted.
+
+Same steps apply to the DA and composable tokens.
 
 ### Core Logic
 
-The framework consists of collections, tokens, and a composition mechanism
+The logic consists of the composition mechanism, collections, tokens, and their management.
 
 #### Collections
 
@@ -123,13 +144,22 @@ traits can hold a list of DAs and fungible assets
 
 Composables can hold a list of traits, a list of digital_assets and fungible assets
 
-
-
 #### Composition
 
 The mechanism of composing and decomposing is embedded within the module, so creators won't need to worry about writing the code for that.
 
-A composition will involve transfering the token to compose to the token to-compose-to, disables its transfer ability so it won't violate the composition rule, and ultimately update the `uri` of the token to-compose-to
+A composition will involve transfering the token to compose to the token to-compose-to, disables its transfer ability so it won't violate the composition rule, and ultimately update the `uri` of the token to-compose-to.
+
+#### Example
+
+A creator is creating a gaming NFT collection with composable traits.
+This AIP would allow for defining traits like this:
+
+- Composable - Knight.
+- Trait - basic sword.
+- DA - Healing lotion.
+
+![Alt text](image-3.png)
 
 ### Data Structure
 
