@@ -1,7 +1,7 @@
 ---
 aip: 
 title: Digital Assets Composability
-author: aladeenb
+author: aladeenb, jczhang
 discussions-to:  https://github.com/aptos-foundation/AIPs/pull/278#issue
 Status: Draft
 last-call-end-date:
@@ -15,9 +15,9 @@ requires: "AIP-10: Move Objects", "AIP-11: Token Objects", "AIP-21: Fungible Ass
 
 ## Summary
 
-This AIP introduces a built-in composability mechanism designed for `AIP-11` and partially forked from `AIP-22`, enabling developers to generate composable tokens without the necessity of writing Move code. This is achieved through the utilization of `AIP-10`.
+This AIP proposes a purpose-specific, extensible composability framework that allows creators to create NFTs for Dynamic PFP, composable game assets, and other rich applications that require composability. It does this with new business logic, sub-functions, data structures, and APIs, while also embracing the extensibility of the object model from `AIP-11` & `AIP-10` and the no-code framework from `AIP-22`.
 
-The solution not only addresses this aspect but also introduces supplementary features such as creator management, custom metadata, embedded migration, and event emission (`AIP-44`), thereby offering a comprehensive stack for composables.
+The solution not only addresses this aspect but also introduces supplementary features such as creator management, custom metadata, and embedded migration. Event emission features from `AIP-44` are also included in the framework, thereby offering a comprehensive stack for composable token use cases.
 
 ## Motivation
 
@@ -29,13 +29,13 @@ The hierarchy consists of three layers:
 
 - `Composable`: A wrapper for a `token-object` that acts as the root and can contain traits, digital assets, and fungible assets.
 - `Trait`: A wrapper for a `token-object` that serves as the child of the Composable, capable of holding digital assets and fungible assets.
-- `DA` (Digital Asset): A wrapper for a `token-object` representing the leaf of the tree and positioned as the child of the Trait. It can hold fungible assets.
+- `DA` (Digital Asset): A wrapper for a `token-object` representing the leaf of the tree and positioned as the child of the Trait. It can hold fungible assets and allow further extensibility in the hierarchy.
 
 The solution also embeds the composability mechanism, which entails transferring the token intended for composition to the target token for composition. This action freezes the transfer capability of the former and ultimately updates the uri of the latter.
 
 ## Rationale
 
-Composability was introduced in `AIP-10`, allowing objects to have ownership of other objects. However, it wasn't specifically crafted to facilitate hierarchical composition. This implies that objects could own other objects without a structured path to clearly define which ones should own others and which ones should not.
+Composability was introduced in `AIP-10`, allowing objects to have ownership of other objects. However, it wasn't specifically crafted to facilitate hierarchical composition, a feature that is widely present in PFP NFT's NFT-trait relations, and in game assets' character-item relations. This lack of hierarchical composition implies that objects could own other objects without a structured path to clearly define which ones should own others and which ones should not, which could result in the potential corruption of assets from exo-collection objects.
 
 In the realm of tokens, creators willing to implement Composable NFT or cNFT will have to write the code for a defined-path composability mechanism. This might not be an issue for some, but some things need to be considered:
 
@@ -47,9 +47,9 @@ In the realm of tokens, creators willing to implement Composable NFT or cNFT wil
 
 #### AIP-22
 
-A potential competitor would be `aptos-token` which is introduced in `AIP-22`. It allows developers to create tokens and collections without writing any Move code. It makes decisions on business logic, data layout, and provides entry functions. It also supports creator management, custom metadata using `PropertyMap` and composability. But it has some limitations:
+`aptos-token` introduced in `AIP-22` is aimed at allowing developers to create tokens and collections without writing any Move code. It makes decisions on business logic, data layout, and provides entry functions. It also supports creator management, custom metadata using `PropertyMap` and composability. But it has some limitations:
 
-- No composability data structure: `aptos-token` does not enforce a clear path for composition, allowing any `AptosToken` to be composed with any `AptosToken`.
+- No structure for composability: `aptos-token` does not enforce a clear path for composition, allowing any `AptosToken` to be composed with any `AptosToken`. This could result in unwanted asset corruption from exo-collection objects as mentioned earlier.
 - No data accessibility: `aptos-token` does not provide a way for tokens to access the data of the tokens they own, and the tokens owned by their owned tokens.
 - Updating `uri` previlige: in `aptos-token`, the `uri` of a token can be updated by the creator in some case (if `mutable_token_uri = true`) or it can have the same `uri` forever (if `mutable_token_uri = false`). This is set during collection creation and it cannot be updated after. Updating the `uri` of a token manually can potentially pose a security risk, as it can be used to falsely claim ownership of a different digital assets.
 - No extensibility support: `AptosToken` data strucure lacks storage for `ExtendRef` and its upon creation it returns `Object<AptosToken>` instead of the `ConstructorRef`, preventing the addition of new resources after.
@@ -60,7 +60,7 @@ Below is a visual example of how `hero.move` would look like using `aptos-token`
 #### AIP-21
 
 TODO: why fungibility is not the solution. We need a more standarised solution that support digital asset composability with the support of fungible assets.
-TODO: the purpose is to have a hirarchy structure of digital assets with the support of embedding fungible assets.
+TODO: the purpose is to have a hierarchy structure of digital assets with the support of embedding fungible assets.
 
 ## Specification
 
@@ -68,11 +68,11 @@ TODO: the purpose is to have a hirarchy structure of digital assets with the sup
 
 #### Composability Data Structure
 
-The solution introduces a hierarchical setup for composing digital assets, which consists of three layers:
+To offer creators and developers defined path for applications such as Dynamic PFP, game assets, and others, the solution introduces a hierarchical setup for composing digital assets, which consists of three layers:
 
-1. *Composable* - a token wrapper storing lists of traits, digital assets, and fungible assets it holds.
-2. *Trait* - a wrapper acting as metadata for composability, storing the list of digital and fungible assets it holds.
-3. *DA* - a wrapper that serves as metadata for traits and composability, storing the list of fungible assets it holds.
+- Layer 1: *Composable* - a token wrapper storing lists of traits, digital assets, and fungible assets it holds.
+- Layer 2: *Trait* - a wrapper acting as metadata for composability, storing the list of digital and fungible assets it holds.
+- Layer 3: *DA* - a wrapper that serves as metadata for traits and composability, storing the list of fungible assets it holds.
 
 This hierarchical setup is designed based on the tree structure, where the Composable is the root, the Trait is the child of the Composable, and the DA is the child of the Trait. The depth of the tree is set to three by default but can be extended to any level. Additionally, the tree can have multiple branches.
 
@@ -92,7 +92,7 @@ The `uri` of the parent token is updated to reflect the composition of the child
 #### Extensibility support
 
 The solution supports the addition of new resources post-creation, providing the flexibility to add extra resources to the token. This facilitates customization of metadata via resources. `property_map` can then potentially be used to store the static metadata of the token, and resources can be used to store the dynamic metadata of the token. Example: `property_map` can store the sword type: "wooden", and resources can store the sword power: "100".
-Extensibility can also be used to add more layers to the composability structure, but then creators will have to write the code to deal with the new layers.
+In addition, the multi-layered structure of the framework hierarchy includes in its Layer 3 support for 'DA', which allows for extensibility for all 'aptos-token' and developers to add further layers to the framework.
 
 Below is a visual example of how `hero.move` would look like using the proposal.
 ![Alt text](image-2.png)
@@ -563,14 +563,16 @@ public fun get_traits_from_composable(composable_object: Object<Composable>): ve
 
 ## Reference Implementation
 
-* live branch: `devnet`
-* sdk: needs to be updated based on the latest version of the module
+- live branch: `devnet`
+- sdk: needs to be updated based on the latest version of the module
 
 ## Risks and Drawbacks
 
-* Things can go wrong if updating the uri is done wrongly, then it could result in a scam. but i think we can mitigate this by enforcing that the uri is generated on chain.
+- Things can go wrong if updating the uri is done wrongly, then it could result in a scam. but i think we can mitigate this by enforcing that the uri is generated on chain.
 
-* The proposed standard will be added on top of existing standards and without making any changes to them. This means that the proposed standard will not break any existing functionality.
+- The proposed standard will be added on top of existing standards and without making any changes to them. This means that the proposed standard will not break any existing functionality.
+
+- Although extensibility issues were mentioned in the early phase of the AIP discussions, we have included `DA` support in the framework hierarchy to allow for extensibility beyond the relational definition between `Composable` and `Trait`.
 
 ## Future Potential
 
@@ -579,12 +581,12 @@ Composable digital assets allow for unique character creation in gaming, streaml
 
 ## Suggested implementation timeline
 
-* An exploratory version has lived within **`devnet`** branch in `TowneSpace-contract/examples` since January of 2024.
+- An exploratory version has lived within **`devnet`** branch in `TowneSpace-contract/examples` since January of 2024.
 
 supposing the AIP passes the gatekeeper’s design review.
 
 ...
 
-* On devnet: by February 2024
-* On testnet: by March 2024
-* On mainnet: by April 2024
+- On devnet: by February 2024
+- On testnet: by March 2024
+- On mainnet: by late March 2024
