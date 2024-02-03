@@ -15,15 +15,15 @@ requires: "AIP-10: Move Objects", "AIP-11: Token Objects", "AIP-21: Fungible Ass
 
 ## Summary
 
-This AIP introduces a built-in composability mechanism designed for `AIP-11`, enabling developers to generate composable tokens without the necessity of crafting Move code. This is accomplished through the utilization of `AIP-10`.
+This AIP introduces a built-in composability mechanism designed for `AIP-11` and partially forked from `AIP-22`, enabling developers to generate composable tokens without the necessity of writing Move code. This is achieved through the utilization of `AIP-10`.
 
-The solution not only addresses this aspect but also introduces supplementary features such as creator management, custom metadata, embedded migration, and event emission, thereby offering a comprehensive stack for composables.
+The solution not only addresses this aspect but also introduces supplementary features such as creator management, custom metadata, embedded migration, and event emission (`AIP-44`), thereby offering a comprehensive stack for composables.
 
 ## Motivation
 
-The proposed solution introduces a hierarchical structure for the composability of digital assets. Within this framework, an NFT or token possesses the capability to own its own set of tokens, and each of these subsidiary tokens, in turn, can own tokens of their own, adhering to a unidirectional pathway. This strategic design is essential to mandate the composition of tokens of the same type in a specific manner and at a designated level.
+The solution suggests a hierarchical setup for composing digital assets. In this proposal, an NFT or token can own its set of tokens, and each of these tokens can, in turn, own their own set of tokens, following a one-way path. This intentional design is crucial to enforce a specific and designated way of composing tokens of the same type at different levels.
 
-For example, consider a player token that has ownership of a sword token, and the sword token, in turn, possesses a power token. The solution enforces a strict compositional hierarchy, ensuring that the sword token can only be composed with the player token, and the power token can exclusively be composed with either the sword token or the player token.
+For example, consider a player token that owns a sword token, and the sword token, in turn, possesses a power token. The solution enforces a strict compositional hierarchy, ensuring that the sword token can only be composed with the player token, and the power token can exclusively be composed with either the sword token or the player token.
 
 The hierarchy consists of three layers:
 
@@ -31,31 +31,34 @@ The hierarchy consists of three layers:
 - `Trait`: A wrapper for a `token-object` that serves as the child of the Composable, capable of holding digital assets and fungible assets.
 - `DA` (Digital Asset): A wrapper for a `token-object` representing the leaf of the tree and positioned as the child of the Trait. It can hold fungible assets.
 
-The solution also embeds the composability mechanism, which entails transferring the token intended for composition to the target token for composition. This action freezes the transfer capability of the former and ultimately updates the uri of the parent token.
+The solution also embeds the composability mechanism, which entails transferring the token intended for composition to the target token for composition. This action freezes the transfer capability of the former and ultimately updates the uri of the latter.
 
 Overall, a visual represenation can look something like this:
 ![Alt text](image.png)
 
 ## Rationale
 
-Composability was introduced in `AIP-10`, allowing objects to have ownership of other objects. However, it wasn't specifically crafted to facilitate hierarchical composition. This implies that objects could own other objects without a structured path and hierarchy to clearly define which ones should own others and which ones should not.
+Composability was introduced in `AIP-10`, allowing objects to have ownership of other objects. However, it wasn't specifically crafted to facilitate hierarchical composition. This implies that objects could own other objects without a structured path to clearly define which ones should own others and which ones should not.
 
-In the realm of tokens, creators willing to implement cNFTs will have to write the code for a defined-path composability mechanism. This might not be an issue for some, but some things need to be considered:
+In the realm of tokens, creators willing to implement Composable NFT or cNFT will have to write the code for a defined-path composability mechanism. This might not be an issue for some, but some things need to be considered:
 
-- Composable NFT or cNFT data structure: The structure requires a clear path for composition, so not all tokens can be composed with each other. So a data structure is needed to enforce this.
+- cNFT data structure: The structure requires a clear path for composition, so not all tokens can be composed with each other. So a data structure is needed to enforce this.
 - Data accessibility: cNFTs need to be able to access the data of the tokens they own, and the tokens owned by their owned tokens. This is to ensure that tokens that are in a composition relation with the parent token have their metadata stored, accessable and should have their transfer capability disabled to not violate the composition rule.
-- Updating the `uri`: The `uri` of the parent token should be updated to reflect the composition of the child tokens. This is to ensure that the parent token `uri` reflects the child tokens it owns, while any change within the composition structure should be reflected
+- Updating the `uri`: The `uri` of the parent token should be updated to reflect the composition of the child tokens. This is to ensure that the parent token `uri` reflects the child tokens it owns, while any change within the composition structure should be reflected.
 
 ### Existing solutions
 
 #### AIP-22
 
-A potential competitor would be `aptos-token`. `aptos-token` is a no-code solution introduced in `AIP-22` that allows developers to create tokens and collections without writing any Move code. It makes decisions on business logic, data layout, and provides entry functions. It also supports creator management, custom metadata using `PropertyMap` and support composability. But it has some limitations:
+A potential competitor would be `aptos-token` which is introduced in `AIP-22`. It allows developers to create tokens and collections without writing any Move code. It makes decisions on business logic, data layout, and provides entry functions. It also supports creator management, custom metadata using `PropertyMap` and composability. But it has some limitations:
 
 - No composability data structure: `aptos-token` does not enforce a clear path for composition, allowing any `AptosToken` to be composed with any `AptosToken`.
 - No data accessibility: `aptos-token` does not provide a way for tokens to access the data of the tokens they own, and the tokens owned by their owned tokens.
-- Updating `uri` accessibility: in `aptos-token`, the `uri` of a token can be updated by the creator in some case (if ` = true`). This is set during collection creation and it cannot be updated after. Updating the `uri` of a token manually can potentially pose a security risk, as it can be used to falsely claim ownership of a different digital assets.
-- NO extensibility support: `aptos-token` lacks storage for `ExtendRef` and returns the Object instead of the `ConstructorRef` of the wrapper object upon creation, preventing the addition of new resources after its initialization.
+- Updating `uri` previlige: in `aptos-token`, the `uri` of a token can be updated by the creator in some case (if `mutable_token_uri = true`) or it can have the same `uri` forever (if `mutable_token_uri = false`). This is set during collection creation and it cannot be updated after. Updating the `uri` of a token manually can potentially pose a security risk, as it can be used to falsely claim ownership of a different digital assets.
+- No extensibility support: `AptosToken` data strucure lacks storage for `ExtendRef` and its upon creation it returns `Object<AptosToken>` instead of the `ConstructorRef`, preventing the addition of new resources after.
+
+Below is a visual example of how `hero.move` would look like using `aptos-token`
+![Alt text](image-1.png)
 
 #### AIP-21
 
