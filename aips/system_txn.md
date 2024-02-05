@@ -1,6 +1,6 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: System Transaction Type
+title: Validator Transaction Type
 author: zhoujun@aptoslabs.com, daniel@aptoslabs.com
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: <Draft | Last Call | Accepted | Final | Rejected>
@@ -11,30 +11,30 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - System Transaction Type
+# AIP-X - Validator Transaction Type
 
 ## Summary
 
-The Aptos blockchain, as it currently stands, predominantly handles two kinds of transactions: `UserTransaction` and a pair of specific system transactions (`BlockMetadata` and `StateCheckpoint`). Looking ahead, there is a clear need for the integration of additional types of system transactions to support future applications. In response to this requirement, this AIP proposes the introduction of a 'system transaction type'. This type will be structured as an enumeration (enum), facilitating the straightforward expansion and incorporation of various distinct system transaction instances in the future.
+The Aptos blockchain, as it currently stands, predominantly handles two kinds of transactions: `UserTransaction` and a pair of specific validator transactions (`BlockMetadata` and `StateCheckpoint`). Looking ahead, there is a clear need for the integration of additional types of validator transactions to support future applications. In response to this requirement, this AIP proposes the introduction of a 'validator transaction type'. This type will be structured as an enumeration (enum), facilitating the straightforward expansion and incorporation of various distinct validator transaction instances in the future.
 
 ### Goals
 
 The objectives of this AIP are twofold:
-- Introduce a new transaction type, referred to as `SystemTransaction`.
-- To implement any requisite modifications ensuring compatibility with the introduction of `SystemTransaction`.
+- Introduce a new transaction type, referred to as `ValidatorTransaction`.
+- To implement any requisite modifications ensuring compatibility with the introduction of `ValidatorTransaction`.
 
 ### Out of Scope
 
-The specific details regarding future extensions of system transaction instances are beyond the scope of this document. These details will be proposed and implemented by future developers as the need arises.
+The specific details regarding future extensions of validator transaction instances are beyond the scope of this document. These details will be proposed and implemented by future developers as the need arises.
 
 ## Motivation
 
-Future applications necessitate the blockchain's ability to efficiently agree upon and update specific proposals on-chain. System transactions facilitate this process by enabling validators to swiftly propose changes and reach consensus in just a few seconds, a feat made possible by the low latency of the Aptos blockchain. In the absence of system transactions, reaching such an agreement would be dependent on [Aptos Governance](https://aptos.dev/concepts/governance/), a more time-consuming process that not only spans several days or even weeks but also requires manual proposal submissions each time.
+Future applications necessitate the blockchain's ability to efficiently agree upon and update specific proposals on-chain. Validator transactions facilitate this process by enabling validators to swiftly propose changes and reach consensus in just a few seconds, a feat made possible by the low latency of the Aptos blockchain. In the absence of validator transactions, reaching such an agreement would be dependent on [Aptos Governance](https://aptos.dev/concepts/governance/), a more time-consuming process that not only spans several days or even weeks but also requires manual proposal submissions each time.
 
 
 ## Impact
 
-This AIP will benefit blockchain-core developers by providing them the flexibility to enhance the blockchain system with new varieties of system transactions. Additionally, it may influence downstream infrastructure elements, like Indexers and SDKs, necessitating potential adjustments to maintain compatibility.
+This AIP will benefit blockchain-core developers by providing them the flexibility to enhance the blockchain system with new varieties of validator transactions. Additionally, it may influence downstream infrastructure elements, like Indexers and SDKs, necessitating potential adjustments to maintain compatibility.
 
 ## Alternative solutions
 
@@ -42,26 +42,26 @@ An alternative approach involves repeatedly executing similar functions through 
 
 ## Specification
 
-The system transaction type will be introduced as the following:
+The validator transaction type will be introduced as the following:
 ```
-pub enum SystemTransaction {
-    DummyTopic(DummySystemTransaction),
+pub enum ValidatorTransaction {
+    DummyTopic(DummyValidatorTransaction),
     // to be populated...
 }
 ```
-which can be extended with any concrete system transaction instance in the future. 
-For instance, a dummy system transaction instance can be:
+which can be extended with any concrete validator transaction instance in the future. 
+For instance, a dummy validator transaction instance can be:
 ```
-pub struct DummySystemTransaction {
+pub struct DummyValidatorTransaction {
     pub nonce: u64,
 }
 ```
-For the validators to propose system transactions, a proper `Proposal` extension (i.e., `ProposalExt`) is also required:
+For the validators to propose validator transactions, a proper `Proposal` extension (i.e., `ProposalExt`) is also required:
 ```
 pub enum ProposalExt {
     V0 {
-        /// The list of system transactions contained in the block proposal
-        system_txns: Vec<SystemTransaction>,
+        /// The list of validator transactions contained in the block proposal
+        validator_txns: Vec<ValidatorTransaction>,
         /// T of the block (e.g. one or more transaction(s)
         payload: Payload,
         /// Author of the block that can be validated by the author's public key and the signature
@@ -82,11 +82,11 @@ https://github.com/aptos-labs/aptos-core/pull/10971
 
 ## Testing (Optional)
 
-This AIP, focusing solely on formatting changes without introducing new concrete system transaction types, necessitates ensuring compatibility through existing tests. However, it's important to note that any future extensions of the system transaction types will require comprehensive testing to maintain system integrity and functionality.
+This AIP, focusing solely on formatting changes without introducing new concrete validator transaction types, necessitates ensuring compatibility through existing tests. However, it's important to note that any future extensions of the validator transaction types will require comprehensive testing to maintain system integrity and functionality.
 
 ## Risks and Drawbacks
 
-The introduction of the system transaction type raises the possibility of malicious blockchain-core developers damaging the blockchain system by proposing harmful system transaction extensions. Therefore, it is crucial that any future additions of new system transaction types be accompanied by a separate AIP and undergo thorough and careful review to mitigate such risks.
+The introduction of the validator transaction type raises the possibility of malicious blockchain-core developers damaging the blockchain system by proposing harmful validator transaction extensions. Therefore, it is crucial that any future additions of new validator transaction types be accompanied by a separate AIP and undergo thorough and careful review to mitigate such risks.
 
 
 ## Future Potential
