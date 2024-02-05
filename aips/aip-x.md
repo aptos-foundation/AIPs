@@ -31,6 +31,10 @@ The hierarchy consists of three layers:
 - `Trait`: A wrapper for a `token-object` that serves as the child of the Composable, capable of holding digital assets and fungible assets.
 - `DA` (Digital Asset): A wrapper for a `token-object` representing the leaf of the tree and positioned as the child of the Trait. It can hold fungible assets and allow further extensibility in the hierarchy.
 
+<img src="image-4.png" alt="Alt text" width="400"> 
+
+> ℹ️ Figure 1: *Wrappers illustration*
+
 The solution also embeds the composability mechanism, which entails transferring the token intended for composition to the target token for composition. This action freezes the transfer capability of the former and ultimately updates the uri of the latter.
 
 ## Rationale
@@ -55,8 +59,10 @@ In the realm of tokens, creators willing to implement Composable NFT or cNFT wil
 - Updating `uri` previlige: in `aptos-token`, the `uri` of a token can be updated by the creator in some case (if `mutable_token_uri = true`) or it can have the same `uri` forever (if `mutable_token_uri = false`). This is set during collection creation and it cannot be updated after. Updating the `uri` of a token manually can potentially pose a security risk, as it can be used to falsely claim ownership of a different digital assets.
 - No extensibility support: `AptosToken` data strucure lacks storage for `ExtendRef` and its upon creation it returns `Object<AptosToken>` instead of the `ConstructorRef`, preventing the addition of new resources after.
 
-Below is a visual example of how `hero.move` would look like using `aptos-token`
-![Alt text](image-1.png)
+Below is a visual example of how `hero.move` would look like using `aptos-token`:
+
+![Alt text](image-6.png)
+> ℹ️ Figure 2: *hero.move using `AIP-22`*
 
 #### AIP-21
 
@@ -79,7 +85,10 @@ To offer creators and developers defined path for applications such as Dynamic P
 This hierarchical setup is designed based on the tree structure, where the Composable is the root, the Trait is the child of the Composable, and the DA is the child of the Trait. The depth of the tree is set to three by default but can be extended to any level. Additionally, the tree can have multiple branches.
 
 Overall, a visual represenation looks something like this:
-![Alt text](image.png)
+
+<img src="image-5.png" alt="Alt text" width="600">
+
+> ℹ️ Figure 3: *Hierarchical setup for composing digital assets*
 
 #### Data accessibility
 
@@ -96,8 +105,9 @@ The `uri` of the parent token is updated to reflect the composition of the child
 The solution supports the addition of new resources post-creation, providing the flexibility to add extra resources to the token. This facilitates customization of metadata via resources. `property_map` can then potentially be used to store the static metadata of the token, and resources can be used to store the dynamic metadata of the token. Example: `property_map` can store the sword type: "wooden", and resources can store the sword power: "100".
 In addition, the multi-layered structure of the framework hierarchy includes in its Layer 3 support for 'DA', which allows for extensibility for all 'aptos-token' and developers to add further layers to the framework.
 
-Below is a visual example of how `hero.move` would look like using the proposal.
-![Alt text](image-2.png)
+![Alt text](image-7.png)
+
+> ℹ️ Figure 4: *hero.move using the proposed standard*
 
 #### Fungible Assets within Digital Assets
 
@@ -169,7 +179,9 @@ This AIP would allow for defining traits like this:
 - Trait - basic sword.
 - DA - Healing lotion.
 
-![Alt text](image-3.png)
+<img src="image-3.png" alt="Alt text" width="250">
+
+> ℹ️ Figure 5: *Example of a composable trait*
 
 ### Data Structure
 
@@ -214,15 +226,11 @@ This standard specifies data strucutes for token subtypes, and collection.
 
 ```move
 #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
-    // Storage state for digital assets
-    struct DigitalAsset has key {
-        // Storage state for the property map
-        property_map: property_map::PropertyMap,
-        // Storage state for the token
-        token: Object<Token>,
-        // Storage state for the fungible assets
-        fungible_assets: vector<Object<FungibleAsset>>
-    }
+// Storage state for digital assets
+struct DA has key {
+    parent: Option<address>, // address of parent token if equipped
+    index: u64, // index of the da in the digital_assets vector from composables or traits
+}
 ```
 
 #### Traits Data Structure
@@ -231,6 +239,7 @@ This standard specifies data strucutes for token subtypes, and collection.
 #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
 // Storage state for traits
 struct Trait has key {
+    parent: Option<address>, // address of parent token if equipped
     index: u64, // index of the trait in the traits vector from composables
     digital_assets: vector<Object<DA>> // digital assets that the trait holds
 }
@@ -265,8 +274,12 @@ struct Composable has key {
 
 ```move
 // Used to determine the naming style of the token
-    struct Indexed has key {}
-    struct Named has key {}
+struct Indexed has key {}
+struct Named has key {}
+
+// Used to determine the type of the process
+struct Equip has key {}
+struct Unequip has key {}
 ```
 
 ### APIs
@@ -481,6 +494,10 @@ public fun update_property<T: key>(
     key: String,
     value: vector<u8>,
 )
+```
+
+```move
+public fun get_parent_token<T: key>(token: Object<T>): address
 ```
 
 ```move
