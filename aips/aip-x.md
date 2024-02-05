@@ -43,10 +43,10 @@ Composability was introduced in `AIP-10`, allowing objects to have ownership of 
 
 In the realm of tokens, creators willing to implement Composable NFT or cNFT will have to write the code for a defined-path composability mechanism. This might not be an issue for some, but some things need to be considered:
 
+- Extensibility support: The solution should support the addition of new resources post-creation, providing the flexibility to add extra resources to the token. This facilitates customization of metadata via resources.
 - cNFT data structure: The structure requires a clear path for composition, so not all tokens can be composed with each other. So a data structure is needed to enforce this.
 - Data accessibility: cNFTs need to be able to access the data of the tokens they own, and the tokens owned by their owned tokens. This is to ensure that tokens that are in a composition relation with the parent token have their metadata stored, accessable and should have their transfer capability disabled to not violate the composition rule.
 - Updating the `uri`: The `uri` of the parent token should be updated to reflect the composition of the child tokens. This is to ensure that the parent token `uri` reflects the child tokens it owns, while any change within the composition structure should be reflected.
-- Extensibility support: The solution should support the addition of new resources post-creation, providing the flexibility to add extra resources to the token. This facilitates customization of metadata via resources.
 
 ### Existing solutions
 
@@ -54,10 +54,10 @@ In the realm of tokens, creators willing to implement Composable NFT or cNFT wil
 
 `aptos-token` introduced in `AIP-22` is aimed at allowing developers to create tokens and collections without writing any Move code. It makes decisions on business logic, data layout, and provides entry functions. It also supports creator management, custom metadata using `PropertyMap` and composability. But it has some limitations:
 
+- No extensibility support: `AptosToken` data strucure lacks storage for `ExtendRef` and its upon creation it returns `Object<AptosToken>` instead of the `ConstructorRef`, preventing the addition of new resources after.
 - No structure for composability: `aptos-token` does not enforce a clear path for composition, allowing any `AptosToken` to be composed with any `AptosToken`. This could result in unwanted asset corruption from exo-collection objects as mentioned earlier.
 - No data accessibility: `aptos-token` does not provide a way for tokens to access the data of the tokens they own, and the tokens owned by their owned tokens.
 - Updating `uri` previlige: in `aptos-token`, the `uri` of a token can be updated by the creator in some case (if `mutable_token_uri = true`) or it can have the same `uri` forever (if `mutable_token_uri = false`). This is set during collection creation and it cannot be updated after. Updating the `uri` of a token manually can potentially pose a security risk, as it can be used to falsely claim ownership of a different digital assets.
-- No extensibility support: `AptosToken` data strucure lacks storage for `ExtendRef` and its upon creation it returns `Object<AptosToken>` instead of the `ConstructorRef`, preventing the addition of new resources after.
 
 Below is a visual example of how `hero.move` would look like using `aptos-token`:
 
@@ -73,6 +73,8 @@ In line with this proposal for a composability setup for digital assets, fungibl
 ## Specification
 
 ### Overview
+
+#### Extensibility support
 
 #### Composability Data Structure
 
@@ -100,10 +102,9 @@ The solution allows for tokens to access the data of the tokens they own, and th
 
 The `uri` of the parent token is updated to reflect the composition of the child tokens. This is to ensure that the parent token `uri` reflects the child tokens it owns, while any change within the composition structure should be reflected.
 
-#### Extensibility support
 
 The solution supports the addition of new resources post-creation, providing the flexibility to add extra resources to the token. This facilitates customization of metadata via resources. `property_map` can then potentially be used to store the static metadata of the token, and resources can be used to store the dynamic metadata of the token. Example: `property_map` can store the sword type: "wooden", and resources can store the sword power: "100".
-In addition, the multi-layered structure of the framework hierarchy includes in its Layer 3 support for 'DA', which allows for extensibility for all 'aptos-token' and developers to add further layers to the framework.
+In addition, the multi-layered structure of the framework hierarchy includes in its Layer 3 support for `DA`, which allows for extensibility for all `aptos-token` and developers to add further layers to the framework.
 
 ![Alt text](image-7.png)
 
