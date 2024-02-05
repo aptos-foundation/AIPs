@@ -36,13 +36,15 @@ Goal is to remove/optimize operations that make Token V2 and Fungible Asset oper
 This will enable higher throughput for Token V2 NFT minting/burning of a single collection, or minting/burning of a single Fungible Asset, providing better experience when there is high demand for a single collection/fungible asset.
 
 There is a **breaking change** for anyone accessing raw resources - like indexers or directly through the RestAPI.
-Two fields inside Digital Assets `Token` struct (from [token.move](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token-objects/sources/token.move)) will be deprecated - name and index, and instead `TokenConcurrentFieldsAppendix` will contain them. `Token.name` will be replaced with `TokenConcurrentFieldsAppendix.name.value`, and similarly for `index` field.
+Two fields inside Digital Assets `Token` struct (from [token.move](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token-objects/sources/token.move)) will be deprecated - name and index, and instead `TokenIdentifiers` will contain them. `Token.name` will be replaced with `TokenIdentifiers.name.value`, and similarly for `index` field.
 
 Additionally, new variants will be added to:
 - Digital Asset (Token) Collection ([collection.move](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-token-objects/sources/collection.move)), namely `ConcurrentSupply` (in addition to current `FixedSupply` and `UnlimitedSupply`), which will now store current, total and max supply
-- Fungible Asset ([fungible_asset.move](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-framework/sources/fungible_asset.move)), namely `ConcurrentSupply` (in addition to current `Supply`), which will now store current and total supply.
+- Fungible Asset ([fungible_asset.move](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-framework/sources/fungible_asset.move)), namely `ConcurrentSupply` (in addition to current `Supply`), which will now store current and total supply. `ConcurrentFungibleBalance` will also be added, to store balance.
 
-Indexer changes will be provided to return correct values for Token name (i.e. `COALESCE(TokenConcurrentFieldsAppendix.name.value, Token.name)`), and supply related fields to both 
+New collections will emit new events: `ConcurrentMintEvent` and `ConcurrentBurnEvent` will be emitted (instead of `MintEvent` and `BurnEvent`) on the new collections. 
+
+Indexer changes will be provided to return correct values for Token name (i.e. `COALESCE(TokenIdentifiers.name.value, Token.name)`), and supply related fields to both. It will also read Concurrent events, and index them as if they were regular events.
 
 ## Specification
 
@@ -99,12 +101,19 @@ Indexer changes are being developed
 ### Suggested deployment timeline
 
 Planned deployment timeline:
-- with v1.8 framework and feature flags upgrade, new `TokenConcurrentFieldsAppendix` (with `name` and `index`) will start to be populated (in addition to current fields)
-- few weeks later, CONCURRENT_ASSETS_ENABLED feature flag will be enabled, and with it:
+- with v1.10 framework and feature flags upgrade, new `TokenIdentifiers` (with `name` and `index`) will start to be populated (in addition to current fields)
+- few weeks later, CONCURRENT_TOKEN_V2 feature flag will be enabled, and with it:
   - `name` and `index` fields in `Token` struct will be deprecated, and will be empty ("" and 0 respectively) for any new token mint
-  - any new Digital Asset collection or Fungible Asset will be created to be "concurrent" - using new ConcurrentSupply variant, and providing performance/throughput benefits
+  - any new Digital Asset collection will be created to be "concurrent" - using new ConcurrentSupply variant, and providing performance/throughput benefits
+    - new collections will emit ConcurrentMintEvent/ConcurrentBurnEvent. 
   - any old Digital Asset collection or Fungible Asset will be able to call upgrade_to_concurrent(&ExtendRef) function, and switch to "concurrent" mode, enabling performance/throughput benefits
-
+ 
+- with v1.11 framework and feature flags upgrade, we plan to enable CONCURRENT_FUNGIBLE_ASSETS feature flag, which will:
+  - any new Fungible Asset collection will be created to be "concurrent" - using new ConcurrentSupply variant, and providing performance/throughput benefits 
+    - new collections will emit ConcurrentMintEvent/ConcurrentBurnEvent. 
+  - any old Fungible Asset collection will be able to call upgrade_to_concurrent(&ExtendRef) function, and switch to "concurrent" mode, enabling performance/throughput benefits
+  - balance field on concurrent collections will be moved to ConcurrentFungibleBalance.balance.value
+  
 ## Security Considerations
 
 Design has been reviewed within the team, and any PRs will be carefully reviewed as well.
