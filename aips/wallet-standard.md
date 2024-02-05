@@ -125,7 +125,7 @@ onAccountChange(newAccount: AccountInfo): Promise<void>
 onNetworkChange(newNetwork: NetworkInfo):Promise<void>
 ```
 
-`aptos:changeNetwork`\* event for the dapp to send to the wallet to change the wallet’s current network
+`aptos:changeNetwork*` event for the dapp to send to the wallet to change the wallet’s current network
 
 ```
 // `network:NetworkInfo` - - The network for the wallet to change to
@@ -133,13 +133,15 @@ onNetworkChange(newNetwork: NetworkInfo):Promise<void>
 changeNetwork(network:NetworkInfo):Promise<UserResponse<{success: boolean,reason?: string}>>
 ```
 
-`aptos:openInMobileApp`\* a function that supports redirecting a user from a web browser on mobile to a native mobile app. The wallet plugin should add the location url a wallet should open the in-app browser at.
+`aptos:openInMobileApp*` a function that supports redirecting a user from a web browser on mobile to a native mobile app. The wallet plugin should add the location url a wallet should open the in-app browser at.
 
 ```
 openInMobileApp(): void
 ```
 
 Types
+
+> Note: `UserResponse` type is used for when a user rejects a rejectable request. For example, when user wants to connect but instead closes the window popup.
 
 ```
 export interface UserApproval<TResponseArgs> {
@@ -156,9 +158,9 @@ export type UserResponse<TResponseArgs> = UserApproval<TResponseArgs> | UserReje
 export interface AccountInfo = { account: Account, ansName?: string }
 
 export interface NetworkInfo {
-  name: string // Name of the network.
-  chainId: string // Chain ID of the network.
-  url?: string // RPC URL of the network.
+  name: Network
+  chainId: string
+  url?: string
 }
 
 export type AptosSignMessageInput = {
@@ -177,7 +179,7 @@ export type AptosSignMessageOutput = {
   message: string
   nonce: string
   prefix: 'APTOS'
-  signature: string | string[]
+  signature: Signature
   bitmap?: Uint8Array
 }
 ```
@@ -188,60 +190,11 @@ The standard exposes a [detect](https://github.com/aptos-labs/wallet-standard/bl
 
 **Wallet Provider**
 
-A wallet registers itself using the [registerWallet](https://github.com/wallet-standard/wallet-standard/blob/master/packages/core/wallet/src/register.ts#L25) method to notify the dapp it is ready to be registered.
+A wallet must implement a [AptosWallet interface](https://github.com/aptos-labs/wallet-standard/blob/main/src/wallet.ts) with the wallet provider info and features:
 
-A wallet must implement a [Wallet interface](https://github.com/aptos-labs/wallet-standard/blob/main/src/wallet.ts#L6) with the wallet provider info and features:
-
-````ts
-interface Wallet {
-  /**
-   * Name of the Wallet. This may be displayed by the app.
-   */
-  readonly name: string;
-
-  /**
-   * Icon of the Wallet. This may be displayed by the app.
-   */
-  readonly icon: `data:image/${
-    | "svg+xml"
-    | "webp"
-    | "png"
-    | "gif"};base64,${string}`;
-
-  /**
-   * Chains supported by the Wallet.
-   */
-  readonly chains: Array<`${string}:${string}`>; // e.g. 'aptos:devnet'
-
-  /**
-   * Website URL of the Wallet. This may be used by the app.
-   */
-  readonly url: string;
-
-  /**
-   * Features supported by the Wallet.
-   *
-   * A feature may have any type. It may be a single method or value, or a collection of them.
-   *
-   * A conventional feature has the following structure:
-   *
-   * ```ts
-   *  export type AptosConnectFeature = {
-   *      // Name of the feature.
-   *      'aptos:connect': {
-   *          // Version of the feature.
-   *          version: '1.0.0';
-   *          // Methods of the feature.
-   *          connect (silent?: boolean, networkInfo?: NetworkInfo): Promise<UserResponse<AccountInfo>>;
-   *      };
-   *  };
-   * ```
-   */
-  readonly features: Readonly<Record<`${string}:${string}`, T>>;
-}
-
-class AptosWallet implements Wallet {
-  name = "Aptos Wallet" as const;
+```ts
+class MyWallet implements AptosWallet {
+  name = "My Wallet";
 
   icon = "data:image/png;base64,iVBORw0KG...SuQmCC";
 
@@ -261,17 +214,31 @@ class AptosWallet implements Wallet {
     return {status: 'approved', args: AccountInfo}
   }
 }
-````
+```
+
+A wallet registers itself using the [registerWallet](https://github.com/wallet-standard/wallet-standard/blob/master/packages/core/wallet/src/register.ts#L25) method to notify the dapp it is ready to be registered.
+
+```ts
+const myWallet = new MyWallet();
+
+registerWallet(myWallet);
+```
 
 **Dapp**
 
-A dapp uses the [getWallets()](https://github.com/wallet-standard/wallet-standard/blob/master/packages/core/app/src/wallets.ts#L41) function which gets all the wallets in the window object. Then it can [filter](https://github.com/aptos-labs/wallet-standard/blob/main/src/detect.ts#L17) the list to get only the Aptos compatible wallets.
+A dapp uses the [getAptosWallets()](https://github.com/aptos-labs/wallet-standard/blob/main/src/detect.ts#L30) function which gets all the Aptos standard compatible wallets.
+
+```ts
+import { getAptosWallets } from "@aptos-labs/wallet-standard";
+
+const wallets = getAptosWallets();
+```
 
 A dapp makes a wallet request by calling the feature name that coresponds to the desired actions.
 
 ```ts
 const onConnect = () => {
-  this.wallet.features["aptos:connect"]();
+  this.wallet.features["aptos:connect"].connect();
 };
 ```
 
@@ -281,7 +248,7 @@ The new standard uses the [new TypeScript SDK](https://github.com/aptos-labs/apt
 
 ## Future Potential
 
-This solution is a general implementation that has already been used by different chains and will hopefully be adopted by more chains. With that, the migration effort of a wallet from one chain to another is minimal. In addition, multi-chain dApps can easily detect any wallet that conforms to the standard.
+This solution is a general implementation that has already been used by different chains and wallets and will probably be adopted by more projects. With that, the migration effort of a wallet from one chain to another is minimal. In addition, multi-chain dApps can easily detect any wallet that conforms to the standard.
 
 Both dApps' and wallets' integration and implementation are straightforward and painless. Mostly, each needs to use a provided method for registration/detection.
 
@@ -291,7 +258,7 @@ The addition of any future features and/or enhancements should not introduce any
 
 ### Suggested implementation timeline
 
-Once the AIP is approved, dapps and wallets can implement the required changes to conform with the new standard.
+Once the AIP is approved, dapps and wallets can implement the required changes (described in the "Reference Implementation" section) to conform with the new standard.
 
 ## Security Considerations
 
