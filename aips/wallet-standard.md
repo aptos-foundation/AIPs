@@ -179,7 +179,7 @@ export type AptosSignMessageOutput = {
   message: string
   nonce: string
   prefix: 'APTOS'
-  signature: Signature
+  signature: Signature | Signature[]
   bitmap?: Uint8Array
 }
 ```
@@ -194,25 +194,49 @@ A wallet must implement a [AptosWallet interface](https://github.com/aptos-labs/
 
 ```ts
 class MyWallet implements AptosWallet {
-  name = "My Wallet";
+  url: string;
+  version: "1.0.0";
+  name: string;
+  icon:
+    | `data:image/svg+xml;base64,${string}`
+    | `data:image/webp;base64,${string}`
+    | `data:image/png;base64,${string}`
+    | `data:image/gif;base64,${string}`;
+  chains: IdentifierArray;
+  features: Readonly<Record<`${string}:${string}`, unknown>>;
+  accounts: readonly AptosWalletAccount[];
+}
+```
 
-  icon = "data:image/png;base64,iVBORw0KG...SuQmCC";
+A wallet must implement a [AptosWalletAccount interface](https://github.com/aptos-labs/wallet-standard/blob/main/src/account.ts) with the wallet account info:
 
-  url = "https://aptos.dev";
+```ts
+enum AptosAccountVariant {
+  Ed25519,
+  MultiEd25519,
+  SingleKey,
+  MultiKey,
+}
 
-  chains = APTOS_CHAINS;
+class AptosWalletAccount implements WalletAccount {
+  address: string;
 
-  features: {
-    'aptos:connect': {
-      version:'1.0.0',
-      connect: this.connect()
-    }
-  }
+  publicKey: Uint8Array;
 
-  connect:AptosConnectMethod = async ({silent,networkInfo}):Promise<UserResponse<AccountInfo>> => {
-    // ...function implementation...
-    return {status: 'approved', args: AccountInfo}
-  }
+  chains: IdentifierArray;
+
+  features: IdentifierArray;
+
+  variant: AptosAccountVariant;
+
+  label?: string;
+
+  icon?:
+    | `data:image/svg+xml;base64,${string}`
+    | `data:image/webp;base64,${string}`
+    | `data:image/png;base64,${string}`
+    | `data:image/gif;base64,${string}`
+    | undefined;
 }
 ```
 
