@@ -42,6 +42,7 @@ In the realm of tokens, creators willing to implement Composable NFT or cNFT wil
 - cNFT data structure: The structure requires a clear path for composition, so not all tokens can be composed with each other. So a data structure is needed to enforce this.
 - Data accessibility: cNFTs need to be able to access the data of the tokens they own, and the tokens owned by their owned tokens. This is to ensure that tokens that are in a composition relation with the parent token have their metadata stored, accessable and should have their transfer capability disabled to not violate the composition rule.
 - Updating the `uri`: The `uri` of the parent token should be updated to reflect the composition of the child tokens. This is to ensure that the parent token `uri` reflects the child tokens it owns, while any change within the composition structure should be reflected.
+- Extensibility support: The solution should support the addition of new resources post-creation, providing the flexibility to add extra resources to the token. This facilitates customization of metadata via resources.
 
 ### Existing solutions
 
@@ -59,8 +60,9 @@ Below is a visual example of how `hero.move` would look like using `aptos-token`
 
 #### AIP-21
 
-TODO: why fungibility is not the solution. We need a more standarised solution that support digital asset composability with the support of fungible assets.
-TODO: the purpose is to have a hierarchy structure of digital assets with the support of embedding fungible assets.
+The introduction of fungible assets in `AIP-21` brings more flexibility and expressiveness compared to the legacy Coin standard. It enables a single object to be represented by numerous distinct but interchangeable units of ownership. However, this improvement doesn't address the need for a hierarchical structure in composing digital assets. Additionally, it lacks a clear pathway for composition, allowing any `FungibleAsset` to be combined with any other `FungibleAsset`.
+
+In line with this proposal for a composability setup for digital assets, fungible assets should also be integrated into the composability framework, allowing each digital asset to contain fungible assets.
 
 ## Specification
 
@@ -96,6 +98,14 @@ In addition, the multi-layered structure of the framework hierarchy includes in 
 
 Below is a visual example of how `hero.move` would look like using the proposal.
 ![Alt text](image-2.png)
+
+#### Fungible Assets within Digital Assets
+
+The solution leverages fungible assets into the composability framework, specifically through `primary_fungible_store`, where any token (regardless of its layer) possesses a `PrimaryStore`. This means that tokens can hold fungible assets, providing utility for applications involving token ownership of fungible assets, such as in-game currencies, food, gems, and more.
+
+Imagine a scenario where a hero token, having ownership of a backpack token, can store a quantity of food. Here, food serves as a fungible asset accessible within the in-game environment. The process includes transferring food to the backpack token using PrimaryStore, and subsequently, the backpack token can be transferred to another hero token.
+
+Furthermore if needed, the proposed cNFT structure can be extended to incorporate a `SecondaryStore` for more complex use cases.
 
 ### Composability lifecycle
 
