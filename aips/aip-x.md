@@ -15,7 +15,7 @@ requires: "AIP-10: Move Objects", "AIP-11: Token Objects", "AIP-21: Fungible Ass
 
 ## Summary
 
-This AIP proposes a purpose-specific, extensible composability framework that allows creators to create NFTs for Dynamic PFP, composable game assets, and other rich applications that require composability. It does this with new business logic, sub-functions, data structures, and APIs, while also embracing the extensibility of the object model from `AIP-11` & `AIP-10` and the no-code framework from `AIP-22`.
+This AIP proposes a purpose-specific, extensible composability framework that allows creators to create NFTs for Dynamic PFP, composable game assets, and other rich applications that require composability. It does this with new business logic, sub-functions, data structures, and APIs, based on the object model from `AIP-11` & `AIP-10` while leveraging the no-code feature from `AIP-22` and the composability freedom with fungible assets in `AIP-21`.
 
 The solution not only addresses this aspect but also introduces supplementary features such as creator management, custom metadata, and embedded migration. Event emission features from `AIP-44` are also included in the framework, thereby offering a comprehensive stack for composable token use cases.
 
@@ -54,9 +54,9 @@ In the realm of tokens, creators willing to implement Composable NFT or cNFT wil
 
 `aptos-token` introduced in `AIP-22` is aimed at allowing developers to create tokens and collections without writing any Move code. It makes decisions on business logic, data layout, and provides entry functions. It also supports creator management, custom metadata using `PropertyMap` and composability. But it has some limitations:
 
-- No extensibility support: `AptosToken` data strucure lacks storage for `ExtendRef` and its upon creation it returns `Object<AptosToken>` instead of the `ConstructorRef`, preventing the addition of new resources after.
+- No extensibility support: `AptosToken` data structure lacks storage for `ExtendRef` and its upon creation it returns `Object<AptosToken>` instead of the `ConstructorRef`, preventing the addition of new resources after.
 - No structure for composability: `aptos-token` does not enforce a clear path for composition, allowing any `AptosToken` to be composed with any `AptosToken`. This could result in unwanted asset corruption from exo-collection objects as mentioned earlier.
-- No data accessibility: `aptos-token` does not provide a way for tokens to access the data of the tokens they own, and the tokens owned by their owned tokens.
+- No data accessibility: `aptos-token` does not provide a way for tokens to access the data of the tokens they own, and the tokens inside the owned tokens.
 - Updating `uri` previlige: in `aptos-token`, the `uri` of a token can be updated by the creator in some case (if `mutable_token_uri = true`) or it can have the same `uri` forever (if `mutable_token_uri = false`). This is set during collection creation and it cannot be updated after. Updating the `uri` of a token manually can potentially pose a security risk, as it can be used to falsely claim ownership of a different digital assets.
 
 Below is a visual example of how `hero.move` would look like using `aptos-token`:
@@ -66,9 +66,14 @@ Below is a visual example of how `hero.move` would look like using `aptos-token`
 
 #### AIP-21
 
-The introduction of fungible assets in `AIP-21` brings more flexibility and expressiveness compared to the legacy Coin standard. It enables a single object to be represented by numerous distinct but interchangeable units of ownership. However, this improvement doesn't address the need for a hierarchical structure in composing digital assets. Additionally, it lacks a clear pathway for composition, allowing any `FungibleAsset` to be combined with any other `FungibleAsset`.
+The introduction of fungible assets in `AIP-21` brings more flexibility and expressiveness compared to the legacy Coin standard. It enables a single object to be represented by numerous distinct but interchangeable units of ownership. However, this improvement doesn't address the need for a hierarchical structure in composing digital assets. Additionally, by allowing any `FungibleAsset` to be combined with any other `FungibleAsset`, albeit offering much freedom in composition, it does not offer a directed path for composition for potential use cases such as PFP and game assets that might require more structure in their composability settings.
 
-> *In line with this proposal for a composability setup for digital assets, fungible assets should also be integrated into the composability framework, allowing each digital asset to contain fungible assets.*
+---
+This AIP takes into account of the features proposed by these previous AIPs, namely:
+
+- The freedom of composing fungible assets instantiated in `AIP-21`.
+- The convenience of digital asset no-code solution for creators instantiated in `AIP-22`.
+This new AIP intends to leverage these features in a new composability framework while offering directed ways for users to engage in asset composition based on the Move Object proposed in `AIP-10`.
 
 ## Specification
 
