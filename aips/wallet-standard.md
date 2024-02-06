@@ -60,7 +60,7 @@ Here is a list of the suggested [features](https://github.com/aptos-labs/wallet-
 
 `aptos:connect` method to establish a connection between a dapp and a wallet.
 
-```
+```ts
 // `silent?: boolean` - gives ability to trigger connection without user prompt (for example, for auto-connect)
 // `networkInfo?: NetworkInfo` - defines the network that the dapp will use (shortcut for connect and change network)
 
@@ -69,25 +69,25 @@ connect(silent?: boolean, networkInfo?: NetworkInfo): Promise<UserResponse<Accou
 
 `aptos:disconnect` method to disconnect a connection established between a dapp and a wallet
 
-```
+```ts
 disconnect(): Promise<void>;
 ```
 
 `aptos:getAccount` to get the current connected account in the wallet
 
-```
+```ts
 getAccount():Promise<UserResponse<AccountInfo>>
 ```
 
 `aptos:getNetwork` to get the current network in the wallet
 
-```
+```ts
 getNetwork(): Promise<UserResponse<NetworkInfo>>;
 ```
 
 `aptos:signAndSubmitTransaction` method to sign and submit a transaction using the current connected account in the wallet.
 
-```
+```ts
 // `transaction: AnyRawTransaction` - a generated raw transaction created with Aptos’ TS SDK
 
 signAndSubmitTransaction(transaction: AnyRawTransaction): Promise<UserResponse<PendingTransactionResponse>>;
@@ -95,7 +95,7 @@ signAndSubmitTransaction(transaction: AnyRawTransaction): Promise<UserResponse<P
 
 `aptos:signTransaction` for the current connected account in the wallet to sign a transaction using the wallet.
 
-```
+```ts
 // `transaction: AnyRawTransaction` - a generated raw transaction created with Aptos’ TS SDK
 
 signTransaction(transaction: AnyRawTransaction):AccountAuthenticator
@@ -103,7 +103,7 @@ signTransaction(transaction: AnyRawTransaction):AccountAuthenticator
 
 `aptos:signMessage` for the current connected account in the wallet to sign a message using the wallet.
 
-```
+```ts
 // `message: AptosSignMessageInput` - a message to sign
 
 signMessage(message: AptosSignMessageInput):Promise<UserResponse<AptosSignMessageOutput>>;
@@ -111,7 +111,7 @@ signMessage(message: AptosSignMessageInput):Promise<UserResponse<AptosSignMessag
 
 `aptos:onAccountChange` event for the wallet to fire when an account has been changed in the wallet.
 
-```
+```ts
 // `newAccount: AccountInfo` - The new connected account
 
 onAccountChange(newAccount: AccountInfo): Promise<void>
@@ -119,7 +119,7 @@ onAccountChange(newAccount: AccountInfo): Promise<void>
 
 `aptos:onNetworkChange` event for the wallet to fire when the network has been changed in the wallet.
 
-```
+```ts
 // `newNetwork: NetworkInfo` - The new wallet current network
 
 onNetworkChange(newNetwork: NetworkInfo):Promise<void>
@@ -127,7 +127,7 @@ onNetworkChange(newNetwork: NetworkInfo):Promise<void>
 
 `aptos:changeNetwork*` event for the dapp to send to the wallet to change the wallet’s current network
 
-```
+```ts
 // `network:NetworkInfo` - - The network for the wallet to change to
 
 changeNetwork(network:NetworkInfo):Promise<UserResponse<{success: boolean,reason?: string}>>
@@ -135,7 +135,7 @@ changeNetwork(network:NetworkInfo):Promise<UserResponse<{success: boolean,reason
 
 `aptos:openInMobileApp*` a function that supports redirecting a user from a web browser on mobile to a native mobile app. The wallet plugin should add the location url a wallet should open the in-app browser at.
 
-```
+```ts
 openInMobileApp(): void
 ```
 
@@ -143,7 +143,7 @@ Types
 
 > Note: `UserResponse` type is used for when a user rejects a rejectable request. For example, when user wants to connect but instead closes the window popup.
 
-```
+```ts
 export interface UserApproval<TResponseArgs> {
  status: 'approved'
  args: TResponseArgs
@@ -159,7 +159,7 @@ export interface AccountInfo = { account: Account, ansName?: string }
 
 export interface NetworkInfo {
   name: Network
-  chainId: string
+  chainId: number
   url?: string
 }
 
@@ -202,8 +202,8 @@ class MyWallet implements AptosWallet {
     | `data:image/webp;base64,${string}`
     | `data:image/png;base64,${string}`
     | `data:image/gif;base64,${string}`;
-  chains: IdentifierArray;
-  features: Readonly<Record<`${string}:${string}`, unknown>>;
+  chains: AptosChain;
+  features: AptosFeatures;
   accounts: readonly AptosWalletAccount[];
 }
 ```
@@ -223,11 +223,11 @@ class AptosWalletAccount implements WalletAccount {
 
   publicKey: Uint8Array;
 
-  chains: IdentifierArray;
+  chains: AptosChain;
 
   features: IdentifierArray;
 
-  variant: AptosAccountVariant;
+  variant: AptosFeatures;
 
   label?: string;
 
