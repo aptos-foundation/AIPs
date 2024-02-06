@@ -19,7 +19,7 @@ requires (*optional): <AIP number(s)>
 
 Currently, the only way[^multisig] to secure your Aptos account is to protect the **secret key (SK)** associated with it. Unfortunately, this is much easier said than done. In reality, secret keys are often *lost* (e.g., users forget to write down their mnemonic when first setting up their Aptos wallet) or *stolen* (e.g., users are tricked into revealing their SK). This makes onboarding users unnecessarily difficult and drives users away when their accounts are lost or stolen.
 
-In this AIP, we describe a more user-friendly approach for account management that relies on the **OpenID Connect (OIDC)** standard (without modifications[^openpubkey]) and recent developments in **zero-knowledge proofs of knowledge (ZKPoKs)** of **OIDC signatures**[^snark-jwt-verify]$^,$[^nozee]$^,$[^bonsay-pay]$^,$[^zk-blind]$^,$[^zklogin].
+In this AIP, we describe a more user-friendly approach for account management that relies on the _unmodified_[^openpubkey] **OpenID Connect (OIDC)** standard and recent developments in **zero-knowledge proofs of knowledge (ZKPoKs)** of **OIDC signatures**[^snark-jwt-verify]$^,$[^nozee]$^,$[^bonsay-pay]$^,$[^zk-blind]$^,$[^zklogin].
 
 Specifically, we enable **OpenID blockchain (OIDB) accounts** on Aptos that are secured through the owner’s existing **OIDC account** (i.e., their Web2 account with an **OIDC provider** such as Google, GitHub or Apple), rather than through a difficult-to-manage secret key. In a nutshell, _“your blockchain account = your OIDC account”_.
 
