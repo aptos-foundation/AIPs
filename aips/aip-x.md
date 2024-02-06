@@ -89,7 +89,7 @@ To offer creators and developers defined path for applications such as Dynamic P
 - Layer 2: *Trait* - a wrapper acting as metadata for composability, storing the list of digital and fungible assets it holds.
 - Layer 3: *DA* - a wrapper that serves as metadata for traits and composability, storing the list of fungible assets it holds.
 
-This hierarchical setup is designed based on the tree structure, where the Composable is the root, the Trait is the child of the Composable, and the DA is the child of the Trait. The depth of the tree is set to three by default but can be extended to any level. Additionally, the tree can have multiple branches.
+This hierarchical setup is achieved using `AIP-10` and `AIP-11` mainly, and designed based on the tree structure, where the Composable is the root, the Trait is the child of the Composable, and the DA is the child of the Trait. The depth of the tree is set to three by default but can be extended to any level. Additionally, the tree can have multiple branches.
 
 Overall, a visual represenation looks something like this:
 
@@ -107,8 +107,7 @@ The solution allows for tokens to access the data of the tokens they own, and th
 
 The `uri` of the parent token is updated to reflect the composition of the child tokens. This is to ensure that the parent token `uri` reflects the child tokens it owns, while any change within the composition structure should be reflected.
 
-
-The solution supports the addition of new resources post-creation, providing the flexibility to add extra resources to the token. This facilitates customization of metadata via resources. `property_map` can then potentially be used to store the static metadata of the token, and resources can be used to store the dynamic metadata of the token. Example: `property_map` can store the sword type: "wooden", and resources can store the sword power: "100".
+The solution supports the addition of new resources post-creation using `ExtendRef` capability introduced in `AIP-11`, providing the flexibility to add extra resources to the token. This facilitates customization of metadata via resources. `property_map` can then potentially be used to store the static metadata of the token, and resources can be used to store the dynamic metadata of the token. Example: `property_map` can store the sword type: "wooden", and resources can store the sword power: "100".
 In addition, the multi-layered structure of the framework hierarchy includes in its Layer 3 support for `DA`, which allows for extensibility for all `aptos-token` and developers to add further layers to the framework.
 
 ![Alt text](image-7.png)
@@ -117,7 +116,7 @@ In addition, the multi-layered structure of the framework hierarchy includes in 
 
 #### Fungible Assets within Digital Assets
 
-The solution leverages fungible assets into the composability framework, specifically through `primary_fungible_store`, where any token (regardless of its layer) possesses a `PrimaryStore`. This means that tokens can hold fungible assets, providing utility for applications involving token ownership of fungible assets, such as in-game currencies, food, gems, and more.
+The solution leverages fungible assets into the composability framework, specifically through `primary_fungible_store` from `AIP-21`, where any token (regardless of its layer) possesses a `PrimaryStore`. This means that tokens can hold fungible assets, providing utility for applications involving token ownership of fungible assets, such as in-game currencies, food, gems, and more.
 
 Imagine a scenario where a hero token, having ownership of a backpack token, can store a quantity of food. Here, food serves as a fungible asset accessible within the in-game environment. The process includes transferring food to the backpack token using PrimaryStore, and subsequently, the backpack token can be transferred to another hero token.
 
@@ -129,19 +128,19 @@ Assuming a collection is created, and tokens with the different three sub types 
 
 - composing a trait token to a composable token:
   1. An entity calls the equip function.
-  2. The trait token is transferred to the composable token.
+  2. The trait token is transferred to the composable token using `transfer()` from `AIP-10`.
   3. The trait is disabled from being transferred (`allow_ungated_transfer = false`).
   4. The trait object is copied to the traits list in the composable.
   5. The composable's uri is updated.
-  6. An event is emitted.
+  6. An event is emitted using `AIP-44`.
 
 - decomposing a trait token from a composable token:
   1. An entity calls the unequip function.
   2. The trait object is removed from the traits list in the composable.
   3. The trait is enabled for transfer (`allow_ungated_transfer = true`).
-  4. The trait token is transferred to the owner.
+  4. The trait token is transferred back to the owner using `transfer()` from `AIP-10`.
   5. The composable's uri is updated.
-  6. An event is emitted.
+  6. An event is emitted using `AIP-44`.
 
 Same steps apply to the DA and composable tokens.
 
