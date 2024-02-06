@@ -129,7 +129,7 @@ Assuming a collection is created, and tokens with the different three sub types 
 - composing a trait token to a composable token:
   1. An entity calls the equip function.
   2. The trait token is transferred to the composable token using `transfer()` from `AIP-10`.
-  3. The trait is disabled from being transferred (`allow_ungated_transfer = false`).
+  3. The trait is disabled from being transferred (`disable_ungated_transfer()` from `AIP-11`).
   4. The trait object is copied to the traits list in the composable.
   5. The composable's uri is updated.
   6. An event is emitted using `AIP-44`.
@@ -137,7 +137,7 @@ Assuming a collection is created, and tokens with the different three sub types 
 - decomposing a trait token from a composable token:
   1. An entity calls the unequip function.
   2. The trait object is removed from the traits list in the composable.
-  3. The trait is enabled for transfer (`allow_ungated_transfer = true`).
+  3. The trait is enabled for transfer (`enable_ungated_transfer()` from `AIP-11`).
   4. The trait token is transferred back to the owner using `transfer()` from `AIP-10`.
   5. The composable's uri is updated.
   6. An event is emitted using `AIP-44`.
