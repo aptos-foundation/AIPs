@@ -19,7 +19,7 @@ requires (*optional): <AIP number(s)>
 
 Currently, the only way[^multisig] to secure your Aptos account is to protect the **secret key (SK)** associated with it. Unfortunately, this is much easier said than done. In reality, secret keys are often *lost* (e.g., users forget to write down their mnemonic when first setting up their Aptos wallet) or *stolen* (e.g., users are tricked into revealing their SK). This makes onboarding users unnecessarily difficult and drives users away when their accounts are lost or stolen.
 
-In this AIP, we describe a more user-friendly approach for account management that relies on the **OpenID Connect (OIDC)** standard and recent developments in **zero-knowledge proofs of knowledge (ZKPoKs)** of **OIDC signatures**[^snark-jwt-verify]$^,$[^nozee]$^,$[^bonsay-pay]$^,$[^zk-blind]$^,$[^zklogin].
+In this AIP, we describe a more user-friendly approach for account management that relies on the _unmodified_[^openpubkey] **OpenID Connect (OIDC)** standard and recent developments in **zero-knowledge proofs of knowledge (ZKPoKs)** of **OIDC signatures**[^snark-jwt-verify]$^,$[^nozee]$^,$[^bonsay-pay]$^,$[^zk-blind]$^,$[^zklogin].
 
 Specifically, we enable **OpenID blockchain (OIDB) accounts** on Aptos that are secured through the owner’s existing **OIDC account** (i.e., their Web2 account with an **OIDC provider** such as Google, GitHub or Apple), rather than through a difficult-to-manage secret key. In a nutshell, _“your blockchain account = your OIDC account”_.
 
@@ -696,6 +696,7 @@ The design and implementation of JWK consensus is outside the scope of this AIP,
 [^multisig]: There are alternatives to single-SK accounts, such as multisignature-based accounts (e.g., via [MultiEd25519](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-stdlib/sources/cryptography/multi_ed25519.move) or via [AIP-55](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md)), but they still bottle down to one or more users protecting their secret keys from loss or theft.
 [^nozee]: https://github.com/sehyunc/nozee
 [^oauth-playground]: https://developers.google.com/oauthplayground/
+[^openpubkey]: **OpenPubkey: Augmenting OpenID Connect with User held Signing Keys**, by Ethan Heilman and Lucie Mugnier and Athanasios Filippidis and Sharon Goldberg and Sebastien Lipman and Yuval Marcus and Mike Milano and Sidhartha Premkumar and Chad Unrein, *in Cryptology ePrint Archive, Paper 2023/296*, 2023, [[URL]](https://eprint.iacr.org/2023/296)
 [^poseidon]: **Poseidon: A New Hash Function for Zero-Knowledge Proof Systems**, by Lorenzo Grassi and Dmitry Khovratovich and Christian Rechberger and Arnab Roy and Markus Schofnegger, *in USENIX Security’21*, 2021, [[URL]](https://www.usenix.org/conference/usenixsecurity21/presentation/grassi)
 [^snark-hash]: https://www.taceo.io/2023/10/10/how-to-choose-your-zk-friendly-hash-function/
 [^snark-jwt-verify]: https://github.com/TheFrozenFire/snark-jwt-verify/tree/master
