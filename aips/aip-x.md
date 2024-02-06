@@ -68,6 +68,7 @@ Below is a visual example of how `hero.move` would look like using `aptos-token`
 
 The introduction of fungible assets in `AIP-21` brings more flexibility and expressiveness compared to the legacy Coin standard. It enables a single object to be represented by numerous distinct but interchangeable units of ownership. However, this improvement doesn't address the need for a hierarchical structure in composing digital assets. Additionally, it lacks a clear pathway for composition, allowing any `FungibleAsset` to be combined with any other `FungibleAsset`.
 
+---
 In line with this proposal for a composability setup for digital assets, fungible assets should also be integrated into the composability framework, allowing each digital asset to contain fungible assets.
 
 ## Specification
