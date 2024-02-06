@@ -68,8 +68,7 @@ Below is a visual example of how `hero.move` would look like using `aptos-token`
 
 The introduction of fungible assets in `AIP-21` brings more flexibility and expressiveness compared to the legacy Coin standard. It enables a single object to be represented by numerous distinct but interchangeable units of ownership. However, this improvement doesn't address the need for a hierarchical structure in composing digital assets. Additionally, it lacks a clear pathway for composition, allowing any `FungibleAsset` to be combined with any other `FungibleAsset`.
 
----
-In line with this proposal for a composability setup for digital assets, fungible assets should also be integrated into the composability framework, allowing each digital asset to contain fungible assets.
+> *In line with this proposal for a composability setup for digital assets, fungible assets should also be integrated into the composability framework, allowing each digital asset to contain fungible assets.*
 
 ## Specification
 
@@ -136,7 +135,8 @@ Assuming a collection is created, and tokens with the different three sub types 
   2. The trait object is removed from the traits list in the composable.
   3. The trait is enabled for transfer (`allow_ungated_transfer = true`).
   4. The trait token is transferred to the owner.
-  5. An event is emitted.
+  5. The composable's uri is updated.
+  6. An event is emitted.
 
 Same steps apply to the DA and composable tokens.
 
