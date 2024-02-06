@@ -62,7 +62,7 @@ We assume the reader is familiar with the OAuth authorization framework[^HPL23] 
   - We often refer to the combination of the header, payload and their signature as a **signed JWT**.
   - See [an example here](#JWT-header-and-payload-example).
 - Relevant JWT header fields (e.g., `kid`)
-- Relevant JWT payload fields (e.g., `aud`, `sub`, `iss`, `email_verified`, `nonce`)
+- Relevant JWT payload fields (e.g., `aud`, `sub`, `iss`, `email_verified`, `nonce`, `iat`, `exp`)
 - **JSON Web Keys (JWKs)**, which are published by each OIDC provider at a JWK endpoint URL indicated in their OpenID configuration URL
 
 #### Terminology
@@ -615,6 +615,12 @@ Currently, zero-knowledge TXNs leak which OIDC provider is involved by revealing
 However, we could modify our ZK relation to hide the OIDC provider too. Specifically, instead of taking in the $\mathsf{jwk}$ as a *public* input, the relation would take it as a *private* input, and then would verify membership of this JWK in a list of approved JWKs committed on chain. (Otherwise, users can input any JWK and forge TXN signatures.)
 
 ## Appendix
+
+### OpenID Connect (OIDC)
+
+The [OIDC specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) says:
+
+ - The `iat` field must be specified in seconds since the UNIX epoch time.
 
 ### JWT header and payload example
 
