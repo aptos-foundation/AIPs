@@ -30,10 +30,12 @@ The ideal conversion should be atomic: destroy the staking contract and, on top 
 This feature enables delegators to spread their stake over the entire validator set and to reach validators of possibly higher uptime. Existing operators of staking contracts would receive additional delegations and become more independent from their stakers that could decide to leave the protocol at any time.
 
 ## Impact
-It has to be determined whether the staker or operator should be the owner of the new delegation pool. This entity would set the operator's address and commission fee of the validator from now on.
+The resulting delegation pool proxies the existing stake pool of the staking contract, hence the operator is unchanged. The commission fee and the beneficiary for operator are instantiated using their values from the staking contract.
+
+It has to be determined whether the staker or operator should be the owner of the new delegation pool. This entity would set the operator and commission fee of the validator from now on.
 The staker sets the operator's commission on the staking contract as they are the sole delegator, now when there are multiple delegators, it wouldn't be fair to empower a particular delegator with this capability instead of the operator.
 
-Previously, the staker could set the delegated voter of the underlying stake pool, implicitly of their owned stake. Nothing changes here, the staker can still delegate their voting power as a delegator after enabling partial voting on the new delegation pool.
+Partial voting is automatically enabled. Previously, the staker could set the delegated voter of the underlying stake pool, implicitly of their owned stake. Now, the staker can vote and delegate their voting power as a regular delegator.
 
 In terms of rewards, there is virtually no impact on the staker, they continue to be rewarded at the same rate as before. In case of the operator, they may expect higher rewards as additional delegators join the pool.
 
