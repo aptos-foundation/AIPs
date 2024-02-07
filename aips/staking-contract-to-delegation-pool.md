@@ -39,6 +39,17 @@ Partial voting is automatically enabled. Previously, the staker could set the de
 
 In terms of rewards, there is virtually no impact on the staker, they continue to be rewarded at the same rate as before. In case of the operator, they may expect higher rewards as additional delegators join the pool.
 
+To summarize, state that would not change:
+- operator
+- commission fee
+- beneficiary for operator 
+- delegated voter of staker
+- individual stakes of staker, operator and any previous operators owning pending-inactive commission
+
+While, the state that would change:
+- the pool ownership may be transferred from staker to operator
+- the voter of the stake pool is set to the resource account of the delegation pool
+
 ## Alternative solutions
 
 As described above, manually converting to a delegation pool requires:
