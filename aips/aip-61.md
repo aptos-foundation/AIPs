@@ -618,9 +618,10 @@ However, we could modify our ZK relation to hide the OIDC provider too. Specific
 
 ### OpenID Connect (OIDC)
 
-The [OIDC specification](https://openid.net/specs/openid-connect-core-1_0.html#IDToken) says:
+The [OIDC specification](https://openid.net/specs/openid-connect-core-1_0.html) says:
 
- - The `iat` field must be specified in seconds since the UNIX epoch time.
+ - The `iat` field must be specified in seconds since the UNIX epoch time ([here](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)).
+ - The refresh protocol does **NOT** allow setting a new nonce ([here]([url](https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokenResponse))).
 
 ### JWT header and payload example
 
