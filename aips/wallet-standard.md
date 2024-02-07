@@ -13,18 +13,24 @@ created: 29/01/2024
 
 ## Summary
 
-A Wallet Standard is an interface a wallet implements. This AIP introduces a new wallet standard for the Aptos ecosystem.
+The Wallet standard defines a universal API for wallet and application interactions. This AIP introduces a new wallet standard for the Aptos ecosystem.
 
 ## Motivation
 
-Most web wallets today come in the form of browser extensions. These extensions interact with dApps by injecting code into every website the user visits. There are several issues with the way injection works today.
+Most web wallets today come in the form of browser extensions. These extensions interact with dApps by injecting themselves to the global window object and exepct a dapp to detect them by reading the window object.
+There are several issues with the way it works today.
 
-1. Wallets inject themselves to the global window object and exepct a dapp to detect them by reading the window object. This method requires the dapp to be made aware of how they can find these objects and must choose to support a limited number of wallets that may not be relevant to the user. In addition, this method creates a race condition risk in the case the dapp loads before a wallet.
-2. The standard is deeply integrated within the Aptos wallet adapter, and any change can cause breaking changes for dApps and wallets, creating endless maintenance work by requiring a dApp or wallet to implement these changes.
-3. Since each dApp needs to install and maintain a wallet plugin dependency, it is exposed to a potential supply chain attack.
-4. The standard supports only the legacy TS SDK input, types, and logic. That means that it doesn't enjoy the features and enhancements of the new TS SDK. In addition, the legacy TS SDK does not receive any more support or new features. Moreover, the standard uses the `any` type, which is less than optimal; we should use a strong typing mechanism.
+1. This method requires the dapp to be made aware of how they can find these objects and must choose to support a limited number of wallets that may not be relevant to the user.
+2. For a dapp to detect the wallets, it needs to run an endless process that keeps scanning the window object to detect wallets that have been injected before and after the dapp has been loaded.
+3. Relying solely on a dapp detecting process logic can create a race condition risk in the case the dapp loads before a wallet and the dapp is not aware of the new wallets.
 
-In this proposal, we suggest bringing a new way of communication, events listener/dispatcher based, between a wallet and a dapp to Aptos that eliminates all the above issues.
+In addition, there are some problems with how the standard is implemented in the Aptos ecosystem these days.
+
+1. The standard is deeply integrated within the Aptos wallet adapter, and any change can cause breaking changes for dApps and wallets, creating endless maintenance work by requiring a dApp or wallet to implement these changes.
+2. Since each dApp needs to install and maintain a wallet plugin dependency, it is exposed to a potential supply chain attack.
+3. The standard supports only the legacy TS SDK input, types, and logic. That means that it doesn't enjoy the features and enhancements of the new TS SDK. In addition, the legacy TS SDK does not receive any more support or new features.
+
+In this proposal, we suggest bringing a generalized event-based model communication between a wallet and a dapp to Aptos that eliminates all the above issues.
 
 ## Impact
 
@@ -33,7 +39,6 @@ In this proposal, we suggest bringing a new way of communication, events listene
 - Familiarize themselves with [the new standard](https://github.com/aptos-labs/wallet-standard/tree/main)
 - Migrate to the [new TypeScript SDK](https://github.com/aptos-labs/aptos-ts-sdk)
 - Support a wallet discoverable function and filter out non-aptos wallets
-- Once a Wallet has migrated to the new standard, can remove the wallet package dependency from the dapp
 
 2. Wallet developers
 
@@ -41,7 +46,7 @@ In this proposal, we suggest bringing a new way of communication, events listene
 - Migrate to the [new TypeScript SDK](https://github.com/aptos-labs/aptos-ts-sdk)
   - Or hold a conversion layer from the new TypeScript SDK types to the legacy TypeScipt SDK types
 - Register the wallet so it will be discoverable by the dapp
-- Implementation of a Wallet class that conforms with the new standard
+- Implementation of a AptosWallet class that conforms with the new standard
 
 ## Rationale
 
@@ -54,7 +59,7 @@ The [Wallet Standard](https://github.com/aptos-labs/wallet-standard) is a chain-
 **Standard Features**
 
 A standard feature is a method that must or should be supported and implemented by a wallet.
-Here is a list of the suggested [features](https://github.com/aptos-labs/wallet-standard/tree/main/src/features)
+Here is a list of the suggested [Aptos features](https://github.com/aptos-labs/wallet-standard/tree/main/src/features)
 
 > a feature marked with `*` is an optional feature
 
@@ -83,14 +88,6 @@ getAccount():Promise<UserResponse<AccountInfo>>
 
 ```ts
 getNetwork(): Promise<UserResponse<NetworkInfo>>;
-```
-
-`aptos:signAndSubmitTransaction` method to sign and submit a transaction using the current connected account in the wallet.
-
-```ts
-// `transaction: AnyRawTransaction` - a generated raw transaction created with Aptos’ TS SDK
-
-signAndSubmitTransaction(transaction: AnyRawTransaction): Promise<UserResponse<PendingTransactionResponse>>;
 ```
 
 `aptos:signTransaction` for the current connected account in the wallet to sign a transaction using the wallet.
@@ -125,10 +122,18 @@ onAccountChange(newAccount: AccountInfo): Promise<void>
 onNetworkChange(newNetwork: NetworkInfo):Promise<void>
 ```
 
+`aptos:signAndSubmitTransaction*` method to sign and submit a transaction using the current connected account in the wallet.
+
+```ts
+// `transaction: AnyRawTransaction` - a generated raw transaction created with Aptos’ TS SDK
+
+signAndSubmitTransaction(transaction: AnyRawTransaction): Promise<UserResponse<PendingTransactionResponse>>;
+```
+
 `aptos:changeNetwork*` event for the dapp to send to the wallet to change the wallet’s current network
 
 ```ts
-// `network:NetworkInfo` - - The network for the wallet to change to
+// `network:NetworkInfo` - The network for the wallet to change to
 
 changeNetwork(network:NetworkInfo):Promise<UserResponse<{success: boolean,reason?: string}>>
 ```
@@ -179,16 +184,17 @@ export type AptosSignMessageOutput = {
   message: string
   nonce: string
   prefix: 'APTOS'
-  signature: Signature | Signature[]
-  bitmap?: Uint8Array
+  signature: Signature
 }
 ```
 
 ## Reference Implementation
 
-The standard exposes a [detect](https://github.com/aptos-labs/wallet-standard/blob/main/src/detect.ts#L17) functionality to detect if existing wallets conform with the Aptos standard by validating required functions are available in the wallet. These functions are called [features](https://github.com/aptos-labs/wallet-standard/tree/main/src/features). Each feature should be defined with an `aptos` namespace, `semicolon` and the `{method}` name, i.e `aptos:connect`.
+The standard exposes a [detect](https://github.com/aptos-labs/wallet-standard/blob/main/src/detect.ts#L17) functionality to detect if existing wallets conform with the Aptos standard by validating required functions are available in the wallet. These functions are called [features](https://github.com/aptos-labs/wallet-standard/tree/main/src/features). Each feature should be defined with an `aptos` namespace, `colon` and the `{method}` name, i.e `aptos:connect`.
 
 **Wallet Provider**
+
+<ins>AptosWallet interface implementation</ins>
 
 A wallet must implement a [AptosWallet interface](https://github.com/aptos-labs/wallet-standard/blob/main/src/wallet.ts) with the wallet provider info and features:
 
@@ -208,7 +214,9 @@ class MyWallet implements AptosWallet {
 }
 ```
 
-A wallet must implement a [AptosWalletAccount interface](https://github.com/aptos-labs/wallet-standard/blob/main/src/account.ts) with the wallet account info:
+<ins>AptosWalletAccount interface implementation</ins>
+
+A wallet must implement a [AptosWalletAccount interface](https://github.com/aptos-labs/wallet-standard/blob/main/src/account.ts) that represents the accounts that have been authorized by the dapp.
 
 ```ts
 enum AptosAccountVariant {
@@ -225,9 +233,9 @@ class AptosWalletAccount implements WalletAccount {
 
   chains: AptosChain;
 
-  features: IdentifierArray;
+  features: AptosFeatures;
 
-  variant: AptosFeatures;
+  variant: AptosAccountVariant;
 
   label?: string;
 
@@ -240,6 +248,8 @@ class AptosWalletAccount implements WalletAccount {
 }
 ```
 
+<ins>Register Wallet</ins>
+
 A wallet registers itself using the [registerWallet](https://github.com/wallet-standard/wallet-standard/blob/master/packages/core/wallet/src/register.ts#L25) method to notify the dapp it is ready to be registered.
 
 ```ts
@@ -250,15 +260,37 @@ registerWallet(myWallet);
 
 **Dapp**
 
+<ins>Get Wallets</ins>
+
 A dapp uses the [getAptosWallets()](https://github.com/aptos-labs/wallet-standard/blob/main/src/detect.ts#L30) function which gets all the Aptos standard compatible wallets.
 
 ```ts
 import { getAptosWallets } from "@aptos-labs/wallet-standard";
 
-const wallets = getAptosWallets();
+let { aptosWallets, on } = getAptosWallets();
 ```
 
-A dapp makes a wallet request by calling the feature name that coresponds to the desired actions.
+<ins>Register Events</ins>
+
+On first load, and before the dapp has been loaded, it gets all the wallets that have been registered so far. To keep getting all the registered wallets after this point, the dapp must add an event listener for new wallets that get registered receiving an unsubscribe function, which it can later use to remove the listener.
+
+```ts
+const removeRegisterListener = on("register", function () {
+  // The dapp can add new aptos wallets to its own state context as they are registered
+  let { aptosWallets } = getAptosWallets();
+});
+
+const removeUnregisterListener = on("unregister", function () {
+  let { aptosWallets } = getAptosWallets();
+});
+```
+
+The dapp has an event listener now, so it sees new wallets immediately and doesn't need to poll or list them again.
+This also works if the dapp loads before any wallets (it will initialize, see no wallets, then see wallets as they load)
+
+<ins>Wallet Request</ins>
+
+A dapp makes a wallet request by calling the feature name that coresponds to the desired action.
 
 ```ts
 const onConnect = () => {
@@ -276,7 +308,7 @@ This solution is a general implementation that has already been used by differen
 
 Both dApps' and wallets' integration and implementation are straightforward and painless. Mostly, each needs to use a provided method for registration/detection.
 
-The addition of any future features and/or enhancements should not introduce any breaking change, as each wallet holds its own plugin code, and any feature/method lives in its own context
+The addition of any future features and/or enhancements should not introduce any breaking change, as each wallet holds its own plugin code, and any feature/method lives in its own context.
 
 ## Timeline
 
