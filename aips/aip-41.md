@@ -239,7 +239,7 @@ Specifically, it ensures that calls to `randomly_pick_winner` cannot be made fro
 
 **O1:** Should the `randomness` module be part of `aptos_std` rather than `aptos_framework`? One reason to keep it in `aptos_std` is in case it might be needed by some of the cryptographic modules there (e.g., perhaps interactive ZKP verifiers that use public coins could use the `randomness` module).
 
-**O2:** Support for private `entry `functions might not be fully implemented: i.e., private `entry` functions could still be callable from a Move script. Or perhaps they are not even callable from a TXN. Or perhaps there are current SDK limitations on creating TXNs that call private entry functions.
+**O2:** Support for private `entry` functions might not be fully implemented: i.e., private `entry` functions could still be callable from a Move script. Or perhaps they are not even callable from a TXN. Or perhaps there are current SDK limitations on creating TXNs that call private entry functions.
 
 **O3:** Would it be useful to have events emmitted when `randomness` APIs are called (e.g., to help with [non-deterministic transaction preview issues](#security-consideration-non-deterministic-transaction-outcomes-in-wallet-previews) in wallets)?
 
