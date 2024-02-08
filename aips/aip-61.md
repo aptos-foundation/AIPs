@@ -333,7 +333,7 @@ A **zero-knowledge signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf
 
 where:
 
-3. $(\mathsf{header}$, $\mathsf{epk}$, $\sigma_\mathsf{eph}$, $\mathsf{exp\\_date}$ are as before
+3. $(\mathsf{header}$, $\mathsf{epk}$, $\sigma_\mathsf{eph}$, $\mathsf{exp\\_date})$ are as before
 4. $\mathsf{exp\\_horizon}$, which is $\le \mathsf{max\\_exp\\_horizon}$; the $\mathsf{exp\\_date}$ must be between $\mathsf{jwt}[\texttt{"iat"}]$ and $\mathsf{jwt}[\texttt{"iat"}]+\mathsf{exp\\_horizon}$
 5. $\pi$ is a **zero-knowledge proof of knowledge (ZKPoK)** for the the ZK relation $\mathcal{R}$ (defined below).
 
