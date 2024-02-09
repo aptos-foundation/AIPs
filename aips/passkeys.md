@@ -19,7 +19,7 @@ This AIP proposes the first WebAuthn Authenticator for Aptos, enabling users to 
 
 [Passkeys](https://fidoalliance.org/passkeys/) are designed to replace passwords as a phishing resistant, faster, and more secure form of user authentication. When a user registers a passkey, a new [public key credential](https://www.w3.org/TR/webauthn-3/#public-key-credential) is created on their device's [authenticator](https://www.w3.org/TR/webauthn-3/#authenticator) - which holds and manages the credentials for that user. As of February 2023, on iOS 16+, Android 9+, and MacOS 13+, the passkey can then securely sync with their device's cloud provider (iCloud or Google Password Manager, for example) using end-to-end encryption to ensure that the passkey is recoverable in the event that the device is lost. When signing in with the passkey, the user is prompted to authenticate - often with a biometric based [authorization gesture](https://www.w3.org/TR/webauthn-3/#authorization-gesture) like Face ID or Touch ID - and provides a response that proves ownership of the passkey via a digital signature.
 
-Passkeys use the [WebAuthn specification](https://www.w3.org/TR/webauthn-3/), a standard co-created by the [FIDO alliance](https://fidoalliance.org/) and the [World Wide Web Consortium (W3C)](https://www.w3.org/), for passkey registration and authentication. We are choosing to use NIST P256 (`Secp256r1`) as the first enabled WebAuthn signature scheme because of its broad support across most modern operating systems. Once complete, this will enable users to sign and submit transactions with any compatible WebAuthn credential on Aptos, including multi-device credentials registered on iOS, MacOS, and Android devices, as well as single-device, hardware-bound credentials on devices like Yubikeys.
+Passkeys use the [WebAuthn specification](https://www.w3.org/TR/webauthn-3/), a standard co-created by the [FIDO alliance](https://fidoalliance.org/) and the [World Wide Web Consortium (W3C)](https://www.w3.org/), for passkey registration and authentication. We are choosing to use NIST P256 (`secp256r1`) as the first enabled WebAuthn signature scheme because of its broad support across most modern operating systems. Once complete, this will enable users to sign and submit transactions with any compatible WebAuthn credential on Aptos, including multi-device credentials registered on iOS, MacOS, and Android devices, as well as single-device, hardware-bound credentials on devices like Yubikeys.
 
 ## Motivation
 
@@ -45,9 +45,9 @@ This AIP will benefit developers and users by providing them with an easy way to
    4. On certain operating systems, the passkey is backed up and syncs seamlessly with multiple devices (see [backup eligibility](#backup-eligibility)).
 
 2. **Security:**
-   1. With passkeys, the private key is stored securely on the device instead of the browser, alleviating the need to store any sensitive material in browser storage where it could be potentially accessed by a malicious party either through physical access on the device or supply chain attacks via a malicious dependency.
+   1. With passkeys, the private key is stored securely on the device instead of the browser, alleviating the need to store any sensitive material in browser storage where it could be potentially be accessed by a malicious party either through physical access on the device or supply chain attacks via a malicious dependency.
    2. By default, passkeys provide a consent-driven signing experience and prompt the user to authenticate every time they sign, similar to Apple Pay or Google Pay.
-   3. Passkeys are bound to a relying party and are not phishable.
+   3. Passkeys are bound to a relying party (e.g., a website) and are not phishable.
 
 ## Alternative solutions
 
@@ -55,24 +55,25 @@ See the section on **Alternative Solutions** in [AIP-61](https://github.com/apto
 
 ### OIDB Accounts
 
-OIDB accounts present a unique and novel way to generate an on-chain account with an OpenID account. This is highly desireable as OIDB accounts are accessible across all devices with browsers. Additionally, most people have an account associated with one or more OIDC providers (e.g., Google) and are familiar with OAuth login flows. Lastly, recoverability is not limited to certain operating systems in the same way that passkeys are.
+OIDB accounts present a unique and novel way to generate an on-chain account with an OpenID account. This is highly desirable as OIDB accounts are accessible across all devices with browsers. Additionally, most people have an account associated with one or more OIDC providers (e.g., Google) and are familiar with OAuth login flows. Lastly, recoverability is not limited to certain operating systems in the same way that passkeys are.
 
 On the other hand, there are tradeoffs to consider as well:
 
 1. There are centralization and liveness concerns both on the OIDC provider and the services that OIDB accounts require to function in a privacy preserving manner (e.g., pepper service, proving service) respectively.
-2. Unless the ephemeral secret key ($\mathsf{esk}$) associated with the OIDB account of the user is encrypted (i.e., with a password), the plaintext ephemeral secret key is still available on the browser, leaving it potentially vulnerable to a malicious actor. Passkey private keys, on the other hand, are stored on the device when the passkey is backed up, often encrypted or within a secure element on the device and not on the browser.
+2. Unless the ephemeral secret key ($\mathsf{esk}$) associated with the OIDB account of the user is encrypted (i.e., with a password) or is a passkey itself, the plaintext ephemeral secret key is still available on the browser, leaving it potentially vulnerable to a malicious actor (but only during its short expiration window). Passkey private keys, on the other hand, are stored on the device when the passkey is backed up, often within a secure element on the device and not on the browser.
 
 ## Specification
 
 ### Terminology
 
 - [**OIDB account**](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md): An OpenID blockchain (OIDB) account whose security and liveness is backed by an OIDC account (e.g., a Google account) rather than a secret key.
-- [**WebAuthn Authenticator**](https://www.w3.org/TR/webauthn-3/#authenticator): A cryptographic entity, existing in hardware or software, that can register a user with a given Relying Party and later assert possession of the registered public key credential, and optionally verify the user to the Relying Party.
+- [**Relying party**](https://www.w3.org/TR/webauthn-3/#relying-party): The website, application, or service that the user is trying to access, which is responsible for verifying a signature from the user's passkey to ensure that the user is who they claim to be.
+- [**WebAuthn Authenticator**](https://www.w3.org/TR/webauthn-3/#authenticator): A cryptographic entity, existing in hardware or software, that can register a user with a given relying party and later assert possession of the registered public key credential, and optionally verify the user to the relying party.
 
 
 ### Aptos Account Creation with Passkeys
 
-During the registration of a new WebAuthn credential, an asymmetric key (public and private key) is generated securely on that device. The private key associated with the WebAuthn credential can be used to derive an associated account on chain.
+During the registration of a new WebAuthn credential, an asymmetric key (i.e., a **private key** and its associateed **public key**) is generated securely on that device. The public key associated with the WebAuthn credential can be used to derive an associated account on chain. The private key, which controls the account, will be secured by the device.
 
 The registration process is particularly important for several reasons:
 
@@ -109,7 +110,7 @@ Some fields in `PublicKeyCredentialCreationOptions` have been highlighted below.
 
 **[`PublicKeyCredentialParameters`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialparameters)**
 
-To make a WebAuthn credential compatible with Aptos, the `pubKeyCredParams` array should only contain supported signature schemes. At the present moment, only `Secp256r1` is supported, which requires that the array have one element with `alg: -7` to denote `Secp256r1` as the choice of credential type.
+To make a WebAuthn credential compatible with Aptos, the `pubKeyCredParams` array should only contain supported signature schemes. At the present moment, only `secp256r1` is supported, which requires that the array have one element with `alg: -7` to denote `secp256r1` as the choice of credential type.
 
 **[`PublicKeyCredentialUserEntity`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialuserentity)**
 
