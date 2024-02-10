@@ -263,9 +263,11 @@ Smart contract platforms are an inherently-adversarial environment to deploy ran
 
 **One problem** with having a Move function’s execution be influenced by on-chain randomness (e.g., by `randomness::u64_integer`), is that the **effects** of its execution can be **tested for** by calling the function from another module (or from a Move script) and **aborting** if the outcomes are not the desired ones.
 
+We discuss **mitigations** against this attack [in "Security Considerations" below](security-consideration-preventing-test-and-abort-attacks).
+
 #### An example attack
 
-Concretely, suppose `raffle::randomly_pick_winner` were a `public entry` function instead of a **private** entry function:
+Concretely, **suppose** `raffle::randomly_pick_winner` were a `public entry` function instead of a **private** entry function:
 
 ```rust
 public entry fun randomly_pick_winner(): address acquires Raffle, Credentials { /* ... */}
@@ -306,12 +308,19 @@ script {
 For example, a contract might naturally want to branch on a random value.
 This would create two possible execution paths: the "then" branch and the "else" branch.
 The problem is these paths could have **different gas costs**: one path could be cheaper while another path could be more expensive in terms of gas.
-As a result, an attacker could bias the execution of the function by **undergasing** the TXN that calls it, ensuring only the cheap path executes successfully while the expensive path always aborts with out of gas.
 
-The attacker would have to repeatedly submit their TXN until the execution randomly lands on the cheap path, potentially wasting coins on gas when the execution randomly lands on the expensive path.
-Nonetheless, the attacker could profit immensely: e.g., he might gain a lot more when the cheap path executes than he would lose by wasting gas in the attack.
+This would allow an attacker to bias the execution of the function by **undergasing** the TXN that calls it, ensuring only the cheap path executes successfully (while the expensive path always aborts with out of gas).
+Note that the attacker would have to repeatedly submit their TXN until the execution randomly takes on the cheap path.
+Although the attacker would be wasting funds when their TXN's execution takes the expensive path and aborts, the attack could nonetheless be worth it if the cheap path is sufficiently profitable.
 
-A simple vulnerable function follows bellow (some context is missing, but can be inferred):
+We discuss **mitigations** against this attack [in "Security Considerations" below](security-consideration-preventing-undergasing-attacks).
+
+#### An example of a vulnerable coin tossing function in a game
+
+A game might toss a coin and take two different execution paths based on it.
+This would be vulnerable to an undergasing attack.
+
+_Note:_ Not all helper functions & constants are defined, but the example should make sense nonetheless.
 
 ```rust
 entry fun coin_toss(player: signer) {
@@ -321,10 +330,10 @@ entry fun coin_toss(player: signer) {
    // Toss a random coin
    let random_coin = randomness::u32_range(0, 2);
    if (random_coin == 0) {
-       // If heads, give player 100 coins (low gas path)
+       // If heads, give player 100 coins (low gas path; attacker can ensure this always gets executed)
        award_hundred_coin(player);
    } else /* random_card == 1 */ {
-       // If tails, punish player (high gas path)
+       // If tails, punish player (high gas path; attacker can ensure this never gets executed)
        lose_twenty_coins(player);
        lose_ten_health_points(player);
        lose_five_armor_points(player);
@@ -432,6 +441,8 @@ To make it more explicit that the transaction's outcome might not be the same on
 The defense discussed in [“Test-and-abort attacks”](#test-and-abort-attacks) assumed that developers make proper use of **private** entry functions as the only entry point into their randapp. Unfortuantely, developers are fallible. Therefore, it is important to prevent **accidentally-introduced bugs**.
 
 We discuss two defenses below that we plan to use to enforce the proper usage of **private** `entry` functions as the only gateway into randapps.
+
+### Security consideration: Preventing undergasing attacks
 
 #### Linter-based checks
 
