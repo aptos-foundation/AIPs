@@ -261,7 +261,7 @@ Specifically, it ensures that calls to `randomly_pick_winner` cannot be made fro
 
 Smart contract platforms are an inherently-adversarial environment to deploy randomness in.
 
-The **key problem** with having a Move function’s execution be influenced by on-chain randomness (e.g., by `randomness::u64_integer`), is that the **effects** of its execution can be **tested for** by calling the function from another module (or from a Move script) and **aborting** if the outcomes are not the desired ones.
+**One problem** with having a Move function’s execution be influenced by on-chain randomness (e.g., by `randomness::u64_integer`), is that the **effects** of its execution can be **tested for** by calling the function from another module (or from a Move script) and **aborting** if the outcomes are not the desired ones.
 
 #### An example attack
 
@@ -296,6 +296,40 @@ script {
             abort(1)
         };
     }
+}
+```
+
+
+### Undergasing attacks
+
+**Another problem** occurs when a Move function’s execution is influenced by on-chain randomness. 
+For example, a contract might naturally want to branch on a random value.
+This would create two possible execution paths: the "then" branch and the "else" branch.
+The problem is these paths could have **different gas costs**: one path could be cheaper while another path could be more expensive in terms of gas.
+As a result, an attacker could bias the execution of the function by **undergasing** the TXN that calls it, ensuring only the cheap path executes successfully while the expensive path always aborts with out of gas.
+
+The attacker would have to repeatedly submit their TXN until the execution randomly lands on the cheap path, potentially wasting coins on gas when the execution randomly lands on the expensive path.
+Nonetheless, the attacker could profit immensely: e.g., he might gain a lot more when the cheap path executes than he would lose by wasting gas in the attack.
+
+A simple vulnerable function follows bellow (some context is missing, but can be inferred):
+
+```rust
+entry fun coin_toss(player: signer) {
+   let player = get_player(player);
+   assert!(!player.has_tossed_coin, E_COIN_ALREADY_TOSSED);
+
+   // Toss a random coin
+   let random_coin = randomness::u32_range(0, 2);
+   if (random_coin == 0) {
+       // If heads, give player 100 coins (low gas path)
+       award_hundred_coin(player);
+   } else /* random_card == 1 */ {
+       // If tails, punish player (high gas path)
+       lose_twenty_coins(player);
+       lose_ten_health_points(player);
+       lose_five_armor_points(player);
+   }
+   player.has_tossed_coin = true;
 }
 ```
 
