@@ -487,6 +487,8 @@ Thanks to Kevin Hoang, Igor Kabiljo and Rati Gelashvili for their help on mitiga
 
 Thanks to Junkil Park for further simplifying the API.
 
+Thanks to Valeria Nikolaenko (a16z Crypto) for pointing out the undergasing attacks.
+
 ## Changelog 
 
 For posterity, past versions of this AIP were:
