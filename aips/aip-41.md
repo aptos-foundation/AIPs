@@ -438,11 +438,11 @@ To make it more explicit that the transaction's outcome might not be the same on
 
 ### Security consideration: Preventing test-and-abort attacks
 
-The defense discussed in [“Test-and-abort attacks”](#test-and-abort-attacks) assumed that developers make proper use of **private** entry functions as the only entry point into their randapp. Unfortuantely, developers are fallible. Therefore, it is important to prevent **accidentally-introduced bugs**.
+The defense discussed in [“Test-and-abort attacks”](#test-and-abort-attacks) assumed that developers make proper use of **private** entry functions as the only entry point into their randapp. 
+Unfortuantely, developers are fallible. 
+Therefore, it is important to prevent **accidentally-introduced bugs**.
 
 We discuss two defenses below that we plan to use to enforce the proper usage of **private** `entry` functions as the only gateway into randapps.
-
-### Security consideration: Preventing undergasing attacks
 
 #### Linter-based checks
 
@@ -475,6 +475,18 @@ We can inspect the Move VM callstack to check if a `randomness` **native** funct
 
 - <strike>This defense is rather aggresive as it interferes with the semantics of the Move language by aborting the execution of vulnerable randomness function calls, which would normally proceed without issue.</strike>
    + The randomness functions are native functions. It is perfectly fine to define custom abort semantics for them. It does not break any of the semantics of the Move language.
+
+### Security consideration: Preventing undergasing attacks
+
+Contract developers can address undergasing attacks by carefully writing their contracts, if they were aware of this attack.
+Unfortunately, the subtlety of the attack (and its defenses) is comparable with the subtlety of side-channel attacks.
+We therefore seek to proactively defend developers from misusing the API and create undergasing vulnerabilities.
+
+In our proposed defense, the Move VM would be able to enforce that TXNs which generate on-chain randomness always (1) declare their `max_gas` amount to be a sufficiently high amount (e.g., the maximum allowed gas amount for a TXN) and (2) lock up the gas in the TXN prologue before execution starts and refund the remaining gas in the epilogue.
+This ensures that randomness TXNs can never be undergased and obviates this class of attacks.
+
+To identify if a TXN uses randomness and, therefore, if the gas lockup should be done, we propose adding a `#[randomness]` annotation to (private) entry functions that sample randomness.
+Without such an annotation, the VM would have to lock up gas for _all_ TXNs which would affect the Aptos ecosystem (e.g., a dapp for transferring APT might always set the gas to some high amount like 1 APT, assuming that it is not locked up and the TXN can use most of it; such dapps would now fail because their 1 APT would be locked up).
 
 ## Testing (optional)
 
