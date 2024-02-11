@@ -67,7 +67,7 @@ On the other hand, there are tradeoffs to consider as well:
 ### Terminology
 
 - [**OIDB account**](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md): An OpenID blockchain (OIDB) account whose security and liveness is backed by an OIDC account (e.g., a Google account) rather than a secret key.
-- [**Relying party**](https://www.w3.org/TR/webauthn-3/#relying-party): The website, application, or service that the user is trying to access, which is responsible for verifying a signature from the user's passkey to ensure that the user is who they claim to be.
+- [**Relying party**](https://www.w3.org/TR/webauthn-3/#relying-party): The website, application, or service that the user is trying to access, which is responsible for verifying a signature from the user's passkey to ensure that the user is who they claim to be. For simplicity, we can say that a "relying party" is synonymous with a **wallet** in this context since both are responsible for managing the user's access to a private key.
 - [**WebAuthn Authenticator**](https://www.w3.org/TR/webauthn-3/#authenticator): A cryptographic entity, existing in hardware or software, that can register a user with a given relying party and later assert possession of the registered public key credential, and optionally verify the user to the relying party.
 
 
@@ -90,22 +90,6 @@ Every WebAuthn credential is created by the relying party (RP) with a set of opt
 
 It's important to carefully consider which options to select as they have significant impacts on the passkey user experience and **CANNOT** be reconfigured after credential creation.
 
-```
-dictionary PublicKeyCredentialCreationOptions {
-    required PublicKeyCredentialRpEntity              rp;
-    required PublicKeyCredentialUserEntity            user;
-
-    required BufferSource                             challenge;
-    required sequence<PublicKeyCredentialParameters>  pubKeyCredParams;
-
-    unsigned long                                     timeout;
-    sequence<PublicKeyCredentialDescriptor>           excludeCredentials = [];
-    AuthenticatorSelectionCriteria                    authenticatorSelection;
-    DOMString                                         attestation = "none";
-    AuthenticationExtensionsClientInputs              extensions;
-};
-```
-
 Some fields in `PublicKeyCredentialCreationOptions` have been highlighted below.
 
 **[`PublicKeyCredentialParameters`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialparameters)**
@@ -114,71 +98,11 @@ To make a WebAuthn credential compatible with Aptos, the `pubKeyCredParams` arra
 
 **[`PublicKeyCredentialUserEntity`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialuserentity)**
 
-Each authenticator stores a [credentials map](https://www.w3.org/TR/webauthn-3/#authenticator-credentials-map), a map from ([`rpId`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-rpid), [[`userHandle`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-userhandle)]) to public key credential source. If the user creates another credential with the same user handle as an existing credential on that authenticator, it will **OVERWRITE** the existing credential, thus overwriting the private key associated with a passkey account. To avoid this, it is **IMPERATIVE** for the relying party to maintain a list of previously registered credentials and corresponding user handles.
- 
-**[`AuthenticatorSelectionCriteria`](https://www.w3.org/TR/webauthn-3/#dictdef-authenticatorselectioncriteria)**
-
-This field defines additional information about the credential and provides constraints that affect the UX of registering / asserting with the credential. See comments above the fields below for more info:
-
-```js
-dictionary AuthenticatorSelectionCriteria {
-  // Can be "platform" | "cross-platform"
-  // Authenticators can either be "roaming" or "platform" authenticators
-  // Roaming authenticators (like phones or yubikeys) can be used to 
-  // authenticate a user via Bluetooth or QR Code
-  DOMString                    authenticatorAttachment;
-  // Can be "required" | "preferred" | "discouraged"
-  // This value indicates the Relying Party requires 
-  // a client-side discoverable credential, and is 
-  // prepared to receive an error if a client-side 
-  // discoverable credential cannot be created.
-  DOMString                    residentKey;
-  boolean                      requireResidentKey = false;
-  // Can be "required" | "preferred" | "discouraged"
-  // If required, it indicates that the RP requires 
-  // user verification for the operation
-  DOMString                    userVerification = "preferred";
-};
-```
-
-#### Registering WebAuthn Credential
-
-In order to perform a [registration ceremony](https://www.w3.org/TR/webauthn-3/#registration-ceremony), the [Relying Party](https://www.w3.org/TR/webauthn-3/#relying-party) MUST proceed as follows:
-
-1. Let `options` be an instance of [`PublicKeyCredentialCreationOptions`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialcreationoptions), configured to the [Relying Party](https://www.w3.org/TR/webauthn-3/#relying-party)'s needs for the ceremony.
-2. Call [`navigator.credentials.create()`](https://w3c.github.io/webappsec-credential-management/#dom-credentialscontainer-create) and pass options as a parameter to the function.
+Each authenticator stores a [credentials map](https://www.w3.org/TR/webauthn-3/#authenticator-credentials-map), a map from ([`rpId`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-rpid), [[`userHandle`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-userhandle)]) to public key credential source. For context, a [user handle](https://www.w3.org/TR/webauthn-3/#user-handle) is a unique id for the credential, similar to a `credentialId`, but chosen by the relying party instead of the authenticator. If the user creates another credential with the same `userHandle` as an existing credential on that authenticator (on that user's device / platform), it will **OVERWRITE** the existing credential, thus overwriting the private key associated with a passkey account. To avoid this, it is **IMPERATIVE** for the relying party to maintain a list of previously registered credentials and corresponding user handles.
 
 #### Registration Response
 
-After successfully calling [`navigator.credentials.create()`](https://w3c.github.io/webappsec-credential-management/#dom-credentialscontainer-create), the authenticator will return a [`PublicKeyCredential`](https://www.w3.org/TR/webauthn-3/#publickeycredential). In the `PublicKeyCredential` will be a `response` field of type [`AuthenticatorAttestationResponse`](https://www.w3.org/TR/webauthn-3/#authenticatorattestationresponse) which will contain most of the information needed for verification of the registration response.
-
-```js
-interface AuthenticatorResponse {
-    [SameObject] readonly attribute ArrayBuffer      clientDataJSON;
-};
-
-// AuthenticatorAttestationResponse inherits from AuthenticatorResponse
-interface AuthenticatorAttestationResponse : AuthenticatorResponse {
-    [SameObject] readonly attribute ArrayBuffer      attestationObject;
-    sequence<DOMString>                              getTransports();
-    ArrayBuffer                                      getAuthenticatorData();
-    ArrayBuffer?                                     getPublicKey();
-    COSEAlgorithmIdentifier                          getPublicKeyAlgorithm();
-};
-
-interface Credential {
-  readonly attribute USVString id;
-  readonly attribute DOMString type;
-  static Promise<boolean> isConditionalMediationAvailable();
-};
-
-// PublicKeyCredential inherits from Credential
-interface PublicKeyCredential : Credential {
-    [SameObject] readonly attribute ArrayBuffer              rawId;
-    [SameObject] readonly attribute AuthenticatorResponse    response;
-    AuthenticationExtensionsClientOutputs getClientExtensionResults();
-};
-```
+After successfully registering the credential, the authenticator will return a [`PublicKeyCredential`](https://www.w3.org/TR/webauthn-3/#publickeycredential). In the `PublicKeyCredential` will be a `response` field of type [`AuthenticatorAttestationResponse`](https://www.w3.org/TR/webauthn-3/#authenticatorattestationresponse) which will contain most of the information needed for verification of the registration response.
 
 Fully decoding the `response` field in `PublicKeyCredential` yields an `AuthenticatorAttestationResponse`. A rust representation of it is included below:
 
@@ -236,30 +160,9 @@ pub struct AuthenticatorAttestationResponse {
 | extensions             | variable (if present)     | Extension-defined authenticator data. This is a CBOR [RFC8949] map with extension identifiers as keys, and authenticator extension outputs as values. See § 9 WebAuthn Extensions for details.                                                                                                                                                                               |
 
 
-The `authenticatorData` in an attestation response (`AuthenticatorAttestationResponse`) contains `flags` that provide information on the **backup eligibility** and **backup state** of the WebAuthn credential. If the relying party (RP) deems that backup should be required for a WebAuthn credential, the RP should check the Backup Eligibility (`BE`)and Backup State (`BS`) flags in the `AuthenticatorAttestationResponse` to ensure that the credential is backed up. Having both `BE` and `BS` set to true implies that the [credential is a multi-device credential and is currently backed up](https://www.w3.org/TR/webauthn-3/#sctn-credential-backup). See the rust representation of the flags below:
+The `authenticatorData` in an attestation response (`AuthenticatorAttestationResponse`) contains `flags` that provide information on the **backup eligibility** and **backup state** of the WebAuthn credential. If the relying party (RP) deems that backup should be required for a WebAuthn credential, the RP should check the Backup Eligibility (`BE`)and Backup State (`BS`) flags in the `AuthenticatorAttestationResponse` to ensure that the credential is backed up. Having both `BE` and `BS` set to true implies that the [credential is a multi-device credential and is currently backed up](https://www.w3.org/TR/webauthn-3/#sctn-credential-backup).
 
-
-```rust [code reference](https://github.com/1Password/passkey-rs/blob/main/passkey-types/src/ctap2/flags.rs#L9)
-bitflags! {
-    /// Flags for authenticator Data
-    ///
-    /// <https://w3c.github.io/webauthn/#authdata-flags>
-    pub struct Flags: u8 {
-        /// User Present, bit 0
-        const UP = 1 << 0;
-        /// User Verified, bit 2
-        const UV = 1 << 2;
-        /// Backup Eligibility, bit 3
-        const BE = 1 << 3;
-        /// Backup state, bit 4
-        const BS = 1 << 4;
-        /// Attested Credential Data, bit 6
-        const AT = 1 << 6;
-        /// Extension Data Included, bit 7
-        const ED = 1 << 7;
-    }
-}
-```
+For those looking to use passkeys as a recoverable private key alternative for Aptos accounts, it is highly advised that the `BE` and `BS` flags both be set to `true` **BEFORE** the on-chain account is created to ensure that the account is recoverable in the event of device loss.
 
 #### Parsing the Public Key
 
@@ -458,7 +361,7 @@ Testing can be found in the reference implementation provided in the PR link abo
 
 As mentioned in AIP 61:
 
-> **Passkeys are not always backed up to the cloud** on some platforms (e.g., Microsoft Windows). Furthermore, passkeys introduce a **cross-device problem**: if a user creates a blockchain account on their Apple phone, their passkey secret key is backed up to iCloud, which will not be accessible from that user’s other Android device, Linux device or Windows device, since support for cross-platform backup of passkeys is not yet implemented.
+> **Passkeys are not always backed up to the cloud** on some platforms (e.g., Microsoft Windows). 
 
 For this reason, it is important to check the `backupEligible` and `backupState` flags from the `authenticatorData` in the registration response to ensure that the passkey has been backed up properly.
 
@@ -470,21 +373,26 @@ See the [operating system reference](https://passkeys.dev/docs/reference/) to be
 
 See this [device support matrix](https://passkeys.dev/device-support/) for more info on which browsers and operating systems enable backup-able passkeys.
 
-### Wallet liveness
+### Wallet Liveness
 
-An important **liveness consideration** is that the relying party that is tied to your passkey must be available in order for users to access their accounts. 
+An important **liveness consideration** is that the relying party (e.g., a wallet) that is tied to your passkey must be available in order for users to access their accounts. 
 
 Several supported browsers, like Google Chrome, that implement the Client to Authenticator Protocol ([CTAP](https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html)), which regulates the communication protocol between a roaming authenticator and the browser, check to see if the relying part is available before allowing the user to register or make an assertion with the passkey.
 
-In other words, if the relying party is unavailable or returns an error like a 404, the user will not be able to use the passkey associated with that relying party until the relying party comes back online.
+In other words, if the relying party is unavailable or returns an error like a 404, the user will not be able to use the passkey associated with that relying party until the relying party comes back online. This includes signing transactions with your passkey.
 
 To learn more about how chromium handles assertion and registration requests, see [`webauthn_handler.h`](https://github.com/chromium/chromium/blob/95bb60bf7fd3d18f469f050b60663b3dbdfa0402/content/browser/devtools/protocol/webauthn_handler.h#L19)
 
-### Compromised cloud provider
+### Compromised Cloud Provider
 
 If your passkey is a multi-device credential, backed up to iCloud or Google Password Manager, and the associated cloud account is compromised, so is your passkey account.
 
 Note this only affects multi-device credentials, not hardware-bound credentials like Yubikeys as those are not backed up.
+
+### Incompetent or Malicious Relying Party
+
+- If the relying party loses the public key associated with the account, the user will be unable to submit transactions to the blockchain as transactions require a public key for signature verification. That being said, there may be ways to mitigate this via [ECDSA public key recovery](https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-examples#public-key-recovery-from-the-ecdsa-signature).
+- If the user creates another credential with the same `userHandle` as an existing credential on that authenticator, it will **OVERWRITE** the existing credential
 
 ## Future Potential
 
@@ -492,7 +400,7 @@ In general, passkeys provide a seamless and intuitive way for users to generate 
 
 ## Timeline
 
-### Suggested deployment timeline
+### Suggested Deployment Timeline
 
 Passkeys are currently available on Devnet, as of January, 2023.
 
