@@ -1,5 +1,5 @@
 ---
-aip:
+aip: 63
 title: Coin to Fungible Asset Migration
 author: lightmark, davidiw, movekevin
 Status: Draft
@@ -7,7 +7,7 @@ type: Standard
 created: <12/05/2023>
 ---
 
-# AIP-X - Coin to Fungible Asset Migration
+# AIP-63 - Coin to Fungible Asset Migration
 
 ## Summary
 [AIP-21](https://github.com/lightmark/AIPs/blob/main/aips/aip-21.md) introduced fungible asset standard aiming to replace the old coin standard to represent any fungible asset on chain, including but not limited to coin.
