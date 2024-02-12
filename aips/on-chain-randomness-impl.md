@@ -87,9 +87,9 @@ Since in production `secrecy_threshold_in_stake_ratio=0.5`  and `reconstruct_thr
 
 ### System design
 
-Aptos Roll introduces several changes to the current Aptos blockchain system, including running a weighted distributed key generation for every epoch change, modifying the existing reconfiguration process, and generating a randomness seed for every block.
+On-chain randomness introduces several changes to the current Aptos blockchain system, including running a wDKG for every epoch change, modifying the existing reconfiguration process, and generating a randomness seed for every block.
 
-Before diving into details, here is a brief background on the Aptos blockchain necessary for describing Aptos Roll.
+Before diving into details, here is a brief background on the Aptos blockchain.
 
 #### Background on Aptos Blockchain
 
