@@ -538,5 +538,6 @@ For posterity, past versions of this AIP were:
 - v1.2 (current):
   - Added protection against _test-and-abort_ attacks
   - Further simplified API by removing the `RandomNumberGenerator` struct.
-  - Discussed linter-based checks and callstack-based checks for improper uses of the `randomness` APIs.
+  - Discussed linter-based checks and callstack-based checks to defend against test-and-abort attacks.
+  - Discussed undergasing attacks and how to obviate them.
   - See [diff from v1.1 here](https://github.com/aptos-foundation/AIPs/compare/3e40b4e630eb8aa517b617799f8e578f5f937682..HEAD).
