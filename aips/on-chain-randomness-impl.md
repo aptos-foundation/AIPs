@@ -63,19 +63,19 @@ On-chain randomness interacts with & impacts our consensus protocol. The two pro
 
 ### Stake Rounding
 
-Aptos Roll relies on rounding the stakes of each validator into a smaller *weight.* This is very good for achieving practical performance but has implications on secrecy and availability. Specifically, any rounding scheme will lead to rounding errors: i.e., some players might receive more secret shares than they deserve and other players might receive less. As a result, this effectively turns the threshold secret sharing scheme into a *ramp secret sharing scheme,* which has a different secrecy threshold and a different reconstruction threshold. Typically, the reconstruction threshold is higher. As a consequence, for liveness, the mechanism needs to ensure any 66% or more of the stake can reconstruct while secrecy holds against any 33% or less of the stake. To minimize the impact of MEV attacks, we chose to make the secrecy threshold even higher, setting it to 50% while still keeping the reconstruction threshold below 66%, to handle a 33% adversary.
+Aptos Roll relies on rounding the stakes of each validator into a smaller *weight.* This is very good for achieving practical performance but has implications on secrecy and availability. Specifically, any rounding scheme will lead to **rounding errors**: i.e., some players might receive more secret shares than they deserve and other players might receive less. As a result, this effectively turns the threshold secret sharing scheme into a *ramp secret sharing scheme,* which has a different secrecy threshold and a different reconstruction threshold. Typically, the reconstruction threshold is higher. As a consequence, for liveness, the mechanism needs to ensure any 66% or more of the stake can reconstruct while secrecy holds against any 33% or less of the stake. To minimize the impact of MEV attacks, we chose to make the secrecy threshold even higher, setting it to 50% while still keeping the reconstruction threshold below 66%, to handle a 33% adversary.
 
-Below we give a brief description of the rounding interfaces and its guarantees. More technical details of the rounding algorithm can be found in our [paper](https://eprint.iacr.org/2024/198).
+Below we give a brief description of the rounding interface and its guarantees. More technical details of the rounding algorithm can be found in our [paper](https://eprint.iacr.org/2024/198).
 
-#### Interfaces
+#### Rounding interface
 
-- Input:
+- **Inputs**:
   - `validator_stakes`: The stake distribution of the validators.
-  - `secrecy_threshold_in_stake_ratio`: Any subset of validators with stake ratio ≤ this value cannot reveal the secret (randomness). Aptos use 50% for this value in production.
-  - `reconstruct_threshold_in_stake_ratio`: Any subset of validators with stake ratio ≥ this value can always reveal the secret (randomness). Aptos use 66% for this value in production.
-- Output:
+  - `secrecy_threshold_in_stake_ratio`: Any subset of validators with stake ratio ≤ this value cannot reveal the secret (randomness). Aptos uses 50% for this value in production.
+  - `reconstruct_threshold_in_stake_ratio`: Any subset of validators with stake ratio ≥ this value can always reveal the secret (randomness). Aptos uses 66% for this value in production.
+- **Output**:
   - `validator_weights`: The weight distribution assigned to the validators after rounding.
-  - `reconstruct_threshold_in_weights`: Any subset of validators with weight sum ≥ this value can always reveal the secret (randomness).
+  - `reconstruct_threshold_in_weights`: Any subset of validators whose weights sum is ≥ this value can always reveal the secret (randomness).
 
 #### Guarantees
 
