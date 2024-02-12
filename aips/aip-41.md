@@ -313,7 +313,7 @@ Note that the attacker would have to repeatedly submit their TXN until the execu
 As a result, the attacker could be wasting funds for the aborted TXNs that took the expensive path.
 Nonetheless, the attack is worth it if the cheap path is sufficiently profitable.
 
-We discuss **mitigations** against this attack [in "Security Considerations" below](security-consideration-preventing-undergasing-attacks).
+We give an example of a vulnerable application below and discuss **mitigations** against this attack [in "Security Considerations" below](security-consideration-preventing-undergasing-attacks).
 
 #### An example of a vulnerable coin tossing function in a game
 
