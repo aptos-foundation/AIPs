@@ -494,11 +494,11 @@ To identify if a TXN uses randomness and, therefore, if the gas lockup should be
 
 ```rust
 #[randomness]
-entry fun coin_toss(player: signer) {
+entry fun coin_toss(player: signer)
 ```
 
 If developers forget to add this annotation, their randomness TXNs would be aborted, ensuring safety against undergasing attacks.
-(A linter can help them detect missing annotations before their code is compiled.)
+(To ensure liveness, a linter can help them detect missing annotations before their code is compiled.)
 
 _Note:_ Without such an annotation, the VM would have to lock up gas for _all_ TXNs which would affect the Aptos ecosystem (e.g., a dapp that transfers APT might always set the gas to some high amount like 1 APT, assuming that it is not locked up and that the TXN can use most of it; such dapps could now fail because their 1 APT would be locked up).
 
