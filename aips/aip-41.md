@@ -332,7 +332,7 @@ entry fun coin_toss(player: signer) {
    if (random_coin == 0) {
        // If heads, give player 100 coins (low gas path; attacker can ensure this always gets executed)
        award_hundred_coin(player);
-   } else /* random_card == 1 */ {
+   } else /* random_coin == 1 */ {
        // If tails, punish player (high gas path; attacker can ensure this never gets executed)
        lose_twenty_coins(player);
        lose_ten_health_points(player);
