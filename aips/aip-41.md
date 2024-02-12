@@ -261,11 +261,13 @@ Specifically, it ensures that calls to `randomly_pick_winner` cannot be made fro
 
 Smart contract platforms are an inherently-adversarial environment to deploy randomness in.
 
-The **key problem** with having a Move function’s execution be influenced by on-chain randomness (e.g., by `randomness::u64_integer`), is that the **effects** of its execution can be **tested for** by calling the function from another module (or from a Move script) and **aborting** if the outcomes are not the desired ones.
+**One problem** with having a Move function’s execution be influenced by on-chain randomness (e.g., by `randomness::u64_integer`), is that the **effects** of its execution can be **tested for** by calling the function from another module (or from a Move script) and **aborting** if the outcomes are not the desired ones.
+
+We discuss **mitigations** against this attack [in "Security Considerations" below](security-consideration-preventing-test-and-abort-attacks).
 
 #### An example attack
 
-Concretely, suppose `raffle::randomly_pick_winner` were a `public entry` function instead of a **private** entry function:
+Concretely, **suppose** `raffle::randomly_pick_winner` were a `public entry` function instead of a **private** entry function:
 
 ```rust
 public entry fun randomly_pick_winner(): address acquires Raffle, Credentials { /* ... */}
@@ -296,6 +298,47 @@ script {
             abort(1)
         };
     }
+}
+```
+
+
+### Undergasing attacks
+
+**Another problem** occurs when a Move function’s execution branches on a random value.
+For example, using an `if` statement on a random value creates two possible execution paths: the "then" branch and the "else" branch.
+The problem is these paths could have **different gas costs**: one path could be cheaper while another path could be more expensive in terms of gas.
+
+This would allow an attacker to bias the execution of the function by **undergasing** the TXN that calls it, ensuring only the cheap path executes successfully (while the expensive path always aborts with out of gas).
+Note that the attacker would have to repeatedly submit their TXN until the execution randomly takes the cheap path.
+As a result, the attacker could be wasting funds for the aborted TXNs that took the expensive path.
+Nonetheless, the attack is worth it if the cheap path is sufficiently profitable.
+
+We give an example of a vulnerable application below and discuss **mitigations** against this attack [in "Security Considerations" below](security-consideration-preventing-undergasing-attacks).
+
+#### An example of a vulnerable coin tossing function in a game
+
+A game might toss a coin and take two different execution paths based on it.
+This would be vulnerable to an undergasing attack.
+
+_Note:_ Not all helper functions & constants are defined, but the example should make sense nonetheless.
+
+```rust
+entry fun coin_toss(player: signer) {
+   let player = get_player(player);
+   assert!(!player.has_tossed_coin, E_COIN_ALREADY_TOSSED);
+
+   // Toss a random coin
+   let random_coin = randomness::u32_range(0, 2);
+   if (random_coin == 0) {
+       // If heads, give player 100 coins (low gas path; attacker can ensure this always gets executed)
+       award_hundred_coin(player);
+   } else /* random_coin == 1 */ {
+       // If tails, punish player (high gas path; attacker can ensure this never gets executed)
+       lose_twenty_coins(player);
+       lose_ten_health_points(player);
+       lose_five_armor_points(player);
+   }
+   player.has_tossed_coin = true;
 }
 ```
 
@@ -395,7 +438,9 @@ To make it more explicit that the transaction's outcome might not be the same on
 
 ### Security consideration: Preventing test-and-abort attacks
 
-The defense discussed in [“Test-and-abort attacks”](#test-and-abort-attacks) assumed that developers make proper use of **private** entry functions as the only entry point into their randapp. Unfortuantely, developers are fallible. Therefore, it is important to prevent **accidentally-introduced bugs**.
+The defense discussed in [“Test-and-abort attacks”](#test-and-abort-attacks) assumed that developers make proper use of **private** entry functions as the only entry point into their randapp. 
+Unfortuantely, developers are fallible. 
+Therefore, it is important to prevent **accidentally-introduced bugs**.
 
 We discuss two defenses below that we plan to use to enforce the proper usage of **private** `entry` functions as the only gateway into randapps.
 
@@ -431,6 +476,32 @@ We can inspect the Move VM callstack to check if a `randomness` **native** funct
 - <strike>This defense is rather aggresive as it interferes with the semantics of the Move language by aborting the execution of vulnerable randomness function calls, which would normally proceed without issue.</strike>
    + The randomness functions are native functions. It is perfectly fine to define custom abort semantics for them. It does not break any of the semantics of the Move language.
 
+### Security consideration: Preventing undergasing attacks
+
+If developers were aware of undergasing attacks, they could carefully write their contracts to avoid them (e.g., use a commit and execute pattern, where the 1st TXN commits to the randomness and the 2nd TXN executes the outcome, branching on the randomness).
+Unfortunately, the subtlety of the attack and its defenses is rather high.
+We therefore seek to proactively defend developers.
+
+In our proposed defense, the Move VM would enforce that randomness TXNs always:
+ 1. Declare their `max_gas` amount to be a sufficiently-high amount (e.g., the maximum allowed gas amount for a TXN),
+ 2. Lock up the gas in the TXN prologue before execution starts,
+ 3. Refund the remaining gas in the epilogue.
+
+If the locked up amount is sufficiently high to cover any TXN's execution, this defense ensures that randomness TXNs can never be undergased, completely obviating this class of attacks.
+
+To identify if a TXN uses randomness and, therefore, if the gas lockup should be done, we propose adding a `#[randomness]` annotation to any (private) entry functions that sample randomness:
+
+
+```rust
+#[randomness]
+entry fun coin_toss(player: signer)
+```
+
+If developers forget to add this annotation, their randomness TXNs would be aborted, ensuring safety against undergasing attacks.
+(To ensure liveness, a linter can help them detect missing annotations before their code is compiled.)
+
+_Note:_ Without such an annotation, the VM would have to lock up gas for _all_ TXNs which would affect the Aptos ecosystem (e.g., a dapp that transfers APT might always set the gas to some high amount like 1 APT, assuming that it is not locked up and that the TXN can use most of it; such dapps could now fail because their 1 APT would be locked up).
+
 ## Testing (optional)
 
 > What is the testing plan? How is this being tested?
@@ -453,6 +524,8 @@ Thanks to Kevin Hoang, Igor Kabiljo and Rati Gelashvili for their help on mitiga
 
 Thanks to Junkil Park for further simplifying the API.
 
+Thanks to Valeria Nikolaenko (a16z Crypto) for pointing out the undergasing attacks.
+
 ## Changelog 
 
 For posterity, past versions of this AIP were:
@@ -465,5 +538,6 @@ For posterity, past versions of this AIP were:
 - v1.2 (current):
   - Added protection against _test-and-abort_ attacks
   - Further simplified API by removing the `RandomNumberGenerator` struct.
-  - Discussed linter-based checks and callstack-based checks for improper uses of the `randomness` APIs.
+  - Discussed linter-based checks and callstack-based checks to defend against test-and-abort attacks.
+  - Discussed undergasing attacks and how to obviate them.
   - See [diff from v1.1 here](https://github.com/aptos-foundation/AIPs/compare/3e40b4e630eb8aa517b617799f8e578f5f937682..HEAD).
