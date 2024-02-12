@@ -1,5 +1,5 @@
 ---
-aip: 
+aip: 65
 title: Storage Fee for State Bytes refundable
 author: msmouse
 discussions-to (*optional): 
@@ -11,7 +11,7 @@ updated (*optional):
 requires (*optional): 
 ---
 
-# AIP-X - Storage Fee for State Bytes Refundable
+# AIP-65 - Storage Fee for State Bytes Refundable
 
 ## Summary
 
