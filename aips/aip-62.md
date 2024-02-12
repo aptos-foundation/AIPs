@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 62
 title: Wallet Standard
 author: 0xmaayan, hardsetting, NorbertBodziony
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/306
@@ -9,7 +9,7 @@ type: Standard
 created: 29/01/2024
 ---
 
-# AIP-X - Wallet Standard
+# AIP-62 - Wallet Standard
 
 ## Summary
 
