@@ -4,7 +4,7 @@ title: Wallet Standard
 author: 0xmaayan, hardsetting, NorbertBodziony
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/306
 Status: Draft
-last-call-end-date (*optional): 09/02/2024
+last-call-end-date (*optional): 19/02/2024
 type: Standard
 created: 29/01/2024
 ---
