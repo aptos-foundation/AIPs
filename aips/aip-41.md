@@ -309,8 +309,9 @@ For example, using an `if` statement on a random value creates two possible exec
 The problem is these paths could have **different gas costs**: one path could be cheaper while another path could be more expensive in terms of gas.
 
 This would allow an attacker to bias the execution of the function by **undergasing** the TXN that calls it, ensuring only the cheap path executes successfully (while the expensive path always aborts with out of gas).
-Note that the attacker would have to repeatedly submit their TXN until the execution randomly takes on the cheap path.
-Although the attacker would be wasting funds when their TXN's execution takes the expensive path and aborts, the attack could nonetheless be worth it if the cheap path is sufficiently profitable.
+Note that the attacker would have to repeatedly submit their TXN until the execution randomly takes the cheap path.
+As a result, the attacker could be wasting funds for the aborted TXNs that took the expensive path.
+Nonetheless, the attack is worth it if the cheap path is sufficiently profitable.
 
 We discuss **mitigations** against this attack [in "Security Considerations" below](security-consideration-preventing-undergasing-attacks).
 
