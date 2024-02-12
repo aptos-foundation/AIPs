@@ -304,9 +304,8 @@ script {
 
 ### Undergasing attacks
 
-**Another problem** occurs when a Move function’s execution is influenced by on-chain randomness. 
-For example, a contract might naturally want to branch on a random value.
-This would create two possible execution paths: the "then" branch and the "else" branch.
+**Another problem** occurs when a Move function’s execution branches on a random value.
+For example, using an `if` statement on a random value creates two possible execution paths: the "then" branch and the "else" branch.
 The problem is these paths could have **different gas costs**: one path could be cheaper while another path could be more expensive in terms of gas.
 
 This would allow an attacker to bias the execution of the function by **undergasing** the TXN that calls it, ensuring only the cheap path executes successfully (while the expensive path always aborts with out of gas).
