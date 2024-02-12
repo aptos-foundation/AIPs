@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 64
 title: Validator Transaction Type
 author: zhoujun@aptoslabs.com, daniel@aptoslabs.com
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Validator Transaction Type
+# AIP-64 - Validator Transaction Type
 
 ## Summary
 
