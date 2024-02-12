@@ -479,16 +479,28 @@ We can inspect the Move VM callstack to check if a `randomness` **native** funct
 ### Security consideration: Preventing undergasing attacks
 
 If developers were aware of undergasing attacks, they could carefully write their contracts to avoid them (e.g., use a commit and execute pattern, where the 1st TXN commits to the randomness and the 2nd TXN executes the outcome, branching on the randomness).
-Unfortunately, the subtlety of the attack and its defenses is very high.
-We therefore seek to proactively defend developers from creating undergasing vulnerabilities by misusing our APIs.
+Unfortunately, the subtlety of the attack and its defenses is rather high.
+We therefore seek to proactively defend developers.
 
-In our proposed defense, the Move VM would enforce that randomness TXNs always (1) declare their `max_gas` amount to be a sufficiently-high amount (e.g., the maximum allowed gas amount for a TXN) and (2) lock up the gas in the TXN prologue before execution starts, and (3) refund the remaining gas in the epilogue.
+In our proposed defense, the Move VM would enforce that randomness TXNs always:
+ 1. Declare their `max_gas` amount to be a sufficiently-high amount (e.g., the maximum allowed gas amount for a TXN),
+ 2. Lock up the gas in the TXN prologue before execution starts,
+ 3. Refund the remaining gas in the epilogue.
+
 If the locked up amount is sufficiently high to cover any TXN's execution, this defense ensures that randomness TXNs can never be undergased, completely obviating this class of attacks.
 
-To identify if a TXN uses randomness and, therefore, if the gas lockup should be done, we propose adding a `#[randomness]` annotation to any (private) entry functions that sample randomness.
-If developers forget to this, their TXNs will abort. 
-(However, a linter can help them detect this before their code is compiled.)
-Without such an annotation, the VM would have to lock up gas for _all_ TXNs which would affect the Aptos ecosystem (e.g., a dapp for transferring APT might always set the gas to some high amount like 1 APT, assuming that it is not locked up and the TXN can use most of it; such dapps would now fail because their 1 APT would be locked up).
+To identify if a TXN uses randomness and, therefore, if the gas lockup should be done, we propose adding a `#[randomness]` annotation to any (private) entry functions that sample randomness:
+
+
+```rust
+#[randomness]
+entry fun coin_toss(player: signer) {
+```
+
+If developers forget to add this annotation, their randomness TXNs would be aborted, ensuring safety against undergasing attacks.
+(A linter can help them detect missing annotations before their code is compiled.)
+
+_Note:_ Without such an annotation, the VM would have to lock up gas for _all_ TXNs which would affect the Aptos ecosystem (e.g., a dapp that transfers APT might always set the gas to some high amount like 1 APT, assuming that it is not locked up and that the TXN can use most of it; such dapps could now fail because their 1 APT would be locked up).
 
 ## Testing (optional)
 
