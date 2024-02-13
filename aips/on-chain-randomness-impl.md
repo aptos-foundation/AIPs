@@ -83,7 +83,7 @@ When validators are assigned with weights according to `validator_weights`, any 
 
 #### Rationale
 
-Since in production `secrecy_threshold_in_stake_ratio=0.5`  and `reconstruct_threshold_in_stake_ratio=0.66`, the subset of validators that can reveal the secret (randomness) must have a stake ratio in `(0.5, 0.66]`. Due to the Proof-of-Stake assumption where the adversary owns at most `1/3` of the stake, the adversary cannot reveal the secret by itself (since `1/3<0.5`), and the honest validators can always reveal the secret by themselves (since `2/3>0.66`).
+Since in production `secrecy_threshold_in_stake_ratio` is `0.5`  and `reconstruct_threshold_in_stake_ratio` is `0.66`, the subset of validators that can reveal the secret (randomness) must have a stake ratio in `(0.5, 0.66]`. Due to the Proof-of-Stake assumption where the adversary owns at most `1/3` of the stake, the adversary cannot reveal the secret by itself (since `1/3 < 0.5`), and the honest validators can always reveal the secret by themselves (since `2/3 > 0.66`).
 
 ### System design
 
