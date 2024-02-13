@@ -1,6 +1,6 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: Passkeys
+title: Passkey Accounts
 author: hariria
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: <Draft | Last Call | Accepted | Final | Rejected>
@@ -11,43 +11,43 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Passkey accounts
+# AIP-X - Passkey Accounts
 
 ## Summary
 
-This AIP proposes the first WebAuthn Authenticator for Aptos, enabling users to utilize passkeys and other WebAuthn credentials for on-chain accounts and transaction signing.
+This AIP proposes the first [WebAuthn](https://www.w3.org/TR/webauthn-3/) Authenticator for Aptos, enabling users to utilize passkeys and other WebAuthn credentials for transaction authentication.
 
-[Passkeys](https://fidoalliance.org/passkeys/) are designed to replace passwords as a phishing resistant, faster, and more secure form of user authentication. When a user registers a passkey, a new [public key credential](https://www.w3.org/TR/webauthn-3/#public-key-credential) is created on their device's [authenticator](https://www.w3.org/TR/webauthn-3/#authenticator) - which holds and manages the credentials for that user. As of February 2023, on iOS 16+, Android 9+, and MacOS 13+, the passkey can then securely sync with their device's cloud provider (iCloud or Google Password Manager, for example) using end-to-end encryption to ensure that the passkey is recoverable in the event that the device is lost. When signing in with the passkey, the user is prompted to authenticate - often with a biometric based [authorization gesture](https://www.w3.org/TR/webauthn-3/#authorization-gesture) like Face ID or Touch ID - and provides a response that proves ownership of the passkey via a digital signature.
+[Passkeys](https://fidoalliance.org/passkeys/) are designed to replace passwords as a phishing resistant, faster, and more secure form of user authentication. When a user registers a passkey, a new website-specific [public key credential](https://www.w3.org/TR/webauthn-3/#public-key-credential) is created on their device's [authenticator](https://www.w3.org/TR/webauthn-3/#authenticator). WebAuthn Authenticators securely store passkeys and enable users to access them via [authorization gestures](https://www.w3.org/TR/webauthn-3/#authorization-gesture) like Face ID or Touch ID. In future sessions with that website, the passkey can be used instead of a password to produce a digital signature that validates the identity of the user.
 
-Passkeys use the [WebAuthn specification](https://www.w3.org/TR/webauthn-3/), a standard co-created by the [FIDO alliance](https://fidoalliance.org/) and the [World Wide Web Consortium (W3C)](https://www.w3.org/), for passkey registration and authentication. We are choosing to use NIST P256 (`secp256r1`) as the first enabled WebAuthn signature scheme because of its broad support across most modern operating systems. Once complete, this will enable users to sign and submit transactions with any compatible WebAuthn credential on Aptos, including multi-device credentials registered on iOS, MacOS, and Android devices, as well as single-device, hardware-bound credentials on devices like Yubikeys.
+On Aptos, passkey transactions are authenticated via a [WebAuthn](https://www.w3.org/TR/webauthn-3/)-specific [`AccountAuthenticator`](#transaction-submission). Aptos currently supports NIST P256 (`secp256r1`) as the only valid WebAuthn signature scheme because of its broad support across most modern operating systems. The WebAuthn [`AccountAuthenticator`](#transaction-submission) enables Aptos users to sign and submit transactions with any compatible WebAuthn credential, including multi-device credentials registered on iOS, MacOS, and Android devices, as well as single-device, hardware-bound credentials on devices like Yubikeys.
 
 ## Motivation
 
 Blockchains have revolutionized digital asset ownership by providing users with the ability to fully control their account without a centralized custodian. This decentralized model, however, has drawbacks. If the user self-custodies their keys, they are fully responsible for the management of their account and there is no recovery path if users lose their private key.
 
-Passkeys provide a great choice for users to create secure private keys that are recoverable in the event of device loss. Furthermore passkeys make onboarding more seamless by enabling a user to create an account without having to write down a plaintext mnemonic or private key.
+Passkeys enable a user to seamlessly onboard into Web3 by offering a mechanism to create and recover an account without relying on plaintext mnemonics or private keys. Specifically, passkeys within the Apple or Android ecosystems can easily be recovered or sync to new devices, so long as that device exists within the same ecosystem (e.g., iOS and MacOS devices can sync passkeys via iCloud). Further opportunities for recoverability exist within Aptos with its native key rotation and support for K-of-N multikey accounts, as discussed in [AIP-55](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md).
 
 ## Goals
 
 The objectives of this AIP are twofold:
 
-- To enable users on Aptos to create an on-chain account associated with their WebAuthn credential
-- To enable users on Aptos to sign transactions with a WebAuthn credential
+1. To enable users on Aptos to create an on-chain account associated with their WebAuthn credential
+2. To enable users on Aptos to sign transactions with a WebAuthn credential
 
 ## Impact
 
 This AIP will benefit developers and users by providing them with an easy way to create non-phishable, recoverable private keys.
 
 1. **User-friendliness:**
-   1. WebAuthn credential registration (private key creation) and transaction signing can be done simply via device biometrics
+   1. WebAuthn credential registration (private key creation) and transaction signing can be done simply via user authentication such as device biometrics
    2. Enables users to interact with dapps via their Passkey accounts, without having to install a mobile or extension wallet: i.e., a **headless wallet experience**.
    3. By storing the private key securely on the device instead of the browser, passkeys eliminate the need for setting up a wallet password, traditionally required for encrypting private keys in the browser.
-   4. On certain operating systems, the passkey is backed up and syncs seamlessly with multiple devices (see [backup eligibility](#backup-eligibility)).
+   4. On certain operating systems, the passkey is backed up and syncs seamlessly with multiple devices (see [backup eligibility](#backup-state-and-eligiblity )).
 
 2. **Security:**
-   1. With passkeys, the private key is stored securely on the device instead of the browser, alleviating the need to store any sensitive material in browser storage where it could be potentially be accessed by a malicious party either through physical access on the device or supply chain attacks via a malicious dependency.
+   1. With passkeys, the private key is stored securely on the device instead of the browser, alleviating the need to store any sensitive material in browser storage where it could potentially be accessed by a malicious party either through physical access on the device or supply chain attacks via a malicious dependency.
    2. By default, passkeys provide a consent-driven signing experience and prompt the user to authenticate every time they sign, similar to Apple Pay or Google Pay.
-   3. Passkeys are bound to a relying party (e.g., a website) and are not phishable.
+   3. Passkeys are bound to a relying party (e.g., a website like a web-based wallet) and are not phishable.
 
 ## Alternative solutions
 
@@ -59,30 +59,49 @@ OIDB accounts present a unique and novel way to generate an on-chain account wit
 
 On the other hand, there are tradeoffs to consider as well:
 
-1. There are centralization and liveness concerns both on the OIDC provider and the services that OIDB accounts require to function in a privacy preserving manner (e.g., pepper service, proving service) respectively.
-2. Unless the ephemeral secret key ($\mathsf{esk}$) associated with the OIDB account of the user is encrypted (i.e., with a password) or is a passkey itself, the plaintext ephemeral secret key is still available on the browser, leaving it potentially vulnerable to a malicious actor (but only during its short expiration window). Passkey private keys, on the other hand, are stored on the device when the passkey is backed up, often within a secure element on the device and not on the browser.
+1. There are centralization and liveness concerns both on the OIDC provider and the services needed for OIDB accounts to function in a privacy preserving manner (e.g., pepper service, proving service) respectively.
+2. Unless the ephemeral secret key ($\mathsf{esk}$) associated with the OIDB account of the user is encrypted (i.e., with a password) or is a passkey itself, the plaintext ephemeral secret key is still available on the browser, leaving it potentially vulnerable to a malicious actor (but only during its short expiration window). Passkey private keys, on the other hand, are often stored securely within an authenticator on the device and end-to-end encrypted during backup.
+
+## User Flow Overview
+
+The goal of this AIP is not to prescribe the method for integrating passkeys into your Aptos application; however, for demonstration purposes, here is an example of how one might use a passkey for transaction signing with a website.
+
+Suppose a new user, Alice, wants to create an account on Aptos and use that account to send money to her friend, Bob, on Aptos.
+
+1. Alice visits a wallet website and creates an account.
+2. During account creation, the wallet prompts Alice to register a passkey for the site.
+3. Alice consents via an authorization gesture (biometric authorization, such as Face ID or Touch ID) and creates a passkey that is bound to that wallet website.
+4. The wallet generates an Aptos address from Alice's passkey public key.
+5. Alice transfers some APT to her address to create the account on chain.
+7. On the web wallet, Alice signs a transaction to send 1 APT to Bob's address.
+8. The dApp requests Alice to sign the transaction via her passkey.
+9. Alice consents via an authorization gesture (biometric authorization, such as Face ID or Touch ID).
+10. The transaction (with the passkey signature and public key) is successfully submitted to the Aptos blockchain, and the APT is transferred to Bob's account.
 
 ## Specification
+
+Passkeys use the [WebAuthn specification](https://www.w3.org/TR/webauthn-3/), a standard co-created by the [FIDO alliance](https://fidoalliance.org/) and the [World Wide Web Consortium (W3C)](https://www.w3.org/), for passkey registration and authentication. Below, this AIP discusses the ways in which the WebAuthn specification is used for transaction authentication on Aptos.
 
 ### Terminology
 
 - [**OIDB account**](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md): An OpenID blockchain (OIDB) account whose security and liveness is backed by an OIDC account (e.g., a Google account) rather than a secret key.
 - [**Relying party**](https://www.w3.org/TR/webauthn-3/#relying-party): The website, application, or service that the user is trying to access, which is responsible for verifying a signature from the user's passkey to ensure that the user is who they claim to be. For simplicity, we can say that a "relying party" is synonymous with a **wallet** in this context since both are responsible for managing the user's access to a private key.
 - [**WebAuthn Authenticator**](https://www.w3.org/TR/webauthn-3/#authenticator): A cryptographic entity, existing in hardware or software, that can register a user with a given relying party and later assert possession of the registered public key credential, and optionally verify the user to the relying party.
+- [**Account Authenticator**](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md#summary): Authorizes the execution of a transaction on Aptos by the set of senders or approvers of the accounts within the transaction.
 
 
 ### Aptos Account Creation with Passkeys
 
-During the registration of a new WebAuthn credential, an asymmetric key (i.e., a **private key** and its associateed **public key**) is generated securely on that device. The public key associated with the WebAuthn credential can be used to derive an associated account on chain. The private key, which controls the account, will be secured by the device.
+During the registration of a new WebAuthn credential, an asymmetric key (i.e., a **private key** and its associated **public key**) is generated securely via the WebAuthn Authenticator on that device. The public key associated with the WebAuthn credential can be used to derive an associated account on chain. The private key, which controls the account, will be secured by the WebAuthn Authenticator on the device.
 
 The registration process is particularly important for several reasons:
 
-1. The public key associated with the credential is only revealed during registration. Assertion responses (signing with the passkey) do NOT return the public key. Thus, the registration response must be parsed and the relevant information about the credential should be stored properly and persisted in storage by the relying party.
+1. The public key associated with the credential is only revealed during registration. Assertion responses (signing with the passkey) do NOT return the public key. Thus, the registration response must be parsed and the relevant information about the credential should be stored properly and persisted in the backend by the wallet.
 2. The registration response includes `flags` that describe the backup characteristics of the credential. If passkey backup is an important consideration, these flags should be evaluated **BEFORE** the on-chain account is created.
 
 #### [`PublicKeyCredentialCreationOptions`](https://www.w3.org/TR/webauthn/#dictdef-publickeycredentialcreationoptions)
 
-Every WebAuthn credential is created by the relying party (RP) with a set of options, called `PublicKeyCredentialCreationOptions`. These options help configure many aspects of the WebAuthn credential, including, but not limited to:
+Every WebAuthn credential is created by the wallet with a set of options, called `PublicKeyCredentialCreationOptions`. These options help configure many aspects of the WebAuthn credential, including, but not limited to:
 
 - The asymmetric key type for the credential (`Ed25519`, `ECDSA`, `RSA`, etc.)
 - User verification requirements during assertions
@@ -98,7 +117,7 @@ To make a WebAuthn credential compatible with Aptos, the `pubKeyCredParams` arra
 
 **[`PublicKeyCredentialUserEntity`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialuserentity)**
 
-Each authenticator stores a [credentials map](https://www.w3.org/TR/webauthn-3/#authenticator-credentials-map), a map from ([`rpId`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-rpid), [[`userHandle`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-userhandle)]) to public key credential source. For context, a [user handle](https://www.w3.org/TR/webauthn-3/#user-handle) is a unique id for the credential, similar to a `credentialId`, but chosen by the relying party instead of the authenticator. If the user creates another credential with the same `userHandle` as an existing credential on that authenticator (on that user's device / platform), it will **OVERWRITE** the existing credential, thus overwriting the private key associated with a passkey account. To avoid this, it is **IMPERATIVE** for the relying party to maintain a list of previously registered credentials and corresponding user handles.
+Each authenticator stores a [credentials map](https://www.w3.org/TR/webauthn-3/#authenticator-credentials-map), a map from ([`rpId`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-rpid), [[`userHandle`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-userhandle)]) to public key credential source. For context, a [user handle](https://www.w3.org/TR/webauthn-3/#user-handle) is a unique id for the credential, similar to a `credentialId`, but chosen by the wallet instead of the authenticator. If the user creates another credential with the same `userHandle` as an existing credential on that authenticator (on that user's device/platform), it will **OVERWRITE** the existing credential, thus overwriting the private key associated with a passkey account. To avoid this, it is **IMPERATIVE** for the wallet to maintain a list of previously registered credentials and corresponding user handles.
 
 #### Registration Response
 
@@ -160,7 +179,7 @@ pub struct AuthenticatorAttestationResponse {
 | extensions             | variable (if present)     | Extension-defined authenticator data. This is a CBOR [RFC8949] map with extension identifiers as keys, and authenticator extension outputs as values. See § 9 WebAuthn Extensions for details.                                                                                                                                                                               |
 
 
-The `authenticatorData` in an attestation response (`AuthenticatorAttestationResponse`) contains `flags` that provide information on the **backup eligibility** and **backup state** of the WebAuthn credential. If the relying party (RP) deems that backup should be required for a WebAuthn credential, the RP should check the Backup Eligibility (`BE`)and Backup State (`BS`) flags in the `AuthenticatorAttestationResponse` to ensure that the credential is backed up. Having both `BE` and `BS` set to true implies that the [credential is a multi-device credential and is currently backed up](https://www.w3.org/TR/webauthn-3/#sctn-credential-backup).
+The `authenticatorData` in an attestation response (`AuthenticatorAttestationResponse`) contains `flags` that provide information on the **backup eligibility** and **backup state** of the WebAuthn credential. If the wallet deems that backup should be required for a WebAuthn credential, the RP should check the Backup Eligibility (`BE`)and Backup State (`BS`) flags in the `AuthenticatorAttestationResponse` to ensure that the credential is backed up. Having both `BE` and `BS` set to true implies that the [credential is a multi-device credential and is currently backed up](https://www.w3.org/TR/webauthn-3/#sctn-credential-backup).
 
 For those looking to use passkeys as a recoverable private key alternative for Aptos accounts, it is highly advised that the `BE` and `BS` flags both be set to `true` **BEFORE** the on-chain account is created to ensure that the account is recoverable in the event of device loss.
 
@@ -199,7 +218,7 @@ With the raw public key, an Aptos account address can be derived. Note that the 
 
 In a traditional client-server implementation of the WebAuthn specification, both registering a new credential and authentication assertion use [challenge-response authentication](https://en.wikipedia.org/wiki/Challenge%E2%80%93response_authentication) to avoid several types of attacks. Randomized challenges are particularly important for protecting against [replay attacks](https://en.wikipedia.org/wiki/Replay_attack) [(§13.4.3)](https://www.w3.org/TR/webauthn-3/#sctn-cryptographic-challenges).
 
-Aptos is adapting the WebAuthn specification to be used for on-chain accounts and transactions. As many already know, on-chain transactions include a sequence number to avoid replay attacks on Aptos. Thus, if transactions are used as the challenge in a WebAuthn assertion, the replay attack risk is mitigated even if the challenge is not randomly generated by the relying party.
+Aptos is adapting the WebAuthn specification to be used for on-chain accounts and transactions. As many already know, on-chain transactions include a sequence number to avoid replay attacks on Aptos. Thus, if transactions are used as the challenge in a WebAuthn assertion, the replay attack risk is mitigated even if the challenge is not randomly generated by the wallet.
 
 #### [`challenge`](https://www.w3.org/TR/webauthn-3/#authenticatorassertionresponse)
 
@@ -357,7 +376,7 @@ Testing can be found in the reference implementation provided in the PR link abo
 
 ## Risks and Drawbacks
 
-### Backup Eligibility 
+### Backup State and Eligiblity 
 
 As mentioned in AIP 61:
 
@@ -373,13 +392,24 @@ See the [operating system reference](https://passkeys.dev/docs/reference/) to be
 
 See this [device support matrix](https://passkeys.dev/device-support/) for more info on which browsers and operating systems enable backup-able passkeys.
 
+#### Incompetent / Malicious Authenticators
+
+If a user's authenticator is backup eligible, in many cases, the passkey will be backed up to their iCloud or Google Password Manager account. In some instances, however, a user may have a custom authenticator, like a password manager (e.g., 1Password), that stores the passkey. 
+
+When registering a passkey with a password manager, the passkey will be backed up to the user's password manager account instead of their iCloud or Google Password Manager account. This is an important consideration for backup eligibility and backup state as the user trusts the password manager and their implementation of the Client to Authenticator Protocol ([CTAP](https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130)) for passkey backup. As mentioned in the [Compromised Cloud Provider](#Compromised-Cloud-Provider) section below, if the password manager is compromised, so is your passkey account.
+
+To mitigate the risk of potentially malicious authenticators, the wallet should parse the Attested Credential Data in the Authenticator Data for the [`AAGUID`](https://www.w3.org/TR/webauthn-2/#sctn-authenticator-model) associated with the credential. 
+
+The [`AAGUID`](https://www.w3.org/TR/webauthn-2/#sctn-authenticator-model) is a 128-bit identifier indicating the type (e.g. make and model) of the authenticator. The [`AAGUID`](https://www.w3.org/TR/webauthn-2/#sctn-authenticator-model) associated with Google Password Manager, iCloud, and several other password managers can be found on the [passkey-authenticator-aaguids](https://github.com/passkeydeveloper/passkey-authenticator-aaguids/blob/main/aaguid.json) repo.
+
+
 ### Wallet Liveness
 
-An important **liveness consideration** is that the relying party (e.g., a wallet) that is tied to your passkey must be available in order for users to access their accounts. 
+An important **liveness consideration** is that the wallet that is tied to your passkey must be available in order for users to access their accounts. 
 
-Several supported browsers, like Google Chrome, that implement the Client to Authenticator Protocol ([CTAP](https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html)), which regulates the communication protocol between a roaming authenticator and the browser, check to see if the relying part is available before allowing the user to register or make an assertion with the passkey.
+Several supported browsers, like Google Chrome, that implement the Client to Authenticator Protocol ([CTAP](https://fidoalliance.org/specs/fido-v2.0-ps-20190130/fido-client-to-authenticator-protocol-v2.0-ps-20190130.html)), which regulates the communication protocol between a roaming authenticator and the browser, check to see if the wallet is available before allowing the user to register or make an assertion with the passkey.
 
-In other words, if the relying party is unavailable or returns an error like a 404, the user will not be able to use the passkey associated with that relying party until the relying party comes back online. This includes signing transactions with your passkey.
+In other words, if the wallet is unavailable or returns an error like a 404, the user will not be able to use the passkey associated with that wallet until the wallet comes back online. This includes signing transactions with your passkey.
 
 To learn more about how chromium handles assertion and registration requests, see [`webauthn_handler.h`](https://github.com/chromium/chromium/blob/95bb60bf7fd3d18f469f050b60663b3dbdfa0402/content/browser/devtools/protocol/webauthn_handler.h#L19)
 
@@ -389,9 +419,9 @@ If your passkey is a multi-device credential, backed up to iCloud or Google Pass
 
 Note this only affects multi-device credentials, not hardware-bound credentials like Yubikeys as those are not backed up.
 
-### Incompetent or Malicious Relying Party
+### Incompetent or Malicious Wallet
 
-- If the relying party loses the public key associated with the account, the user will be unable to submit transactions to the blockchain as transactions require a public key for signature verification. That being said, there may be ways to mitigate this via [ECDSA public key recovery](https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-examples#public-key-recovery-from-the-ecdsa-signature).
+- If the wallet loses the public key associated with the account, the user will be unable to submit transactions to the blockchain as transactions require a public key for signature verification. That being said, there are ways to mitigate this via [ECDSA public key recovery](https://wiki.hyperledger.org/display/BESU/SECP256R1+Support#SECP256R1Support-PublicKeyRecoveryfromSignature). This is an important consideration for future supported WebAuthn signature schemes as other signature schemes like `ed25519` do not support public key recovery inthe same way that ECDSA does.
 - If the user creates another credential with the same `userHandle` as an existing credential on that authenticator, it will **OVERWRITE** the existing credential
 
 ## Future Potential
