@@ -87,9 +87,7 @@ Since in production `secrecy_threshold_in_stake_ratio=0.5`  and `reconstruct_thr
 
 ### System design
 
-On-chain randomness introduces several changes to the current Aptos blockchain system, including running a wDKG for every epoch change, modifying the existing reconfiguration process, and generating a randomness seed for every block.
-
-Before diving into details, here is a brief background on the Aptos blockchain.
+On-chain randomness introduces several changes to the current Aptos blockchain system, including running a wDKG for every epoch change, modifying the existing reconfiguration process, and generating a randomness seed for every block. This section describes the above system changes. More technical details of the design can be found in our [paper](https://eprint.iacr.org/2024/198).
 
 #### Background on Aptos Blockchain
 
@@ -103,13 +101,14 @@ The blockchain also decouples consensus (i.e., currently a BFT consensus protoco
 
 The goal of wDKG is to have validators jointly generate a *shared secret*, which will be used to compute the randomness seed for every block. Aptos Roll runs a *non-interactive* wDKG *before* every epoch change. The design rationale is the following.
 
-- Before epoch change instead of after. If the wDKG starts after the epoch change (at beginning of the new epoch), then the validators do not have the shared secret setup for the randomness generation when epoch starts. Until the wDKG finishes, validators cannot process any transaction that requires randomness, which may take tens of seconds. Therefore, the design of Aptos Roll runs wDKG before the epoch starts, so that the new epoch starts with setup ready for generating randomness.
-- Non-interactivity. The new validators of the next epoch may be offline until the new epoch starts. This means an interactive wDKG, which requires the new validators to interact with the current validators, is not feasible. In contrast, the non-interactive wDKG does not require the new validators to be online, and can use the blockchain as the broadcast channel among old and new validators when epoch change.
+- Why use weighted DKG instead of unweighted DKG? As previously mentioned, the security of the on-chain randomness assumes proof-of-stake, therefore the DKG needs to incorporate the weights of the validators when generating the shared secret for randomness generation.
+- Why running wDKG before epoch change instead of after? If the wDKG starts after the epoch change, then the validators do not have the shared secret setup for the randomness generation when epoch starts. Until the wDKG finishes, validators cannot process any transaction that requires randomness. On the other hand, when running wDKG before the epoch change, validators can generate randomness and process transactions immediately after entering the new epoch. 
+- Why use non-interactive wDKG? The new validators of the next epoch may be offline until the new epoch starts. This means an interactive wDKG, which requires the new validators to interact with the current validators, is not feasible. In contrast, the non-interactive wDKG does not require the new validators to be online, and can use the blockchain as the broadcast channel among old and new validators when epoch change.
 
 Here is the description of the non-interactive wDKG designed and implemented for Aptos Roll.
 
-- When the current epoch reaches predefined limit (2 hours) or a governance proposal requires a reconfiguration, each validator will act as a *dealer*: it computes a *weighted publicly-verifiable secret sharing (wPVSS) transcript* based on the weight distribution of the next-epoch validators after rounding, and sends it to all validators via a reliable multicast.
-- Once each validator receives a secure-subset of *valid transcripts* from 66% of the stake, it aggregates the valid transcript into a single final *aggregated transcript* and passes it on to consensus. More specifically, the validator will propose the aggregated wPVSS transcript via validator transaction. Upon committing on the first validator transaction that contains a valid aggregated wPVSS transcript, validators finish the wDKG and start the new epoch.
+- When the current epoch reaches predefined limit (2 hours) or a governance proposal requires a reconfiguration, each validator will act as a *dealer*: it first computes the weight distribution (`validator_weights`) and the weight threshold (`reconstruct_threshold_in_weights`) of the next-epoch validators via rounding, and then computes a *weighted publicly-verifiable secret sharing (wPVSS) transcript* based on the weight distribution and threshold, and sends it to all validators via a reliable multicast.
+- Once each validator receives a secure-subset of *valid transcripts* from 66% of the stake, it aggregates the valid transcript into a single final *aggregated transcript* and passes it on to consensus. More specifically, the validator will propose the aggregated wPVSS transcript via a `ValidatorTransaction`. Upon committing on the first `ValidatorTransaction` that contains a valid aggregated wPVSS transcript, validators finish the wDKG and start the new epoch.
 - Finally, when the new epoch begins and the new validators are online, they can decrypt their shares of the secret from the aggregated transcript. At this point, the new validators will be ready to produce randomness for every block by evaluating a wVRF in a secret-shared manner, as we explain in a later section.
 
 #### Reconfiguration
@@ -134,10 +133,10 @@ There is one more complication about the async reconfiguration due to *on-chain 
 
 #### Randomness Generation Using wVRFs
 
-In each epoch, the validators can collaborate to produce randomness for every block finalized by consensus, by  evaluating a *weighted verifiable random function (wVRF)* using shared secret established by wDKG. 
+In each epoch, the validators will collaborate to produce randomness for *every* block finalized by consensus, by evaluating a *weighted verifiable random function (wVRF)* using shared secret established by wDKG. 
 
-- When a block achieves consensus finalization, each validator will use its decrypted share from the aggregated wPVSS transcript, produce its wVRF *share* for that block and reliably-multicast this share.
-- Upon collecting wVRF shares that exceeds the reconstruction weight threshold (by the stake rounding algorithm), every validator will combine them into (and agree on) a final wVRF *evaluation*, which becomes the block seed. Lastly, this seed is attached to the block and the block is sent for execution.
+- When a block achieves consensus finalization, each validator will use its decrypted share from the aggregated wPVSS transcript to produce its wVRF *share* for that block by evaluating *wVRF* on block-specific unbiasable message (e.g., epoch number and round number), and reliably-multicast this share.
+- Upon collecting wVRF shares that exceeds the reconstruction weight threshold (`reconstruct_threshold_in_weights` by the stake rounding algorithm), every validator will combine them and derive the same final wVRF *evaluation*, which essentically equals to the shared secret evaluated on the block-specific unbiasable message. Lastly, validators attach wVRF *evaluation* as the block seed and send the block for execution.
 
 Importantly, only 50% or more of the stake can compute the wVRF evaluation, which ensures **unpredictability**. Furthermore, the uniqueness property of wVRFs together with the secrecy of the wPVSS scheme ensure **unbiasability** against adversaries controlling less than 50% of the stake.
 
@@ -203,7 +202,7 @@ Further stress testing in `previewnet`.
 
  > Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
  > You are responsible for updating this AIP with a better estimate, if any, after the AIP passes the gatekeeper’s design review.
- >
+ > 
  > - On devnet?
  > - On testnet?
  > - On mainnet?
