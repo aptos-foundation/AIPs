@@ -91,11 +91,11 @@ On-chain randomness introduces several changes to the current Aptos blockchain s
 
 #### Background on Aptos Blockchain
 
-Aptos is a proof-of-stake (PoS) blockchain with a consensus algorithm that operates in periodic two-hour intervals known as *epochs*. The set of validators and their stake distribution remain fixed within each epoch, and can change across epoch boundaries. The validators of the next epoch do not come online until the new epoch starts.
+Aptos is a **proof-of-stake (PoS)** blockchain with a consensus algorithm that operates in periodic two-hour intervals known as **epochs**. The set of validators and their stake distribution remain fixed within each epoch, and can change across epoch boundaries. The validators of the next epoch do not come online until the new epoch starts.
 
-The blockchain also decouples consensus (i.e., currently a BFT consensus protocol named [Jolteon](https://arxiv.org/abs/2106.10362)) from execution (i.e., an optimistic concurrency control execution engine named [BlockSTM](https://medium.com/aptoslabs/block-stm-how-we-execute-over-160k-transactions-per-second-on-the-aptos-blockchain-3b003657e4ba)), where each block is first finalized by consensus and then executed to update the blockchain state.
+The blockchain also decouples **consensus** (i.e., currently a BFT consensus protocol named [Jolteon](https://arxiv.org/abs/2106.10362)) from **execution** (i.e., an optimistic concurrency control execution engine named [BlockSTM](https://medium.com/aptoslabs/block-stm-how-we-execute-over-160k-transactions-per-second-on-the-aptos-blockchain-3b003657e4ba)), where each block is first finalized by consensus and then executed to update the blockchain state.
 
-*This consensus-execution decoupling is especially important for on-chain randomness, because it allows the network to first commit to an ordering of transactions before computing and revealing randomness later on, which ensures the randomness is unbiasable and unpredictable.*
+**Note:** This consensus-execution decoupling is especially important for on-chain randomness, because it allows the network to first commit to an ordering of transactions before computing and revealing randomness later on, which ensures the randomness is unbiasable and unpredictable.
 
 #### Weighted Distributed Key Generation Using wPVSS
 
