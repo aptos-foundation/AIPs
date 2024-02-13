@@ -241,7 +241,7 @@ During an assertion, the `SHA3-256` digest of `signing_message(raw_transaction)`
 In other words, the `challenge` is:
 
 $$
-challenge = H(signing\_message(raw\_transaction))
+challenge = H({signing\\_message(raw\\_transaction)})
 $$
 
 where $H$ is a `SHA3-256` hash.
@@ -266,8 +266,10 @@ The `signature` included in the `AuthenticatorAssertionResponse` is computed ove
 In other words, for a signature $\sigma$:
 
 $$
-m = authenticatorData \ || \ H(clientDataJSON)\\
-\sigma = sign(sk, m)
+\begin{aligned}
+m &= \text{authenticatorData} \ || \ H(\text{clientDataJSON})\\
+\sigma &= \text{sign}(\text{sk}, m)
+\end{aligned}
 $$
 
 where $H$ is a `SHA-256` hash (note: NOT `SHA3-256`), $sk$ is the passkey secret key (private key), and $||$ is binary concatenation.
@@ -351,7 +353,7 @@ pub struct PartialAuthenticatorAssertionResponse {
 
 Once the transaction has reached the signature verification step, the WebAuthn authenticator will then perform the following steps on the signature $\sigma$:
 
-1. Verify that the actual `RawTransaction` matches the expected `challenge` from `clientDataJSON` by computing $H(signing\_message(raw\_transaction))$, where $H$ is a `SHA3-256` hash, and verifying that it equals the `challenge` in `clientDataJSON`
+1. Verify that the actual `RawTransaction` matches the expected `challenge` from `clientDataJSON` by computing $H(signing\\_message(raw\\_transaction))$, where $H$ is a `SHA3-256` hash, and verifying that it equals the `challenge` in `clientDataJSON`
 2. Reconstruct the message `m` with the `clientDataJSON`, and `authenticatorData`, and
 3. Given the message `m`, a public key `pk` and a raw signature $\sigma$, apply a verification function to determine if $V(σ, m, pk)$ evaluates to `true`
 
