@@ -39,7 +39,7 @@ At the same time, we must do this without imposing a high penalty on the blockch
  > Describe the impetus for this change. What does it accomplish?
  > What might occur if we do not accept this proposal?
 
-As already described in [AIP-41](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md#motivation), the need for on-chain randomness arises in many applications, such as decentralized games, raffles, randomized NFTs, randomized airdrops, and more. Plus, many blockchain applications will benefit from randomness in terms of fairness, security, and functionality.
+As already described in AIP-41[^aip-41] the need for on-chain randomness arises in many applications, such as decentralized games, raffles, randomized NFTs, randomized airdrops, and more. Plus, many blockchain applications will benefit from randomness in terms of fairness, security, and functionality.
 
 ## Impact
 
@@ -65,7 +65,7 @@ On-chain randomness interacts with & impacts our consensus protocol. The two pro
 
 Aptos Roll relies on rounding the stakes of each validator into a smaller *weight.* This is very good for achieving practical performance but has implications on secrecy and availability. Specifically, any rounding scheme will lead to **rounding errors**: i.e., some players might receive more secret shares than they deserve and other players might receive less. As a result, this effectively turns the threshold secret sharing scheme into a *ramp secret sharing scheme,* which has a different secrecy threshold and a different reconstruction threshold. Typically, the reconstruction threshold is higher. As a consequence, for liveness, the mechanism needs to ensure any 66% or more of the stake can reconstruct while secrecy holds against any 33% or less of the stake. To minimize the impact of MEV attacks, we chose to make the secrecy threshold even higher, setting it to 50% while still keeping the reconstruction threshold below 66%, to handle a 33% adversary.
 
-Below we give a brief description of the rounding interface and its guarantees. More technical details of the rounding algorithm can be found in our [paper](https://eprint.iacr.org/2024/198).
+Below we give a brief description of the rounding interface and its guarantees. More technical details of the rounding algorithm can be found in our paper[^DPTX24e].
 
 #### Rounding interface
 
@@ -87,7 +87,7 @@ Since in production `secrecy_threshold_in_stake_ratio` is `0.5`  and `reconstruc
 
 ### System design
 
-On-chain randomness introduces several changes to the current Aptos blockchain system, including running a wDKG for every epoch change, modifying the existing reconfiguration process, and generating a randomness seed for every block. This section describes the above system changes. More technical details of the design can be found in our [paper](https://eprint.iacr.org/2024/198).
+On-chain randomness introduces several changes to the current Aptos blockchain system, including running a wDKG for every epoch change, modifying the existing reconfiguration process, and generating a randomness seed for every block. This section describes the above system changes. More technical details of the design can be found in our paper[^DPTX24e].
 
 #### Background on Aptos Blockchain
 
@@ -229,3 +229,4 @@ Under-gasing attack preventions.
 ## References
 
 [^aip-41]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md
+[^DPTX24e]: **Distributed Randomness using Weighted VRFs**, by Sourav Das and Benny Pinkas and Alin Tomescu and Zhuolun Xiang, 2024, [[URL]](https://eprint.iacr.org/2024/198)
