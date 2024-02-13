@@ -2,11 +2,11 @@
 aip: 66
 title: Passkey Accounts
 author: hariria
-discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: <Draft | Last Call | Accepted | Final | Rejected>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/322
+Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedback and reviews>
 type: Standard (Core/Framework)
-created: <12/14/2023>
+created: 12/14/2023
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
