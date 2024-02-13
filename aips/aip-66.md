@@ -41,11 +41,11 @@ This AIP will benefit developers and users by providing them with an easy way to
 1. **User-friendliness:**
    1. WebAuthn credential registration (private key creation) and transaction signing can be done simply via user authentication such as device biometrics
    2. Enables users to interact with dapps via their Passkey accounts, without having to install a mobile or extension wallet: i.e., a **headless wallet experience**.
-   3. By storing the private key securely on the device instead of the browser, passkeys eliminate the need for setting up a wallet password, traditionally required for encrypting private keys in the browser.
+   3. By storing the private key securely in the WebAuthn Authenticator instead of browser storage (e.g., localstorage), passkeys eliminate the need for setting up a wallet password, traditionally required for encrypting private keys in the browser.
    4. On certain operating systems, the passkey is backed up and syncs seamlessly with multiple devices (see [backup eligibility](#backup-state-and-eligiblity )).
 
 2. **Security:**
-   1. With passkeys, the private key is stored securely on the device instead of the browser, alleviating the need to store any sensitive material in browser storage where it could potentially be accessed by a malicious party either through physical access on the device or supply chain attacks via a malicious dependency.
+   1. With passkeys, the private key is not stored in browser storage (e.g., localStorage) where it could potentially be accessed by a malicious party either through physical access on the device or supply chain attacks via a malicious dependency.
    2. By default, passkeys provide a consent-driven signing experience and prompt the user to authenticate every time they sign, similar to Apple Pay or Google Pay.
    3. Passkeys are bound to a relying party (e.g., a website like a web-based wallet) and are not phishable.
 
@@ -66,17 +66,17 @@ On the other hand, there are tradeoffs to consider as well:
 
 The goal of this AIP is not to prescribe the method for integrating passkeys into your Aptos application; however, for demonstration purposes, here is an example of how one might use a passkey for transaction signing with a website.
 
-Suppose a new user, Alice, wants to create an account on Aptos and use that account to send money to her friend, Bob, on Aptos.
+Suppose a new user, Alice, wants to create an account on Aptos and use that account to send money to her friend, Bob.
 
 1. Alice visits a wallet website and creates an account.
 2. During account creation, the wallet prompts Alice to register a passkey for the site.
 3. Alice consents via an authorization gesture (biometric authorization, such as Face ID or Touch ID) and creates a passkey that is bound to that wallet website.
 4. The wallet generates an Aptos address from Alice's passkey public key.
 5. Alice transfers some APT to her address to create the account on chain.
-7. On the web wallet, Alice signs a transaction to send 1 APT to Bob's address.
-8. The dApp requests Alice to sign the transaction via her passkey.
-9. Alice consents via an authorization gesture (biometric authorization, such as Face ID or Touch ID).
-10. The transaction (with the passkey signature and public key) is successfully submitted to the Aptos blockchain, and the APT is transferred to Bob's account.
+6. On the web wallet, Alice signs a transaction to send 1 APT to Bob's address.
+7. The dApp requests Alice to sign the transaction via her passkey.
+8. Alice consents via an authorization gesture (biometric authorization, such as Face ID or Touch ID).
+9. The transaction (with the passkey signature and public key) is successfully submitted to the Aptos blockchain, and the APT is transferred to Bob's account.
 
 ## Specification
 
@@ -117,7 +117,7 @@ To make a WebAuthn credential compatible with Aptos, the `pubKeyCredParams` arra
 
 **[`PublicKeyCredentialUserEntity`](https://www.w3.org/TR/webauthn-3/#dictdef-publickeycredentialuserentity)**
 
-Each authenticator stores a [credentials map](https://www.w3.org/TR/webauthn-3/#authenticator-credentials-map), a map from ([`rpId`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-rpid), [[`userHandle`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-userhandle)]) to public key credential source. For context, a [user handle](https://www.w3.org/TR/webauthn-3/#user-handle) is a unique id for the credential, similar to a `credentialId`, but chosen by the wallet instead of the authenticator. If the user creates another credential with the same `userHandle` as an existing credential on that authenticator (on that user's device/platform), it will **OVERWRITE** the existing credential, thus overwriting the private key associated with a passkey account. To avoid this, it is **IMPERATIVE** for the wallet to maintain a list of previously registered credentials and corresponding user handles.
+Each authenticator stores a [credentials map](https://www.w3.org/TR/webauthn-3/#authenticator-credentials-map), a map from ([`rpId`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-rpid), [[`userHandle`](https://www.w3.org/TR/webauthn-3/#public-key-credential-source-userhandle)]) to public key credential source. For context, a [user handle](https://www.w3.org/TR/webauthn-3/#user-handle) is a unique id for the credential, similar to a `credentialId`, but chosen by the wallet instead of the WebAuthn Authenticator. If the user creates another credential with the same `userHandle` as an existing credential on that authenticator (on that user's device/platform), it will **OVERWRITE** the existing credential, thus overwriting the private key associated with a passkey account. To avoid this, it is **IMPERATIVE** for the wallet to maintain a list of previously registered credentials and corresponding user handles.
 
 #### Registration Response
 
@@ -179,7 +179,7 @@ pub struct AuthenticatorAttestationResponse {
 | extensions             | variable (if present)     | Extension-defined authenticator data. This is a CBOR [RFC8949] map with extension identifiers as keys, and authenticator extension outputs as values. See § 9 WebAuthn Extensions for details.                                                                                                                                                                               |
 
 
-The `authenticatorData` in an attestation response (`AuthenticatorAttestationResponse`) contains `flags` that provide information on the **backup eligibility** and **backup state** of the WebAuthn credential. If the wallet deems that backup should be required for a WebAuthn credential, the RP should check the Backup Eligibility (`BE`)and Backup State (`BS`) flags in the `AuthenticatorAttestationResponse` to ensure that the credential is backed up. Having both `BE` and `BS` set to true implies that the [credential is a multi-device credential and is currently backed up](https://www.w3.org/TR/webauthn-3/#sctn-credential-backup).
+The `authenticatorData` in an attestation response (`AuthenticatorAttestationResponse`) contains `flags` that provide information on the **backup eligibility** and **backup state** of the WebAuthn credential. If the wallet deems that backup should be required for a WebAuthn credential, the wallet should check the Backup Eligibility (`BE`)and Backup State (`BS`) flags in the `AuthenticatorAttestationResponse` to ensure that the credential is backed up. Having both `BE` and `BS` set to true implies that the [credential is a multi-device credential and is currently backed up](https://www.w3.org/TR/webauthn-3/#sctn-credential-backup).
 
 For those looking to use passkeys as a recoverable private key alternative for Aptos accounts, it is highly advised that the `BE` and `BS` flags both be set to `true` **BEFORE** the on-chain account is created to ensure that the account is recoverable in the event of device loss.
 
@@ -261,7 +261,7 @@ interface AuthenticatorAssertionResponse : AuthenticatorResponse {
 
 #### [`Signature`](https://www.w3.org/TR/webauthn-3/#dom-authenticatorassertionresponse-signature)
 
-The `signature` included in the `AuthenticatorAssertionResponse` is computed over a message `m` where `m` is the binary concatenation of `authenticatorData` and the SHA-256 digest of `clientDataJSON`.[^verifyingAssertion]
+The `signature` included in the `AuthenticatorAssertionResponse` is computed over a message `m` where `m` is the binary concatenation of `authenticatorData` and the SHA-256 digest of `clientDataJSON`.[^verifyingAssertion]. `clientDataJSON` is a JSON serialization of [`CollectedClientData`](https://www.w3.org/TR/webauthn-3/#dictdef-collectedclientdata) and includes the `challenge` and other data about the request like the `origin` and the [`type`](https://www.w3.org/TR/webauthn-3/#dom-collectedclientdata-type) of the request.
 
 In other words, for a signature $\sigma$:
 
@@ -284,7 +284,7 @@ interface AuthenticatorAssertionResponse :AuthenticatorResponse {
 
 ### Transaction Submission
 
-This AIP builds upon the new `TransactionAuthenticator`s and `AccountAuthenticator`s presented in [AIP-55](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md) by using the `SingleKeyAuthenticator` and `MultiKeyAuthenticator` that supports a single key and a k-of-n multi-key, respectively. A new `WebAuthn` variant under `AnySignature` and a new `Secp256r1Ecdsa` variant under `AnyPublicKey` enables users to submit transactions using a `Secp256r1` WebAuthn credential from both a `SingleKey` or `MultiKey` account.
+This AIP builds upon the new `TransactionAuthenticator`s and `AccountAuthenticator`s presented in [AIP-55](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md) by using the `SingleKeyAuthenticator` and `MultiKeyAuthenticator`, which supports a single key and a k-of-n multi-key, respectively. A new `WebAuthn` variant under `AnySignature` and a new `Secp256r1Ecdsa` variant under `AnyPublicKey` enables users to submit transactions using a `Secp256r1` WebAuthn credential from both a `SingleKey` or `MultiKey` account.
 
 ```rust
 AccountAuthenticator::SingleKey { authenticator: SingleKeyAuthenticator }
@@ -351,7 +351,7 @@ pub struct PartialAuthenticatorAssertionResponse {
 
 Once the transaction has reached the signature verification step, the WebAuthn authenticator will then perform the following steps on the signature $\sigma$:
 
-1. Verify that the actual `challenge` (`RawTransaction`) matches the expected `challenge` from `clientDataJSON` by computing $H(signing\_message(raw\_transaction))$, where $H$ is a `SHA3-256` hash, and verifying that it equals the `challenge` in `clientDataJSON`
+1. Verify that the actual `RawTransaction` matches the expected `challenge` from `clientDataJSON` by computing $H(signing\_message(raw\_transaction))$, where $H$ is a `SHA3-256` hash, and verifying that it equals the `challenge` in `clientDataJSON`
 2. Reconstruct the message `m` with the `clientDataJSON`, and `authenticatorData`, and
 3. Given the message `m`, a public key `pk` and a raw signature $\sigma$, apply a verification function to determine if $V(σ, m, pk)$ evaluates to `true`
 
@@ -362,8 +362,8 @@ Assuming everything else is correct, verification passes, and other validators a
 To summarize, in the Aptos blockchain implementation of the WebAuthn specification, the high-level protocol for authentication assertion is as follows: 
 
 1. The client provides a `challenge` in the form of the `SHA3-256` of the `signing_message` of the `RawTransaction`. We use the `SHA3-256` of the `RawTransaction` instead of the `RawTransaction` to limit the size of the `challenge`, which is part of the `clientDataJSON`.
-2. If the user provides consent, the user agent (browser) will request the authenticator to use a Passkey credential to generate an assertion signature over a message `m` where `m` includes the challenge and returns an authenticator response to the client. 
-3. The client will then send a `SignedTransaction` to the blockchain, where the signature field of the `SignedTransaction` includes the relevant fields in the authenticator response 
+2. If the user provides consent, the user agent (browser) will request the WebAuthn Authenticator to use a Passkey credential to generate an assertion signature over a message `m` where `m` includes the challenge and returns a response to the client. 
+3. The client will then send a `SignedTransaction` to the blockchain, where the signature field of the `SignedTransaction` includes the relevant fields in the WebAuthn Authenticator response 
 4. The blockchain will verify that the `SignedTransaction`'s signature is over the same message `m` (which includes the `RawTransaction`) and verify that the assertion signature is valid with the corresponding public key
 
 ## Reference Implementation
@@ -411,7 +411,7 @@ Several supported browsers, like Google Chrome, that implement the Client to Aut
 
 In other words, if the wallet is unavailable or returns an error like a 404, the user will not be able to use the passkey associated with that wallet until the wallet comes back online. This includes signing transactions with your passkey.
 
-To learn more about how chromium handles assertion and registration requests, see [`webauthn_handler.h`](https://github.com/chromium/chromium/blob/95bb60bf7fd3d18f469f050b60663b3dbdfa0402/content/browser/devtools/protocol/webauthn_handler.h#L19)
+To learn more about how Chromium handles assertion and registration requests, see [`webauthn_handler.h`](https://github.com/chromium/chromium/blob/95bb60bf7fd3d18f469f050b60663b3dbdfa0402/content/browser/devtools/protocol/webauthn_handler.h#L19)
 
 ### Compromised Cloud Provider
 
@@ -421,8 +421,14 @@ Note this only affects multi-device credentials, not hardware-bound credentials 
 
 ### Incompetent or Malicious Wallet
 
-- If the wallet loses the public key associated with the account, the user will be unable to submit transactions to the blockchain as transactions require a public key for signature verification. That being said, there are ways to mitigate this via [ECDSA public key recovery](https://wiki.hyperledger.org/display/BESU/SECP256R1+Support#SECP256R1Support-PublicKeyRecoveryfromSignature). This is an important consideration for future supported WebAuthn signature schemes as other signature schemes like `ed25519` do not support public key recovery inthe same way that ECDSA does.
+- If the wallet loses the public key associated with the account, the user will be unable to submit transactions to the blockchain as transactions require a public key for signature verification. That being said, there are ways to mitigate this via [ECDSA public key recovery](https://wiki.hyperledger.org/display/BESU/SECP256R1+Support#SECP256R1Support-PublicKeyRecoveryfromSignature). This is an important consideration for future supported WebAuthn signature schemes as other signature schemes like `ed25519` do not support public key recovery in the same way that ECDSA does.
 - If the user creates another credential with the same `userHandle` as an existing credential on that authenticator, it will **OVERWRITE** the existing credential
+
+### Authorization Prompt
+
+A drawback of passkeys is that there is no way to customize the authorization prompt for a WebAuthn Authenticator via the WebAuthn API. Though this may be safer for many payment applications, it might not be ideal for certain applications, such as gaming, where the application may prefer not to require an authorization gesture from the user each time they sign a transaction. Additionally, there is some variability in the authorization message used in the prompt, depending on the WebAuthn Authenticator. Ideally, the authorization prompt might include information about the transaction (e.g., a transaction simulation result) and prompt the user to "Sign the transaction" with their passkey, instead of prompting the user to "Use your <PASSKEY_NAME> passkey for <WALLET_NAME>" or "Use Touch ID to sign in."
+
+Wallets can address this by preemptively educating the user about the passkey transaction signing process. For example, a wallet may change the button for "Sign transaction" to "Authenticate and sign" or "Authenticate and pay," to indicate to the user that authenticating with the passkey will sign the transaction. Additionally, during user onboarding, the wallet may provide educational resources to explain the passkey transaction signing process to the user.
 
 ## Future Potential
 
