@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 67
 title: Native Consensus for JSON Web Key (JWK)
 author: Zhoujun Ma (zhoujun@aptoslabs.com)
 Status: Draft
@@ -7,7 +7,7 @@ type: <Standard (Core, Networking, Framework)>
 created: <02/10/2024>
 ---
 
-# AIP-X - Native Consensus for JSON Web Key (JWK)
+# AIP-67 - Native Consensus for JSON Web Key (JWK)
   
 ## Summary
 
