@@ -1,5 +1,5 @@
 ---
-aip: TBD
+aip: 68
 title: Reordering transactions in a block for fairness
 author: igor-aptos (https://github.com/igor-aptos), msmouse
 discussions-to (*optional): TBD
@@ -11,7 +11,7 @@ updated (*optional):
 requires (*optional):
 ---
 
-# AIP-X - Reordering transactions in a block for fairness
+# AIP-68 - Reordering transactions in a block for fairness
 
 ## Summary
 
