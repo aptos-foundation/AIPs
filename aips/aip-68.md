@@ -2,7 +2,7 @@
 aip: 68
 title: Reordering transactions in a block for fairness
 author: igor-aptos (https://github.com/igor-aptos), msmouse
-discussions-to (*optional): TBD
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/333
 Status: Draft
 last-call-end-date (*optional): 
 type: Core
