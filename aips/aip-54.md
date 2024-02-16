@@ -3,7 +3,7 @@ aip: 54
 title: Object code deployment
 author: movekevin, xbtmatt
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/259
-Status: Draft
+Status: In review
 type: Standard (Framework)
 created: 10/09/2023
 ---
@@ -38,8 +38,8 @@ Current existing solutions:
 
 ## Specification
 The new object deployment flow will contain 3 specific components:
-1. A new object_code module that offers the different APIs for deploying, upgrading, etc. using objects
-2. A new resource PackageRegistryObject that wraps the existing PackageRegistry resource into the object resource group for storage efficiency.
+1. A new object_code_deployment module that offers the different APIs for deploying, upgrading, etc. using objects
+2. A new resource `PublisherRef` that contains the extend ref used for upgrading the code.
 3. Improvements to the Aptos CLI to simplify code deployment and upgrade flows.
 
 In addition, the following improvements can be considered:
@@ -49,47 +49,45 @@ In addition, the following improvements can be considered:
 4. Ability to incrementally upload part of the code and publish the final package. This allows deploying packages larger than the 64KB size limit per transaction.
 5. VM changes: The ability to deploy code without specifying the address of the code in advance. This can be used in conjunction with dynamically creating a new object to host the newly deployed code.
 
-### New object_code module
+## Reference Implementation
+Please refer to the [reference implementation](https://github.com/aptos-labs/aptos-core/pull/11748).
+
+### New object_code_deployment module
 ```rust
-module aptos_framework::object_code {
+module aptos_framework::object_code_deployment {
   #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
-  struct PublishRef has key {
-    inner: Object<PackageRegistryObject>,
+  struct PublisherRef has key {
     // Extend ref of the code object.
     extend_ref: ExtendRef,
   }
 
-  /// Create a new object to host the code and a PublishRef object if the code is upgradable and send it to publisher.
+  /// Create a new object to host the code and a PublisherRef object if the code is upgradable and send it to publisher.
   public entry fun publish(publisher: &signer, metadata_serialized: vector<u8>, code: vector<vector<u8>>) {}
 
   /// Upgrade the code in an existing code_object
   /// Requires the publisher to have a PublisherRef object.
-  public entry fun upgrade(publisher: &signer, code_object: Object<PackageRegistryCode>, metadata_serialized: vector<u8>, code: vector<vector<u8>>) {}
+  public entry fun upgrade(
+    publisher: &signer,
+    metadata_serialized: vector<u8>,
+    code: vector<vector<u8>>,
+    code_object: Object<PublisherRef>,
+  ) {}
 
   /// Make an existing upgradable package immutable.
   /// Requires the publisher to have a PublisherRef object.
-  public entry fun freeze(publisher: &signer, code_object: Object<PackageRegistryCode>) {}
-}
-```
-
-### New PackageRegistryObject
-```rust
-module aptos_framework::code {
-  #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
-  struct PackageRegistryObject has key, store, drop {
-    inner: PackageRegistry,
-  }
+  public entry fun freeze(publisher: &signer, code_object: Object<PackageRegistry>) {}
 }
 ```
 
 ### Improvements to CLI
 ```
 > aptos move publish --profile testnet
+> aptos move create-object-and-publish-package --address-name <address_name> --profile testnet
 --------------------------------------
 Deployed code at 0x1234
 PublisherRef sent to 0xpublisher for future upgrades
 
-> aptos move upgrade --profile testnet --existing-code 0x1234
+> aptos move upgrade-object-package --object-address 0x1234 --profile testnet
 --------------------------------------
 Upgraded code at 0x1234 to latest version
 ```
