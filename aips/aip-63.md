@@ -19,10 +19,10 @@ This AIP proposes a global mapping between coin and fungible asset and allow `co
 
 This AIP intends to achieve the following:
 
-- Automatically create a paired fungible asset metadata for a coin type at the coin creator address if it does not exist yet, including `AptosCoin`.
+- Automatically create a paired fungible asset metadata for a coin type at the coin creator address if it does not exist yet, including `AptosCoin`. Or the coin creator has the option to manually pair a fungible asset with a coin type.
 - Create helper functions to convert between paired coin and fungible asset, with different visibilities.
 - To make the change compatible with existing dApps using move API in the current coin standard, this AIP proposes to change a couple of functions in coin module to convert coin and its paired fungible asset when needed to keep the same function signature.
-- Realize passive migration from `CoinStore<CoinType>` to the primary fungible store of all coin types by both `deposit` and `withdraw` functions in `coin` module w/o breaking any existing Dapps calling those functions.
+- Create a function call to migrate from `CoinStore<CoinType>` to the primary fungible store of all coin types by both `deposit` and `withdraw` functions in `coin` module w/o breaking any existing Dapps calling those functions.
 
 ### Out of Scope
 - Start proactive migration by iterating and migrating all the `CoinStore`s on chain.
@@ -33,8 +33,8 @@ Before the widespread adoption of DeFi applications on the Aptos network, it's c
 
 ## Impact
 
-- Coin Creators: Each coin will now be automatically paired with a fungible asset type. The existing capabilities such as `MintCapability`, `FreezeCapability`, and `BurnCapability` will be leveraged to generate the corresponding `MintRef`, `TransferRef`, and `BurnRef` for the paired fungible asset.
-- Users: The process is seamless and requires no active involvement. The migration will occur automatically during transactions that involve `coin::deposit` or `coin::withdraw`. Post-migration, all coins in a user's storage will be converted into their respective fungible asset forms.
+- Coin Creators: Each coin will now be paired with a fungible asset type. The existing capabilities such as `MintCapability`, `FreezeCapability`, and `BurnCapability` will be leveraged to generate the corresponding `MintRef`, `TransferRef`, and `BurnRef` for the paired fungible asset.
+- Users: The process is seamless but requires active involvement. The migration will occur when the user call the migration function. Post-migration, all coins in a user's storage will be converted into their respective fungible asset forms.
 - DApps:
   - Smart contract: Existing dApps based on the coin standard won't be disrupted by this migration, as it's designed to be non-breaking. Users interacting with these protocols may notice the migration as a byproduct when they deposit or withdraw coins. Once the migration is complete, all accounts will have their APT represented as a fungible asset, enabling the ecosystem to develop using the fungible asset API and issue new fungible assets without a paired coin. 
     - Indexing: The impact on indexing services may vary. It could be a significant change depending on how these services track balance and supply. 
@@ -68,10 +68,17 @@ A `CoinConversionMap` will be stored under `@aptos_framework`:
     /// The mapping between coin and fungible asset.
     struct CoinConversionMap has key {
         coin_to_fungible_asset_map: SmartTable<TypeInfo, address>,
-        fungible_asset_to_coin_map: SmartTable<address, TypeInfo>,
     }
 ```
-with two helper functions to do the conversion:
+The reverse mapping is realized by insert a `PairedCoinType` resource into the fungible asset metadata object:
+```rust
+/// The paired coin type info stored in fungible asset metadata object.
+    struct PairedCoinType has key {
+        type: TypeInfo,
+    }
+```
+
+Those two helper functions perform the conversion:
 ```rust
 // Conversion from coin to fungible asset
 public fun coin_to_fungible_asset<CoinType>(coin: Coin<CoinType> ): FungibleAsset;
@@ -80,38 +87,39 @@ public fun coin_to_fungible_asset<CoinType>(coin: Coin<CoinType> ): FungibleAsse
 public fun fungible_asset_to_coin<CoinType>(fungible_asset: FungibleAsset):
 ```
 
-The paired fungible asset metadata address would be deterministic:
-- For APT, the address is `0x1`.
-- For other coins, the address would be `sha3(coin_creator_address | "paired_fungible_asset_metadata_seed" | 0xFE)`. However, if this address is already used by an account or an object by any chance, it fallbacks to a random address based on AUID.
+The paired fungible asset metadata address would be `0x1` for APT and arbitrary for other coins.
 
 Note: This AIP does not prompt the reverse conversion so the visibility of `fungible_asset_to_coin` is not public. Whenever `coin_to_fungible_asset<CoinType>` is called and the paired fungible asset does not exist, the coin module will automatically create a fungible asset metadata and add it to the mapping as to pair with `CoinType`. This paired fungible asset will have exactly the same name, symbol and decimals with the coin type.
 
-Whenever calling `deposit` or `withdraw`, a function `maybe_convert_to_fungible_store` will be called that removes the `CoinStore<CoinType>` and convert the left coin into the paired fungible asset.
+Function `maybe_convert_to_fungible_store` can remove the `CoinStore<CoinType>` and convert the left coin into the paired fungible asset.
 ```rust
-fun maybe_convert_to_fungible_store<CoinType>(
-        account: address
-    ) acquires CoinStore, CoinConversionMap, CoinInfo {
-        if (exists<CoinStore<CoinType>>(account)) {
-            let CoinStore<CoinType> {
-                coin,
-                frozen,
-                deposit_events,
-                withdraw_events
-            } = move_from<CoinStore<CoinType>>(account);
-            event::destory_handle(deposit_events);
-            event::destory_handle(withdraw_events);
-            let fungible_asset = coin_to_fungible_asset(coin);
-            let metadata = fungible_asset::asset_metadata(&fungible_asset);
-            let store = primary_fungible_store::ensure_primary_store_exists(account, metadata);
-            fungible_asset::deposit(store, fungible_asset);
-            // Note:
-            // It is possible the primary fungible store may already exist before this function call.
-            // In this case, if the account owns a frozen CoinStore and an unfrozen primary fungible store, this
-            // function would convert and deposit the rest coin into the primary store and freeze it to make the
-            // `frozen` semantic as consistent as possible.
-            fungible_asset::set_frozen_flag_internal(store, frozen);
-        };
-    }
+
+fun maybe_convert_to_fungible_store<CoinType>(account: address) acquires CoinStore, CoinConversionMap, CoinInfo {
+    if (exists<CoinStore<CoinType>>(account)) {
+        let CoinStore<CoinType> {
+            coin,
+            frozen,
+            deposit_events,
+            withdraw_events
+        } = move_from<CoinStore<CoinType>>(account);
+        event::emit(CoinEventHandleDeletion {
+        event_handle_creation_address: guid::creator_address(event::guid(&deposit_events)),
+        deleted_deposit_event_handle_creation_number: guid::creation_num(event::guid(&deposit_events)),
+        deleted_withdraw_event_handle_creation_number: guid::creation_num(event::guid(&withdraw_events))});
+        event::destory_handle(deposit_events);
+        event::destory_handle(withdraw_events);
+        let fungible_asset = coin_to_fungible_asset(coin);
+        let metadata = fungible_asset::asset_metadata(&fungible_asset);
+        let store = primary_fungible_store::ensure_primary_store_exists(account, metadata);
+        fungible_asset::deposit(store, fungible_asset);
+        // Note:
+        // It is possible the primary fungible store may already exist before this function call.
+        // In this case, if the account owns a frozen CoinStore and an unfrozen primary fungible store, this
+        // function would convert and deposit the rest coin into the primary store and freeze it to make the
+        // `frozen` semantic as consistent as possible.
+        fungible_asset::set_frozen_flag_internal(store, frozen);
+    };
+}
 ```
 
 `Supply` and `balance` are modified correspondingly to reflect the sum of coin and the paired fungible asset.
