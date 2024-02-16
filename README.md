@@ -28,11 +28,6 @@ Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [
 
 | Number | Theme | Title  | Author |
 |:---|:---|:---|:---
-| [AIP-45](https://github.com/aptos-foundation/AIPs/issues/232) | Smart Contract | [Safe Burning of User-Owned Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-45.md) | davidiw, movekevin, lightmark, bowenyang007, capcap, kent-white |
-| [AIP-46](https://github.com/aptos-foundation/AIPs/issues/222) | Cryptography | [New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-46.md) | Michael Straka (michael@aptoslabs.com) |
-| [AIP-47](https://github.com/aptos-foundation/AIPs/issues/226) | Core |[Aggregators V2](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-47.md)| georgemitenkov (https://github.com/georgemitenkov), vusirikala (https://github.com/vusirikala), gelash (https://github.com/gelash), igor-aptos (https://github.com/igor-aptos) |
-| [AIP-48](https://github.com/aptos-foundation/AIPs/issues/237) | Smart Contract |[Allow direct commission change vesting contract](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-48.md)| wintertoro, movekevin, junkil-park |
-| [AIP-49](https://github.com/aptos-foundation/AIPs/issues/247) | Cryptography |[`secp256k1` ECDSA for Transaction Authentication](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-49.md)| davidiw |
 | [AIP-50](https://github.com/aptos-foundation/AIPs/issues/249) | Smart Contract | [Change Commission rates in delegation pools](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-50.md)| junkil-park, michelle-aptos, movekevin, wintertoro |
 | [AIP-51](https://github.com/aptos-foundation/AIPs/issues/251) | Smart Contract |[Changing beneficiaries for operators](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-51.md)| junkil-park, michelle-aptos, movekevin, wintertoro |
 | [AIP-52](https://github.com/aptos-foundation/AIPs/issues/258) | Core |[Automated Account Creation for Sponsored Transactions](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-52.md)| davidiw |
@@ -45,6 +40,11 @@ Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [
 | [AIP-59](https://github.com/aptos-foundation/AIPs/issues/291) | Gas | [Storage IO Gas Adjustments](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-59.md)| msmouse |
 | [AIP-60](https://github.com/aptos-foundation/AIPs/issues/298) | Gas | [Improve fairness of shared computation resources](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-60.md)| igor-aptos, vgao1996 |
 | [AIP-61](https://github.com/aptos-foundation/AIPs/issues/) | Cryptography | [OpenID blockchain (OIDB) accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)| Alin Tomescu |
+| [AIP-62](https://github.com/aptos-foundation/AIPs/issues/297) | Devex | [Wallet Standard](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-62.md)| 0xmaayan, hardsetting, NorbertBodziony |
+| [AIP-63](https://github.com/aptos-foundation/AIPs/issues/297) | Smart Contract | [Coin to Fungible Asset Migration](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-63.md)| lightmark, davidiw, movekevin |
+| [AIP-64](https://github.com/aptos-foundation/AIPs/issues/297) | Blockchain | [Validator Transaction Type](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-64.md)| zhoujun@aptoslabs.com, daniel@aptoslabs.com |
+| [AIP-65](https://github.com/aptos-foundation/AIPs/issues/297) | Gas | [Storage Fee for State Bytes refundable](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-65.md)| msmouse |
+| [AIP-66](https://github.com/aptos-foundation/AIPs/issues/297) | Cryptography | [Passkey Accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-66.md)| hariria |
 | ... | ... |||
 
 ## Types of AIPs
