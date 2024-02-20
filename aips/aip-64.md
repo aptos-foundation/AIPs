@@ -63,7 +63,7 @@ But notice that:
 - These updates are for system configurations and typically requires higher priority than user transactions.
 - Unlike user transactions, there is no gas involved in these updates.
 - The execution result of such updates needs different handling from user transactions. (See [security considerations](#security_considerations).)
-  Therefore, while this alternative also avoids a new transaction type,
+Therefore, while this alternative also avoids a new transaction type,
   it will also complicate the existing user transaction flow,
   and creating a separate flow for the updates provide better maintainability.
 
