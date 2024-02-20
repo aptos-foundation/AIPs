@@ -55,17 +55,18 @@ While it saves the trouble of adding a new transaction type, there are some long
 - `BlockMetadata` transactions are more critical and need to be formally verified to never abort.
   Publishing the feature-specific updates in  `BlockMetadata` transactions requires the updates to be formally verified, which is unnecessary.
 - Running all updates sequentially in a single `BlockMetadata` transactions can be too slow.
-  As mentioned in [security considerations](#Security_Considerations), every update needs to be cryptographically verified which can be expensive operations.
+  As mentioned in [security considerations](#security_considerations), every update needs to be cryptographically verified which can be expensive operations.
   Pulling updates out into separate transations helps speed up the execution.
 
-Another alternative is to propose the updates as user transactions.
+A 2nd alternative is to propose the updates as user transactions.
 But notice that:
 - These updates are for system configurations and typically requires higher priority than user transactions.
 - Unlike user transactions, there is no gas involved in these updates.
 - The execution result of such updates needs different handling from user transactions. (See [security considerations](#security_considerations).)
-Therefore, while this alternative also avoids a new transaction type,
-  it will also complicate the existing user transaction flow,
-  and creating a separate flow for the updates provide better maintainability.
+
+Therefore, while the 2nd alternative also avoids a new transaction type,
+it will also complicate the existing user transaction flow.
+Creating a separate flow for the updates should provide better maintainability.
 
 ## Specification
 
