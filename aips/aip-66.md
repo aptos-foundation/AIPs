@@ -378,6 +378,12 @@ Testing can be found in the reference implementation provided in the PR link abo
 
 ## Risks and Drawbacks
 
+> [!WARNING]  
+> Given the risks mentioned, passkey wallet providers should allow users to set up a k-of-n `MultiKey` account (as per [AIP-55](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md)) associated with their passkey. An additional non-passkey signer enables a user to access their account, even if the wallet is unavailable.
+> 
+> For instance, configuring a 1-of-2 `MultiKey` account with a passkey and an `ed25519` private key enables transaction signing even if the wallet is unavailable. However, the wallet will need to provide a way for the user to access the passkey public key even if the wallet is unavailable. This is because the `MultiKey` Authenticator requires all associated public keys in transactions. Refer to the [Loss of Passkey Public Key](#Loss-of-Passkey-Public-Key) section for further information.
+
+
 ### Backup State and Eligiblity 
 
 As mentioned in AIP 61:
@@ -415,16 +421,24 @@ In other words, if the wallet is unavailable or returns an error like a 404, the
 
 To learn more about how Chromium handles assertion and registration requests, see [`webauthn_handler.h`](https://github.com/chromium/chromium/blob/95bb60bf7fd3d18f469f050b60663b3dbdfa0402/content/browser/devtools/protocol/webauthn_handler.h#L19)
 
+### Incompetent or Malicious Wallet
+
+#### Loss of Passkey Public Key
+
+- If the wallet loses the public key associated with the passkey, the user will not be able to submit transactions to the blockchain. This is because transactions require a public key for signature verification. There are two primary strategies for mitigating this risk:
+  1. **(Recommended)** Ensure the passkey is associated with a k-of-n `MultiKey` account. Store the mapping between a passkey `credentialId`, `publicKey`, and `address` on chain. If the wallet is unavailable, the user can retrieve the public key associated with passkey credential from the blockchain and submit a `MultiKey` transaction, signed by a non-passkey signer.
+  2. The passkey public key associated with a `secp256r1` passkey credential can be recovered from an ECDSA signature ([ECDSA public key recovery](https://wiki.hyperledger.org/display/BESU/SECP256R1+Support#SECP256R1Support-PublicKeyRecoveryfromSignature)). This, however, assumes that the passkey provider is available. 
+     - Note: Public key recovery is an important consideration for future supported WebAuthn signature schemes as other signature schemes like `ed25519` do not support public key recovery in the same way that ECDSA does.
+
+#### Overwriting the Passkey
+
+If the user creates another credential with the same `userHandle` as an existing credential on that authenticator, it will **OVERWRITE** the existing credential. Wallets must keep track of existing `userHandle`s to ensure this does not happen.
+
 ### Compromised Cloud Provider
 
 If your passkey is a multi-device credential, backed up to iCloud or Google Password Manager, and the associated cloud account is compromised, so is your passkey account.
 
 Note this only affects multi-device credentials, not hardware-bound credentials like Yubikeys as those are not backed up.
-
-### Incompetent or Malicious Wallet
-
-- If the wallet loses the public key associated with the account, the user will be unable to submit transactions to the blockchain as transactions require a public key for signature verification. That being said, there are ways to mitigate this via [ECDSA public key recovery](https://wiki.hyperledger.org/display/BESU/SECP256R1+Support#SECP256R1Support-PublicKeyRecoveryfromSignature). This is an important consideration for future supported WebAuthn signature schemes as other signature schemes like `ed25519` do not support public key recovery in the same way that ECDSA does.
-- If the user creates another credential with the same `userHandle` as an existing credential on that authenticator, it will **OVERWRITE** the existing credential
 
 ### Authorization Prompt
 
