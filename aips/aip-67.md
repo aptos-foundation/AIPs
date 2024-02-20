@@ -52,7 +52,7 @@ But hopefully each operation should be trivial.
 
 ### Alternative 1: use separate JWK oracle(s)
 One alternative is to run a separate trusted oracle to watch JWKs
-(or a seprate trusted oracle network to watch JWks and quorum-certify updates)
+(or a separate trusted oracle network to watch JWks and quorum-certify updates)
 and publish updates on chain through regular Aptos transactions.
 
 Reasons to not consider: security and decentralization + DevOps complexity.
@@ -87,6 +87,22 @@ Reasons to not consider: DevOps complexity.
 This requires refactoring of some fundamental building blocks of Aptos (e.g., decoupled execution), which might be too much implementation/testing complexity.
 
 ## Specification
+
+### Assumptions
+
+An OIDC provider may rotate its JWKs in any frequency.
+But as long as it eventually stays on a version for long enough,
+and this version can be observed by a subset of honest validators that hold more than 2/3 of the total voting power,
+this version can be successfully replicated on chain.
+
+This assumption is valid for most OIDC providers today.
+(The fastest rotator known is Google, who rotates their JWK nearly every week.)
+
+Here are some examples when JWK consensus may get stuck on a provider.
+- When validators have evenly split views on the JWKs of this provider.
+- When the provider rotates too fast.
+- When 1/3 of the total voting power is controlled by malicious validator,
+  and at least one honest validator does not have access to the provider's JWK API.
 
 ### On-chain states
 
