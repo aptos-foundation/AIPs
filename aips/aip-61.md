@@ -448,7 +448,7 @@ We will expand later on the testing plan. **(TBA.)**
  > - Any backwards compatibility issues we should be aware of?
  > - If there are issues, how can we mitigate or resolve them
 
-All the risk and drawbacks are described in the [“Security, Liveness and Privacy Considerations” section](#Security,-Liveness-and-Privacy-Considerations).
+All the risk and drawbacks are described in the [“Security, Liveness and Privacy Considerations” section](#Security-Liveness-and-Privacy-Considerations).
 
 ## Future Potential
 
