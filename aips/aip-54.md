@@ -1,7 +1,7 @@
 ---
 aip: 54
 title: Object code deployment
-author: movekevin, xbtmatt
+author: movekevin, xbtmatt, johnchanguk
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/259
 Status: In review
 type: Standard (Framework)
@@ -13,9 +13,10 @@ created: 10/09/2023
 ## Summary
 
 This AIP proposes a simplified code deployment process that improves the current developer experience with deploying and upgrading Move modules on Aptos. Specifically:
-1. Developers can deploy a package of Move modules, which get automatically get uploaded to a newly created object.
+1. Developers can deploy a package of Move modules to newly created objects instead of their account.
 2. Developers receive a PublisherRef object if the package is upgradable.
-3. PublisherRef can be used to update the package in the future and transferred freely to another account.
+3. PublisherRef can be used to update the package in the future.
+4. PublisherRef can be transferred to another account including MultiSig accounts or managed by a module.
 
 This new simplified and improved code deployment process will eliminate most of the current pains and confusion around code deployment.
 Furthermore, this will reduce the storage footprint of each code deployment while maintaining the ease of adding programmatic control over publishing/upgrading as it'd not need to create a new resource account.
@@ -62,7 +63,7 @@ module aptos_framework::object_code_deployment {
   }
 
   /// Create a new object to host the code and a PublisherRef object if the code is upgradable and send it to publisher.
-  public entry fun publish(publisher: &signer, metadata_serialized: vector<u8>, code: vector<vector<u8>>) {}
+  public entry fun publish(publisher: &signer, metadata_serialized: vector<u8>, code: vector<vector<u8>>);
 
   /// Upgrade the code in an existing code_object
   /// Requires the publisher to have a PublisherRef object.
@@ -71,11 +72,11 @@ module aptos_framework::object_code_deployment {
     metadata_serialized: vector<u8>,
     code: vector<vector<u8>>,
     code_object: Object<PublisherRef>,
-  ) {}
+  );
 
   /// Make an existing upgradable package immutable.
   /// Requires the publisher to have a PublisherRef object.
-  public entry fun freeze(publisher: &signer, code_object: Object<PackageRegistry>) {}
+  public entry fun freeze(publisher: &signer, code_object: Object<PackageRegistry>);
 }
 ```
 
