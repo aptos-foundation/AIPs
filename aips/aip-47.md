@@ -68,35 +68,44 @@ Explain why you submitted this proposal specifically over alternative solutions.
 Module structs and function signatures:
 ```
 module aptos_framework::aggregator_v2 {
-   struct Aggregator<Element> has store {
-      value: Element,
-      max_value: Element,
+   struct Aggregator<IntElement> has store {
+      value: IntElement,
+      max_value: IntElement,
    }
-   struct AggregatorSnapshot<Element> has store {
-      value: Element,
+   struct AggregatorSnapshot<IntElement> has store {
+      value: IntElement,
+   }
+   struct DerivedStringSnapshot has store, drop {
+      value: String,
+      padding: vector<u8>,
    }
 
-   public native fun try_add(aggregator: &mut Aggregator<Element>, value: Element): bool;
+   public native fun try_add(aggregator: &mut Aggregator<IntElement>, value: IntElement): bool;
 
-   public native fun read(aggregator: &Aggregator<Element>): Element;
+   public native fun read(aggregator: &Aggregator<IntElement>): IntElement;
 
-   public native fun snapshot(aggregator: &Aggregator<Element>): AggregatorSnapshot<Element>;
+   public native fun snapshot(aggregator: &Aggregator<IntElement>): AggregatorSnapshot<IntElement>;
    
-   public native fun read_snapshot<Element>(aggregator_snapshot: &AggregatorSnapshot<Element>): Element;
+   public native fun read_snapshot<IntElement>(aggregator_snapshot: &AggregatorSnapshot<IntElement>): IntElement;
+
+   public native fun derive_string_concat<IntElement>(before: String, snapshot: &AggregatorSnapshot<IntElement>, after: String): DerivedStringSnapshot;
+
+   public native fun read_derived_string(snapshot: &DerivedStringSnapshot): String;
 }
 ```
 
 Modification/write paths are efficient, read paths are expensive. 
-That means that `try_add` and `snapshot` are efficient (except when `try_add` returns a different value from the last time it was called), 
+That means that `try_add`, `snapshot` and `derive_string_concat` are efficient (except when `try_add` returns a different value from the last time it was called), 
 while `read`/`read_snapshot` sequentialize the workload if called close to a modification. 
-Note, that means that `read_snapshot` is generally cheap if done not too close to `snapshot` call that created it.
+Note, that means that `read_snapshot`/`read_derived_string` are generally cheap if done not too close to `snapshot`/`derive_string_concat` calls that created them (i.e. not in the same transction).
 
 #### Flow
 - we execute set of transactions at a time (block at a time in consensus, chunk during state-sync). We create a new BlockSTM/MVHashMap for each execution, and Aggregator handling lives within that scope
-- whenever we are reading from storage (i.e. MVHashMap doesn’t have data, and needs to fetch it from storage), we take all Aggregators/AggregatorsSnapshots in the resource, store their values from storage as their initial values, give them unique ID, and replace their value field with that unique ID. Inside of VM, `value` field now becomes like a reference - it is an identifier, and actual value is lifted out.
+- whenever we are reading from storage (i.e. MVHashMap doesn’t have data, and needs to fetch it from storage), we take all Aggregators/AggregatorsSnapshots in the resource, store their values from storage as their initial values, give them unique ID, and replace their value field with that unique ID. Inside of VM, `value` field now becomes `ValueImpl::DelayedFieldID`, and it is like a reference - it is an identifier, and actual value is lifted out.
 - Modifications to Aggregator go in the VMChangeSet as a separate key - EphemeralId, instead of StateKey representing resource that contains it. And so changes to the actual value are not conflicts.
 - BlockSTM speculatively executes transactions, and tracks what values it explicitly provided to each transaction (whether through aggregator::read or bool via aggregator::try_add). If values it provided don’t match with final values - BlockSTM invalidates execution, and requires re-running it.
 - in the final pass, when BlockSTM creates transaction outputs, it replaces unique ID inside `value` field with an actual value
+- In order to make sure gas charges are done correctly, every DelayedField has a fixed width (length of it's byte representation when serializing) - both when it is actual value, as well as when it is `ValueImpl::DelayedFieldID`. For that purpose, String fields - that have variable legnth, are put inside `DerivedStringSnapshot`, which has additional padding field - to guarantee fixed width. `DelayedFieldID` consits of both `unique_index` and it's fixed `width`.
 
 ### Implementation details
 
@@ -168,7 +177,18 @@ For now, we will not expose cloning of the Aggregator, so the link for computing
 
 ## Reference Implementation
 
-WIP on aggregators_v2 branch.
+- API in [aggregator_v2.move](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-framework/sources/aggregator_v2/aggregator_v2.move)
+- Implementation of native functions in [aggregator_v2.rs](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/src/natives/aggregator_natives/aggregator_v2.rs) and extension/context in [delayed_field_extension.rs](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/aptos-aggregator/src/delayed_field_extension.rs). Full implementation of fallback (non-concurrent) implementation of aggregators V2 is in the first file.
+- DelayedFieldID in [delayed_field_id.rs](https://github.com/aptos-labs/aptos-core/blob/main/third_party/move/move-vm/types/src/delayed_values/delayed_field_id.rs)
+- implementation of TDelayedFieldView interface in [view.rs](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/block-executor/src/view.rs), which tracks `CapturedReads.delayed_field_reads` in [captured_reads.rs](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/block-executor/src/captured_reads.rs)
+- BlockSTM handles validation and materialization in [executor.rs](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/block-executor/src/executor.rs) and stores versioned values in [versioned_delayed_fields.rs](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/mvhashmap/src/versioned_delayed_fields.rs)
+- Logic to split Resource Groups inside of VMChangeSet is in [resource_group_adapter.rs](https://github.com/aptos-labs/aptos-core/blob/7b5cf257d6546e394ddd761f332df7b712bacd19/aptos-move/aptos-vm-types/src/resource_group_adapter.rs)
+- end to end tests are in [aggregator_v2.rs](https://github.com/aptos-labs/aptos-core/blob/7b5cf257d6546e394ddd761f332df7b712bacd19/aptos-move/e2e-move-tests/src/tests/aggregator_v2.rs) 
+
+These are the feature flags:
+* API is gated by AGGREGATOR_V2_API
+* Resource Groups split is gated by RESOURCE_GROUPS_SPLIT_IN_VM_CHANGE_SET
+* Handling AggregatorsV2 in a delayed and concurrent way is gated by AGGREGATOR_V2_DELAYED_FIELDS 
 
 ## Risks and Drawbacks
 
@@ -181,11 +201,11 @@ commonly don’t affect the rest of the computation) for other more complicated 
 
 ## Timeline
 
-Tentatively targetted for aptos-release-v1.8
+Tentatively targetted for aptos-release-v1.10
 
 ### Suggested implementation timeline
 
-Above design has been completed, and implementation is ongoing, and you can follow it on the aggregators_v2 branch
+Full implementation has been completed, together with a suite of tests
 
 ### Suggested developer platform support timeline
 
@@ -197,7 +217,7 @@ We will also add more documentation/learning resources on how to use Aggregators
 
 ### Suggested deployment timeline
 
-Tentatively with aptos-release-v1.8
+Tentatively with aptos-release-v1.10
 
 ## Security Considerations
 
@@ -205,4 +225,4 @@ Main security consideration here is correctness of execution and determinism. De
 
 ## Testing (optional)
 
-Once completed, we will have extensive unit tests, as well as benchmarks to validate performance improvements, and comparisons to naive approaches.
+Extensive unit and e2e tests, as well as benchmarks to validate performance improvements, and comparisons to naive approaches. Performance tests are included in the single_node_performance.py regression benchmark suite.
