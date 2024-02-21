@@ -22,7 +22,8 @@ Specifically, the legacy "free quota" mechanism which heavily punishes updating 
 The updated scheme aligns better with the reality of disk space consumption by the transactions hence serves as a better economic benchmark for the developers to optimize the cost of transactions.
 
 
-# Background
+# Background - Why the "free bytes quota" existed
+
 Generally speaking the Aptos nodes keep two categories of blockchain data on disk:
 
 1. Permanant storage: Items in the latest state and associated authentication data structures -- the network has to keep them around indefinitely until a transaction deleted the relevant state. Such storage should be priced high and is subject to refunding once deleted.
