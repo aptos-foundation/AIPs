@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 69
 title: Start replication of Google JWK on chain
 author: Zhoujun Ma (zhoujun@aptoslabs.com)
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -10,7 +10,7 @@ created: <02/21/2024>
 requires (*optional): 67
 ---
 
-# AIP-X - Start replication of Google JWKs on chain
+# AIP-69 - Start replication of Google JWKs on chain
 
 ## Summary
 
