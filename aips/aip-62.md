@@ -144,18 +144,23 @@ changeNetwork(network:NetworkInfo):Promise<UserResponse<{success: boolean,reason
 openInMobileApp(): void
 ```
 
-Types
+**Types**
 
 > Note: `UserResponse` type is used for when a user rejects a rejectable request. For example, when user wants to connect but instead closes the window popup.
 
 ```ts
+export enum UserResponseStatus {
+  APPROVED = 'Approved',
+  REJECTED = 'Rejected'
+}
+
 export interface UserApproval<TResponseArgs> {
- status: 'approved'
+ status: UserResponseStatus.APPROVED
  args: TResponseArgs
 }
 
 export interface UserRejection {
- status: 'rejected'
+ status: UserResponseStatus.REJECTED
 }
 
 export type UserResponse<TResponseArgs> = UserApproval<TResponseArgs> | UserRejection;
@@ -185,6 +190,37 @@ export type AptosSignMessageOutput = {
   nonce: string
   prefix: 'APTOS'
   signature: Signature
+}
+```
+
+**Errors**
+
+A wallet must throw a [AptosWalletError](https://github.com/aptos-labs/wallet-standard/blob/main/src/errors.ts). The standard requires to support `Unauthorized` and `InternalError` but a wallet can throw a custom `AptosWalletError` error
+
+Using the default message
+
+```ts
+if (error) {
+  throw new AptosWalletError(AptosWalletErrorCode.Unauthorized);
+}
+```
+
+Using a custom message
+
+```ts
+if (error) {
+  throw new AptosWalletError(
+    AptosWalletErrorCode.Unauthorized,
+    "My custom unauthorized message"
+  );
+}
+```
+
+Using a custom error
+
+```ts
+if (error) {
+  throw new AptosWalletError(-32000, "Invalid Input");
 }
 ```
 
