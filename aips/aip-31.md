@@ -20,7 +20,15 @@ This AIP proposes to add a flag in `delegation_pool.move` to allow “permission
 
 Some delegation pools may require a KYC process before accepting delegated stake for compliance reasons. Since delegation pools are permissionless, this feature gives the pool owner more control over who the delegation pool can accept stake from. 
 
-## Rationale
+## Specification
+
+Any account can construct their own allowlist of addresses, independent of the delegation pool, by interacting with the `aptos_framework::delegation_pool_allowlist` module.
+However, a delegation pool will only use the allowlist defined under its owner account. If there is no allowlist created by the owner, the delegation pool is still permissionless.
+
+Accessing the owner address directly from the delegation pool is not possible, therefore a new feature has been introduced to save the owner address within the delegation pool. This can be enabled publicly by calling `aptos_framework::delegation_pool::enable_ownership_lookup` with arguments: `pool_address` and `owner_address` which will be linked from now on.
+
+A delegation pool whose owner has created an allowlist, but doesn't have direct access to the owner address will remain permissionless.
+New delegation pools will have the ownership lookup feature enabled by default.
 
 **Considerations:**
 
