@@ -14,25 +14,38 @@ created: <02/10/2024>
 OpenID Connect (OIDC) orchestrates authentication by enabling a user to prove their identity to a client application, through the mediation of a trusted identity provider, leveraging the OAuth 2.0 framework for secure interactions.
 Typically, this process involves verifying a signature of the provider with its cryptographic public keys, which are published in format of **JSON Web Key (JWK)**. For security purpose, JWKs are rotated periodically, but providers may each have its own rotation schedule, and providers typically do not provide official documentation or notification: client apps are expected to fetch JWKs in an ad-hoc manner.
 
-[AIP-61: OIDB accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md) introduced a new type of Aptos accounts that are secured through the owner’s existing OIDC accounts (i.e., their Web2 account with an OIDC provider such as Google, GitHub or Apple), and verifying a transaction from such an OIDC account involves verifying a signature of the provider with its JWK. This requires that validators **agree on the latest JWKs** of every provider that needs to supported.
+[AIP-61: keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md) introduced a new type of Aptos accounts that are secured through the owner’s existing OIDC accounts (i.e., their Web2 account with an OIDC provider such as Google, GitHub or Apple), and verifying a transaction from such an OIDC account involves verifying a signature of the provider with its JWK. This requires that validators **agree on the latest JWKs** of every provider that needs to supported.
 
 This AIP proposes a solution where validators:
 - monitor the OIDC providers' JWKs by directly fetching them;
 - once a JWK change is detected, collaborate with peers to form a quorum-certified JWK update;
-- publish the update on-chain through a [validator transaction](https://github.com/aptos-foundation/AIPs/pull/274/files).
+- publish the update on-chain through a [validator transaction](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-64.md).
 
 ### Goals
 
-- Functional: for every provider in a given provider set (probably in an on-chain resource), ensure validators agree on its latest JWKs (and probably publish it as another on-chain resource).
+To have a framework that replicate external JWKs on chain.
+- Functional: for every provider in a given provider set (probably in an on-chain resource),
+  ensure validators agree on its latest JWKs (and probably publish it as another on-chain resource).
 - Non-functional:
-    - Security and decentralization: the JWKs should be agreed on by the validator network in a secure and decentralized way, ideally introduce zero extra security assumptions.
-    - Low replication latency: once a provider rotates its JWKs, the blockchain should pick them up as soon as possible to be able to process OIDB-based transactions signed by the new key (i.e., ensure liveness after OIDB accounts are enabled).
-    - Provider-independence: extra operation required on an OIDC provider's end should be minimized (ideally zero), so new OIDC providers can be supported at a very low cost.
+    - Security and decentralization: the JWKs should be agreed on by the validator network in a secure and decentralized way,
+      ideally introduce zero extra security assumptions.
+    - Low replication latency: once a provider rotates its JWKs, the blockchain should pick them up as soon as possible.
+      - Without the latest JWKs from provider X, transactions issued by X-based keyless accounts may get rejected.
+    - Provider-independence: extra operation required on an OIDC provider's end should be minimized (ideally zero),
+      so new OIDC providers can be supported at a very low cost.
     - DevOps complexity: solutions with lower development & operation complexity is considered cheaper and less risky.
+
+### Out of Scope
+
+The following details are not covered in this AIP and probably have their own AIPs.
+- The list of supported OIDC providers.
+- The actual Open ID configuration of each OIDC provider.
+- The actual JWK operation of each OIDC provider.
+- The actual impact and recommended operations for operators.
 
 ## Motivation
 
-As explained in the summary, [AIP-61: OIDB accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md) re quires validators agree on the latest JWKs of the OIDC providers.
+As explained in the summary, [AIP-61: keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md) re quires validators agree on the latest JWKs of the OIDC providers.
 This AIP proposes a solution of the functional goal that balances all non-functional needs:
 - the OIDC provider set is assumed to be maintained in an on-chain resource;
 - validators take the OIDC provider set as an input and for each provider, monitor and publish the quorum-certified JWK updates on chain;
@@ -67,7 +80,7 @@ publish using a governance proposal and wait to be voted by the majority of the 
 Reasons to not consider: latency.
 The voting can last up to 7 days (by the current setting),
 which means the new JWKs may not be available on chain until they are 7 days old,
-which further means the OIDB-associated transactions signed by the new key won't be accepted for 7 days.
+which further means the keyless transactions signed by the new key won't be accepted for 7 days.
 
 ### Alternative 3: let OIDC provider update JWKs on chain
 One alternative is to have OIDC providers each create their own Aptos account
@@ -76,7 +89,7 @@ and publish their new keys on-chain whenever they publish them at its own JWK UR
 Reasons to not consider: security + provider-independence.
 This alternative requires that OIDC providers are sufficiently incentivized to participate in Aptos protocol,
 which is not the case today and it is unclear how to ensure that.
-Even if the providers are incentivized, any of their Aptos account keys/JWKs effectively become a new "single point of compromise" for the whole system: if compromised, all associated OIDB accounts are compromised.
+Even if the providers are incentivized, any of their Aptos account keys/JWKs effectively become a new "single point of compromise" for the whole system: if compromised, all associated keyless accounts are compromised.
 This is some new (and likely undesired) security assumption to make.
 Additionlly, existing OIDC providers will be required to update their key rotation logic.
 
@@ -122,7 +135,7 @@ Here are some examples when JWK consensus may get stuck on a provider.
 1. Turn on/off the feature.
 1. Start/stop watching an OIDC provider (i.e., update `SupportedOIDCProviders`).
 1. Delete all observed JWKs of an OIDC provider.
-    - Typically used together with "stop watching an OIDC provider" to fully disable a provider (from the perspective of OIDB accounts). This can make validator-side logic simpler.
+    - Typically used together with "stop watching an OIDC provider" to fully disable a provider (from the perspective of keyless accounts). This can make validator-side logic simpler.
 1. Patch the on-chain JWK collection.
     - Example use case: a single key is found compromised but the provider has not yet rotate it.
 
@@ -147,7 +160,7 @@ A validator, if a member of the validator set of the current epoch, should do th
     - switch `consensus_state` to `InProgress(ob, latest_on_chain.version + 1, task_handle)`.
 - Once a quorum-cert is formed for `(ob_jwks, version)`, if the state is `InProgress{ob_jwks, version, _}`:
     - propose a transaction to update the on-chain `ObservedJWKs` with the observed and quorum-certified `(ob_jwks, version)` of `provider`.
-        - can leverage [validator transactions](https://github.com/aptos-foundation/AIPs/pull/274/files).
+        - can leverage [validator transactions](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-64.md).
     - switch `consensus_state` to `Finished{ob_jwks, version}`.
 - On an `ObservedJWKsUpdated` event where the value of `provider` is different from `latest_on_chain`:
     - reinitialize `latest_on_chain` with the new on-chain values;
@@ -186,7 +199,7 @@ Actions are required on operators' end, but hopefully they are trivial.
 
 ## Future Potential
 
-This AIP is mainly to support [AIP-61: OIDB accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md).
+This AIP is mainly to support [AIP-61: keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md).
 
 It's unclear how it can be leveraged further.
 
@@ -210,7 +223,7 @@ Release 1.10
 Below, we suppose the following 2 fundamental assumptions are valid and only discuss the assumtpions required for JWK consensus to work.
 - The assumptions for blockchain main consensus.
 - OIDC provider itself (mainly, its JWKs and HTTPS private keys) are secure.
-    - Compromised OIDC providers are discussed in [AIP-61: OIDB accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md).
+    - Compromised OIDC providers are discussed in [AIP-61: keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md).
 
 ### Supporting a single OIDC provider
 
@@ -220,9 +233,9 @@ The proposed solution should work if more than 2/3 of the total validator voting
 
 More implications:
 - If no more than 2/3 of the total validator voting power is held in a secure environment for the provider,
-  new keys of the provider cannot be published on chain. (From the perspective of OIDB accounts, it is a liveness issue.)
+  new keys of the provider cannot be published on chain. (From the perspective of keyless accounts, it is a liveness issue.)
 - If more than 2/3 of the total validator voting power is held in a malicious environment for the provider (where DNS server and CA certs are both controlled by an attacker),
-  malicious JWKs can be published on chain. (From the perspective of OIDB accounts, it means any user account associated with this provider can be corrupted.)
+  malicious JWKs can be published on chain. (From the perspective of keyless accounts, it means any user account associated with this provider can be corrupted.)
 
 Some realistic scenarios where the assumptions may be invalid.
 - Extremely imbalanced stake distribution. If a large amount of stake goes to a small set of validator nodes, it is in general easier to compromise.
