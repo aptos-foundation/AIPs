@@ -45,6 +45,10 @@ New delegation pools will have the ownership lookup feature enabled by default.
 
 Delegation pools with allowlisting will have to manage their own KYC process. 
 
+The minimum stake requirement for active and pending-inactive stake per delegator is 10 APT.
+A delegator owning exactly 10 APT active stake might not be able to unlock or be evicted by the pool owner: 10 APT could be worth 9,99..9 APT when unlocked due to rounding errors caused by the "active to pending-inactive" conversion and the unlock would revert.\
+As rewards are added on this delegator's active stake, the active balance becomes > 10 APT which unblocks them. However, in case the validator is inactive and the delegator is not allowlisted, they don't produce rewards and also cannot add stake to get unblocked.
+
 ## Future Potential
 
 This feature may be a requirement for any exchanges, financial institutions, or other entities that want to run a validator using a permissioned delegation pool. 
