@@ -20,22 +20,22 @@ on chain, using the (native JWK consensus framework)[https://github.com/aptos-fo
 
 ## Goals
 
-This will enable Google-based [OIDB accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md).
+This will enable Google-based [keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md).
 
 ## Motivations
 
-Google is one of the most popular OIDC providers. Enabling Google-based OIDB accounts can greatly expand Aptos user base.
+Google is one of the most popular OIDC providers. Enabling Google-based keyless accounts can greatly expand Aptos user base.
 
 Besides, some recent observation shows that Google's JWK operation seems to satisfy the requirements of
 [JWK consensus]([https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md])
-and [OIDB accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)
+and [keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)
 quite well.
 (NOTE: this is unofficial observation and there is no Google documentation known to confirm with!)
 - JWK rotation happens approximately **every week**.
 - There are usually 2 JWKs, `(K[i], K[i+1])`.
   - Likely, `K[i+1]` is the new primary JWK, and `K[i]` is kept so signatures before the last rotation can still be verified.
   - It is unclear whether Google starts to sign with `K[i+1]` immediately after the last rotation.
-    - If so, due to replication latency (currently ~10 seconds), OIDB transactions signed by `K[i+1]` may be unverifiable in the first ~10 seconds after rotation.
+    - If so, due to replication latency (currently ~10 seconds), keyless transactions signed by `K[i+1]` may be unverifiable in the first ~10 seconds after rotation.
       Anyway, replication latency is unavoidable and is mitigatable with some retry mechanism in SDK/applications.
   - The next rotation updates the JWK set to `(K[i+1], K[i+2])`.
 
@@ -66,7 +66,7 @@ script {
         let framework_signer = &core_signer;
 
         jwks::upsert_oidc_provider(
-            &framework_signer,
+            framework_signer,
             b"https://accounts.google.com",
             b"https://accounts.google.com/.well-known/openid-configuration"
         );
@@ -103,4 +103,4 @@ Also see [here](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.m
 for the security considerations of the JWK consensus framework in general.
 
 Also see [here](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#security-liveness-and-privacy-considerations)
-for the security considerations of OIDB accounts in general.
+for the security considerations of keyless accounts in general.

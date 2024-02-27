@@ -35,7 +35,7 @@ A typical usage of the validator transaction framework is for validators to upda
 Some Aptos features have adopt it as a building block.
 - In [on-chain randomness](https://github.com/aptos-foundation/AIPs/pull/321/files) design, randomness generation key shares for epoch `e` validators are on-chain configurations.
   They are computed off-chain at the end of epoch `e-1` and then published on chain using a `ValidatorTransaction`.
-- For [OIDB accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md), the latest JWKs of every OIDC provider are part of the feature configuration, and must be replicated on-chain as soon as possible.
+- For [keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md), the latest JWKs of every OIDC provider are part of the feature configuration, and must be replicated on-chain as soon as possible.
   This is done by a sub-feature [JWK consensus](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md) where the validator transaction framework is used to publish a quorum-certified JWK update on chain.
 
 ## Impact
