@@ -379,9 +379,10 @@ Testing can be found in the reference implementation provided in the PR link abo
 ## Risks and Drawbacks
 
 > [!WARNING]  
-> Given the risks mentioned, passkey wallet providers should allow users to set up a k-of-n `MultiKey` account (as per [AIP-55](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md)) associated with their passkey. An additional non-passkey signer enables a user to access their account, even if the wallet is unavailable.
+> This AIP does not aim to prescribe or enforce a particular solution to the risks and drawbacks mentioned below. Ultimately, however, it is the responsibility of the wallet provider to address these risks appropriately. 
 > 
-> For instance, configuring a 1-of-2 `MultiKey` account with a passkey and an `ed25519` private key enables transaction signing even if the wallet is unavailable. However, the wallet will need to provide a way for the user to access the passkey public key even if the wallet is unavailable. This is because the `MultiKey` Authenticator requires all associated public keys in transactions. Refer to the [Loss of Passkey Public Key](#Loss-of-Passkey-Public-Key) section for further information.
+> One way a wallet may address some of the recoverability risks mentioned below is by allowing a user to set up a k-of-n `MultiKey` account (as per [AIP-55](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md)) associated with their passkey. An additional non-passkey signer enables a user to access their account, even if the wallet is unavailable.For instance, configuring a 1-of-2 `MultiKey` account with a passkey and an `ed25519` private key enables transaction signing even if the wallet is unavailable. However, the wallet will need to provide a way for the user to access the passkey public key even if the wallet is unavailable. This is because the `MultiKey` Authenticator requires all associated public keys in transactions. Refer to the [Loss of Passkey Public Key](#Loss-of-Passkey-Public-Key) section for further information.
+>
 
 
 ### Backup State and Eligiblity 
