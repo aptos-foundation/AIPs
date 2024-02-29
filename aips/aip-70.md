@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): AIP-47, AIP-44
 ---
 
-# AIP-70 - Parallelize Fungible Assets minting/burning
+# AIP-70 - Parallelize Fungible Assets
   
 ## Summary
 
