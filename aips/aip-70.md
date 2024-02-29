@@ -1,5 +1,5 @@
 ---
-aip: X
+aip: 70
 title: Parallelize Fungible Assets
 author: igor-aptos (https://github.com/igor-aptos), vusirikala (https://github.com/vusirikala)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/209
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): AIP-47, AIP-44
 ---
 
-# AIP-X - Parallelize Fungible Assets minting/burning
+# AIP-70 - Parallelize Fungible Assets minting/burning
   
 ## Summary
 
