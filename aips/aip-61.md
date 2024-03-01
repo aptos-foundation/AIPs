@@ -36,7 +36,7 @@ An important property of keyless accounts is that they are not only *bound* to t
    3. Enable users to easily-access their blockchain account from any device
 
 2. **Security:**
-   1. Keyless accounts should be as secure as OIDC accounts
+   1. Keyless accounts should be as secure as their underlying OIDC account (see discussion [here](#compromised-oidc-account))
    2. Keyless accounts should be recoverable if the managing applications disappears (see alternative recovery paths discussion below)
 
 3. **Privacy**: 
@@ -541,9 +541,21 @@ To deal with this, we propose installing **alternative recovery paths**:
 
 - Alternatively, for popular applications, we could consider **manual patches**: e.g., adding an override for their `client_id` in our ZK relation. (But this brings about a centralization risk.)
 
+### Compromised OIDC account
+
+The whole point of keyless accounts is to make a user’s blockchain account **as secure as their OIDC account**. Naturally, if the OIDC account (e.g., Google) is compromised, all keyless accounts associated with that user’s OIDC account will be vulnerable 
+
+In fact, even though the OIDC account might be **temporarily** compromised, the keyless account could be **permanently** compromised, since an attacker can simply rotate the account’s key in the brief window it has access to the underlying OIDC account.
+
+Nonetheless, this is the intended security model: *“your blockchain account = your Google account”*!
+
+Users who are not comfortable with this model, can either (1) not use this feature at all or (2) use `t`-out-of-`n` approaches[^multiauth] where one of the `n` factors is a keyless account, based on their preference.
+
+**Note:** The pepper service also uses the OIDC account for authenticating requests, so the pepper cannot be meaningfully be used as 2nd factor; not without defeating the point of keyless accounts, which is to preclude the need for users to remember any information.
+
 ### Compromised OIDC provider
 
-Recall that “your blockchain account = your OIDC account.” In other words:
+Recall that _“your blockchain account = your OIDC account.”_ In other words:
 
 - If your OIDC account is compromised, so is your keyless account.
 - If your OIDC provider (e.g., Google) is compromised, so is your keyless account associated with that provider.
