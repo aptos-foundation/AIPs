@@ -1,9 +1,9 @@
 ---
 aip: 61
-title: OpenID blockchain (OIDB) accounts
+title: Keyless accounts
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/297
-Status: Draft
+Status: Approved
 last-call-end-date (*optional): 02/15/2024
 type: <Standard (Core, Framework)>
 created: 01/04/2024
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-61 - OpenID blockchain (OIDB) accounts
+# AIP-61 - Keyless accounts
 
 ## Summary
 
@@ -21,9 +21,9 @@ Currently, the only way[^multisig] to secure your Aptos account is to protect th
 
 In this AIP, we describe a more user-friendly approach for account management that relies on the _unmodified_[^openpubkey] **OpenID Connect (OIDC)** standard and recent developments in **zero-knowledge proofs of knowledge (ZKPoKs)** of **OIDC signatures**[^snark-jwt-verify]$^,$[^nozee]$^,$[^bonsay-pay]$^,$[^zk-blind]$^,$[^zklogin].
 
-Specifically, we enable **OpenID blockchain (OIDB) accounts** on Aptos that are secured through the owner’s existing **OIDC account** (i.e., their Web2 account with an **OIDC provider** such as Google, GitHub or Apple), rather than through a difficult-to-manage secret key. In a nutshell, _“your blockchain account = your OIDC account”_.
+Specifically, we enable **keyless accounts** on Aptos that are secured through the owner’s existing **OIDC account** (i.e., their Web2 account with an **OIDC provider** such as Google, GitHub or Apple), rather than through a difficult-to-manage secret key. In a nutshell, _“your blockchain account = your OIDC account”_.
 
-A key property of OIDB accounts is that they are not only *bound* to the user’s OIDC account (e.g., `alice@gmail.com`) but are also bound to a **managing application** registered with the OIDC provider (e.g., a dapp’s `dapp.xyz` website, or a wallet’s mobile phone app). In other words, they are **application-specific** accounts. As a consequence, if the managing application of an account disappears or loses their OIDC provider registration credentials, then users whose accounts are bound to this application will become inaccessible, unless alternative **recovery paths** are provided (discussed below).
+An important property of keyless accounts is that they are not only *bound* to the user’s OIDC account (e.g., `alice@gmail.com`) but are also bound to a **managing application** registered with the OIDC provider (e.g., a dapp’s `dapp.xyz` website, or a wallet’s mobile phone app). In other words, they are **application-specific** accounts. As a consequence, if the managing application of an account disappears or loses their OIDC provider registration credentials, then users whose accounts are bound to this application will become inaccessible, unless alternative **recovery paths** are provided (discussed below).
 
 ### Goals
 
@@ -36,16 +36,16 @@ A key property of OIDB accounts is that they are not only *bound* to the user’
    3. Enable users to easily-access their blockchain account from any device
 
 2. **Security:**
-   1. OIDB accounts should be as secure as OIDC accounts
-   2. OIDB accounts should be recoverable if the managing applications disappears (see alternative recovery paths discussion below)
+   1. Keyless accounts should be as secure as their underlying OIDC account (see discussion [here](#compromised-oidc-account))
+   2. Keyless accounts should be recoverable if the managing applications disappears (see alternative recovery paths discussion below)
 
 3. **Privacy**: 
-   1. OIDB accounts and their associated transactions should **not** leak any information about the user’s OIDC account (e.g., a Google user’s email address or their OAuth `sub` identifier).
+   1. Keyless accounts and their associated transactions should **not** leak any information about the user’s OIDC account (e.g., a Google user’s email address or their OAuth `sub` identifier).
    2. The OIDC provider (e.g., Google) should not be able to track the user’s transaction activity.
-   3. OIDB blockchain accounts for the same user but with different managing applications should not be linkable on chain.
-4. **Efficiency**: Transactions for OIDB accounts should be efficient to create by wallets/dapps (< 1 second) and efficient to validate by Aptos validators (< 2 milliseconds).
+   3. Keyless accounts for the same user but with different managing applications should not be linkable on chain.
+4. **Efficiency**: Transactions for keyless accounts should be efficient to create by wallets/dapps (< 1 second) and efficient to validate by Aptos validators (< 2 milliseconds).
 5. **Censorship-resistance:** Aptos validators should not be able to give preferential treatment to OpenID transactions based on the identity of the managing application or user.
-6. **Decentralization**: OIDB accounts should not require the existence of parties that can never be decentralized.
+6. **Decentralization**: Keyless accounts should not require the existence of parties that can never be decentralized.
 
 ### Background
 
@@ -62,20 +62,20 @@ We assume the reader is familiar with the OAuth authorization framework[^HPL23] 
   - We often refer to the combination of the header, payload and their signature as a **signed JWT**.
   - See [an example here](#JWT-header-and-payload-example).
 - Relevant JWT header fields (e.g., `kid`)
-- Relevant JWT payload fields (e.g., `aud`, `sub`, `iss`, `email_verified`, `nonce`)
+- Relevant JWT payload fields (e.g., `aud`, `sub`, `iss`, `email_verified`, `nonce`, `iat`, `exp`)
 - **JSON Web Keys (JWKs)**, which are published by each OIDC provider at a JWK endpoint URL indicated in their OpenID configuration URL
 
 #### Terminology
 
 - **OIDC account**: A Web2 account with an OIDC provider such as Google (e.g., `alice@gmail.com`)
-- **OIDB account**: An OpenID blockchain (OIDB) account whose security and liveness is backed by an OIDC account (e.g., a Google account) rather than a secret key. The heart of this AIP is to explain how such OIDB accounts can be safely implemented.
-- **Application-specific [OIDB] accounts**: An OIDB account is **bound** both the user’s identity (e.g., `alice@gmail.com` and the managing application’s identity (e.g., `dapp.xyz`). This means that, in order to access the account, a signed JWT token over that user’s identity and over the managing application’s identity must be exhibited. Such a token can only be obtained through signing in the managing application via the user’s OIDC provider (e.g., Google). This has [important implications](#alternative-recovery-paths-for-when-managing-applications-disappear).
+- **Keyless account**: A blockchain account whose security and liveness is backed by an OIDC account (e.g., a Google account) rather than a secret key. The heart of this AIP is to explain how such keyless accounts can be safely implemented.
+- **Application-specific keyless accounts**: A keyless account is **bound** both the user’s identity (e.g., `alice@gmail.com` and the managing application’s identity (e.g., `dapp.xyz`). This means that, in order to access the account, a signed JWT token over that user’s identity and over the managing application’s identity must be exhibited. Such a token can only be obtained through signing in the managing application via the user’s OIDC provider (e.g., Google). This has [important implications](#alternative-recovery-paths-for-when-managing-applications-disappear).
 
 #### tl;dr on OIDC
 
 For the purposes of this AIP, the most important thing to understand about OIDC is that it enables a **managing application** (e.g., `dapp.xyz` or `some-wallet.org` or a mobile phone app) to sign in its users via their OIDC provider (e.g, Google) without learning that user’s OIDC credentials (i.e., Google account password). Importantly, if (and only if) the user successfully logs in, then **only** the managing application (and no one else) receives a **signed JWT** from Google as a publicly-verifiable proof of the user having logged in.
 
-The purpose of this AIP will be to demonstrate how this signed JWT can be used to authorize transactions for an OIDB account associated with that user *and* managing application.
+The purpose of this AIP will be to demonstrate how this signed JWT can be used to authorize transactions for a keyless account associated with that user *and* managing application.
 
 #### Zero-knowledge proofs
 
@@ -109,20 +109,20 @@ To **verify the transaction** is authorized to access the account, the validator
 
 This AIP is concerned with:
 
-1. Explaining the intricacies of how OIDB accounts work
-2. Describing our initial Rust implementation of the OIDB transaction authenticator
+1. Explaining the intricacies of how keyless accounts work
+2. Describing our initial Rust implementation of the keyless transaction authenticator
 
 ### Out of Scope
 
  > What are we committing to not doing and why are they scoped out?
 
 1. Security of DNS and X.509 certificate ecosystem
-   - OIDB accounts rely on OAuth and OIDC, whose security in turn relies on the security of DNS and the X.509 certificate ecosystem.
+   - Keyless accounts rely on OAuth and OIDC, whose security in turn relies on the security of DNS and the X.509 certificate ecosystem.
    - So does all the software on the Internet, so we consider this out-of-scope
 2. Malicious wallet applications that impersonate a genuine wallet application
    - We assume an attacker is **not** able to publish a mobile phone app in (say) Apple’s App Store that impersonates a wallet’s registered OAuth `client_id`
-   - We assume an attacker is **not** able to trick a user into installing a malicious desktop app that impersonates another app’s OAuth `client_id`. For this reason, we do **not** recommend managing applications for OIDB accounts that are desktop apps, since they are very easy to impersonate.
-3. In-depth discussion of auxiliary backend components necessary for OIDB accounts:
+   - We assume an attacker is **not** able to trick a user into installing a malicious desktop app that impersonates another app’s OAuth `client_id`. For this reason, we do **not** recommend managing applications for keyless accounts that are desktop apps, since they are very easy to impersonate.
+3. In-depth discussion of auxiliary backend components necessary for keyless accounts:
    - **Pepper service**: will be the scope of a future AIP (see [the appendix](#pepper-service))
    - **ZK proving service**: will be the scope of a future AIP (see [the appendix](#(oblivious)-zk-proving-service))
    - **Consensus on JSON Web Keys (JWKs)**: will be the scope of a future AIP (see [the appendix](#jwk-consensus))
@@ -147,14 +147,14 @@ Not accepting this proposal would maintain the status quo of user-unfriendly acc
  > Which audiences are impacted by this change? What type of action does the audience need to take?
 
 1. Dapp developers
-   - Familiarize themselves with the SDK for OIDB accounts
+   - Familiarize themselves with the SDK for keyless accounts
    - If desired, dapps can enable a **walletless experience** where users can sign in to the dapp directly via their OpenID account (e.g., their Google account) without connecting a wallet.
    - This will give the user access to their **dapp-specific blockchain account** for that dapp. This way, since this account is scoped only to that dapp, the dapp can authorize transactions “blindly” on the user’s behalf, without complicated TXN prompts.
 2. Wallet developers
-   - Familiarize themselves with the SDK for OIDB accounts
-   - Consider switching their default user onboarding flow to use OIDB accounts
+   - Familiarize themselves with the SDK for keyless accounts
+   - Consider switching their default user onboarding flow to use keyless accounts
 3. Users
-   - Familiarize themselves with the security model of OIDB accounts
+   - Familiarize themselves with the security model of keyless accounts
    - Understand their account would be as secure as their OpenID accounts (e.g., their Google account)
    - Understand how to use alternative _recovery paths_, should the managing application become unavailable
 
@@ -180,9 +180,9 @@ This has two problems. First, the MPC system will learn who is transacting and w
 
 Second, the MPC is superfluous since users can be authenticated directly to the validators via OIDC (as argued in this AIP) or via passkeys (as argued [above](#passkeys)).
 
-Put differently, **OIDB accounts sidestep the need for a complex MPC signing service** (which can be tricky to implement securely and robustly) by directly authenticating users via OIDC. At the same time OIDB accounts are as secure as MPC-based accounts, since they both bootstrap security from OIDC.
+Put differently, **keyless accounts sidestep the need for a complex MPC signing service** (which can be tricky to implement securely and robustly) by directly authenticating users via OIDC. At the same time, keyless accounts are as secure as MPC-based accounts, since they both bootstrap security from OIDC.
 
-Nonetheless, OIDB accounts still rely on a distributed pepper service and a ZK proving service (see [the appendix](#appendix)). However:
+Nonetheless, keyless accounts still rely on a distributed pepper service and a ZK proving service (see [the appendix](#appendix)). However:
 
 - The proving service is needed only for performance when computing ZKPs in the browser or on phones and stands to be removed in the future when the ZKP system is optimized.
 - The pepper service, unlike the MPC service, is not sensitive for security: an attacker who fully compromises it cannot steal users accounts; not without also having compromised the users’ OIDC accounts.
@@ -198,17 +198,17 @@ As pointed out above, our approach directly authenticates users to the blockchai
 
  > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
-### OIDB accounts
+### Keyless accounts
 
-Below, we explain the key concepts behind how OIDB accounts are implemented:
+Below, we explain the key concepts behind how keyless accounts are implemented:
 
-1. What is the *public key* of an OIDB account?
+1. What is the *public key* of a keyless account?
 2. How is the *authentication key* derived from this public key?
 3. What does the *digital signature* look like for OIDC account transactions?
 
 #### Public keys
 
-The **public key** of an OIDB account consists of:
+The **public key** of a keyless account consists of:
 
 1. $\mathsf{iss\\_val}$: the OIDC provider’s identity, as it appears in a JWT’s `iss` field (e.g., `https://accounts.google.com`), denoted by $\mathsf{iss\\_val}$
 2. $\mathsf{addr\\_idc}$: an **identity commitment (IDC)**, which is a <u>hiding</u> commitment to:
@@ -242,7 +242,7 @@ Therefore, we introduce a **pepper service** that can help users recover their p
 
 #### Authentication keys
 
-Next, the **authentication key** of an OIDB account is simply the hash of its public key defined above. More formally, assuming any cryptographic hash function $H$, the authentication key is:
+Next, the **authentication key** of a keyless account is simply the hash of its public key defined above. More formally, assuming any cryptographic hash function $H$, the authentication key is:
 
 ```math
 \mathsf{auth\_key} = H(\mathsf{iss\_val}, \mathsf{addr\_idc})
@@ -323,7 +323,7 @@ An alternative would be to ensure that $\mathsf{exp\\_date} < \texttt{current\\_
 
 #### Zero-knowledge signatures
 
-This gets us to the _essence of this AIP_: we are now ready to describe how privacy-preserving signatures work for our OIDB accounts. These signatures leak _nothing_ about the user’s OIDC account nor the managing app’s ID associated with the accessed OIDB account.
+This gets us to the _essence of this AIP_: we are now ready to describe how privacy-preserving signatures work for our keyless accounts. These signatures leak _nothing_ about the user’s OIDC account nor the managing app’s ID associated with the accessed keyless account.
 
 A **zero-knowledge signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf{txn}$ for an address with authentication key $\mathsf{auth\\_key}$ is defined as:
 
@@ -333,7 +333,7 @@ A **zero-knowledge signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf
 
 where:
 
-3. $(\mathsf{header}$, $\mathsf{epk}$, $\sigma_\mathsf{eph}$, $\mathsf{exp\\_date}$ are as before
+3. $(\mathsf{header}$, $\mathsf{epk}$, $\sigma_\mathsf{eph}$, $\mathsf{exp\\_date})$ are as before
 4. $\mathsf{exp\\_horizon}$, which is $\le \mathsf{max\\_exp\\_horizon}$; the $\mathsf{exp\\_date}$ must be between $\mathsf{jwt}[\texttt{"iat"}]$ and $\mathsf{jwt}[\texttt{"iat"}]+\mathsf{exp\\_horizon}$
 5. $\pi$ is a **zero-knowledge proof of knowledge (ZKPoK)** for the the ZK relation $\mathcal{R}$ (defined below).
 
@@ -448,7 +448,7 @@ We will expand later on the testing plan. **(TBA.)**
  > - Any backwards compatibility issues we should be aware of?
  > - If there are issues, how can we mitigate or resolve them
 
-All the risk and drawbacks are described in the [“Security, Liveness and Privacy Considerations” section](#Security,-Liveness-and-Privacy-Considerations).
+All the risk and drawbacks are described in the [“Security, Liveness and Privacy Considerations” section](#Security-Liveness-and-Privacy-Considerations).
 
 ## Future Potential
 
@@ -515,15 +515,15 @@ An important **liveness consideration** of this is that if the proving service i
 
 ### Alternative recovery paths for when managing applications disappear
 
-Recall that OIDB accounts are bound not just to the user but also to a managing application (e.g., a dapp or a wallet).
+Recall that keyless accounts are bound not just to the user but also to a managing application (e.g., a dapp or a wallet).
 
 Unfortunately, this **managing application could disappear** for various reasons:
 
 1. Its OAuth `client_id` might be banned by the OIDC provider (for various reasons)
 2. An incompetent administrator loses the application’s OAuth `client_secret` or deletes the registered application from the OIDC provider
-3. A clueless administrator simply takes down the application (e.g., removes a mobile phone app from the app store or stops running the dapp’s website) without realizing that its users will lose access to their OIDB account on that application.
+3. A clueless administrator simply takes down the application (e.g., removes a mobile phone app from the app store or stops running the dapp’s website) without realizing that its users will lose access to their keyless account on that application.
 
-In any case, **if the managing application disappears, then users will no longer be able to access their OIDB account** bound to that application, since they can no longer obtain a signed JWT without the application.
+In any case, **if the managing application disappears, then users will no longer be able to access their keyless account** bound to that application, since they can no longer obtain a signed JWT without the application.
 
 To deal with this, we propose installing **alternative recovery paths**:
 
@@ -536,17 +536,29 @@ To deal with this, we propose installing **alternative recovery paths**:
   - For **Twitter**, a user could prove they own their Twitter account by tweeting a specially-crafted message
   - Similarly, for **GitHub**, users could do the same by posting a gist.
   - Given an HTTPS oracle, validators could verify such a tweet or a gist and allow the user to rotate their account's key. This would **not** be **privacy-preserving** since, at minimum, the validators would learn the user’s identity from the HTTPS URL.
-- Alternatively, all OIDB accounts could be set up as a 1 out of 2[^multiauth] with a **recovery [passkey](#Passkeys)** sub-account. This way, the passkey, if backed up automatically (e.g., on Apple platforms), then it could be used to restore access to the account.
+- Alternatively, all keyless accounts could be set up as a 1 out of 2[^multiauth] with a **recovery [passkey](#Passkeys)** sub-account. This way, the passkey, if backed up automatically (e.g., on Apple platforms), then it could be used to restore access to the account.
   - A traditional SK sub-account could also be used but this would require the managing application to giver users the option to write the SK, which defeats the user-friendliness goals.
 
 - Alternatively, for popular applications, we could consider **manual patches**: e.g., adding an override for their `client_id` in our ZK relation. (But this brings about a centralization risk.)
 
+### Compromised OIDC account
+
+The whole point of keyless accounts is to make a user’s blockchain account **as secure as their OIDC account**. Naturally, if the OIDC account (e.g., Google) is compromised, all keyless accounts associated with that user’s OIDC account will be vulnerable 
+
+In fact, even though the OIDC account might be **temporarily** compromised, the keyless account could be **permanently** compromised, since an attacker can simply rotate the account’s key in the brief window it has access to the underlying OIDC account.
+
+Nonetheless, this is the intended security model: *“your blockchain account = your Google account”*!
+
+Users who are not comfortable with this model, can either (1) not use this feature at all or (2) use `t`-out-of-`n` approaches[^multiauth] where one of the `n` factors is a keyless account, based on their preference.
+
+**Note:** The pepper service also uses the OIDC account for authenticating requests, so the pepper cannot be meaningfully be used as 2nd factor; not without defeating the point of keyless accounts, which is to preclude the need for users to remember any information.
+
 ### Compromised OIDC provider
 
-Recall that “your blockchain account = your OIDC account.” In other words:
+Recall that _“your blockchain account = your OIDC account.”_ In other words:
 
-- If your OIDC account is compromised, so is your OIDB account.
-- If your OIDC provider (e.g., Google) is compromised, so is your OIDB account associated with that provider.
+- If your OIDC account is compromised, so is your keyless account.
+- If your OIDC provider (e.g., Google) is compromised, so is your keyless account associated with that provider.
 
 We stress that this is a **feature**, not a **bug**: we want Aptos users to leverage the security & user-friendliness of their OIDC accounts to transact easily. Nonetheless, for users who do not want to fully rely on the security of their OIDC account, they can upgrade to a $t$ out of $n$ approach, using a combination of different OIDC accounts and/or traditional SKs[^multiauth].
 
@@ -563,7 +575,7 @@ In the unlikely case that this happens, we can proceed as follows:
 
 ### Web-based wallets and walletless dapps
 
-OIDB accounts will give rise to (1) web-based wallets that users can sign into via (say) Google and (2) **walletless dapps** that users can sign into directly via (again, say) Google.
+Keyless accounts will give rise to (1) web-based wallets that users can sign into via (say) Google and (2) **walletless dapps** that users can sign into directly via (again, say) Google.
 
 There are several security challenges in the web environment:
 
@@ -596,7 +608,7 @@ However, for webapps (e.g., dapps or web-wallets) there are two options:
 1. Use the OAuth implicit grant flow and store everything in the browser (e.g., local storage, IndexedDB). 
    - This way, even if a dapp/web-wallet is compromised, the user’s assets cannot be stolen unless they go to the compromised website and trigger some malicious JS.
 2. Use the OAuth authorization grant flow and store the ESK in the browser and the signed JWT in the backend.
-   - Unfortunately, some OIDC providers allow refreshing the signed JWT from the backend on a new `nonce` field, without the user’s consent. This means a compromised backend can refresh the signed JWT on an EPK it controls and steal OIDB accounts (assuming the OAuth session has not expired). This can be done without the user’s involvement in accessing the compromised website.
+   - Unfortunately, some OIDC providers allow refreshing the signed JWT from the backend on a new `nonce` field, without the user’s consent. This means a compromised backend can refresh the signed JWT on an EPK it controls and steal keyless accounts (assuming the OAuth session has not expired). This can be done without the user’s involvement in accessing the compromised website.
 
 ### What should $\mathsf{max\\_exp\\_horizon}$ be set to?
 
@@ -615,6 +627,13 @@ Currently, zero-knowledge TXNs leak which OIDC provider is involved by revealing
 However, we could modify our ZK relation to hide the OIDC provider too. Specifically, instead of taking in the $\mathsf{jwk}$ as a *public* input, the relation would take it as a *private* input, and then would verify membership of this JWK in a list of approved JWKs committed on chain. (Otherwise, users can input any JWK and forge TXN signatures.)
 
 ## Appendix
+
+### OpenID Connect (OIDC)
+
+The [OIDC specification](https://openid.net/specs/openid-connect-core-1_0.html) says:
+
+ - The `iat` field must be specified in seconds since the UNIX epoch time ([here](https://openid.net/specs/openid-connect-core-1_0.html#IDToken)).
+ - The refresh protocol does **NOT** allow setting a new nonce ([here]([url](https://openid.net/specs/openid-connect-core-1_0.html#RefreshTokenResponse))). However, in our experiences, providers like Google do allow users to refresh their OIDC signatures on a new `nonce`.
 
 ### JWT header and payload example
 
@@ -676,13 +695,17 @@ Its design is outside the scope of this AIP, but here we highlight some of its k
 
 ### JWK consensus
 
-Transaction signatures for OIDB accounts involve verifying an OIDC signature. This requires that validators **agree on the latest JWKs** (i.e., public keys) of the OIDC provider, which are periodically-updated at a provider-specific **OpenID configuration URL**. 
+Transaction signatures for keyless accounts involve verifying an OIDC signature. This requires that validators **agree on the latest JWKs** (i.e., public keys) of the OIDC provider, which are periodically-updated at a provider-specific **OpenID configuration URL**. 
 
 The design and implementation of JWK consensus is outside the scope of this AIP, but here we highlight some of its key properties:
 
 - The validators will frequently scan for JWK changes at every supported provider’s **OpenID configuration URL**
 - When a change is detected by a validator, that validator will propose the change via a one-shot consensus mechanism
 - Once the validators agree, the new JWKs will be reflected in a public Move module in `aptos_framework::jwks`.
+
+## Changelog
+
+- _2024-02-29_: An [earlier version](https://github.com/aptos-foundation/AIPs/blob/71cc264cc249faf4ac23a3f441fb76a64278b51a/aips/aip-61.md) of this AIP referred to keyless accounts as **OpenID-based blockchain (OIDB)** accounts.
 
 ## References
 
