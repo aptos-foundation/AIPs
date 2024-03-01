@@ -199,10 +199,9 @@ Actions are required on operators' end, but hopefully they are trivial.
 
 ## Future Potential
 
-This AIP is mainly to support [AIP-61: keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md).
+The purpose of this AIP is to support the implementation of [AIP-61: keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md).
 
-It's unclear how it can be leveraged further.
-
+However, this AIP paves the way towards **native** support for HTTP oracles in Move. Specifically, the JWK consensus infrastructure could be used to empower Move contracts to **asynchronously** fetch the contents of an HTTP page. This could open up many applications, such as price oracles, native bridges, prediction markets, and more.
 
 ## Timeline
 
