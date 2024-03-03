@@ -51,16 +51,16 @@ This AIP will benefit developers and users by providing them with an easy way to
 
 ## Alternative solutions
 
-See the section on **Alternative Solutions** in [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#alternative-solutions) for a more in-depth exploration into the respective tradeoffs of multi-party computation (MPC), hardware security modules (HSMs), and OpenID blockchain (OIDB) accounts.
+See the section on **Alternative Solutions** in [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#alternative-solutions) for a more in-depth exploration into the respective tradeoffs of multi-party computation (MPC), hardware security modules (HSMs), and OpenID blockchain (Keyless) accounts.
 
-### OIDB Accounts
+### Keyless Accounts
 
-OIDB accounts present a unique and novel way to generate an on-chain account with an OpenID account. This is highly desirable as OIDB accounts are accessible across all devices with browsers. Additionally, most people have an account associated with one or more OIDC providers (e.g., Google) and are familiar with OAuth login flows. Lastly, recoverability is not limited to certain operating systems in the same way that passkeys are.
+Keyless accounts present a unique and novel way to generate an on-chain account with an OpenID account. This is highly desirable as Keyless accounts are accessible across all devices with browsers. Additionally, most people have an account associated with one or more OIDC providers (e.g., Google) and are familiar with OAuth login flows. Lastly, recoverability is not limited to certain operating systems in the same way that passkeys are.
 
 On the other hand, there are tradeoffs to consider as well:
 
-1. There are centralization and liveness concerns both on the OIDC provider and the services needed for OIDB accounts to function in a privacy preserving manner (e.g., pepper service, proving service) respectively.
-2. Unless the ephemeral secret key ($\mathsf{esk}$) associated with the OIDB account of the user is encrypted (i.e., with a password) or is a passkey itself, the plaintext ephemeral secret key is still available on the browser, leaving it potentially vulnerable to a malicious actor (but only during its short expiration window). Passkey private keys, on the other hand, are often stored securely within an authenticator on the device and end-to-end encrypted during backup.
+1. There are centralization and liveness concerns both on the OIDC provider and the services needed for Keyless accounts to function in a privacy preserving manner (e.g., pepper service, proving service) respectively.
+2. Unless the ephemeral secret key ($\mathsf{esk}$) associated with the Keyless account of the user is encrypted (i.e., with a password) or is a passkey itself, the plaintext ephemeral secret key is still available on the browser, leaving it potentially vulnerable to a malicious actor (but only during its short expiration window). Passkey private keys, on the other hand, are often stored securely within an authenticator on the device and end-to-end encrypted during backup.
 
 ## User Flow Overview
 
@@ -84,7 +84,7 @@ Passkeys use the [WebAuthn specification](https://www.w3.org/TR/webauthn-3/), a 
 
 ### Terminology
 
-- [**OIDB account**](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md): An OpenID blockchain (OIDB) account whose security and liveness is backed by an OIDC account (e.g., a Google account) rather than a secret key.
+- [**Keyless account**](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md): A Keyless account, whose security and liveness is backed by an OIDC account (e.g., a Google account) rather than a secret key.
 - [**Relying party**](https://www.w3.org/TR/webauthn-3/#relying-party): The website, application, or service that the user is trying to access, which is responsible for verifying a signature from the user's passkey to ensure that the user is who they claim to be. For simplicity, we can say that a "relying party" is synonymous with a **wallet** in this context since both are responsible for managing the user's access to a private key.
 - [**WebAuthn Authenticator**](https://www.w3.org/TR/webauthn-3/#authenticator): A cryptographic entity, existing in hardware or software, that can register a user with a given relying party and later assert possession of the registered public key credential, and optionally verify the user to the relying party.
 - [**Account Authenticator**](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md#summary): Authorizes the execution of a transaction on Aptos by the set of senders or approvers of the accounts within the transaction.
