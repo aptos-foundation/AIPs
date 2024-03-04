@@ -16,7 +16,7 @@ requires (*optional):
 ## Summary
 
 This AIP proposes to update the Transaction Shuffler logic to add other aspects of fairness to how transactions are ordered in the block.
-In addition to using senders to spread out transactions (from [AIP-27](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-27.md)), this AIP will extend that to spread out adjacent transactions (in the proposed order) that match on two new categories - module and entry function, to give transactions from non-dominant modules / entry functions a better chance of surval a potential block cut resuling from the block gas limit being hit.
+In addition to using senders to spread out transactions (from [AIP-27](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-27.md)), this AIP will extend that to spread out adjacent transactions (in the proposed order) that match on two new categories - module and entry function, to give transactions from non-dominant modules / entry functions a better chance of surviving a potential block cut resuling from the block gas limit being hit.
 
 ### Goals
 
