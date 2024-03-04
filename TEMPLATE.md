@@ -85,7 +85,7 @@ requires (*optional): <AIP number(s)>
 
  > - How can this AIP potentially impact the security of the network and its users? How is this impact mitigated?
  > - Are there specific parts of the code that could introduce a security issue if not implemented properly?
- > - Link tests (e.g. unit, end-to-end, property, fuzz) that validate both expected and unexpected behavior of this proposal
+ > - Link tests (e.g. unit, end-to-end, property, fuzz) in the reference implementation that validate both expected and unexpected behavior of this proposal
  > - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
 
 ...
