@@ -20,6 +20,7 @@ This AIP proposes a global mapping between coin and fungible asset and allow `co
 This AIP intends to achieve the following:
 
 - Automatically create a paired fungible asset metadata for a coin type at the coin creator address if it does not exist yet, including `AptosCoin`. Or the coin creator has the option to manually pair a fungible asset with a coin type.
+- Coin/Fungible Asset creator has the option to manually pair coin and fungible asset if neither is paired yet and all the conditions are met.
 - Create helper functions to convert between paired coin and fungible asset, with different visibilities.
 - To make the change compatible with existing dApps using move API in the current coin standard, this AIP proposes to change a couple of functions in coin module to convert coin and its paired fungible asset when needed to keep the same function signature.
 - Create a function call to migrate from `CoinStore<CoinType>` to the primary fungible store of all coin types by both `deposit` and `withdraw` functions in `coin` module w/o breaking any existing Dapps calling those functions.
@@ -87,7 +88,7 @@ public fun coin_to_fungible_asset<CoinType>(coin: Coin<CoinType> ): FungibleAsse
 public fun fungible_asset_to_coin<CoinType>(fungible_asset: FungibleAsset):
 ```
 
-The paired fungible asset metadata address would be `0x1` for APT and arbitrary for other coins.
+The paired fungible asset metadata address would be `0xA` for APT and arbitrary for other coins.
 
 Note: This AIP does not prompt the reverse conversion so the visibility of `fungible_asset_to_coin` is not public. Whenever `coin_to_fungible_asset<CoinType>` is called and the paired fungible asset does not exist, the coin module will automatically create a fungible asset metadata and add it to the mapping as to pair with `CoinType`. This paired fungible asset will have exactly the same name, symbol and decimals with the coin type.
 
@@ -155,7 +156,7 @@ In the future, another public function to proactively migrate all the `CoinStore
 ## Timeline
 
 ### Suggested implementation/deployment timeline
-Expected to be finished by v1.9 and deployed together with v1.10 release, Q1 2024.
+Expected to be finished by v1.10 and deployed together with v1.10/v1.11 release, Q1 2024.
 
 ### Suggested developer platform support timeline
 Q1 2024
