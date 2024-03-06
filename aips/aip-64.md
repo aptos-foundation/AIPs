@@ -196,7 +196,7 @@ pub enum ProposalExt {
 ### High-level Data Flow in Validator
 
 At a high level, participating processes are the follows.
-- Upper-level feature processess as the validator transaction producers.
+- Upper-level feature processes as the validator transaction producers.
 - Consensus as the validator transaction consumers.
 - A validator transaction pool to decouple the producers and the consumer.
   - Transactions can be maintained in a queue for fairness.
@@ -208,6 +208,12 @@ Below are the key interactions.
 - When the consensus receives a proposal, it should verify that the proposed validator transactions do not exceed the pull limit.
 - Producers may changes its mind of what transaction to propose, or at the end of the epoch, help clean up the pool.
   - This requires the pool to support "revoke" operation.
+
+### Execution
+
+It is up to each individual feature to define what its validator transactions should do, how it should be verified in proposal and in execution.
+
+The definition needs to include the security practice discussed in section [Security Considerations](#security-considerations).
 
 ## Reference Implementation
 
