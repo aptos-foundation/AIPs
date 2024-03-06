@@ -40,10 +40,7 @@ Some Aptos features have adopt it as a building block.
 
 ## Impact
 
-This AIP will benefit blockchain-core developers by providing them the flexibility to enhance the blockchain system with new varieties of validator transactions. Additionally, it may influence downstream infrastructure elements, like Indexers and SDKs, necessitating potential adjustments to maintain compatibility.
-
-`ValidatorTransaction` needsd to be a new transaction type.
-Downstream consumers (e.g., indexers, explorers, SDKs) may be broken if they do not handle unknown transaction types properly.
+The new transaction type may break downstream consumers (e.g., indexers, explorers, SDKs) if they do not handle unknown transaction types properly.
 
 ## Alternative solutions
 
@@ -70,37 +67,153 @@ Creating a separate flow for the updates should provide better maintainability.
 
 ## Specification
 
-The validator transaction type will be introduced as the following:
+### Node Transaction API changes
+
+Node transaction API should support `ValidatorTransaction` as a new transaction variant.
+```rust
+/// In aptos_api_types::transaction
+pub enum Transaction {
+    PendingTransaction(PendingTransaction),
+    UserTransaction(Box<UserTransaction>),
+    GenesisTransaction(GenesisTransaction),
+    BlockMetadataTransaction(BlockMetadataTransaction),
+    StateCheckpointTransaction(StateCheckpointTransaction),
+    ValidatorTransaction(ValidatorTransaction), // New!
+}
 ```
+
+The following properties of a `ValidatorTransaction` should be exposed.
+```rust
+/// In aptos_api_types::transaction
+pub struct ValidatorTransaction {
+    pub info: TransactionInfo,
+    pub events: Vec<Event>,
+    pub timestamp: U64,
+}
+```
+
+Example JSON returned from node transaction API `/v1/transactions/by_version/<version>`:
+```json
+{
+  "version": "19403939",
+  "hash": "0x8853505309d4f5b97a6ac3004f2410df055cdd507c99fce3e0318f7deeef43ff",
+  "state_change_hash": "0x4a70ca32dfb51227fca6c7d430f49cc9e822e96b1ffcff8b4d8fd2ae3ae53ecb",
+  "event_root_hash": "0xc49747cf5fa2dcb6351a7039a6604b63d73d6f4de3e2e14bee88f8ff5f346229",
+  "state_checkpoint_hash": "0x9e67939845db211fb5596733391bbdeda0dcbf4d2bf7fe72496cab6eef23daff",
+  "gas_used": "0",
+  "success": true,
+  "vm_status": "Executed successfully",
+  "accumulator_root_hash": "0x50d548f5f7a73f3e2d1bc62a91abca9fead3bcec3dc590793521f21f2092d143",
+  "changes": [
+    {
+      "address": "0x1",
+      "state_key_hash": "0x2287692c179002981a8fe19f6def197ed5ff452848659e2e091ead318d719050",
+      "data": {
+        "type": "0x1::reconfiguration::Configuration",
+        "data": {
+          "epoch": "5098",
+          "events": {
+            "counter": "5098",
+            "guid": {
+              "id": {
+                "addr": "0x1",
+                "creation_num": "2"
+              }
+            }
+          },
+          "last_reconfiguration_time": "1709688193025121"
+        }
+      },
+      "type": "write_resource"
+    },
+  ],
+  "events": [
+    {
+      "guid": {
+        "creation_number": "2",
+        "account_address": "0x1"
+      },
+      "sequence_number": "5097",
+      "type": "0x1::reconfiguration::NewEpochEvent",
+      "data": {
+        "epoch": "5098"
+      }
+    }
+  ],
+  "timestamp": "1709688193025121",
+  "type": "validator_transaction"
+}
+```
+
+Note that the current API specification is opaque about the upper-level feature that triggers this transaction.
+Here are the reasons to do so.
+- This way, we can avoid changing transaction API specification each time a new feature that requires validator transactions is added.
+- It is unclear who is interested in knowing the upper-level feature of a validator transaction.
+  (Since validator transactions are not public-facing, it makes sense to not expose them at all.
+  But currently it is not an option.)
+- In practice, fields `changes` and `events` are enough to determine the upper-level feature:
+  each feature typically has its unique events to emit/resources to touch.
+
+### Internal data format changes (for validator network/storage)
+
+The internal `Transaction` enum used by validator network/storage also has to support a new variant.
+```rust
+/// In aptos_types::transaction
+pub enum Transaction {
+    UserTransaction(SignedTransaction),
+    GenesisTransaction(WriteSetPayload),
+    BlockMetadata(BlockMetadata),
+    StateCheckpoint(HashValue),
+    ValidatorTransaction(ValidatorTransaction), // New!
+}
+```
+
+Updating the internal data format is less pain than updating API specification,
+so here the `ValidatorTransaction` is explicit about its upper-level feature.
+```rust
+/// In aptos_types::validator_txn
 pub enum ValidatorTransaction {
-    DummyTopic(DummyValidatorTransaction),
-    // to be populated...
+    DKGResult(DKGTranscript),
+    ObservedJWKUpdate(jwks::QuorumCertifiedUpdate),
+    // future features...
 }
 ```
-which can be extended with any concrete validator transaction instance in the future. 
-For instance, a dummy validator transaction instance can be:
-```
-pub struct DummyValidatorTransaction {
-    pub nonce: u64,
-}
-```
-For the validators to propose validator transactions, a proper `Proposal` extension (i.e., `ProposalExt`) is also required:
-```
+
+For the validators to propose validator transactions in Joteon consensus,
+a proper `Proposal` extension (i.e., `ProposalExt`) is also required.
+```rust
+/// In aptos_consensus_types::proposal_ext
 pub enum ProposalExt {
     V0 {
-        /// The list of validator transactions contained in the block proposal
-        validator_txns: Vec<ValidatorTransaction>,
-        /// T of the block (e.g. one or more transaction(s)
+        validator_txns: Vec<ValidatorTransaction>, // the old `Proposal` doesn't have this
         payload: Payload,
-        /// Author of the block that can be validated by the author's public key and the signature
         author: Author,
-        /// Failed authors from the parent's block to this block.
-        /// I.e. the list of consecutive proposers from the
-        /// immediately preceeding rounds that didn't produce a successful block.
         failed_authors: Vec<(Round, Author)>,
     },
 }
 ```
+
+### High-level Data Flow in Validator
+
+At a high level, participating processes are the follows.
+- Upper-level feature processes as the validator transaction producers.
+- Consensus as the validator transaction consumers.
+- A validator transaction pool to decouple the producers and the consumer.
+  - Transactions can be maintained in a queue for fairness.
+
+Below are the key interactions.
+- Producers put validator transactions into the pool.
+- When the consensus needs to propose, it should pull some validator transactions from the pool first.
+  - A pull limit on the count and size needs to be agreed on.
+- When the consensus receives a proposal, it should verify that the proposed validator transactions do not exceed the pull limit.
+- Producers may changes its mind of what transaction to propose, or at the end of the epoch, help clean up the pool.
+  - This requires the pool to support "revoke" operation.
+
+### Execution
+
+It is up to each individual feature to define what its validator transactions should do, how it should be verified in proposal and in execution.
+
+The definition needs to include the security practice discussed in section [Security Considerations](#security-considerations).
 
 ## Reference Implementation
 
