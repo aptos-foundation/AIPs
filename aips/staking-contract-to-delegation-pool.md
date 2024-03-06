@@ -30,25 +30,33 @@ The ideal conversion should be atomic: destroy the staking contract and, on top 
 This feature enables delegators to spread their stake over the entire validator set and to reach validators of possibly higher uptime. Existing operators of staking contracts would receive additional delegations and become more independent from their stakers that could decide to leave the protocol at any time.
 
 ## Impact
-The resulting delegation pool proxies the existing stake pool of the staking contract, hence the operator is unchanged. The commission fee and the beneficiary for operator are instantiated using their values from the staking contract.
+The resulting delegation pool proxies the existing stake pool of the staking contract.
 
-It has to be determined whether the staker or operator should be the owner of the new delegation pool. This entity would set the operator and commission fee of the validator from now on.
-The staker sets the operator's commission on the staking contract as they are the sole delegator, now when there are multiple delegators, it wouldn't be fair to empower a particular delegator with this capability instead of the operator.
+The operator is a config of the underlying stake pool, and thus it remains unchanged.
+
+The commission fee from the staking contract is preserved. Changing the commission fee will apply from the next lockup cycle from now on.
+
+The pool ownership is preserved, the staker becomes owner of the delegation pool and can set the operator and commission fee as before.
 
 Partial voting is automatically enabled. Previously, the staker could set the delegated voter of the underlying stake pool, implicitly of their owned stake. Now, the staker can vote and delegate their voting power as a regular delegator.
 
+If the beneficiary of operator is not set on `aptos_framework::delegation_pool`, then it cannot be initialized as the conversion function doesn't have access to operator's signer, only to staker's. The default beneficiary will be used which is the operator themselves.
+If the beneficiary is already set, then this address will be used for the new delegation pool as well.
+
 In terms of rewards, there is virtually no impact on the staker, they continue to be rewarded at the same rate as before. In case of the operator, they may expect higher rewards as additional delegators join the pool.
 
-To summarize, state that would not change:
+Staker's delegated voter (stake pool's voter) is preserved and applies immediately. Delegating voting power will apply from the next lockup cycle from now on.
+
+To summarize, state that will be preserved:
+- pool ownership
 - operator
 - commission fee
-- beneficiary for operator 
 - delegated voter of staker
-- individual stakes of staker, operator and any previous operators owning pending-inactive commission
+- individual stakes of staker, operator and any previous operators still owning pending-inactive commission
 
-While, the state that would change:
-- the pool ownership may be transferred from staker to operator
+While, state that will change:
 - the voter of the stake pool is set to the resource account of the delegation pool
+- beneficiary of operator: address already applying on delegation-pool module will be used
 
 ## Alternative solutions
 
@@ -61,9 +69,11 @@ As described above, manually converting to a delegation pool requires:
 
 `aptos_framework::delegation_pool` implements `initialize_delegation_pool_from_staking_contract(staker: &signer, operator: address)` which is called by `staker` on their staking contract identified by `operator` to atomically convert it, preserving the state of the underlying stake pool, implicitly the activeness of the validator.
 
+`aptos_framework::staking_contract` implements `destroy_staking_contract(staker: &signer, operator: address)` which will only be called by `aptos_framework::delegation_pool::initialize_delegation_pool_from_staking_contract`. This function destroys the `StakingContract` between `staker` and `operator` and returns the resource account storing the stake pool and the ownership capability.
+
 ## Reference Implementation
 
-There is a reference implementation at https://github.com/bwarelabs/aptos-core/tree/migrate-to-delegation-pool
+There is a reference implementation at https://github.com/bwarelabs/aptos-core/tree/convert-staking-contract-to-delegation-pool
 
 ## Testing (Optional)
 
