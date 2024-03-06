@@ -23,6 +23,14 @@ Some delegation pools may require a KYC process before accepting delegated stake
 ## Specification
 
 Any account can construct their own allowlist of addresses, independent of the delegation pool, by interacting with the `aptos_framework::delegation_pool_allowlist` module.
+- `enable_delegators_allowlisting(signer)`: enables allowlisting with an empty allowlist
+- `disable_delegators_allowlisting(signer)`: disables allowlisting and deletes the existing allowlist, owned pool becomes permissionless
+- `allowlist_delegator(signer, address)`: adds an address to the allowlist, fails if allowlisting is not enabled
+- `remove_delegator_from_allowlist(signer, address)`: removes an address from the allowlist, fails if allowlisting is not enabled
+- `allowlisting_enabled(address owner)`: returns whether `owner` has enabled allowlisting on their pool
+- `delegator_allowlisted(address owner, address delegator)`: returns whether `delegator` is allowlisted on `owner`'s pool
+- `get_delegators_allowlist(address owner)`: returns the allowlist defined by `owner`
+
 However, a delegation pool will only use the allowlist defined under its owner account. If there is no allowlist created by the owner, the delegation pool is still permissionless.
 
 Accessing the owner address directly from the delegation pool is not possible, therefore a new feature has been introduced to save the owner address within the delegation pool. This can be enabled publicly by calling `aptos_framework::delegation_pool::enable_ownership_lookup` with arguments: `pool_address` and `owner_address` which will be linked from now on.
