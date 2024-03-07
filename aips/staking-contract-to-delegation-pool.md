@@ -34,18 +34,18 @@ The resulting delegation pool proxies the existing stake pool of the staking con
 
 The operator is a config of the underlying stake pool, and thus it remains unchanged.
 
-The commission fee from the staking contract is preserved. Changing the commission fee will apply from the next lockup cycle from now on.
+The commission fee from the staking contract is preserved. However, changing the commission fee will apply from the next lockup cycle from now on.
 
 The pool ownership is preserved, the staker becomes owner of the delegation pool and can set the operator and commission fee as before.
 
 Partial voting is automatically enabled. Previously, the staker could set the delegated voter of the underlying stake pool, implicitly of their owned stake. Now, the staker can vote and delegate their voting power as a regular delegator.
 
-If the beneficiary of operator is not set on `aptos_framework::delegation_pool`, then it cannot be initialized as the conversion function doesn't have access to operator's signer, only to staker's. The default beneficiary will be used which is the operator themselves.
+If the beneficiary of operator is not configured on `aptos_framework::delegation_pool`, then it cannot be initialized as the conversion function doesn't have access to operator's signer, only to staker's. The default beneficiary will be used which is the operator themselves.
 If the beneficiary is already set, then this address will be used for the new delegation pool as well.
 
 In terms of rewards, there is virtually no impact on the staker, they continue to be rewarded at the same rate as before. In case of the operator, they may expect higher rewards as additional delegators join the pool.
 
-Staker's delegated voter (stake pool's voter) is preserved and applies immediately. Delegating voting power will apply from the next lockup cycle from now on.
+Staker's delegated voter (stake pool's voter) is preserved and applies immediately. However, delegating voting power will apply from the next lockup cycle from now on.
 
 To summarize, state that will be preserved:
 - pool ownership
@@ -84,7 +84,7 @@ Design UTs to validate that:
 
 ## Risks and Drawbacks
 
-Transferring the ability to set the operator commission from the staker to the operator could alter the terms of their previous agreement.
+The beneficiary of operator is set to a possibly different address than the one used on the staking contract without operator's approval. This address is either the one already configured on the delegation-pool module or the operator themselves, which is an address still owned by the operator.
 
 ## Future Potential
 
@@ -103,7 +103,5 @@ The conversion is a one-time process that could be executed through a wallet con
 ## Security Considerations
 
 If the conversion can be executed only by the staker, they might decide to not proceed with it, thereby preventing the operator from acquiring additional stake.
-
-The staker loses the capability to set the commission fee and would have to leave the pool if the commission fee is changed against their will.
 
 ## Open Questions (Optional)
