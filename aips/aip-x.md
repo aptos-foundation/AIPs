@@ -15,7 +15,7 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
-This AIP is an extension of AIP-61: Keyless Accounts, which allow users to have a wallet which is tied to an OpenID account, and to authenticate with the blockchain via their OIDC provider. As summarized in AIP-61, “your blockchain account = your OIDC account”. OpenID authenticates users based on personally-identifying information, e.g. an email address or a twitter handle. We want to guarantee:
+This AIP is an extension of [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md): Keyless Accounts, which allow users to have a wallet which is tied to an OpenID account, and to authenticate with the blockchain via their OIDC provider. As summarized in AIP-61, “your blockchain account = your OIDC account”. OpenID authenticates users based on personally-identifying information, e.g. an email address or a twitter handle. We want to guarantee:
 
 - The OpenID provider does not learn which wallets are linked to which users.
 - The validators (and other outside observers) also cannot learn the link between wallets and OpenID users.
