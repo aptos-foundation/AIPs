@@ -78,13 +78,7 @@ The main code repository for the prover service is linked here:
 
 * [Prover service code](https://github.com/aptos-labs/prover-service)
 
-## Testing (Optional)
 
- > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out)
- > - When can we expect the results?
- > - What are the test results and are they what we expected? If not, explain the gap.
-
-...
 
 ## Risks and Drawbacks
 
@@ -94,39 +88,31 @@ The main code repository for the prover service is linked here:
 
 - If we don’t sufficiently optimize the circuit and prover code, the prover service could be cost-prohibitive to scale.
     - Solution: robust benchmarks of prover, understanding of cost involved in running the service
-- Currently, the prover service learns all
--
+
+### Privacy
+
+- prover service learns sensitive user information
+ - This would allow us to de-anonymize Aptos Keyless users.
+ - It would **not** allow us to authorize transactions on behalf of users, since the prover service does not learn the user's ephemeral signing key.[^spec]
+- induces risks for both users and for us
+
+### Scalability
+
+- expensive to host
+
+### Centralization
+
+Prover service must be trusted with sensitive information. Because of this, there is a risk of centralization of this system. (TODO: elaborate)
 
 ## Future Potential
 
- > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in one year? In five years?
-
-...
+See open questions below.
 
 ## Timeline
 
-### Suggested implementation timeline
+### Suggested implementation/deployment timeline
 
- > Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
-
-...
-
-### Suggested developer platform support timeline
-
- > Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
-
-...
-
-### Suggested deployment timeline
-
- > Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
- > You are responsible for updating this AIP with a better estimate, if any, after the AIP passes the gatekeeper’s design review.
- >
- > - On devnet?
- > - On testnet?
- > - On mainnet?
-
-...
+We have implemented the prover service already, and plan to deploy it as part of mainnet release v1.10.
 
 ## Security Considerations
 
