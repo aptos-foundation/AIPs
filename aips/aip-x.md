@@ -35,7 +35,7 @@ We are not trying to solve the issue of privacy between the user and the prover 
 * The user's OIDC handle. For example, if logging in with Google, the prover service will learn the user's email.
 * The user's privacy-preserving pepper[^spec].
 
-The fact that the prover service learns this information induces privacy and centralization risks. These risks are discussed [below](##Risks and Drawbacks).
+The fact that the prover service learns this information induces privacy and centralization risks. These risks are discussed [below](##risks-and-drawbacks).
 
 
 ## Motivation
@@ -96,7 +96,7 @@ The main code repository for the prover service is linked here:
  - It would **not** allow us to authorize transactions on behalf of users, since the prover service does not learn the user's ephemeral signing key.[^spec]
 - induces risks for both users and for us
 - We mitigate these risks by making the prover *stateless*: it stores nothing about a user after completing that user's request
-- We plan to eliminate these risks in the future by building a better underlying ZKP system; see [open questions](## Open Questions) below
+- We plan to eliminate these risks in the future by building a better underlying ZKP system; see [open questions](##-Open-Questions) below
 
   
 ### Scalability
