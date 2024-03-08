@@ -15,22 +15,27 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
- > Summarize in 3-5 sentences what is the problem we’re solving for and how are we solving for it
+This AIP is an extension of AIP-61: Keyless Accounts, which allow users to have a wallet which is tied to an OpenID account, and to authenticate with the blockchain via their OIDC provider. As summarized in AIP-61, “your blockchain account = your OIDC account”. OpenID authenticates users based on personally-identifying information, e.g. an email address or a twitter handle. We want to guarantee:
 
-...
+- The OpenID provider does not learn which wallets are linked to which users.
+- The validators (and other outside observers) also cannot learn the link between wallets and OpenID users.
+
+In order to do this, we are using a zero-knowledge proof which each user must provide to validators to authenticate transactions. Generating such a proof is computationally intensive. To allow for users to login quickly and on low-powered hardware, we plan to offload this proof computation to a proving service.
 
 ### Goals
 
  > What are the goals and what is in scope? Any metrics?
  > Discuss the business impact and business value this change would impact.
 
-...
+Implement a fast and cheap service
+
+Training wheels
 
 ### Out of Scope
 
  > What are we committing to not doing and why are they scoped out?
 
-...
+We are not trying to solve the issue of privacy between the user and the prover service. That is, we are *allowing* the prover service to learn the link between the user’s wallet ID and the client’s OAuth ID.
 
 ## Motivation
 
@@ -49,7 +54,7 @@ requires (*optional): <AIP number(s)>
 
  > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
 
-...
+The most obvious alternative is requiring the user to generate a proof client-side. From preliminary benchmarks, doing this in-browser takes such a long time that is completely unusable. (i.e., > 25 seconds to generate the proof.)
 
 ## Specification
 
@@ -77,7 +82,10 @@ requires (*optional): <AIP number(s)>
  > - Any backwards compatibility issues we should be aware of?
  > - If there are issues, how can we mitigate or resolve them?
 
-...
+- If we don’t sufficiently optimize the circuit and prover code, the prover service could be cost-prohibitive to scale.
+    - Solution: robust benchmarks of prover, understanding of cost involved in running the service
+- Currently, the prover service learns all
+-
 
 ## Future Potential
 
