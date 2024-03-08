@@ -97,23 +97,26 @@ pub struct RequestInput {
 
 The response from the prover for route `/v0/prove` is defined via the following
 
-* ProverServiceResponse struct below, taken from [src/api.rs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs) in the prover service code
+* ProverServiceResponse enum below, taken from [src/api.rs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs) in the prover service code
+* The Groth16Proof 
 * The serde_json library's JSON deserialization behavior
 * Custom serialization logic for the [EphemeralPublicKey](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/authenticator.rs#L1121) and [Pepper](https://github.com/aptos-labs/aptos-core/blob/main/types/src/keyless/mod.rs#L163) types, defined in `aptos-types`
 
 ```
+pub type PoseidonHash = [u8; 32];
+
 #[derive(Debug, Serialize, Deserialize)]
-pub struct RequestInput {
-    pub jwt_b64: String,
-    pub epk: EphemeralPublicKey,
-    #[serde(with = "hex")]
-    pub epk_blinder: EphemeralPublicKeyBlinder,
-    pub exp_date_secs: u64,
-    pub exp_horizon_secs: u64,
-    pub pepper: Pepper,
-    pub uid_key: String,
-    pub extra_field: Option<String>,
-    pub aud_override: Option<String>,
+#[serde(untagged)]
+pub enum ProverServiceResponse {
+    Success {
+        proof: Groth16Proof,
+        #[serde(with = "hex")]
+        public_inputs_hash: PoseidonHash,
+        training_wheels_signature: Ed25519Signature,
+    },
+    Error {
+        message: String,
+    },
 }
 ```
 
