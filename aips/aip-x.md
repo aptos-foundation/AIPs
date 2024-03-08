@@ -74,7 +74,7 @@ The prover service API consists of the required format for requests along with t
 Request input is specified via the following:
 
 * RequestInput struct below, taken from [src/api.rs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs) in the prover service code
-* The serde library's JSON serialization behavior
+* The serde_json library's JSON serialization behavior
 * Custom serialization logic for the [EphemeralPublicKey](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/authenticator.rs#L1121) and [Pepper](https://github.com/aptos-labs/aptos-core/blob/main/types/src/keyless/mod.rs#L163) types, defined in `aptos-types`
 
 ```
