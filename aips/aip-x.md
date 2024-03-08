@@ -1,9 +1,9 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: (AIP title)
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
+title: Keyless Prover Service
+author: Rex Fernando, Alin Tomescu
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: <Draft | Last Call | Accepted | Final | Rejected>
+Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
 created: <mm/dd/yyyy>
