@@ -77,7 +77,7 @@ The request body for the route `/v0/prove` is required to be a json object with 
 * The serde_json library's JSON deserialization behavior
 * Custom serialization logic for the [EphemeralPublicKey](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/authenticator.rs#L1121) and [Pepper](https://github.com/aptos-labs/aptos-core/blob/main/types/src/keyless/mod.rs#L163) types, defined in `aptos-types`
 
-```
+```rust
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RequestInput {
     pub jwt_b64: String,
@@ -98,11 +98,11 @@ pub struct RequestInput {
 The response from the prover for route `/v0/prove` is defined via the following
 
 * ProverServiceResponse enum below, taken from [src/api.rs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs) in the prover service code
-* The Groth16Proof 
+* The [Groth16Proof](https://github.com/aptos-labs/aptos-core/blob/49354812f75b6a9e7832b031df45ac626e33c9dc/types/src/keyless/groth16_sig.rs#L23C1-L30C2) struct defined in `aptos-types`
 * The serde_json library's JSON deserialization behavior
 * Custom serialization logic for the [EphemeralPublicKey](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/authenticator.rs#L1121) and [Pepper](https://github.com/aptos-labs/aptos-core/blob/main/types/src/keyless/mod.rs#L163) types, defined in `aptos-types`
 
-```
+```rust
 pub type PoseidonHash = [u8; 32];
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -117,6 +117,17 @@ pub enum ProverServiceResponse {
     Error {
         message: String,
     },
+}
+```
+
+```rust
+#[derive(
+    Copy, Clone, Debug, Deserialize, PartialEq, Eq, Hash, Serialize, CryptoHasher, BCSCryptoHash,
+)]
+pub struct Groth16Proof {
+    a: G1Bytes,
+    b: G2Bytes,
+    c: G1Bytes,
 }
 ```
 
