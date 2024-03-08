@@ -71,10 +71,10 @@ The prover service API consists of the required format for requests along with t
 
 #### Request Format:
 
-Request input is specified via the following:
+The request body for the route `/v0/prove` is required to be a json object with structure specified via the following:
 
 * RequestInput struct below, taken from [src/api.rs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs) in the prover service code
-* The serde_json library's JSON serialization behavior
+* The serde_json library's JSON deserialization behavior
 * Custom serialization logic for the [EphemeralPublicKey](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/authenticator.rs#L1121) and [Pepper](https://github.com/aptos-labs/aptos-core/blob/main/types/src/keyless/mod.rs#L163) types, defined in `aptos-types`
 
 ```
@@ -92,6 +92,31 @@ pub struct RequestInput {
     pub aud_override: Option<String>,
 }
 ```
+
+#### Response Format
+
+The response from the prover for route `/v0/prove` is defined via the following
+
+* ProverServiceResponse struct below, taken from [src/api.rs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs) in the prover service code
+* The serde_json library's JSON deserialization behavior
+* Custom serialization logic for the [EphemeralPublicKey](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/authenticator.rs#L1121) and [Pepper](https://github.com/aptos-labs/aptos-core/blob/main/types/src/keyless/mod.rs#L163) types, defined in `aptos-types`
+
+```
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RequestInput {
+    pub jwt_b64: String,
+    pub epk: EphemeralPublicKey,
+    #[serde(with = "hex")]
+    pub epk_blinder: EphemeralPublicKeyBlinder,
+    pub exp_date_secs: u64,
+    pub exp_horizon_secs: u64,
+    pub pepper: Pepper,
+    pub uid_key: String,
+    pub extra_field: Option<String>,
+    pub aud_override: Option<String>,
+}
+```
+
 
 * [Prover service request and response structs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs)
 
