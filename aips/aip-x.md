@@ -20,29 +20,30 @@ This AIP is an extension of [AIP-61](https://github.com/aptos-foundation/AIPs/bl
 - The OpenID provider does not learn which wallets are linked to which users.
 - The validators (and other outside observers) also cannot learn the link between wallets and OpenID users.
 
-In order to do this, we are using a zero-knowledge proof which each user must provide to validators to authenticate transactions. Generating such a proof is computationally intensive. To allow for users to login quickly and on low-powered hardware, we plan to offload this proof computation to a proving service.
+In order to do this, we are using a zero-knowledge proof which each user must provide to validators to authenticate transactions. Generating such a proof must be done each time a user logs in, and then each time the user's ephemeral public key[^epk] is computationally intensive. To allow for users to login quickly and on low-powered hardware, we plan to offload this proof computation to a proving service.
 
 ### Goals
 
- > What are the goals and what is in scope? Any metrics?
- > Discuss the business impact and business value this change would impact.
+1. Enable Keyless account users to login quickly and without friction. 
+2. Respect users' privacy as much as possible.
+3. Build a service that is relatively inexpensive host.
+4. Protect against bugs in the zero-knowledge system.
 
-Implement a fast and cheap service
+## Motivation
 
-Training wheels
-
+The motivation of this AIP follows directly from the motivation of [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md). The purpose of Aptos Keyless is to greatly reduce friction in onboarding and key management for users. Specifically, the Keyless Proving Service will allow for the most computationally intensive step 
+ 
 ### Out of Scope
 
  > What are we committing to not doing and why are they scoped out?
 
-We are not trying to solve the issue of privacy between the user and the prover service. That is, we are *allowing* the prover service to learn the link between the user’s wallet ID and the client’s OAuth ID.
+We are not trying to solve the issue of privacy between the user and the prover service. That is, we are *allowing* the prover service to learn the user's private information, including:
+* The user's OIDC handle. For example, if logging in with Google, the prover service will learn the user's email.
+* The user's privacy-preserving pepper [link to aip-61 here].
 
-## Motivation
+The fact that the prover service learns this information induces privacy and centralization risks. These risks are discussed [below](##Risks and Drawbacks).
 
- > Describe the impetus for this change. What does it accomplish?
- > What might occur if we do not accept this proposal?
 
-...
 
 ## Impact
 
@@ -132,3 +133,7 @@ The most obvious alternative is requiring the user to generate a proof client-si
  > Q&A here, some of them can have answers some of those questions can be things we have not figured out but we should
 
 ...
+
+## References
+
+[^epk]: https://github.com/rex1fernando/AIPs/blob/main/aips/aip-61.md#specification)https://github.com/rex1fernando/AIPs/blob/main/aips/aip-61.md#specification
