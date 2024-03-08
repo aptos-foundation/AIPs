@@ -95,7 +95,9 @@ The main code repository for the prover service is linked here:
  - This would allow us to de-anonymize Aptos Keyless users.
  - It would **not** allow us to authorize transactions on behalf of users, since the prover service does not learn the user's ephemeral signing key.[^spec]
 - induces risks for both users and for us
+- We mitigate these risks by making the prover *stateless*: it stores nothing about a user after completing that user's request
 
+  
 ### Scalability
 
 - expensive to host
