@@ -27,15 +27,9 @@ In order to do this, we are using a zero-knowledge proof which each user must pr
 1. Enable Keyless account users to login quickly and without friction. 
 2. Respect users' privacy as much as possible.
 3. Build a service that is relatively inexpensive host.
-4. Protect against bugs in the zero-knowledge system.
+5. Protect against bugs in the zero-knowledge system.
 
-## Motivation
-
-The motivation of this AIP follows directly from the motivation of [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md). The purpose of Aptos Keyless is to greatly reduce friction in onboarding and key management for users. Specifically, the Keyless Proving Service will allow for the most computationally intensive step during login to be offloaded to a powerful cloud VM instead of being done locally, thus greatly improving the user experience of Aptos Keyless.
- 
 ### Out of Scope
-
- > What are we committing to not doing and why are they scoped out?
 
 We are not trying to solve the issue of privacy between the user and the prover service. That is, we are *allowing* the prover service to learn the user's private information, including:
 * The user's OIDC handle. For example, if logging in with Google, the prover service will learn the user's email.
@@ -44,18 +38,21 @@ We are not trying to solve the issue of privacy between the user and the prover 
 The fact that the prover service learns this information induces privacy and centralization risks. These risks are discussed [below](##Risks and Drawbacks).
 
 
+## Motivation
+
+The motivation of this AIP follows directly from the motivation of [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md). The purpose of Aptos Keyless is to greatly reduce friction in onboarding and key management for users. Specifically, the Keyless Proving Service will allow for the most computationally intensive step during login to be offloaded to a powerful cloud VM instead of being done locally, thus greatly improving the user experience of Aptos Keyless.
+ 
+
 
 ## Impact
 
- > Which audiences are impacted by this change? What type of action does the audience need to take?
-
-...
+The direct impact of this AIP will be on users of Aptos Keyless accounts. The impact will be twofold:
+* Users will have a much faster login experience than they would if we were generating proofs client-side. From preliminary benchmarks, generating proofs in-browser takes such a long time that is completely unusable. (i.e., > 25 seconds to generate the proof.)
+* On the other hand, users's private information will be sent to the prover service.
 
 ## Alternative solutions
 
- > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
-
-The most obvious alternative is requiring the user to generate a proof client-side. From preliminary benchmarks, doing this in-browser takes such a long time that is completely unusable. (i.e., > 25 seconds to generate the proof.)
+The most obvious alternative is requiring the user to generate a proof client-side. As discussed above, this solution is untenable, at least with the current ZKP system that is implemented in Aptos Keyless.
 
 ## Specification
 
