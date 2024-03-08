@@ -63,11 +63,6 @@ The most obvious alternative is requiring the user to generate a proof client-si
 
 ...
 
-## Reference Implementation
-
-The main code repository for the prover service is linked here:
-
-* [Prover service code](https://github.com/aptos-labs/prover-service)
 
 ### API:
 
@@ -77,7 +72,14 @@ The prover service is accessed via the following endpoint:
 
 The prover service API consists of the required format for requests along with the format which responses take. Both input and response formats are defined by the following:
 
-* [Prover service request and response structs]([https://github.com/aptos-labs/prover-service](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs))
+* [Prover service request and response structs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs)
+
+
+## Reference Implementation
+
+The main code repository for the prover service is linked here:
+
+* [Prover service code](https://github.com/aptos-labs/prover-service)
 
 ## Testing (Optional)
 
@@ -136,13 +138,14 @@ The prover service API consists of the required format for requests along with t
  > - Any security implications/considerations?
  > - Any security design docs or auditing materials that can be shared?
 
-...
+* DDOS-ing prover service
 
-## Open Questions (Optional)
+## Open Questions 
 
- > Q&A here, some of them can have answers some of those questions can be things we have not figured out but we should
+The research team at Aptos plans to spend considerable time on how to mitigate the privacy and centralization compromises encompassed in this AIP. Specifically, we plan to work on the following questions:
 
-...
+* Can we design a new ZKP with sufficient performance to allow for client-side proving, and thus eliminate the prover service altogether?
+* If not, can we design a prover service which is "blind", i.e., it does not learn any sensitive information about users?
 
 ## References
 
