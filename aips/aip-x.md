@@ -1,6 +1,6 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: Keyless Prover Service
+title: Prover Service for Aptos Keyless Accounts
 author: Rex Fernando, Alin Tomescu
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
@@ -11,11 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - (AIP title)
-  
-(Please give a temporary file name to your AIP when first drafting it, such as `aip-x.md`. The AIP manager will assign a number to it after reviewing.)
-
-(Please remove the questions in the "quote box". Provide complete context to the questions being asked in the content that you provide.)
+# AIP-X - Prover Service for Aptos Keyless Accounts
 
 ## Summary
 
