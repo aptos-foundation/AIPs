@@ -1,7 +1,7 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Prover Service for Aptos Keyless Accounts
-author: Rex Fernando, Alin Tomescu
+author: Rex Fernando
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
