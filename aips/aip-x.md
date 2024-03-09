@@ -26,7 +26,7 @@ In order to do this, we are using a zero-knowledge proof which each user must pr
 
 1. Enable Keyless account users to login quickly and without friction. 
 2. Respect users' privacy as much as possible.
-3. Build a service that is relatively inexpensive host.
+3. Build a service that is relatively inexpensive to host.
 5. Protect against bugs in the zero-knowledge system.
 
 ### Out of Scope
