@@ -191,7 +191,7 @@ We have implemented the prover service already, and plan to deploy it as part of
 
 ## Open Questions 
 
-The research team at Aptos plans to spend considerable time on how to mitigate the privacy and centralization compromises encompassed in this AIP. Specifically, we plan to work on the following questions:
+In the next few months, we plan to spend considerable time on how to mitigate the privacy and centralization compromises encompassed in this AIP. Specifically, we plan to work on the following questions:
 
 * Can we design a new ZKP with sufficient performance to allow for client-side proving, and thus eliminate the prover service altogether?
 * If not, can we design a prover service which is "blind", i.e., it does not learn any sensitive information about users?
