@@ -61,10 +61,12 @@ The most obvious alternative is requiring the user to generate a proof client-si
 ```mermaid
 
 sequenceDiagram
-Client->OIDC Provider: $$\mathsf{nonce}$$
+Client->OIDC Provider: nonce
+Note: nonce is a commitment of the epk and expiration date
 OIDC Provider->>Client: JWT with signature
-OIDC Provider->>Aptos Prover Service: How about you?
-Aptos Prover Service-->>OIDC Provider: Jolly good!
+Client->>Aptos Prover Service: RequestInput
+Aptos Prover Service->>Client: ProverServiceResponse
+Client ->> Validators: $$\mathsf{txn}$$
 
 ```
 
