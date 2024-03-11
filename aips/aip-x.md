@@ -76,12 +76,14 @@ This spec is an extension of the spec in AIP-61[^spec]. As explained in AIP-61, 
 
 At a high level, the prover will have the following behavior. As configuration, it will take in a Groth16 prover key which encodes the relation $\mathcal{R}$, as well as a **training wheels signing key**.
 
-receive requests of the format $(\textbf{x}, \textbf{w})$, where $\textbf{x}$ and $\textbf{w}$ are as described above in $\mathcal{R}$, and will:
+The client will interact with the prover service after receiving a signed JWT from the OIDC provider. It will send a request of the format $(\textbf{x}, \textbf{w})$ to the prover service, where $\textbf{x}$ and $\textbf{w}$ are as described above in $\mathcal{R}$. The prover service will then:
 1. Compute a Groth16 proof $\pi$ for $(\textbf{x}, \textbf{w})$
 2. Compute a signature $\sigma$ for the message $m = H(\textbf{x}) || \pi$
 3. Return $(\pi, \sigma)$ as the response.
 
+Once the client has $\pi$ and $\sigma$, it may use these to authenticate transactions with respect to its Aptos Keyless account.
 
+The flow between the client, the OIDC Provider, and the Aptos Prover Service is shown in the diagram below.
 
 ```mermaid
 sequenceDiagram
@@ -90,7 +92,7 @@ Note left of OIDC Provider: nonce is a commitment of the epk and expiration date
 OIDC Provider->>Client: JWT with signature
 Client->>Aptos Prover Service: RequestInput
 Aptos Prover Service->>Client: ProverServiceResponse
-Client ->> Validators: **txn**
+Client ->> Validators: **txn** $\pi$
 Note left of Validators: **txn** contains G16P, epk, ...
 
 
