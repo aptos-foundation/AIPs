@@ -190,7 +190,7 @@ The main code repository for the prover service is linked here:
  
 The main risks in this system fall into three categories:
 
-- **Privacy risks.** The prover service learns sensitive information (i.e., the user's pepper and JWT). This would allow us to de-anonymize Aptos Keyless users.
+- **Privacy risks.** The prover service learns sensitive information (i.e., the user's pepper and OIDC handle). This would allow us to de-anonymize Aptos Keyless users.
   - Note that this sensitive information does **not** allow us to authorize transactions on behalf of users, since the prover service does not learn the user's ephemeral signing key.[^spec]
   - We mitigate this risk  by making the prover *stateless*: it stores nothing about a user after completing that user's request.
 - **Scalability.** The prover service could potentially become expensive to host as the number of Aptos Keyless users scales up.
