@@ -59,14 +59,15 @@ The most obvious alternative is requiring the user to generate a proof client-si
  > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
 ```mermaid
-
 sequenceDiagram
 Client->OIDC Provider: nonce
 Note left of OIDC Provider: nonce is a commitment of the epk and expiration date
 OIDC Provider->>Client: JWT with signature
 Client->>Aptos Prover Service: RequestInput
 Aptos Prover Service->>Client: ProverServiceResponse
-Client ->> Validators: $\mathsf{txn}$
+Client ->> Validators: **txn**
+Note left of Validators: **txn** contains G16P, epk, ...
+
 
 ```
 
