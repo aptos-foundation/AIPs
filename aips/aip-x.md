@@ -75,7 +75,7 @@ This spec is an extension of the spec in AIP-61[^spec]. As explained in AIP-61, 
 ```
 and with verification logic as defined in[^spec]. TODO: provide more context
 
-At a high level, the prover will have the following behavior. As configuration, it will take in a Groth16 prover key which encodes the relation $\mathcal{R}$, as well as a **training wheels signing key**. TODO: explain training wheels better
+At a high level, the prover will have the following behavior. As configuration, it will take in a Groth16 prover key which encodes the relation $\mathcal{R}$, as well as a **training wheels signing key**. The validators will now have knowledge of the corresponding **training wheels public key**, and will refuse to accept any Aptos Keyless transaction unless the proof and statement have been signed.
 
 The flow between the client, the OIDC Provider, and the Aptos Prover Service is shown in the diagram below. The client will interact with the prover service after receiving a signed JWT from the OIDC provider (step ❶ and ❷ below). It will send a request of the format $(\textbf{x}, \textbf{w})$ to the prover service, where $\textbf{x}$ and $\textbf{w}$ are as described above in $\mathcal{R}$ (step ❸). The prover service will then:
 1. Compute a Groth16 proof $\pi$ for $(\textbf{x}, \textbf{w})$
