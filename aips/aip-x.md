@@ -62,7 +62,7 @@ The most obvious alternative is requiring the user to generate a proof client-si
 
 sequenceDiagram
 Client->OIDC Provider: nonce
-Note: nonce is a commitment of the epk and expiration date
+Note left of OIDC Provider: nonce is a commitment of the epk and expiration date
 OIDC Provider->>Client: JWT with signature
 Client->>Aptos Prover Service: RequestInput
 Aptos Prover Service->>Client: ProverServiceResponse
