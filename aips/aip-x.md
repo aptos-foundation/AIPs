@@ -58,7 +58,7 @@ The most obvious alternative is requiring the user to generate a proof client-si
 
  > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
-This spec is an extension of the spec in AIP-61[^spec]. As explained in AIP-61, to authenticate a transaction, a user needs a Groth16 ZK proof for the relation $\mathcal{R}$: 
+This spec is an extension of the spec in AIP-61[^spec]. As explained in AIP-61, to authenticate a transaction, a user needs a Groth16 ZK proof for the relation $\mathcal{R}$, with the following inputs:
 
 ```math
 \mathcal{R}\begin{pmatrix}
@@ -73,7 +73,7 @@ This spec is an extension of the spec in AIP-61[^spec]. As explained in AIP-61, 
     \rho]
 \end{pmatrix},
 ```
-as defined in[^spec].
+and with verification logic as defined in[^spec].
 
 At a high level, the prover will have the following behavior. As configuration, it will take in a Groth16 prover key which encodes the relation $\mathcal{R}$, as well as a **training wheels signing key**.
 
