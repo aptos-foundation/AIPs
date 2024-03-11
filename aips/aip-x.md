@@ -209,12 +209,9 @@ The main code repository for the prover service is linked here:
 
 See open questions below.
 
-## Timeline
-
-### Suggested implementation/deployment timeline
+## Suggested implementation/deployment timeline
 
 We have implemented the prover service already, and plan to deploy it as part of mainnet release v1.10.
-
 
 ## Open Questions 
 
