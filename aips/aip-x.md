@@ -115,7 +115,7 @@ The prover service API consists of the required format for requests along with t
 
 #### Request Format:
 
-The request body for the route `/v0/prove` is required to be a json object with structure specified via the `RequestInput` struct below. This struct encodes both the public input $\mathbf{x}$ and the private input $\mathbf{w}$ in the relation $\mathcal{R}$ above.
+The request body for the route `/v0/prove` is required to be a json object with structure specified via the rust `RequestInput` struct below. This struct encodes both the public input $\mathbf{x}$ and the private input $\mathbf{w}$ in the relation $\mathcal{R}$ above.
 
 The specific structure of the request JSON object is determined by:
 * `RequestInput` struct below, taken from [src/api.rs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs) in the prover service code
@@ -140,13 +140,13 @@ pub struct RequestInput {
 
 #### Response Format
 
-The response from the prover for route `/v0/prove` is defined via the following
+The response from the prover for route `/v0/prove` is a JSON object with structure specified via the rust `ProverServiceResponse` enum below. On successful proof generation, this enum encodes the proof, the Poseidon hash of the public inputs, and the training wheels signature. In the case of an error during proof generation, the enum encodes an explanatory error message to display to the client.
 
-* ProverServiceResponse enum below, taken from [src/api.rs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs) in the prover service code
+The specific structure of the response JSON object is determined by:
+* The ProverServiceResponse enum below, taken from [src/api.rs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs) in the prover service code
 * The [Groth16Proof](https://github.com/aptos-labs/aptos-core/blob/49354812f75b6a9e7832b031df45ac626e33c9dc/types/src/keyless/groth16_sig.rs#L23C1-L30C2) struct defined in `aptos-types`
 * The serde_json library's JSON deserialization behavior
-* Custom serialization logic for the [EphemeralPublicKey](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/authenticator.rs#L1121) and [Pepper](https://github.com/aptos-labs/aptos-core/blob/main/types/src/keyless/mod.rs#L163) types, defined in `aptos-types`
-* TODO: describe signature struct/behavior
+* Custom serialization logic for the [Ed25519Signature](https://github.com/aptos-labs/aptos-core/blob/e492ecd8db1daf2197f8199e65e601aad5c84b6f/crates/aptos-crypto/src/ed25519/ed25519_sigs.rs#L19C12-L19C28), [G1Bytes](https://github.com/aptos-labs/aptos-core/blob/e492ecd8db1daf2197f8199e65e601aad5c84b6f/types/src/keyless/bn254_circom.rs#L51) and [G2Bytes](https://github.com/aptos-labs/aptos-core/blob/e492ecd8db1daf2197f8199e65e601aad5c84b6f/types/src/keyless/bn254_circom.rs#L51) structs.
 
 ```rust
 pub type PoseidonHash = [u8; 32];
@@ -176,10 +176,6 @@ pub struct Groth16Proof {
     c: G1Bytes,
 }
 ```
-
-
-* [Prover service request and response structs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs)
-
 
 
 ## Reference Implementation
