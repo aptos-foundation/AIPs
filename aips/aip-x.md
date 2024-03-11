@@ -35,7 +35,7 @@ We are not trying to solve the issue of privacy between the user and the prover 
 * The user's OIDC handle. For example, if logging in with Google, the prover service will learn the user's email.
 * The user's privacy-preserving pepper[^spec].
 
-The fact that the prover service learns this information induces privacy and centralization risks. These risks are discussed [below](#risks-and-drawbacks).
+The fact that the prover service learns this information means new privacy and centralization risks. These risks are discussed [below](#risks-and-drawbacks).
 
 
 ## Motivation
