@@ -187,13 +187,6 @@ The main code repository for the prover service is linked here:
 
 
 ## Risks and Drawbacks
-
- > - Express here the potential negative ramifications of taking on this proposal. What are the hazards?
- > - Any backwards compatibility issues we should be aware of?
- > - If there are issues, how can we mitigate or resolve them?
-
-- If we don’t sufficiently optimize the circuit and prover code, the prover service could be cost-prohibitive to scale.
-    - Solution: robust benchmarks of prover, understanding of cost involved in running the service
  
 The main risks in this system fall into three categories:
 
