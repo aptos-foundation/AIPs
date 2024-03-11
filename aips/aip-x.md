@@ -66,7 +66,7 @@ Note left of OIDC Provider: nonce is a commitment of the epk and expiration date
 OIDC Provider->>Client: JWT with signature
 Client->>Aptos Prover Service: RequestInput
 Aptos Prover Service->>Client: ProverServiceResponse
-Client ->> Validators: $$\mathsf{txn}$$
+Client ->> Validators: $\mathsf{txn}$
 
 ```
 
