@@ -48,7 +48,7 @@ The motivation of this AIP follows directly from the motivation of [AIP-61](http
 
 The direct impact of this AIP will be on users of Aptos Keyless accounts. The impact will be twofold:
 * Users will have a much faster login experience than they would if we were generating proofs client-side. From preliminary benchmarks, generating proofs in-browser takes such a long time that is completely unusable. (i.e., > 25 seconds to generate the proof.)
-* On the other hand, users's private information will be sent to the prover service.
+* On the other hand, users's private information will be sent to the prover service. This induces a trust assumption: users must trust that the prover service will not leak this information.
 
 ## Alternative solutions
 
@@ -157,7 +157,7 @@ The main code repository for the prover service is linked here:
 - prover service learns sensitive user information
  - This would allow us to de-anonymize Aptos Keyless users.
  - It would **not** allow us to authorize transactions on behalf of users, since the prover service does not learn the user's ephemeral signing key.[^spec]
-- induces risks for both users and for us
+- risks for both users and for us
 - We mitigate these risks by making the prover *stateless*: it stores nothing about a user after completing that user's request
 - We plan to eliminate these risks in the future by building a better underlying ZKP system; see [open questions](#Open-Questions) below
 
