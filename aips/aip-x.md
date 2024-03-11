@@ -61,10 +61,7 @@ The most obvious alternative is requiring the user to generate a proof client-si
 ```mermaid
 
 sequenceDiagram
-Client->>OIDC Provider: Hello John, how are you?
-loop HealthCheck
-    John->>John: Fight against hypochondria
-end
+Client->OIDC Provider: Hello John, how are you?
 Note right of John: Rational thoughts!
 OIDC Provider-->>Client: Great!
 OIDC Provider->>Aptos Prover Service: How about you?
