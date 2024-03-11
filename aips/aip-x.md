@@ -32,7 +32,7 @@ The specific goals of the Aptos Keyless Prover Service are as follows:
 
 ### Out of Scope
 
-We are not trying to solve the issue of privacy between the user and the prover service. That is, we are *allowing* the prover service to learn the user's private information, including:
+We are not trying to solve the issue of privacy between the user and the prover service. That is, we are *allowing* the prover service to (temporarily, while computing the proof) learn the user's private information, including:
 * The user's OIDC handle. For example, if logging in with Google, the prover service will learn the user's email.
 * The user's privacy-preserving pepper[^spec].
 
