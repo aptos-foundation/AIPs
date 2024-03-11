@@ -77,14 +77,13 @@ and with verification logic as defined in[^spec]. TODO: provide more context
 
 At a high level, the prover will have the following behavior. As configuration, it will take in a Groth16 prover key which encodes the relation $\mathcal{R}$, as well as a **training wheels signing key**. TODO: explain training wheels better
 
-The client will interact with the prover service after receiving a signed JWT from the OIDC provider. It will send a request of the format $(\textbf{x}, \textbf{w})$ to the prover service, where $\textbf{x}$ and $\textbf{w}$ are as described above in $\mathcal{R}$. The prover service will then:
+The flow between the client, the OIDC Provider, and the Aptos Prover Service is shown in the diagram below. The client will interact with the prover service after receiving a signed JWT from the OIDC provider (step ❶ and ❷ below). It will send a request of the format $(\textbf{x}, \textbf{w})$ to the prover service, where $\textbf{x}$ and $\textbf{w}$ are as described above in $\mathcal{R}$ (step ❸). The prover service will then:
 1. Compute a Groth16 proof $\pi$ for $(\textbf{x}, \textbf{w})$
 2. Compute a **training wheels signature** $\sigma$ for the message $m = H(\textbf{x}) || \pi$
-3. Return $(\pi, \sigma)$ as the response.
+3. Return $(\pi, \sigma)$ as the response (step ❹).
 
-Once the client has $\pi$ and $\sigma$, it may use these to authenticate transactions with respect to its Aptos Keyless account.
+Once the client has $\pi$ and $\sigma$, it may use these to authenticate transactions with respect to its Aptos Keyless account (step ❺).
 
-The flow between the client, the OIDC Provider, and the Aptos Prover Service is shown in the diagram below.
 
 ```mermaid
 sequenceDiagram
