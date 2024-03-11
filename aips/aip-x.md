@@ -58,6 +58,39 @@ The most obvious alternative is requiring the user to generate a proof client-si
 
  > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
+This spec is an extension of the spec in AIP-61[^spec]. As explained in AIP-61, to authenticate a transaction, a user needs a Groth16 ZK proof for the relation $\mathcal{R}$: 
+
+```math
+\mathcal{R}\begin{pmatrix}
+	\textbf{x} = [
+        (\mathsf{iss\_val}, \mathsf{jwk}, \mathsf{header}), 
+        (\mathsf{epk}, \mathsf{exp\_date}), 
+        \mathsf{addr\_idc}, \mathsf{exp\_horizon}
+    ],\\ 
+    \textbf{w} = [
+        (\mathsf{aud\_val}, \mathsf{uid\_key}, \mathsf{uid\_val}, r),
+        (\sigma_\mathsf{oidc}, \mathsf{jwt}), 
+    \rho]
+\end{pmatrix} = 1
+```
+
+At a high level, the prover will have the following behavior. As configuration, it will take in a Groth16 prover key which encodes the relation $\mathcal{R}$, as well as a **training wheels signing key**.
+
+receive requests of the format $	\textbf{x} = [
+        (\mathsf{iss\_val}, \mathsf{jwk}, \mathsf{header}), 
+        (\mathsf{epk}, \mathsf{exp\_date}), 
+        \mathsf{addr\_idc}, \mathsf{exp\_horizon}
+    ],\\ 
+    \textbf{w} = [
+        (\mathsf{aud\_val}, \mathsf{uid\_key}, \mathsf{uid\_val}, r),
+        (\sigma_\mathsf{oidc}, \mathsf{jwt}), 
+    \rho]$, and will:
+1. Compute a Groth16 proof $\pi$ for $(\textbf{x}, \textbf{w})$
+2. Compute a signature $\sigma$ for the message $m = H(\textbf{x}) || \pi$
+3. Return $(\pi, \sigma)$ as the response.
+
+
+
 ```mermaid
 sequenceDiagram
 Client->OIDC Provider: nonce
