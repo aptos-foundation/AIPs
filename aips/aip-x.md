@@ -88,7 +88,7 @@ The flow between the client, the OIDC Provider, and the Aptos Prover Service is 
 
 ```mermaid
 sequenceDiagram
-Client->OIDC Provider: nonce
+Client->>OIDC Provider: nonce
 Note left of OIDC Provider: nonce is a commitment of the epk and expiration date
 OIDC Provider->>Client: JWT with signature
 Client->>Aptos Prover Service: (x,w)
