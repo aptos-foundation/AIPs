@@ -138,6 +138,7 @@ The response from the prover for route `/v0/prove` is defined via the following
 * The [Groth16Proof](https://github.com/aptos-labs/aptos-core/blob/49354812f75b6a9e7832b031df45ac626e33c9dc/types/src/keyless/groth16_sig.rs#L23C1-L30C2) struct defined in `aptos-types`
 * The serde_json library's JSON deserialization behavior
 * Custom serialization logic for the [EphemeralPublicKey](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/authenticator.rs#L1121) and [Pepper](https://github.com/aptos-labs/aptos-core/blob/main/types/src/keyless/mod.rs#L163) types, defined in `aptos-types`
+* TODO: describe signature struct/behavior
 
 ```rust
 pub type PoseidonHash = [u8; 32];
