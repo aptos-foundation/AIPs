@@ -58,7 +58,7 @@ The most obvious alternative is requiring the user to generate a proof client-si
 
 ## Specification
 
-This spec is an extension of the spec in AIP-61[^spec]. As explained in AIP-61, to authenticate a transaction, a user needs a Groth16 ZK proof for the relation $\mathcal{R}$, with the following inputs:
+This spec is an extension of the spec in AIP-61[^spec]. As explained in AIP-61, to authenticate a transaction, a user needs a Groth16 ZK proof for the relation $\mathcal{R}$, which encodes the logic of linking an **ephemeral public key (epk)** to an Aptos Keyless account, via a signed JWT with a nonce that encodes this epk and an expiration date. Specifically, $\mathcal{R}$ has the following inputs:
 
 ```math
 \mathcal{R}\begin{pmatrix}
@@ -73,7 +73,7 @@ This spec is an extension of the spec in AIP-61[^spec]. As explained in AIP-61, 
     \rho]
 \end{pmatrix},
 ```
-and with verification logic as defined in[^spec]. TODO: provide more context
+and has verification logic as defined in[^spec]. 
 
 ### Protecting Against ZKP Bugs
 
