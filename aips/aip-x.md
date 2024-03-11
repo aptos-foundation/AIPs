@@ -194,31 +194,23 @@ The main code repository for the prover service is linked here:
 
 - If we don’t sufficiently optimize the circuit and prover code, the prover service could be cost-prohibitive to scale.
     - Solution: robust benchmarks of prover, understanding of cost involved in running the service
+ 
+The main risks in this system fall into three categories:
 
-### Privacy
+- **Privacy risks.** The prover service learns sensitive information (i.e., the user's pepper and JWT). This would allow us to de-anonymize Aptos Keyless users.
+  - Note that this sensitive information does **not** allow us to authorize transactions on behalf of users, since the prover service does not learn the user's ephemeral signing key.[^spec]
+  - We mitigate this risk  by making the prover *stateless*: it stores nothing about a user after completing that user's request.
+- **Scalability.** The prover service could potentially become expensive to host as the number of Aptos Keyless users scales up.
+- **Centralization.** Because of the inherent trust requirements of the prover service, and because of the training wheels, there is a strong risk of centralization. 
 
-- prover service learns sensitive user information
- - This would allow us to de-anonymize Aptos Keyless users.
- - It would **not** allow us to authorize transactions on behalf of users, since the prover service does not learn the user's ephemeral signing key.[^spec]
-- risks for both users and for us
-- We mitigate these risks by making the prover *stateless*: it stores nothing about a user after completing that user's request
-- We plan to eliminate these risks in the future by building a better underlying ZKP system; see [open questions](#Open-Questions) below
+We plan to eliminate these risks in the future by building a better underlying ZKP system, which allows client-side proving. See [open questions](#Open-Questions) below.
 
-  
-### Scalability
-
-- expensive to host
-
-
-## Future Potential
-
-See open questions below.
 
 ## Suggested implementation/deployment timeline
 
 We have implemented the prover service already, and plan to deploy it as part of mainnet release v1.10.
 
-## Open Questions 
+## Future Potential/Open Questions 
 
 In the next few months, we plan to spend considerable time on how to mitigate the privacy and centralization compromises encompassed in this AIP. Specifically, we plan to work on the following questions:
 
