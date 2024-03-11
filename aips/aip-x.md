@@ -99,18 +99,19 @@ Client ->> Validators: txn, authenticated with proof and signature
 
 ### API:
 
-The prover service is accessed via the following endpoint:
+We now give a more detailed description of the API. The prover service is accessed via the following endpoint:
 
 * https://prover.keyless.devnet.aptoslabs.com/v0/prove
 
-The prover service API consists of the required format for requests along with the format which responses take. Both input and response formats are defined by the following:
+The prover service API consists of the required format for requests along with the format which responses take, described in the next sections.
 
 #### Request Format:
 
-The request body for the route `/v0/prove` is required to be a json object with structure specified via the following:
+The request body for the route `/v0/prove` is required to be a json object with structure specified via the `RequestInput` struct below. This struct encodes both the public input $\mathbf{x}$ and the private input $\mathbf{w}$ in the relation $\mathcal{R}$ above.
 
-* RequestInput struct below, taken from [src/api.rs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs) in the prover service code
-* The serde_json library's JSON deserialization behavior
+The specific structure of the request JSON object is determined by:
+* `RequestInput` struct below, taken from [src/api.rs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs) in the prover service code
+* The `serde_json` library's JSON deserialization behavior
 * Custom serialization logic for the [EphemeralPublicKey](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/authenticator.rs#L1121) and [Pepper](https://github.com/aptos-labs/aptos-core/blob/main/types/src/keyless/mod.rs#L163) types, defined in `aptos-types`
 
 ```rust
