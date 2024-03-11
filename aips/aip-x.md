@@ -93,7 +93,9 @@ Note left of OIDC Provider: nonce is a commitment of the epk and expiration date
 OIDC Provider->>Client: JWT with signature
 Client->>Aptos Prover Service: (x,w)
 Aptos Prover Service->>Client: proof and signature
-Client ->> Validators: txn, authenticated with proof and signature
+loop Client can sign transactions non-interactively until epk expires
+	Client ->> Validators: txn, authenticated with proof and signature
+end
 ```
 
 
