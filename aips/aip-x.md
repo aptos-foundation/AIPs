@@ -25,9 +25,9 @@ In order to do this, we are using a zero-knowledge proof which each user must pr
 ### Goals
 
 1. Enable Keyless account users to login quickly and without friction. 
-2. Respect users' privacy as much as possible.
+2. Preserve privacy of users.
 3. Build a service that is relatively inexpensive to host.
-5. Protect against bugs in the zero-knowledge system.
+4. Protect against bugs in the zero-knowledge system.
 
 ### Out of Scope
 
@@ -58,7 +58,19 @@ The most obvious alternative is requiring the user to generate a proof client-si
 
  > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
-...
+```mermaid
+
+sequenceDiagram
+Client->>OIDC Provider: Hello John, how are you?
+loop HealthCheck
+    John->>John: Fight against hypochondria
+end
+Note right of John: Rational thoughts!
+OIDC Provider-->>Client: Great!
+OIDC Provider->>Aptos Prover Service: How about you?
+Aptos Prover Service-->>OIDC Provider: Jolly good!
+
+```
 
 
 ### API:
@@ -135,6 +147,8 @@ pub struct Groth16Proof {
 * [Prover service request and response structs](https://github.com/aptos-labs/prover-service/blob/master/src/api.rs)
 
 
+### Protecting Against ZKP Bugs
+
 ## Reference Implementation
 
 The main code repository for the prover service is linked here:
@@ -166,9 +180,6 @@ The main code repository for the prover service is linked here:
 
 - expensive to host
 
-### Centralization
-
-Prover service must be trusted with sensitive information. Because of this, there is a risk of centralization of this system. (TODO: elaborate)
 
 ## Future Potential
 
@@ -180,14 +191,6 @@ See open questions below.
 
 We have implemented the prover service already, and plan to deploy it as part of mainnet release v1.10.
 
-## Security Considerations
-
- > - Does this result in a change of security assumptions or our threat model?
- > - Any potential scams? What are the mitigation strategies?
- > - Any security implications/considerations?
- > - Any security design docs or auditing materials that can be shared?
-
-* DDOS-ing prover service
 
 ## Open Questions 
 
