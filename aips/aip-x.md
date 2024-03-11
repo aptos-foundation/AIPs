@@ -90,12 +90,9 @@ sequenceDiagram
 Client->OIDC Provider: nonce
 Note left of OIDC Provider: nonce is a commitment of the epk and expiration date
 OIDC Provider->>Client: JWT with signature
-Client->>Aptos Prover Service: RequestInput
-Aptos Prover Service->>Client: ProverServiceResponse
-Client ->> Validators: **txn** $\pi$
-Note left of Validators: **txn** contains G16P, epk, ...
-
-
+Client->>Aptos Prover Service: (x,w)
+Aptos Prover Service->>Client: proof and signature
+Client ->> Validators: txn, authenticated with proof and signature
 ```
 
 
