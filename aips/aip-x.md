@@ -71,8 +71,9 @@ This spec is an extension of the spec in AIP-61[^spec]. As explained in AIP-61, 
         (\mathsf{aud\_val}, \mathsf{uid\_key}, \mathsf{uid\_val}, r),
         (\sigma_\mathsf{oidc}, \mathsf{jwt}), 
     \rho]
-\end{pmatrix} = 1
+\end{pmatrix},
 ```
+as defined in[^spec].
 
 At a high level, the prover will have the following behavior. As configuration, it will take in a Groth16 prover key which encodes the relation $\mathcal{R}$, as well as a **training wheels signing key**.
 
