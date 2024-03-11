@@ -49,7 +49,7 @@ The motivation of this AIP follows directly from the motivation of [AIP-61](http
 
 The direct impact of this AIP will be on users of Aptos Keyless accounts. The impact will be threefold:
 * Users will have a much faster login experience than they would if we were generating proofs client-side. From preliminary benchmarks, generating proofs in-browser takes such a long time that is completely unusable. (i.e., > 25 seconds to generate the proof.)
-* As long as the **training wheels* are activated, if a bug is found in the ZKP toolchain (i.e., in circom), users' funds are safe.
+* As long as the **training wheels** are activated, if a bug is found in the ZKP toolchain (i.e., in circom), users' funds are safe.
 * On the other hand, users's private information will be sent to the prover service. This induces a trust assumption: users must trust that the prover service will not leak this information.
 
 ## Alternative solutions
