@@ -11,14 +11,6 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-```mermaid
-graph TD;
-    A-->B;
-    A-->C;
-    B-->D;
-    C-->D;
-```
-
 # AIP-X - Prover Service for Aptos Keyless Accounts
 
 ## Summary
