@@ -61,9 +61,8 @@ The most obvious alternative is requiring the user to generate a proof client-si
 ```mermaid
 
 sequenceDiagram
-Client->OIDC Provider: Hello John, how are you?
-Note right of John: Rational thoughts!
-OIDC Provider-->>Client: Great!
+Client->OIDC Provider: $$\mathsf{nonce}$$
+OIDC Provider->>Client: JWT with signature
 OIDC Provider->>Aptos Prover Service: How about you?
 Aptos Prover Service-->>OIDC Provider: Jolly good!
 
