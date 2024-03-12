@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 71
 title: Refactor Aptos Framework Events with Module Events
 author: lightmark
 Status: Draft
@@ -7,7 +7,7 @@ type: Framework
 created: 02/22/2024
 ---
 
-# AIP-X - Refactor Aptos Framework Events with Module Events
+# AIP-71 - Refactor Aptos Framework Events with Module Events
 
 ## Summary
 
