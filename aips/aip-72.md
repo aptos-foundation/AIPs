@@ -1,5 +1,5 @@
 ---
-aip: x
+aip: 72
 title: Minting Standard for Digital Assets
 author: johnchanguk, jillxuu, briungri, bowenyang007
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-x - Minting Standard for Digital Assets
+# AIP-72 - Minting Standard for Digital Assets
 
 ## Summary
 
