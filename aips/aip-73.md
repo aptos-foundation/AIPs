@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 73
 title: Dispatchable Token Standard
 author: Runtian Zhou
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -9,7 +9,7 @@ type: Framework
 created: 03/08/2024
 ---
 
-# AIP-X - Dispatchable token standard
+# AIP-73 - Dispatchable token standard
 
 ## Summary
 
