@@ -102,11 +102,11 @@ sequenceDiagram
 autonumber
 Client->>OIDC provider: nonce
 Note left of OIDC provider: nonce is a commitment of the EPK and expiration date
-OIDC provider->>Client: JWT with signature
+OIDC provider->>Client: JWT with OIDC signature
 Client->>Prover service: (x,w)
-Prover service->>Client: proof and signature
+Prover service->>Client: proof and training wheels signature
 loop Client can sign transactions non-interactively until EPK expires
-	Client ->> Validators: TXN, authenticated with proof and signature
+	Client ->> Validators: TXN, authenticated with proof and training wheels signature
 end
 ```
 
