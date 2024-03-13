@@ -193,7 +193,9 @@ The main risks in this system fall into three categories:
   - Note that this sensitive information does **not** allow us to authorize transactions on behalf of users, since the prover service does not learn the user's ephemeral signing key.[^spec]
   - We mitigate this risk  by making the prover *stateless*: it stores nothing about a user after completing that user's request.
 - **Scalability.** The prover service could potentially become expensive to host as the number of Aptos Keyless users scales up.
-- **Centralization.** Because of the inherent trust requirements of the prover service, and because of the training wheels, there is a strong risk of centralization. 
+- **Centralization.** Because of the inherent trust requirements of the prover service, and because of the training wheels, there is a strong risk of centralization:
+  - Initially, after deployment of Aptos Keyless, only we will be able to run the prover service (until we turn the training wheels off).
+  - Even after we remove the training wheels, since the prover service handles sensitive user information, users will potentially want to use a service which an established reputation.
 
 We plan to eliminate these risks in the future by building a better underlying ZKP system, which allows client-side proving. See [open questions](#Open-Questions) below.
 
