@@ -22,38 +22,43 @@ We want to guarantee:
 - The OpenID provider does not learn which wallet addresses are linked to which OpenID users.
 - The validators (and other outside observers) also cannot learn the link between wallet addresses and OpenID users.
 
-In order to do this, we are using a zero-knowledge proof which each user must provide to validators to authenticate transactions. Generating such a proof must be done each time a user logs in, and then each time the user's ephemeral public key[^spec], and is computationally intensive. To allow for users to log in quickly and on low-powered hardware, we must currently offload this proof computation to a **proving service**.
+In order to do this, we are using a **zero-knowledge proof (ZKP)** which each user must provide to validators to authenticate transactions. Generating such a proof must be done each time a user logs in, and then each time the user's ephemeral public key expires[^spec], and is computationally intensive. To allow for users to log in quickly and on low-powered hardware, we must currently offload this proof computation to a **proving service**.
 
 This AIP's focus will be the motivation, design and risks around this proving service.
 
 ### Goals
 
-The specific goals of the Aptos Keyless Prover Service are as follows:
-1. Enable Keyless account users to login quickly and without friction. 
-2. Preserve privacy of users.
+The goals of the prover are as follows:
+
+1. Enable keyless users to log in quickly and without friction.
+2. Preserve privacy of users w.r.t to the OIDC provider and the blockchain.
 3. Implement a **training wheels** mode which protects against bugs in the zero-knowledge system.
 
 ### Out of Scope
 
-We are not trying to solve the issue of privacy between the user and the prover service. That is, we are *allowing* the prover service to (temporarily, while computing the proof) learn the user's private information, including:
+Initially, we will not provide privacy for the user w.r.t. the prover service itself. 
+
+That is, we are *allowing* the prover service to **temporarily** learn the user's private information, while computing the ZKP, including:
+
 * The user's OIDC handle. For example, if logging in with Google, the prover service will learn the user's email.
 * The user's privacy-preserving pepper[^spec].
 
-The fact that the prover service learns this information means new privacy and centralization risks. These risks are discussed [below](#risks-and-drawbacks).
+The fact that the prover service learns this information creates some privacy and centralization risks, which are discussed [below](#risks-and-drawbacks).
 
 
 ## Motivation
 
-The motivation of this AIP follows directly from the motivation of [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md). The purpose of Aptos Keyless is to greatly reduce friction in onboarding and key management for users. Specifically, the Keyless Proving Service will allow for the most computationally intensive step during login to be offloaded to a powerful cloud VM instead of being done locally, thus greatly improving the user experience of Aptos Keyless.
- 
-
+The proving service will allow for the most computationally intensive step during login to be offloaded to a powerful cloud VM instead of being done locally. This drastically reduces the time between when a user logs in with their keyless account to when that user is able to transact, from ~25 seconds to 3 seconds. In turn, this greatly improves the user experience of keyless accounts.
 
 ## Impact
 
 The direct impact of this AIP will be on users of Aptos Keyless accounts. The impact will be threefold:
-* Users will have a much faster login experience than they would if we were generating proofs client-side. From preliminary benchmarks, generating proofs in-browser takes such a long time that is completely unusable. (i.e., > 25 seconds to generate the proof.) In contrast, the time to generate the proof server-side is less than 3 seconds.
-* As long as the **training wheels** are activated, if a bug is found in the ZKP toolchain (i.e., in circom), users' funds are safe.
-* On the other hand, users's private information will be sent to the prover service. This induces a trust assumption: users must trust that the prover service will not leak this information.
+1. Users will have a much faster login experience than they would if we were generating proofs client-side.
+   + From preliminary benchmarks, generating proofs in-browser takes such a long time that is completely unusable. (i.e., > 25 seconds to generate the proof.)
+   + In contrast, the time to generate the proof server-side is less than 3 seconds.
+3. As long as the **training wheels** are activated, if a bug is found in the ZKP toolchain (e.g., in `circom`[^circom]), users' funds are safe.
+4. Users's private information will be sent to the prover service. This induces a trust assumption: users must trust that the prover service will not leak this information.
+   + This privacy risk will be eliminated in the future either via (1) multi-party computation techniques or (2) by reducing the proving time in our ZKP toolchain so as to obviate the need for a proving service.
 
 ## Alternative solutions
 
@@ -61,7 +66,7 @@ The most obvious alternative is requiring the user to generate a proof client-si
 
 ## Specification
 
-This spec is an extension of the spec in AIP-61[^spec]. As explained in AIP-61, to authenticate a transaction, a user needs a Groth16 ZK proof for the relation $\mathcal{R}$, which encodes the logic of linking an **ephemeral public key (epk)** to an Aptos Keyless account, via a signed JWT with a nonce that encodes this epk and an expiration date. Specifically, $\mathcal{R}$ has the following inputs:
+As explained in AIP-61[^spec], to authenticate a transaction, a user needs a Groth16 ZK proof for the relation $\mathcal{R}$, which encodes the logic of linking an **ephemeral public key (EPK)** to an Aptos Keyless account, via a signed JWT with a nonce that encodes this EPK and an expiration date. Specifically, $\mathcal{R}$ has the following inputs:
 
 ```math
 \mathcal{R}\begin{pmatrix}
@@ -80,7 +85,7 @@ and has verification logic as defined in[^spec].
 
 ### Protecting Against ZKP Bugs
 
-Recall that one of the goals of the prover service is to provide preliminary protection against bugs in the ZKP toolchain. To do this, we will enable a so-called **training wheels** mode for the first few months of Aptos Keyless deployment. In this mode, the prover will have a **training wheels signing key**, and the validators will have knowledge of the corresponding **training wheels public key**. Validators will then refuse to accept any Aptos Keyless transaction unless the proof and statement have been signed.
+Recall that one of the goals of the prover service is to provide preliminary protection against bugs in the ZKP toolchain. To do this, we will enable a so-called **training wheels** mode for the first few months of Aptos Keyless deployment. In this mode, the prover will have a **training wheels signing key**, and the validators will have knowledge of the corresponding **training wheels public key**. Validators will then refuse to accept any Aptos Keyless transaction unless the proof and statement have been signed under this PK.
 
 ### Prover Behavior and Authentication Flow
 
@@ -217,4 +222,5 @@ In the next few months, we plan to spend considerable time on how to mitigate th
 
 ## References
 
+[^circom]: https://docs.circom.io/circom-language/signals/
 [^spec]: https://github.com/rex1fernando/AIPs/blob/main/aips/aip-61.md#specification
