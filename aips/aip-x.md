@@ -1,7 +1,7 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: Prover Service for Aptos Keyless Accounts
-author: Rex Fernando
+title: Prover service for keyless accounts
+author: Rex Fernando (rex.fernando@aptoslabs.com)
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
@@ -52,7 +52,7 @@ The proving service will allow for the most computationally intensive step durin
 
 ## Impact
 
-The direct impact of this AIP will be on users of Aptos Keyless accounts. The impact will be threefold:
+The direct impact of this AIP will be on users of keyless accounts. The impact will be threefold:
 1. Users will have a much faster login experience than they would if we were generating proofs client-side.
    + From preliminary benchmarks, generating proofs in-browser takes such a long time that is completely unusable. (i.e., > 25 seconds to generate the proof.)
    + In contrast, the time to generate the proof server-side is less than 3 seconds.
@@ -62,11 +62,11 @@ The direct impact of this AIP will be on users of Aptos Keyless accounts. The im
 
 ## Alternative solutions
 
-The most obvious alternative is requiring the user to generate a proof client-side. As discussed above, this solution is untenable, at least with the current ZKP system that is implemented in Aptos Keyless.
+The most obvious alternative is requiring the user to generate a proof client-side. As discussed above, this solution is untenable, at least with the current Groth16-based ZKP system described in AIP-61[^spec].
 
 ## Specification
 
-As explained in AIP-61[^spec], to authenticate a transaction, a user needs a Groth16 ZK proof for the relation $\mathcal{R}$, which encodes the logic of linking an **ephemeral public key (EPK)** to an Aptos Keyless account, via a signed JWT with a nonce that encodes this EPK and an expiration date. Specifically, $\mathcal{R}$ has the following inputs:
+As explained in AIP-61[^spec], to authenticate a transaction, a user needs a Groth16 ZKP for the relation $\mathcal{R}$, which encodes the logic of linking an **ephemeral public key (EPK)** to a keyless account, via a signed JWT with a nonce that encodes this EPK and an expiration date. Specifically, $\mathcal{R}$ has the following inputs:
 
 ```math
 \mathcal{R}\begin{pmatrix}
@@ -85,19 +85,18 @@ and has verification logic as defined in[^spec].
 
 ### Protecting Against ZKP Bugs
 
-Recall that one of the goals of the prover service is to provide preliminary protection against bugs in the ZKP toolchain. To do this, we will enable a so-called **training wheels** mode for the first few months of Aptos Keyless deployment. In this mode, the prover will have a **training wheels signing key**, and the validators will have knowledge of the corresponding **training wheels public key**. Validators will then refuse to accept any Aptos Keyless transaction unless the proof and statement have been signed under this PK.
+Recall that one of the goals of the prover service is to provide preliminary protection against bugs in the ZKP toolchain. To do this, we will enable a so-called **training wheels** mode for the first few months of the deployment. In this mode, the prover will have a **training wheels signing key**, and the validators will have knowledge of the corresponding **training wheels public key**. Validators will then refuse to accept any keyless transaction unless the proof and statement have been signed under this PK.
 
 ### Prover Behavior and Authentication Flow
 
 At a high level, the prover will have the following behavior. As configuration, it will take in a Groth16 prover key which encodes the relation $\mathcal{R}$, as well as the training wheels signing key.
 
-In the following, we refer to a **client**, which is assumed to be either a wallet app or a dApp. The client logic is implemented via our typescript SDK. The flow between the client, the OIDC Provider, and the Aptos Prover Service is shown in the diagram below. The client will interact with the prover service after receiving a signed JWT from the OIDC provider (step ❶ and ❷ below). It will send a request of the format $(\textbf{x}, \textbf{w})$ to the prover service, where $\textbf{x}$ and $\textbf{w}$ are as described above in $\mathcal{R}$ (step ❸). The prover service will then:
+In the following, we refer to a **client**, which is assumed to be either a wallet app or a dApp. The client logic is implemented via our typescript SDK. The flow between the client, the OIDC provider, and the prover service is shown in the diagram below. The client will interact with the prover service after receiving a signed JWT from the OIDC provider (step ❶ and ❷ below). It will send a request of the format $(\textbf{x}, \textbf{w})$ to the prover service, where $\textbf{x}$ and $\textbf{w}$ are as described above in $\mathcal{R}$ (step ❸). The prover service will then:
 1. Compute a Groth16 proof $\pi$ for $(\textbf{x}, \textbf{w})$
 2. Compute a **training wheels signature** $\sigma$ for the message $m = H(\textbf{x}) || \pi$
 3. Return $(\pi, \sigma)$ as the response (step ❹).
 
-Once the client has $\pi$ and $\sigma$, it may use these to authenticate transactions with respect to its Aptos Keyless account (step ❺).
-
+Once the client has $\pi$ and $\sigma$, it may use these to authenticate transactions for its keyless account (step ❺).
 
 ```mermaid
 sequenceDiagram
@@ -112,12 +111,9 @@ loop Client can sign transactions non-interactively until epk expires
 end
 ```
 
-
 ### API:
 
-We now give a more detailed description of the API. The prover service is accessed via the following endpoint:
-
-* https://prover.keyless.devnet.aptoslabs.com/v0/prove
+We now give a more detailed description of the API. The prover service is accessed via the following endpoint: [https://prover.keyless.devnet.aptoslabs.com/v0/prove](https://prover.keyless.devnet.aptoslabs.com/v0/prove)
 
 The prover service API consists of the required format for requests along with the format which responses take, described in the next sections.
 
