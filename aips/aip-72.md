@@ -30,7 +30,7 @@ We aim to provide a non-framework standard to show the “right” way of doing 
     - An example scenario where things can go wrong is when `Refs` are not configured or stored correctly for collections/tokens. Not configuring this correctly can lead to loss of control over the collections and tokens. We want to provide industry standard code where developers can use, whilst not having the developer worrying about configuring things the correct way.
 - As a standard, indexing needs to be built once and can easily be reused across extensions of this library.
 - Increase code reusability.
-    - Checkout our example where we built a custom mint under 50 lines of code! (same thing would’ve taken at least 300+ lines)
+  - **[Example](https://github.com/aptos-labs/token-minter/blob/main/launchpad/sources/launchpad.move#L126)** where we built a custom mint under 50 lines of code! (same thing would’ve taken at least 300+ lines)
 
 ## Specifications
 
@@ -42,7 +42,7 @@ Furthermore the contracts will be deployed immutably, meaning they cannot be upg
 
 ### Core Logic
 
-![collectionmodular.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/8f0dc06f-0c4a-4f0f-9929-010781440fdb/c675226f-9410-46fa-bfcf-9e364c97ceb3/collectionmodular.png)
+![mempool_diagram](../diagrams/collection_ownership.png)
 
 ### Collections
 
@@ -233,7 +233,7 @@ If there are bugs in our modules and projects are using them, they will be susce
 
 ### Reference Implementation
 
-<TODO> - add a link
+**[Launchpad Example](https://github.com/aptos-labs/token-minter/blob/main/launchpad/sources/launchpad.move)**
 
 ### Future Outlook
 
