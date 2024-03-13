@@ -28,7 +28,6 @@ Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [
 
 | Number | Theme | Title  | Author |
 |:---|:---|:---|:---
-| [AIP-60](https://github.com/aptos-foundation/AIPs/issues/298) | Gas | [Improve fairness of shared computation resources](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-60.md)| igor-aptos, vgao1996 |
 | [AIP-61](https://github.com/aptos-foundation/AIPs/issues/) | Cryptography | [OpenID blockchain (OIDB) accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)| Alin Tomescu |
 | [AIP-62](https://github.com/aptos-foundation/AIPs/issues/297) | Devex | [Wallet Standard](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-62.md)| 0xmaayan, hardsetting, NorbertBodziony |
 | [AIP-63](https://github.com/aptos-foundation/AIPs/issues/297) | Smart Contract | [Coin to Fungible Asset Migration](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-63.md)| lightmark, davidiw, movekevin |
@@ -37,6 +36,12 @@ Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [
 | [AIP-66](https://github.com/aptos-foundation/AIPs/issues/297) | Cryptography | [Passkey Accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-66.md)| hariria |
 | [AIP-67](https://github.com/aptos-foundation/AIPs/issues/331) | Cryptography | [Native Consensus for JSON Web Key (JWK)](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md)| Zhoujun Ma (zhoujun@aptoslabs.com) |
 | [AIP-68](https://github.com/aptos-foundation/AIPs/issues/333) | Blockchain | [Reordering transactions in a block for fairness](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-68.md)| igor-aptos |
+| [AIP-69](https://github.com/aptos-foundation/AIPs/issues/349) | Smart Contract | [Start replication of Google JWKs on chain](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-69.md)| Zhoujun Ma (zhoujun@aptoslabs.com) |
+| [AIP-70](https://github.com/aptos-foundation/AIPs/issues/359) | Smart Contract | [Parallelize Fungible Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-70.md)| igor-aptos (https://github.com/igor-aptos), vusirikala (https://github.com/vusirikala) |
+| [AIP-71](https://github.com/aptos-foundation/AIPs/issues/367) | Smart Contract | [Refactor Aptos Framework Events with Module Events](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-71.md)| lightmark |
+| [AIP-72](https://github.com/aptos-foundation/AIPs/issues/370) | Devex | [Minting Standard for Digital Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-72.md)| johnchanguk, jillxuu, briungri, bowenyang007 |
+| [AIP-73](https://github.com/aptos-foundation/AIPs/issues/374) | Smart Contract | [Dispatchable token standard](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-73.md)| Runtian Zhou |
+| [AIP-74](https://github.com/aptos-foundation/AIPs/issues/375) | Blockchain | [Increase block gas limit to account for concurrency increase](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-74.md)| Sital Kedia (skedia@aptoslabs.com), Igor Kabiljo (ikabiljo@aptoslabs.com) |
 | ... | ... |||
 
 ## Types of AIPs
