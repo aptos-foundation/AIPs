@@ -2,8 +2,8 @@
 aip: 73
 title: Dispatchable Token Standard
 author: Runtian Zhou
-discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/374
+Status: In Review
 last-call-end-date (*optional): 04/08/2024
 type: Framework
 created: 03/08/2024

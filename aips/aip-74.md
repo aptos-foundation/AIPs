@@ -2,7 +2,8 @@
 aip: 74
 title: Increase block gas limit to account for concurrency increase
 author: Sital Kedia (skedia@aptoslabs.com), Igor Kabiljo (ikabiljo@aptoslabs.com)
-Status: <Draft>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/375
+Status: Accepted
 type: <Standard>
 created: <03/12/2024>
 ---
