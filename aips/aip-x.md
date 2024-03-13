@@ -27,8 +27,7 @@ In order to do this, we are using a zero-knowledge proof which each user must pr
 The specific goals of the Aptos Keyless Prover Service are as follows:
 1. Enable Keyless account users to login quickly and without friction. 
 2. Preserve privacy of users.
-3. Build a service that is relatively inexpensive to host.
-4. Implement a **training wheels** mode which protects against bugs in the zero-knowledge system.
+3. Implement a **training wheels** mode which protects against bugs in the zero-knowledge system.
 
 ### Out of Scope
 
