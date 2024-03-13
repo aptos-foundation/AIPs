@@ -15,12 +15,16 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
-This AIP is an extension of [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md): Keyless Accounts, which allow users to have a wallet that is tied to an OpenID account, and to authenticate with the blockchain via their OIDC provider. As summarized in AIP-61, “your blockchain account = your OIDC account”. OpenID authenticates users based on personally-identifying information, e.g. an email address or a twitter handle. We want to guarantee:
+This AIP is an extension of [AIP-61: Keyless Accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md), which allow users to have a wallet that is tied to an OpenID account, and to authenticate with the blockchain via their OIDC provider. As summarized in AIP-61, “your blockchain account = your OIDC account”. OpenID authenticates users based on personally-identifying information, e.g. an email address or a Twitter handle. 
 
-- The OpenID provider does not learn which wallets are linked to which users.
-- The validators (and other outside observers) also cannot learn the link between wallets and OpenID users.
+We want to guarantee:
 
-In order to do this, we are using a zero-knowledge proof which each user must provide to validators to authenticate transactions. Generating such a proof must be done each time a user logs in, and then each time the user's ephemeral public key[^spec], and is computationally intensive. To allow for users to login quickly and on low-powered hardware, we plan to offload this proof computation to a proving service.
+- The OpenID provider does not learn which wallet addresses are linked to which OpenID users.
+- The validators (and other outside observers) also cannot learn the link between wallet addresses and OpenID users.
+
+In order to do this, we are using a zero-knowledge proof which each user must provide to validators to authenticate transactions. Generating such a proof must be done each time a user logs in, and then each time the user's ephemeral public key[^spec], and is computationally intensive. To allow for users to log in quickly and on low-powered hardware, we must currently offload this proof computation to a **proving service**.
+
+This AIP's focus will be the motivation, design and risks around this proving service.
 
 ### Goals
 
