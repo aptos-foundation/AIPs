@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Prover Service for Aptos Keyless Accounts
+# AIP-X - Prover service for keyless accounts
 
 ## Summary
 
@@ -100,13 +100,13 @@ Once the client has $\pi$ and $\sigma$, it may use these to authenticate transac
 ```mermaid
 sequenceDiagram
 autonumber
-Client->>OIDC Provider: nonce
-Note left of OIDC Provider: nonce is a commitment of the epk and expiration date
-OIDC Provider->>Client: JWT with signature
-Client->>Aptos Prover Service: (x,w)
-Aptos Prover Service->>Client: proof and signature
-loop Client can sign transactions non-interactively until epk expires
-	Client ->> Validators: txn, authenticated with proof and signature
+Client->>OIDC provider: nonce
+Note left of OIDC provider: nonce is a commitment of the EPK and expiration date
+OIDC provider->>Client: JWT with signature
+Client->>Prover service: (x,w)
+Prover service->>Client: proof and signature
+loop Client can sign transactions non-interactively until EPK expires
+	Client ->> Validators: TXN, authenticated with proof and signature
 end
 ```
 
