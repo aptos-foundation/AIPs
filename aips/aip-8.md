@@ -14,7 +14,7 @@ updated: 2023/1/9
 
 ## Summary
 
-Recently, the concept of *inline functions* has been added to Aptos Move. Those functions are expanded at compile time and do not have an equivalent in the Move bytecode. This ability allows them to implement a feature which is currently not available for regular Move functions: taking functions, given as lambda expressions, as parameters. Given this, we can define popular higher-order functions like 'for_each', 'filter', 'map', and 'fold' for collection types in Move. In this AIP, we suggest a set of conventions for those functions.
+Move, in its current version, does not support higher order functions and dynamic dispatch. These concepts are not supported by Move bytecode and on the virtual machine level. Recently, the concept of *inline functions* has been added to Aptos Move. Those functions are expanded at compile time and do not have an equivalent in the Move bytecode. This allows them to implement a feature which is not available for regular Move functions: taking functions, given as lambda expressions, as parameters. Given this, we can define popular higher-order functions like 'for_each', 'filter', 'map', and 'fold' for collection types in Move. In this AIP, we suggest a set of conventions for those functions.
 
 ## Motivation
 
