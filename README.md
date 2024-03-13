@@ -28,23 +28,20 @@ Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [
 
 | Number | Theme | Title  | Author |
 |:---|:---|:---|:---
-| [AIP-50](https://github.com/aptos-foundation/AIPs/issues/249) | Smart Contract | [Change Commission rates in delegation pools](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-50.md)| junkil-park, michelle-aptos, movekevin, wintertoro |
-| [AIP-51](https://github.com/aptos-foundation/AIPs/issues/251) | Smart Contract |[Changing beneficiaries for operators](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-51.md)| junkil-park, michelle-aptos, movekevin, wintertoro |
-| [AIP-52](https://github.com/aptos-foundation/AIPs/issues/258) | Core |[Automated Account Creation for Sponsored Transactions](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-52.md)| davidiw |
-| [AIP-53](https://github.com/aptos-foundation/AIPs/issues/257) | Core | [Make Fee Payer Address Optional in Transaction Authenticator](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-53.md)| davidiw |
-| [AIP-54](https://github.com/aptos-foundation/AIPs/issues/259) | Smart Contract | [Object code deployment](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-54.md)| movekevin, xbtmatt |
-| [AIP-55](https://github.com/aptos-foundation/AIPs/issues/267) | Smart Contract | [Generalize Transaction Authentication and Support Arbitrary K-of-N MultiKey Accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md)| davidiw, hariria |
-| [AIP-56](https://github.com/aptos-foundation/AIPs/issues/270) | Move Lang | [Resource Access Control](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-56.md)| wrwg |
-| [AIP-57](https://github.com/aptos-foundation/AIPs/issues/285) | Core | [Block Output Size Limit and Conflict-Aware Block Gas Limit](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-57.md)| igor-aptos |
-| [AIP-58](https://github.com/aptos-foundation/AIPs/issues/286) | Gas | [Gas Schedule Adjustments](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-58.md)| igor-aptos, vgao1996 |
-| [AIP-59](https://github.com/aptos-foundation/AIPs/issues/291) | Gas | [Storage IO Gas Adjustments](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-59.md)| msmouse |
-| [AIP-60](https://github.com/aptos-foundation/AIPs/issues/298) | Gas | [Improve fairness of shared computation resources](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-60.md)| igor-aptos, vgao1996 |
 | [AIP-61](https://github.com/aptos-foundation/AIPs/issues/) | Cryptography | [OpenID blockchain (OIDB) accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)| Alin Tomescu |
 | [AIP-62](https://github.com/aptos-foundation/AIPs/issues/297) | Devex | [Wallet Standard](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-62.md)| 0xmaayan, hardsetting, NorbertBodziony |
 | [AIP-63](https://github.com/aptos-foundation/AIPs/issues/297) | Smart Contract | [Coin to Fungible Asset Migration](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-63.md)| lightmark, davidiw, movekevin |
 | [AIP-64](https://github.com/aptos-foundation/AIPs/issues/297) | Blockchain | [Validator Transaction Type](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-64.md)| zhoujun@aptoslabs.com, daniel@aptoslabs.com |
 | [AIP-65](https://github.com/aptos-foundation/AIPs/issues/297) | Gas | [Storage Fee for State Bytes refundable](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-65.md)| msmouse |
 | [AIP-66](https://github.com/aptos-foundation/AIPs/issues/297) | Cryptography | [Passkey Accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-66.md)| hariria |
+| [AIP-67](https://github.com/aptos-foundation/AIPs/issues/331) | Cryptography | [Native Consensus for JSON Web Key (JWK)](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md)| Zhoujun Ma (zhoujun@aptoslabs.com) |
+| [AIP-68](https://github.com/aptos-foundation/AIPs/issues/333) | Blockchain | [Reordering transactions in a block for fairness](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-68.md)| igor-aptos |
+| [AIP-69](https://github.com/aptos-foundation/AIPs/issues/349) | Smart Contract | [Start replication of Google JWKs on chain](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-69.md)| Zhoujun Ma (zhoujun@aptoslabs.com) |
+| [AIP-70](https://github.com/aptos-foundation/AIPs/issues/359) | Smart Contract | [Parallelize Fungible Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-70.md)| igor-aptos (https://github.com/igor-aptos), vusirikala (https://github.com/vusirikala) |
+| [AIP-71](https://github.com/aptos-foundation/AIPs/issues/367) | Smart Contract | [Refactor Aptos Framework Events with Module Events](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-71.md)| lightmark |
+| [AIP-72](https://github.com/aptos-foundation/AIPs/issues/370) | Devex | [Minting Standard for Digital Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-72.md)| johnchanguk, jillxuu, briungri, bowenyang007 |
+| [AIP-73](https://github.com/aptos-foundation/AIPs/issues/374) | Smart Contract | [Dispatchable token standard](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-73.md)| Runtian Zhou |
+| [AIP-74](https://github.com/aptos-foundation/AIPs/issues/375) | Blockchain | [Increase block gas limit to account for concurrency increase](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-74.md)| Sital Kedia (skedia@aptoslabs.com), Igor Kabiljo (ikabiljo@aptoslabs.com) |
 | ... | ... |||
 
 ## Types of AIPs

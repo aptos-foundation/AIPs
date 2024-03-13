@@ -3,7 +3,7 @@ aip: 66
 title: Passkey Accounts
 author: hariria
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/322
-Status: Draft
+Status: In Review
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedback and reviews>
 type: Standard (Core/Framework)
 created: 12/14/2023

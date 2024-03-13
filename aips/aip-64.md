@@ -2,8 +2,8 @@
 aip: 64
 title: Validator Transaction Type
 author: zhoujun@aptoslabs.com, daniel@aptoslabs.com
-discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: <Draft | Last Call | Accepted | Final | Rejected>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/327
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core/Framework)
 created: <10/17/2023>

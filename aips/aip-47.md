@@ -3,7 +3,7 @@ aip: AIP-47
 title: Aggregators V2
 author: georgemitenkov (https://github.com/georgemitenkov), vusirikala (https://github.com/vusirikala), gelash (https://github.com/gelash), igor-aptos (https://github.com/igor-aptos)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/226
-Status: In Review
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core/Framework)
 created: 08/09/2023
