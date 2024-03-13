@@ -2,7 +2,7 @@
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Prover service for keyless accounts
 author: Rex Fernando (rex.fernando@aptoslabs.com)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/379
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
