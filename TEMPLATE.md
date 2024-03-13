@@ -77,9 +77,16 @@ requires (*optional): <AIP number(s)>
 
 ## Risks and Drawbacks
 
- > - Express here the potential negative ramifications of taking on this proposal. What are the hazards?
- > - Any backwards compatibility issues we should be aware of?
- > - If there are issues, how can we mitigate or resolve them?
+ > - Express here the potential risks of taking on this proposal. What are the hazards? What can go wrong?
+ > - Can this proposal impact backward compabitibility?
+ > - What is the mitigation plan for each risk or drawback?
+
+## Security Considerations
+
+ > - How can this AIP potentially impact the security of the network and its users? How is this impact mitigated?
+ > - Are there specific parts of the code that could introduce a security issue if not implemented properly?
+ > - Link tests (e.g. unit, end-to-end, property, fuzz) in the reference implementation that validate both expected and unexpected behavior of this proposal
+ > - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
 
 ...
 
@@ -114,14 +121,6 @@ requires (*optional): <AIP number(s)>
 
 ...
 
-## Security Considerations
-
- > - Does this result in a change of security assumptions or our threat model?
- > - Any potential scams? What are the mitigation strategies?
- > - Any security implications/considerations?
- > - Any security design docs or auditing materials that can be shared?
-
-...
 
 ## Open Questions (Optional)
 
