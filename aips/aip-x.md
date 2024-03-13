@@ -195,7 +195,7 @@ The main risks in this system fall into three categories:
 - **Scalability.** The prover service could potentially become expensive to host as the number of Aptos Keyless users scales up.
 - **Centralization.** Because of the inherent trust requirements of the prover service, and because of the training wheels, there is a strong risk of centralization:
   - Initially, after deployment of Aptos Keyless, only we will be able to run the prover service (until we turn the training wheels off).
-  - Even after we remove the training wheels, since the prover service handles sensitive user information, users will be more inclined to use a service which an established reputation.
+  - Even after we remove the training wheels, since the prover service handles sensitive user information, users will be more inclined to use a service with an established reputation.
 
 We plan to eliminate these risks in the future by building a better underlying ZKP system, which allows client-side proving. See [open questions](#Open-Questions) below.
 
