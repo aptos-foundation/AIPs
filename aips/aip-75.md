@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Prover service for keyless accounts
+# AIP-75 - Prover service for keyless accounts
 
 ## Summary
 
@@ -31,12 +31,12 @@ This AIP's focus will be the motivation, design and risks around this prover ser
 The goals of the prover are as follows:
 
 1. Enable keyless users to log in quickly and without friction.
-2. Preserve privacy of users w.r.t to the OIDC provider and the blockchain.
+2. Preserve privacy of users with respect to the OIDC provider and the blockchain.
 3. Implement a **training wheels** mode which protects against bugs in the zero-knowledge system.
 
 ### Out of Scope
 
-Initially, there will **not** be any privacy for the user w.r.t. the prover service itself; only w.r.t. the OIDC provider and the blockchain. 
+Initially, there will **not** be any privacy for the user with respect to the prover service itself. The privacy guarantees will only be with respect to the OIDC provider and the blockchain. 
 
 That is, the prover service will **temporarily** learn the user's private information, while computing the ZKP, including:
 
