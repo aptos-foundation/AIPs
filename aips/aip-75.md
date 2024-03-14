@@ -15,12 +15,12 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
-This AIP is an extension of [AIP-61: Keyless Accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md), which allow users to have a wallet that is tied to an OpenID account, and to sign transactions for the blockchain via their OIDC provider, instead of via a secret key. As summarized in AIP-61, _“your blockchain account = your OIDC account”_. 
+This AIP is an extension of [AIP-61: Keyless Accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md), which allow users to have an Aptos account that is tied to an OpenID account, and to sign transactions for the blockchain via their OIDC provider, instead of via a secret key. As summarized in AIP-61, _“your blockchain account = your OIDC account”_. 
 
 However, OpenID Connect authenticates users based on personally-identifying information (e.g., an email address or a Twitter handle). In this sense, are two privacy goals:
 
-- The OpenID provider must **not** learn which wallet addresses are linked to which OpenID users.
-- The validators (and other outside observers) also must **not** learn the link between wallet addresses and OpenID users.
+- The OpenID provider must **not** learn which account addresses are linked to which OpenID users.
+- The validators (and other outside observers) also must **not** learn the link between account addresses and OpenID users.
 
 To achieve privacy, a **zero-knowledge proof (ZKP)** is given by users to validators to authenticate transactions. Generating such a proof must be done each time a user logs in, and then each time the user's ephemeral public key expires[^spec], and is computationally intensive. To allow for users to log in quickly and on low-powered hardware, the proof computation must be offloaded to a **prover service**.
 
