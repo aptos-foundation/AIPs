@@ -112,7 +112,10 @@ end
 
 ### API
 
-The prover service is accessed via the following endpoint: [https://prover.keyless.devnet.aptoslabs.com/v0/prove](https://prover.keyless.devnet.aptoslabs.com/v0/prove)
+The prover service is accessed via the following endpoint: 
+* **devnet:** [https://prover.keyless.devnet.aptoslabs.com/v0/prove](https://prover.keyless.devnet.aptoslabs.com/v0/prove)
+* **testnet:** [https://prover.keyless.testnet.aptoslabs.com/v0/prove](https://prover.testnet.devnet.aptoslabs.com/v0/prove)
+* **mainnet:** [https://prover.keyless.mainnet.aptoslabs.com/v0/prove](https://prover.mainnet.devnet.aptoslabs.com/v0/prove)
 
 Next, we describe the format of a proving request and its associated response below.
 
