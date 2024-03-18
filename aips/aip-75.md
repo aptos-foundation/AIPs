@@ -15,12 +15,12 @@ requires (*optional): 61
 
 ## Summary
 
-This AIP is an extension of [AIP-61: Keyless Accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md), which allow users to have a wallet that is tied to an OpenID account, and to sign transactions for the blockchain via their OIDC provider, instead of via a secret key. As summarized in AIP-61, _“your blockchain account = your OIDC account”_. 
+This AIP is an extension of [AIP-61: Keyless Accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md), which allow users to have an Aptos account that is tied to an OpenID account, and to sign transactions for the blockchain via their OIDC provider, instead of via a secret key. As summarized in AIP-61, _“your blockchain account = your OIDC account”_. 
 
 However, OpenID Connect authenticates users based on personally-identifying information (e.g., an email address or a Twitter handle). In this sense, are two privacy goals:
 
-- The OpenID provider must **not** learn which wallet addresses are linked to which OpenID users.
-- The validators (and other outside observers) also must **not** learn the link between wallet addresses and OpenID users.
+- The OpenID provider must **not** learn which account addresses are linked to which OpenID users.
+- The validators (and other outside observers) also must **not** learn the link between account addresses and OpenID users.
 
 To achieve privacy, a **zero-knowledge proof (ZKP)** is given by users to validators to authenticate transactions. Generating such a proof must be done each time a user logs in, and then each time the user's ephemeral public key expires[^spec], and is computationally intensive. To allow for users to log in quickly and on low-powered hardware, the proof computation must be offloaded to a **prover service**.
 
@@ -31,12 +31,12 @@ This AIP's focus will be the motivation, design and risks around this prover ser
 The goals of the prover are as follows:
 
 1. Enable keyless users to log in quickly and without friction.
-2. Preserve privacy of users w.r.t to the OIDC provider and the blockchain.
+2. Preserve privacy of users with respect to the OIDC provider and the blockchain.
 3. Implement a **training wheels** mode which protects against bugs in the zero-knowledge system.
 
 ### Out of Scope
 
-Initially, there will **not** be any privacy for the user w.r.t. the prover service itself; only w.r.t. the OIDC provider and the blockchain. 
+Initially, there will **not** be any privacy for the user with respect to the prover service itself. The privacy guarantees will only be with respect to the OIDC provider and the blockchain. 
 
 That is, the prover service will **temporarily** learn the user's private information, while computing the ZKP, including:
 
@@ -112,7 +112,10 @@ end
 
 ### API
 
-The prover service is accessed via the following endpoint: [https://prover.keyless.devnet.aptoslabs.com/v0/prove](https://prover.keyless.devnet.aptoslabs.com/v0/prove)
+The prover service is accessed via the following endpoint: 
+* **devnet:** [https://prover.keyless.devnet.aptoslabs.com/v0/prove](https://prover.keyless.devnet.aptoslabs.com/v0/prove)
+* **testnet:** [https://prover.keyless.testnet.aptoslabs.com/v0/prove](https://prover.testnet.devnet.aptoslabs.com/v0/prove)
+* **mainnet:** [https://prover.keyless.mainnet.aptoslabs.com/v0/prove](https://prover.mainnet.devnet.aptoslabs.com/v0/prove)
 
 Next, we describe the format of a proving request and its associated response below.
 
