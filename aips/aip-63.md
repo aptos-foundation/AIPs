@@ -23,13 +23,15 @@ The goal is to This AIP intends to achieve the following:
     - Coin/Fungible Asset creator has the option to manually pair coin and fungible asset if neither is paired yet and all the conditions are met.
     - Create helper functions to convert between paired coin and fungible asset, with different visibilities.
     - To make the change compatible with existing dApps using move API in the current coin standard, this AIP proposes to change a couple of functions in coin module to convert coin and its paired fungible asset when needed to keep the same function signature.
+- Give users option to migrate their `CoinStore<CoinType>` to `PrimaryFungibleStore` of the corresponding FA at any time to experience dapps built upon FA standard only.
 - Lay out a comprehensive plan migrating from coin to fungible asset, with the following requirements:
     - Do not break any existing on-chain dapps.
     - Minimize the migration cost for both dapp devs and users, which means the migration process should be as minimally intrusive, more transparent as possible to them. Technically, this means the solution should be able to seamlessly handle situations in which a user has FA and Coin of the same asset type in the migration procedure.
 
 
 ### Out of Scope
-- Force people to migrate their `CoinStore` to `PrimaryFungibleStore`
+- Coerce user to migrate their `CoinStore` to `PrimaryFungibleStore`
+- Make `PrimaryFungibleStore` of APT FA default to replace `CoinStore<AptosCoin>` for new account.
 
 ## Motivation
 
@@ -55,7 +57,7 @@ Before the widespread adoption of DeFi applications on the Aptos network, it's c
     - What happens if the creator fails to create the fungible asset? This inaction could halt progress in migrating that particular coin type.
     - Some coin was initialized under a resource account that nobody has control of. There is no way to get the `signer` of those accounts to pair with an FA.
 
-Advantages of the propsal over 1:
+Advantages of the proposal over 1:
 - Eliminates the need for manual intervention, no matter the coin creator is a normal account or resource account.
 - Maintains the original semantics of `MintCapability`, `FreezeCapability`, and `BurnCapability`, ensuring consistency with the corresponding fungible asset.
  
@@ -148,14 +150,14 @@ Also, to keep the capability semantics consistent, this AIP proposed 3 helper fu
 ### Case Study
 Let's use APT coin as an example. Assume APT coin and FA are created and paired. 
 
-1. Before a user deletes the `CoinStore<AptosCoin>` and convert APT to FA:
-- Withdraw: APT coin will be drawn from `CoinStore<AptosCoin>` first. If its balance is not enough, then go withdraw more APT FA from `PrimaryFungibleStore` and convert it back to coin.
-- Deposit: APT coin will be deposited to `CoinStore<AptosCoin>`. 
+1. Before a user deletes the `CoinStore<AptosCoin>`:
+- `withdraw`/`burn_from`/`collect_into_aggregatable_coin`: APT coin will be drawn from `CoinStore<AptosCoin>` first. If its balance is not enough, then go withdraw more APT FA from `PrimaryFungibleStore` and convert it back to coin.
+- `deposit`: APT coin will be deposited to `CoinStore<AptosCoin>`.
 Note: Even user has not migrated the `CoinStore` they could get APT FA from other people via fungible asset module API but not coin module API.
     
-2. After a user deletes the `CoinStore<AptosCoin>` and convert APT to FA:
-- Withdraw: APT FA will all be withdrawn from APT `PrimaryFungibleStore` and converted back to coin.
-- Deposit: APT coin will be converted to FA and deposited to APT `PrimaryFungibleStore`.
+2. After a user deletes the `CoinStore<AptosCoin>`:
+- `withdraw`/`burn_from`/`collect_into_aggregatable_coin`: APT FA will all be withdrawn from APT `PrimaryFungibleStore` and converted back to coin.
+- `deposit`: APT coin will be converted to FA and deposited to APT `PrimaryFungibleStore`.
 
 `coin::register` is not deprecated yet so it is possible that after a user deletes the `CoinStore`, it gets recreated again. So case 2 can go back to case 1 in rare cases. However, the goal of this AIP is not to get rid of this case but to allow the ecosystem dapps could still work perfectly with both coin and FA of the same asset type coexist under users' accounts.
 For the long term plan, please refer to the [future plan](#future-potential)
@@ -186,7 +188,7 @@ Disable the creation of any new `CoinStore`. Then
 - Trigger the migration inside `Withdraw<CoinType>` and `Deposit<CoinType>` function of any `CoinType` to help the migration of other coin types implicitly when users interacts with those assets.
 
 ### Phase 4
-When most users have their assets all in FA, We need new AIP to disble the coin creation and facilite the whole ecosystem to build on top of fungible asset module API and deprecated coin module.
+When most users have their assets all in FA, we need a new AIP proposing disabling new coin creation and facilitate the whole ecosystem to build on top of fungible asset module API and deprecated coin module.
 
 ## Timeline
 
