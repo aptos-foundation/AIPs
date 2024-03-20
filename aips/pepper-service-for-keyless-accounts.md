@@ -89,7 +89,7 @@ and the evaluation function as `vuf.eval`.
 
 In addition, an asymmetric encryption with variable-length input is required to encrypt the pepper with end user's ESK,
 to ensure only the end user can see the pepper.
-Without encryption, it is still possible for the OIDC provider to learn the account address by interacting with the pepper service on behalf of the end user.
+Otherwise, anyone who has access to a leaked JWT can learn the account address by interacting with the pepper service.
 
 Here is an example asymmetric encryption scheme that combines ElGamal asymmetric encryption scheme and AES-256-GCM `(Aes256Gcm.enc, Aes256Gcm.dec)` symmetric encryption with variable-length input (assuming the ephemeral key pair is an Ed25519 key pair, scheme referred to as `ElGamalCurve25519Aes256Gcm` below).
 - Let `x, Y` be the Ed25519 key pair.
