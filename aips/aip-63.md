@@ -20,7 +20,6 @@ This AIP proposes a global mapping between coin and fungible asset and allow `co
 The goal is to This AIP intends to achieve the following:
 - Start exposing FAs of existing coins to the ecosystem, so that they can prepare dapps and apps for FAs (FA only in the future). DeFi, wallets, and other applications can seamlessly understand FA and equivalent coin and use them equivalently and transparently via coin module.
     - Automatically create a paired fungible asset metadata for a coin type at the coin creator address if it does not exist yet, including `AptosCoin`. Or the coin creator has the option to manually pair a fungible asset with a coin type.
-    - Coin/Fungible Asset creator has the option to manually pair coin and fungible asset if neither is paired yet and all the conditions are met.
     - Create helper functions to convert between paired coin and fungible asset, with different visibilities.
     - To make the change compatible with existing dApps using move API in the current coin standard, this AIP proposes to change a couple of functions in coin module to convert coin and its paired fungible asset when needed to keep the same function signature.
 - Give users option to migrate their `CoinStore<CoinType>` to `PrimaryFungibleStore` of the corresponding FA at any time to experience dapps built upon FA standard only.
@@ -39,13 +38,13 @@ Before the widespread adoption of DeFi applications on the Aptos network, it's c
 
 ## Impact
 
-- Coin Creators: Each coin could be paired with one and only one fungible asset type. The existing capabilities such as `MintCapability`, `FreezeCapability`, and `BurnCapability` will be leveraged to generate the corresponding `MintRef`, `TransferRef`, and `BurnRef` for the paired fungible asset.
+- Coin Creators: Each coin could be paired with one and only one fungible asset type. The existing capabilities such as `MintCapability`, `FreezeCapability`, and `BurnCapability` will be leveraged to get the corresponding `MintRef`, `TransferRef`, and `BurnRef` for the paired fungible asset.
 - Users: The process is designed to be smooth and uninterrupted, yet it necessitates proactive participation. The migration will be initiated when the user activates the migration function. Following the migration, all coins within a user's storage will be seamlessly transformed into their corresponding fungible asset forms and all the subsequence deposit will be redirected to the primary fungible store of the asset type.
 - DApps:
   - Smart contract: Existing dApps based on the coin standard won't be disrupted by this migration, as it's designed to be non-breaking. Users interacting with these protocols may get either coin or FA of the same asset type depending on whether they migrated or not. Same for withdraw. Once the migration is complete, all accounts will have their coin represented as fungible asset, enabling the ecosystem to develop using the fungible asset API and issue new fungible assets without a paired coin. 
     - Indexing: The impact on indexing services may vary. It could be a significant change depending on how these services track balance and supply. 
     - Events: Post-migration, only events related to fungible assets will be emitted.
-    - WriteSet Modifications: `CoinStore` will be removed when migration code is triggered, replaced by a primary fungible store. In some scenarios, both may coexist temporarily.
+    - WriteSet Modifications: `CoinStore` will be removed when migration code is triggered, replaced by a primary fungible store. Once the user has primary fungible store created, she can never resurrect `CoinStore` so the migration is not reversible. If a user does not migrate but get FA via `primary_fungible_store` module, she can have both `CoinStore` and primary fungible store. But once she migrates, she will only have primary fungible store for this asset.
 - Wallets:
   - Wallets must be updated to correctly display balances, aggregating the totals of coins and their paired fungible assets, depending on indexing.
   - Following the migration's completion and the emergence of fungible assets without paired coins, it's imperative for wallets to transition to the fungible asset move API, such as for asset transfers.
@@ -114,9 +113,10 @@ fun maybe_convert_to_fungible_store<CoinType>(account: address) acquires CoinSto
             withdraw_events
         } = move_from<CoinStore<CoinType>>(account);
         event::emit(CoinEventHandleDeletion {
-        event_handle_creation_address: guid::creator_address(event::guid(&deposit_events)),
-        deleted_deposit_event_handle_creation_number: guid::creation_num(event::guid(&deposit_events)),
-        deleted_withdraw_event_handle_creation_number: guid::creation_num(event::guid(&withdraw_events))});
+            event_handle_creation_address: guid::creator_address(event::guid(&deposit_events)),
+            deleted_deposit_event_handle_creation_number: guid::creation_num(event::guid(&deposit_events)),
+            deleted_withdraw_event_handle_creation_number: guid::creation_num(event::guid(&withdraw_events))
+        });
         event::destory_handle(deposit_events);
         event::destory_handle(withdraw_events);
         let fungible_asset = coin_to_fungible_asset(coin);
@@ -131,35 +131,49 @@ fun maybe_convert_to_fungible_store<CoinType>(account: address) acquires CoinSto
         fungible_asset::set_frozen_flag_internal(store, frozen);
     };
 }
+
 ```
 
 `Supply` and `balance` are modified correspondingly to reflect the sum of coin and the paired fungible asset.
 
-Also, to keep the capability semantics consistent, this AIP proposed 3 helper functions to generate the `MintRef`, `TransferRef` and `BurnRef` of the paired fungible asset from the `MintCapability`, `FreezeCapability` and `BurnCapability` of the coin so the move API from `fungible_asset.move` can be used too in new code.
+Also, to keep the capability semantics consistent, this AIP proposed 3 sets of helper functions to temporarily get the `MintRef`, `TransferRef` and `BurnRef` of the paired fungible asset from the `MintCapability`, `FreezeCapability` and `BurnCapability` of the coin so the move API from `fungible_asset.move` can be used too in new code.
+For example, the set of helper for `MintRef` is:
 ```rust
-    /// Get the `MintRef` of paired fungible asset of a coin type from `MintCapability`.
-    public fun paired_mint_ref<CoinType>(_: &MintCapability<CoinType>): MintRef;
+#[view]
+/// Check whether `MintRef` is not taken out.
+public fun paired_mint_ref_exists<CoinType>(): bool;
 
-    /// Get the TransferRef of paired fungible asset of a coin type from `FreezeCapability`.
-    public fun paired_transfer_ref<CoinType>(_: &FreezeCapability<CoinType>): TransferRef;
+/// Get the `MintRef` of paired fungible asset of a coin type from `MintCapability` with a hot potato receipt.
+public fun get_paired_mint_ref<CoinType>(_: &MintCapability<CoinType>): (MintRef, MintRefReceipt);
 
-    /// Get the `BurnRef` of paired fungible asset of a coin type from `BurnCapability`.
-    public fun paired_burn_ref<CoinType>(_: &BurnCapability<CoinType>): BurnRef;
+/// Return the `MintRef` after usage with the hot potato receipt.
+public fun return_paired_mint_ref(mint_ref: MintRef, receipt: MintRefReceipt);
 ```
+
+It is noted that move "Hot Potato" is adopted here to make sure the only one copy of `MintRef` can be "borrowed" with `&MintCapability` but must be returned in the same transaction at the end.
+The definitino of `MintRefReceipt` is:
+```rust
+// The hot potato receipt for flash borrowing MintRef.
+struct MintRefReceipt {
+    metadata: Object<Metadata>,
+}
+```
+Same pattern is also adopted for `TransferRef` and `BurnRef`.
+
 
 ### Case Study
 Let's use APT coin as an example. Assume APT coin and FA are created and paired. 
 
-1. Before a user deletes the `CoinStore<AptosCoin>`:
+1. If a user has the `CoinStore<AptosCoin>` (not migrated):
 - `withdraw`/`burn_from`/`collect_into_aggregatable_coin`: APT coin will be drawn from `CoinStore<AptosCoin>` first. If its balance is not enough, then go withdraw more APT FA from `PrimaryFungibleStore` and convert it back to coin.
 - `deposit`: APT coin will be deposited to `CoinStore<AptosCoin>`.
 Note: Even user has not migrated the `CoinStore` they could get APT FA from other people via fungible asset module API but not coin module API.
     
-2. After a user deletes the `CoinStore<AptosCoin>`:
-- `withdraw`/`burn_from`/`collect_into_aggregatable_coin`: APT FA will all be withdrawn from APT `PrimaryFungibleStore` and converted back to coin.
-- `deposit`: APT coin will be converted to FA and deposited to APT `PrimaryFungibleStore`.
+2. After a user does not have the `CoinStore<AptosCoin>` (migrated):
+- `withdraw`/`burn_from`/`collect_into_aggregatable_coin`: APT FA will all be withdrawn from APT `PrimaryFungibleStore` if it exists and converted back to coin.
+- `deposit`: APT coin will be converted to FA and deposited to APT `PrimaryFungibleStore`, which will be created if does not exist.
 
-`coin::register` is not deprecated yet so it is possible that after a user deletes the `CoinStore`, it gets recreated again. So case 2 can go back to case 1 in rare cases. However, the goal of this AIP is not to get rid of this case but to allow the ecosystem dapps could still work perfectly with both coin and FA of the same asset type coexist under users' accounts.
+`coin::is_account_registered` and `coin::register` are not deprecated yet but modified so `CoinStore<T>` cannot be created if the user has their primary fungible store of the paired FA of coin `T` created. So users of case 2 can never go back to case 1.
 For the long term plan, please refer to the [future plan](#future-potential)
 
 ## Reference Implementation
