@@ -34,7 +34,7 @@ We aim to provide a non-framework standard to show the “right” way of doing 
 
 ## Specifications
 
-An NFT minter creates the core minting contract that consists of a selection of modules from the NFT minting standard library. This methodology allows the minter to writer to develop a single file minting package that contains on order of 100 lines of code or less due to the ability to reuse the expansive minting module libraries. These modules include `token_refs`, `collection_refs`, `transfer_token`, `coin_payment` , `collection_properties`.
+An NFT minter creates the core minting contract that consists of a selection of modules from the NFT minting standard library. This methodology allows the minter to writer to develop a single file minting package that contains on order of 100 lines of code or less due to the ability to reuse the expansive minting module libraries. These modules include `token_components`, `collection_components`, `coin_payment`, `collection_properties`.
 
 This standard will not be part of framework so that we could iterate fast and be more agile with extending it. To remove security risks, we decided to make the modules **non upgradable** and will deploy these using resource accounts and remove access to the signer capability. (**there are no private keys we can access**).
 
@@ -50,7 +50,7 @@ When creating collections, the signer passed into the module's create collection
 
 1. `CollectionComponents` module is responsible for creating the collection refs and properties. The developer will have a configuration to pass in, from which the refs will be generated based off of. This consists of being allowed to transfer tokens, burn tokens, changing collection and token description.
 2. This module will contain all entry functions to mutate the collection, as long as the refs were stored from the collection property configuration.
-3. `CreateCollectionRefs` and `CreateCollectionProperties` events are emitted once the collection has been created. We index these events, creating incentive for developers to use our standard as they benefit from indexed events.
+3. `InitCollectionProperties` event is emitted once the collection has been created. We index events such as this and more, creating incentive for developers to use our standard as they benefit from indexed events.
 
 ```move
 #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
@@ -63,86 +63,66 @@ struct CollectionRefs has key {
     extend_ref: Option<object::ExtendRef>,
 }
 
-#[event]
-/// Event emitted when CollectionRefs are created.
-struct CreateCollectionRefs has drop, store {
-    mutator_ref_exists: bool,
-    royalty_mutator_ref_exists: bool,
-    extend_ref_exists: bool,
+struct CollectionProperty has copy, drop, store {
+    value: bool,
+    initialized: bool,
 }
 
 #[event]
 /// Event emitted when CollectionProperties are created.
 struct InitCollectionProperties has drop, store {
-    mutable_description: bool,
-    mutable_uri: bool,
-    mutable_token_description: bool,
-    mutable_token_name: bool,
-    mutable_token_properties: bool,
-    mutable_token_uri: bool,
-    mutable_royalty: bool,
-    tokens_burnable_by_creator: bool,
-    tokens_transferable_by_creator: bool,
-}
-    
-#[resource_group_member(group = aptos_framework::object::ObjectGroup)]
-struct CollectionProperties has key {
-    /// Determines if the creator can mutate the collection's description
-    mutable_description: bool,
-    /// Determines if the creator can mutate the collection's uri
-    mutable_uri: bool,
-    /// Determines if the creator can mutate token descriptions
-    mutable_token_description: bool,
-    /// Determines if the creator can mutate token names
-    mutable_token_name: bool,
-    /// Determines if the creator can mutate token properties
-    mutable_token_properties: bool,
-    /// Determines if the creator can mutate token uris
-    mutable_token_uri: bool,
-    /// Determines if the creator can change royalties
-    mutable_royalty: bool,
-    /// Determines if the creator can burn tokens
-    tokens_burnable_by_creator: bool,
-    /// Determines if the creator can transfer tokens
-    tokens_transferable_by_creator: bool,
+    mutable_description: CollectionProperty,
+    mutable_uri: CollectionProperty,
+    mutable_token_description: CollectionProperty,
+    mutable_token_name: CollectionProperty,
+    mutable_token_properties: CollectionProperty,
+    mutable_token_uri: CollectionProperty,
+    mutable_royalty: CollectionProperty,
+    tokens_burnable_by_collection_owner: CollectionProperty,
+    tokens_transferable_by_collection_owner: CollectionProperty,
 }
 
-/// Creates a `Collection`, `CollectionRefs`, `CollectionProperties` 
-/// resource in a single collection object.
-/// Emits `CreateCollectionEvent`.
-public fun create_collection(
-    creator: &signer,
-    description: String,
-    max_supply: Option<u64>, // If value is present, collection configured to have a fixed supply.
-    name: String,
-    uri: String,
-    mutable_description: bool,
-    mutable_royalty: bool,
-    mutable_uri: bool,
-    mutable_token_description: bool,
-    mutable_token_name: bool,
-    mutable_token_properties: bool,
-    mutable_token_uri: bool,
-    tokens_burnable_by_creator: bool,
-    tokens_transferable_by_creator: bool,
-    royalty: Option<Royalty>,
-): Object<Collection> {}
+#[resource_group_member(group = aptos_framework::object::ObjectGroup)]
+struct CollectionProperties has copy, drop, key {
+    /// Determines if the collection owner can mutate the collection_properties's description
+    mutable_description: CollectionProperty,
+    /// Determines if the collection owner can mutate the collection_properties's uri
+    mutable_uri: CollectionProperty,
+    /// Determines if the collection owner can mutate token descriptions
+    mutable_token_description: CollectionProperty,
+    /// Determines if the collection owner can mutate token names
+    mutable_token_name: CollectionProperty,
+    /// Determines if the collection owner can mutate token properties
+    mutable_token_properties: CollectionProperty,
+    /// Determines if the collection owner can mutate token uris
+    mutable_token_uri: CollectionProperty,
+    /// Determines if the collection owner can change royalties
+    mutable_royalty: CollectionProperty,
+    /// Determines if the collection owner can burn tokens
+    tokens_burnable_by_collection_owner: CollectionProperty,
+    /// Determines if the collection owner can transfer tokens
+    tokens_transferable_by_collection_owner: CollectionProperty,
+}
+
+/// Creates `CollectionRefs` and `CollectionProperties` resource in a single collection object.
+/// Emits `InitCollectionProperties`.
+public fun create_refs_and_properties(constructor_ref: &ConstructorRef): Object<CollectionRefs> {}
 ```
 
 ### Tokens
 
-The token module will provide functions to update/mutate the token’s property map. `property_map.move` will be updated with a function to initialize the property map for a token with the `ExtendRef`. Currently there is no function to support this, only at construction time of a token with a `ConstructorRef`.
+The token module will provide functions to update/mutate the token’s property map. `property_map.move` will be updated with a function to initialize the property map for a token with the `ExtendRef` in a separate AIP.
+Currently there is no function to support this, only at construction time of a token with a `ConstructorRef`.
 
 1. `TokenComponents` module is responsible for creating the token refs associated with the collection properties originally configured for the collection.
-2. This module will contain all entry functions to mutate the token, as long as the refs were stored from the collection property configuration.
-3. `CreateTokenRefs` is emitted once the token has been created and index these events.
+2. This module will contain functions to mutate the token, as long as the refs were stored from the collection property configuration.
 
 ```move
 #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
 struct TokenRefs has key {
     /// Used to generate signer for the token. Can be used for extending the
     /// token or transferring out objects from the token
-    extend_ref: object::ExtendRef,
+    extend_ref: Option<object::ExtendRef>,
     /// Used to burn.
     burn_ref: Option<token::BurnRef>,
     /// Used to control freeze.
@@ -150,28 +130,10 @@ struct TokenRefs has key {
     /// Used to mutate fields
     mutator_ref: Option<token::MutatorRef>,
     /// Used to mutate properties
-    property_mutator_ref: property_map::MutatorRef,
+    property_mutator_ref: Option<property_map::MutatorRef>,
 }
 
-#[event]
-/// Event emitted when CollectionRefs are created.
-struct CreateTokenRefs has drop, store {
-    extend_ref_exists: bool,
-    burn_ref_exists: bool,
-    transfer_ref_exists: bool,
-    mutator_ref_exists: bool,
-    property_mutator_ref_exists: bool,
-}
-
-public fun create(
-    creator: &signer,
-    collection: Object<Collection>,
-    description: String,
-    name: String,
-    uri: String,
-    recipient_addr: address,
-    soulbound: bool,
-): Object<Token> {}
+public fun create_refs(constructor_ref: &ConstructorRef): Object<TokenRefs> {}
 ```
 
 ### Additional Feature Extensions
