@@ -15,8 +15,7 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
-In [keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)
-an end user needs a private blinding factor (pepper) as an input in privacy-preserving account address derivation:
+In [keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md) an end user needs a private blinding factor (pepper) as an input in the privacy-preserving account address derivation:
 as long as the pepper is not leaked, the link between the account and the provider/dApp owner behind it remains hidden.
 
 This AIP proposes a solution to manange pepper for the end users without actually storing them by
