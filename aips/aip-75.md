@@ -192,6 +192,10 @@ The code repository for the prover service can be found in [https://github.com/a
  
 The main risks of the prover service fall into three categories:
 
+- **Liveness risks.** If the training wheels are **on** and the prover service is down, then some keyless users will not be able to transact.
+  - This is because the blockchain validators expect a training wheels signature over the ZKP, which users will not be able to obtain with the prover service down.
+  - Note that users who still have an unexpired ZKP with a valid training wheel signature will continue to be able to transact.
+  - Once the prover service comes back up, all users will be able to transact.
 - **Privacy risks.** The prover service learns sensitive information (i.e., the user's pepper and OIDC handle). This would allow us to de-anonymize keyless users.
   - Note that this sensitive information does **not** allow us to authorize transactions on behalf of users, since the prover service does **not** learn the user's ephemeral secret key.[^spec]
   - For now, this privacy risk is mitigated by making the prover *stateless*: it stores nothing about a user after completing that user's request.
