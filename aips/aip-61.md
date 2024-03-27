@@ -198,22 +198,20 @@ As pointed out above, our approach directly authenticates users to the blockchai
 
  > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
-### Keyless accounts
-
 Below, we explain the key concepts behind how keyless accounts are implemented:
 
 1. What is the *public key* of a keyless account?
 2. How is the *authentication key* derived from this public key?
 3. What does the *digital signature* look like for OIDC account transactions?
 
-#### Public keys
+### Public keys
 
 The **public key** of a keyless account consists of:
 
 1. $\mathsf{iss\\_val}$: the OIDC provider’s identity, as it appears in a JWT’s `iss` field (e.g., `https://accounts.google.com`), denoted by $\mathsf{iss\\_val}$
 2. $\mathsf{addr\\_idc}$: an **identity commitment (IDC)**, which is a <u>hiding</u> commitment to:
    - The owning user’s identifier issued by the OIDC provider (e.g., `alice@gmail.com`), denoted by $\mathsf{uid\\_val}$.
-   - The name of the JWT field that stores the user identifier, denoted by $\mathsf{uid\\_key}$. Currently, we only allow `sub` or `email`[^jwt-email-field].
+   - The name of the JWT field that stores the user identifier, denoted by $\mathsf{uid\\_key}$. Currently, the Typescript SDK only allows `sub` or `email`[^jwt-email-field] to protect naive developers from using the wrong JWT field. Nonetheless, the validators will accept any field, so as to not restrict power users from innovating on top of this feature.
    - The managing application’s identifier issued to it during registration with the OIDC provider (i.e., an OAuth `client_id` stored in the JWT’s `aud` field), denoted by $\mathsf{aud\\_val}$. 
 
 A bit more formally (but ignoring complex implementation details), the IDC is computed by hashing the fields above using a SNARK-friendly hash function $H'$:
@@ -222,7 +220,7 @@ A bit more formally (but ignoring complex implementation details), the IDC is co
 \mathsf{addr\_idc} = H'(\mathsf{uid\_key}, \mathsf{uid\_val}, \mathsf{aud\_val}; r),\ \text{where}\ r\stackrel{\$}{\gets} \{0,1\}^{256}
 ```
 
-#### Peppers
+### Peppers
 
 Note the use of a (high-entropy) blinding factor $r$ to derive the IDC above. This ensures that the IDC is indeed a hiding commitment to the user’s and managing application’s identity. Throughout this AIP, this blinding factor is referred to as a privacy-preserving **pepper**.
 
@@ -240,7 +238,7 @@ Relying on users to remember their pepper $r$ would maintain the status-quo of e
 
 Therefore, we introduce a **pepper service** that can help users recover their pepper (we discuss its properties [in the appendix](#Pepper-service)).
 
-#### Authentication keys
+### Authentication keys
 
 Next, the **authentication key** of a keyless account is simply the hash of its public key defined above. More formally, assuming any cryptographic hash function $H$, the authentication key is:
 
@@ -250,7 +248,7 @@ Next, the **authentication key** of a keyless account is simply the hash of its 
 
 **Note:** In practice, a domain separator is also hashed in above, but for simplicity of exposition, we ignore such details.
 
-#### Secret keys
+### Secret keys
 
 After defining the “public key” above, a natural question arises:
 
@@ -258,9 +256,13 @@ After defining the “public key” above, a natural question arises:
 
 The answer is there is no additional secret key that the user has to write down. Instead, the “secret key”, consists of the user’s ability to sign in to the OIDC account via the managing application committed in the $\mathsf{auth\\_key}$ above.
 
-Put differently, the “secret key” can be thought of as the user’s password for that account, which the user already knows, or a pre-installed HTTP cookie which precludes the need for the user to re-enter the password. Although, this **password is not sufficient**: the managing application must be available: it must allow the user to sign in to their OIDC account and receive the OIDC signature. (We discuss [how to deal with disappearing apps](#alternative-recovery-paths-for-when-managing-applications-disappear) later on.)
+Put differently, the “secret key” can be thought of as the user’s password for that account, which the user already knows, or a pre-installed HTTP cookie which precludes the need for the user to re-enter the password. However, this **password is not sufficient**: the managing application must be available: it must allow the user to sign in to their OIDC account and receive the OIDC signature. (We discuss [how to deal with disappearing apps](#alternative-recovery-paths-for-when-managing-applications-disappear) later on.)
 
 More formally, if a user can successfully use the application identified by $\mathsf{aud\\_val}$ to sign in (via OAuth) to their OIDC account identified by $(\mathsf{uid\\_key}, \mathsf{uid\\_val})$ and issued by the OIDC provider identified by $\mathsf{iss\\_val}$, then that ability acts as that users “secret key.”
+
+### Signatures
+
+We begin with a “warm-up” and describe our “leaky mode” keyless signatures which do not preserve the user’s privacy. After, we describe our “zero-knowledge” signatures which do preserve privacy.
 
 #### _Warm-up_: Leaky signatures that reveal the user’s and app’s identity
 
@@ -269,7 +271,7 @@ Before describing our fully privacy-preserving TXN signatures, we warm-up by des
 A **leaky signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf{txn}$ for an address with authentication key $\mathsf{auth\\_key}$ is defined as:
 
 ```math
-\sigma_\mathsf{txn} = (\mathsf{uid\_key}, \mathsf{jwt}, \mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \sigma_\mathsf{oidc}, \mathsf{exp\_date}, \rho, r)
+\sigma_\mathsf{txn} = (\mathsf{uid\_key}, \mathsf{jwt}, \mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \sigma_\mathsf{oidc}, \mathsf{exp\_date}, \rho, r, \mathsf{idc\_aud\_val})
 ```
 
 where:
@@ -281,8 +283,9 @@ where:
 5. $\sigma_\mathsf{eph}$ is an **ephemeral signature** over the transaction $\mathsf{txn}$
 6. $\sigma_\mathsf{oidc}$ is the OIDC signature over the full JWT (i.e.,  over the $\mathsf{header}$ and $\mathsf{jwt}$ payload)
 7. $\mathsf{exp\\_date}$ is a timestamp past which $\mathsf{epk}$ is considered expired and cannot be used to sign TXN.
-9. $\rho$ is a high-entropy **EPK blinding factor** used to create an **EPK commitment** to $\mathsf{epk}$ and $\mathsf{exp\\_date}$ that is stored in the $\mathsf{jwt}[\texttt{"nonce"}]$ field
-10. $r$ is the pepper for the address IDC, which is assumed to be zero in this "leaky mode"
+8. $\rho$ is a high-entropy **EPK blinder** used to create an **EPK commitment** to $\mathsf{epk}$ and $\mathsf{exp\\_date}$ that is stored in the $\mathsf{jwt}[\texttt{"nonce"}]$ field
+9. $r$​ is the pepper for the address IDC, which is assumed to be zero in this "leaky mode"
+10. $\mathsf{idc\\_aud\\_val}$ is an **optional** field used for [account recovery](#recovery-service). This field is expected to be set to the same `aud` value as in the IDC. Note that this is necessary information to include in the TXN signature during recovery, since, in that case, the $\mathsf{jwt}$ payload will contain the `aud` of the recovery service, not the `aud` committed in the IDC.
 
 **tl;dr**: To **verify the $\sigma_\mathsf{txn}$ signature**, validators check that the OIDC provider (1) signed the user and app IDs that are committed in the address IDC and (2) signed the EPK which, in turn, signed the transaction, while enforcing some expiration date on the EPK.
 
@@ -291,15 +294,16 @@ In more detail, signature verification against the PK $(\mathsf{iss\\_val}, \mat
 1. If using `email`-based IDs, ensure the email has been verified:
    1. If $\mathsf{uid\\_key}\stackrel{?}{=}\texttt{"email"}$, assert $\mathsf{jwt}[\texttt{"email\\_verified"}] \stackrel{?}{=} \texttt{"true"}$
 1. Let $\mathsf{uid\\_val}\gets\mathsf{jwt}[\mathsf{uid\\_key}]$
-1. Let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
+1. If $\mathsf{idc\\_aud\\_val}$ is set, assert that $\mathsf{jwt}[\texttt{"aud"}]$ is in the [`aud` override list](#aud-override-list), stored on chain
+1. If $\mathsf{idc\\_aud\\_val}$ is set, let $\mathsf{aud\\_val}\gets \mathsf{idc\\_aud\\_val}$; otherwise, let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
 1. Assert $\mathsf{addr\\_idc} \stackrel{?}{=} H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$, using the pepper $r$ from the signature
 1. Verify that the PK matches the authentication key on-chain:
    1. Assert $\mathsf{auth\\_key} \stackrel{?}{=} H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$
 1. Check the EPK is committed in the JWT’s `nonce` field:
    1. Assert $\mathsf{jwt}[\texttt{"nonce"}] \stackrel{?}{=} H’(\mathsf{epk},\mathsf{exp\\_date};\rho)$
 1. Check the EPK expiration date is not too far off into the future (we detail this below):
-   1. Assert $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{max\\_exp\\_horizon}$, where $\mathsf{max\\_exp\\_horizon}$ is an on-chain parameter
-   1. We do not assert the expiration date is not in the past (i.e., assert $\mathsf{exp\\_date} > \mathsf{jwt}[\texttt{"iat"}]$). Instead, we assume that the JWT’s issued-at timestamp (`iat`) field is correct and therefore close to the current block time. So if an application mis-sets $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}]$, then the EPK will be expired and useless.
+   1. Assert $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}] + \mathsf{max\\_exp\\_horizon}$, where $\mathsf{max\\_exp\\_horizon}$ is an on-chain parameter (see [here](#move-module))
+   1. We do not assert the expiration date is not in the past (i.e., assert $\mathsf{exp\\_date} > \mathsf{jwt}[\texttt{"iat"}]$). Instead, we assume that the JWT’s issued-at timestamp (`iat`) field is correct and therefore close to the current block time. So if an application mis-sets $\mathsf{exp\\_date} < \mathsf{jwt}[\texttt{"iat"}]$, then the EPK will be expired from the perspective of the blockchain.
 1. Check the EPK is not expired:
    1. Assert $\texttt{current\\_block\\_time()} < \mathsf{exp\\_date}$
 1. Verify the ephemeral signature $\sigma_\mathsf{eph}$ under $\mathsf{epk}$ over the transaction $\mathsf{txn}$
@@ -317,7 +321,7 @@ An alternative would be to ensure that $\mathsf{exp\\_date} < \texttt{current\\_
 **Leaky mode caveats** that will be addressed next:
 
 - The pepper $r$ is leaked by the transaction, which allows brute-forcing of the address IDC.
-- Similarly, the EPK blinding factor $\rho$ does not yet serve its privacy-preserving purpose since it is revealed by the TXN.
+- Similarly, the EPK blinder $\rho$ does not yet serve its privacy-preserving purpose since it is revealed by the TXN.
 - The JWT payload is included in plaintext and leaks the identities of the managing application and user.
 - Even if the JWT payload were hidden, the OIDC signature could leak these identities, since the signed JWT could be low-entropy. Therefore, an attacker could brute-force the signature verification on a small subset of likely-to-have-been-signed JWTs.
 
@@ -416,11 +420,213 @@ Unfortunately, Groth16 is a pre-processing SNARK with a relation-specific truste
 
 A consequence of this is that we cannot upgrade/bugfix our ZK relation implementation without redoing the setup. Therefore, in the future, we will likely transition to either a **transparent** SNARK or one with a one-time, relation-independent **universal trusted setup**.
 
-### Reference implementation
+### Move module
+
+Keyless accounts require an on-chain configuration for:
+
+1. The Groth16 verification key under which the ZKP verifies
+2. Circuit-specific constants
+3. The training wheels public key, if any
+4. The `aud` override list
+5. The max # of keyless signatures allowed in a TXN (to mitigate against DoS attacks)
+
+This configuration is stored as part of two resources in `aptos_framework::keyless_account`:
+
+```rust
+/// The 288-byte Groth16 verification key (VK) for the ZK relation that implements keyless accounts
+struct Groth16VerificationKey has key, store {
+    /// 32-byte serialization of `alpha * G`, where `G` is the generator of `G1`.
+    alpha_g1: vector<u8>,
+    /// 64-byte serialization of `alpha * H`, where `H` is the generator of `G2`.
+    beta_g2: vector<u8>,
+    /// 64-byte serialization of `gamma * H`, where `H` is the generator of `G2`.
+    gamma_g2: vector<u8>,
+    /// 64-byte serialization of `delta * H`, where `H` is the generator of `G2`.
+    delta_g2: vector<u8>,
+    /// `\forall i \in {0, ..., \ell}, 64-byte serialization of gamma^{-1} * (beta * a_i + alpha * b_i + c_i) * H`, where
+    /// `H` is the generator of `G1` and `\ell` is 1 for the ZK relation.
+    gamma_abc_g1: vector<vector<u8>>,
+}
+
+struct Configuration has key, store {
+    /// An override `aud` for the identity of a recovery service, which will help users recover their keyless accounts
+    /// associated with dapps or wallets that have disappeared.
+    /// IMPORTANT: This recovery service **cannot** on its own take over user accounts; a user must first sign in
+    /// via OAuth in the recovery service in order to allow it to rotate any of that user's keyless accounts.
+    override_aud_vals: vector<String>,
+    /// No transaction can have more than this many keyless signatures.
+    max_signatures_per_txn: u16,
+    /// How far in the future from the JWT issued at time the EPK expiry can be set.
+    max_exp_horizon_secs: u64,
+    /// The training wheels PK, if training wheels are on
+    training_wheels_pubkey: Option<vector<u8>>,
+    /// The max length of an ephemeral public key supported in our circuit (93 bytes)
+    max_commited_epk_bytes: u16,
+    /// The max length of the value of the JWT's `iss` field supported in our circuit (e.g., `"https://accounts.google.com"`)
+    max_iss_val_bytes: u16,
+    /// The max length of the JWT field name and value (e.g., `"max_age":"18"`) supported in our circuit
+    max_extra_field_bytes: u16,
+    /// The max length of the base64url-encoded JWT header in bytes supported in our circuit
+    max_jwt_header_b64_bytes: u32,
+}
+```
+
+This Move module also provides governance functions that update this configuration:
+
+```rust
+// Sets the Groth16 verification key, only callable via governance proposal.
+// WARNING: If a malicious key is set, this would lead to stolen funds.
+public fun update_groth16_verification_key(fx: &signer, vk: Groth16VerificationKey) acquires Groth16VerificationKey { /* ... */ }
+
+// Sets the keyless configuration, only callable via governance proposal.
+public fun update_configuration(fx: &signer, config: Configuration) acquires Configuration { /* ... */ }
+
+// Convenience method to [un]set the training wheels PK, only callable via governance proposal.
+// WARNING: If a malicious key is set, this could lead to stolen funds assuming there is a bug in the ZKP circuit.
+public fun update_training_wheels(fx: &signer, pk: Option<vector<u8>>) acquires Configuration { /* ... */ }
+
+// Convenience method to set the max expiration horizon, only callable via governance proposal.
+public fun update_max_exp_horizon(fx: &signer, max_exp_horizon_secs: u64) acquires Configuration { /* ... */ }
+
+// Convenience method to clear the set of override `aud`'s, only callable via governance proposal.
+// WARNING: When no override `aud` is set, recovery of keyless accounts associated with applications that disappeared
+// is no longer possible.
+public fun remove_all_override_auds(fx: &signer) acquires Configuration { /* ... */ }
+
+// Convenience method to append to the set of override `aud`'s, only callable via governance proposal.
+// WARNING: If a malicious override `aud` is set, this could lead to stolen funds.
+public fun add_override_aud(fx: &signer, aud: String) acquires Configuration { /* ... */ }
+```
+
+#### `aud` override list
+
+Note that, to support the [recovery service (discussed later on)](#recovery-service), the Move module maintains a list of `aud` overrides inside the `Configuration`.
+
+### Rust structs
+
+A keyless public key is defined as:
+
+```rust
+pub struct KeylessPublicKey {
+    /// The value of the `iss` field from the JWT, indicating the OIDC provider.
+    /// e.g., https://accounts.google.com
+    pub iss_val: String,
+
+    /// SNARK-friendly commitment to:
+    /// 1. The application's ID; i.e., the `aud` field in the signed OIDC JWT representing the OAuth client ID.
+    /// 2. The OIDC provider's internal identifier for the user; e.g., the `sub` field in the signed OIDC JWT
+    ///    which is Google's internal user identifier for bob@gmail.com, or the `email` field.
+    ///
+    /// e.g., H(aud || uid_key || uid_val || pepper), where `pepper` is the commitment's randomness used to hide
+    ///  `aud` and `sub`.
+    pub idc: IdCommitment,
+}
+
+pub struct IdCommitment(#[serde(with = "serde_bytes")] pub(crate) Vec<u8>);
+```
+
+A keyless signature is defined as:
+
+```rust
+pub struct KeylessSignature {
+    pub cert: EphemeralCertificate,
+
+    /// The decoded/plaintext JWT header (i.e., *not* base64url-encoded), with two relevant fields:
+    ///  1. `kid`, which indicates which of the OIDC provider's JWKs should be used to verify the
+    ///     \[ZKPoK of an\] OpenID signature.,
+    ///  2. `alg`, which indicates which type of signature scheme was used to sign the JWT
+    pub jwt_header_json: String,
+
+    /// The expiry time of the `ephemeral_pubkey` represented as a UNIX epoch timestamp in seconds.
+    pub exp_date_secs: u64,
+
+    /// A short lived public key used to verify the `ephemeral_signature`.
+    pub ephemeral_pubkey: EphemeralPublicKey,
+
+    /// A signature ove the transaction and, if present, the ZKP, under `ephemeral_pubkey`.
+    /// The ZKP is included in this signature to prevent malleability attacks.
+    pub ephemeral_signature: EphemeralSignature,
+}
+
+pub enum EphemeralCertificate {
+    ZeroKnowledgeSig(ZeroKnowledgeSig),
+    OpenIdSig(OpenIdSig),
+}
+
+pub struct ZeroKnowledgeSig {
+    pub proof: ZKP,
+    /// The expiration horizon that the circuit should enforce on the expiration date committed in
+    /// the nonce. This must be <= `Configuration::max_expiration_horizon_secs`.
+    pub exp_horizon_secs: u64,
+    /// An optional extra field (e.g., `"<name>":"<val>") that will be matched publicly in the JWT
+    pub extra_field: Option<String>,
+    /// Will be set to the override `aud` value that the circuit should match, instead of the `aud`
+    /// in the IDC. This will allow users to recover keyless accounts bound to an application that
+    /// is no longer online.
+    pub override_aud_val: Option<String>,
+    /// A signature on the proof and the statement (via the training wheels SK) to mitigate against
+    /// flaws in our circuit.
+    pub training_wheels_signature: Option<EphemeralSignature>,
+}
+
+pub struct OpenIdSig {
+    /// The decoded bytes of the JWS signature in the JWT (https://datatracker.ietf.org/doc/html/rfc7515#section-3)
+    #[serde(with = "serde_bytes")]
+    pub jwt_sig: Vec<u8>,
+    /// The decoded/plaintext JSON payload of the JWT (https://datatracker.ietf.org/doc/html/rfc7519#section-3)
+    pub jwt_payload_json: String,
+    /// The name of the key in the claim that maps to the user identifier; e.g., "sub" or "email"
+    pub uid_key: String,
+    /// The random value used to obfuscate the EPK from OIDC providers in the nonce field
+    #[serde(with = "serde_bytes")]
+    pub epk_blinder: Vec<u8>,
+    /// The privacy-preserving value used to calculate the identity commitment. It is typically uniquely derived from `(iss, client_id, uid_key, uid_val)`.
+    pub pepper: Pepper,
+    /// When an override aud_val is used, the signature needs to contain the aud_val committed in the
+    /// IDC, since the JWT will contain the override.
+    pub idc_aud_val: Option<String>,
+}
+
+pub enum EphemeralPublicKey {
+    Ed25519 {
+        public_key: Ed25519PublicKey,
+    },
+    Secp256r1Ecdsa {
+        public_key: secp256r1_ecdsa::PublicKey,
+    },
+}
+
+pub enum EphemeralSignature {
+    Ed25519 {
+        signature: Ed25519Signature,
+    },
+    WebAuthn {
+        signature: PartialAuthenticatorAssertionResponse,
+    },
+}
+```
+
+### PRs
 
 We will add more links to our circuit code and Rust TXN authenticator below:
  - [Rust authenticator code for the leaky mode](https://github.com/aptos-labs/aptos-core/pull/11681)
  - [Rust authenticator code for the Groth16-based ZKP mode](https://github.com/aptos-labs/aptos-core/pull/11772)
+ - [Fetch the Groth16 VK from on-chain](https://github.com/aptos-labs/aptos-core/pull/11895)
+ - [Properly handle exp_horizon + VK & Configuration initialization in Rust](https://github.com/aptos-labs/aptos-core/pull/11966)
+ - [Optional training wheels signature](https://github.com/aptos-labs/aptos-core/pull/11986)
+ - [Fix smoke tests](https://github.com/aptos-labs/aptos-core/pull/11994)
+ - [base10 string for nonce](https://github.com/aptos-labs/aptos-core/pull/12001)
+ - [Remove uid_key restriction](https://github.com/aptos-labs/aptos-core/pull/12007)
+ - [Optimize `iss` storage & refactor](https://github.com/aptos-labs/aptos-core/pull/12017)
+ - [Rename to AIP-61 terminology](https://github.com/aptos-labs/aptos-core/pull/12123)
+ - [Rename to keyless](https://github.com/aptos-labs/aptos-core/pull/12285)
+ - [base64 fixes, training wheels signature fixes](https://github.com/aptos-labs/aptos-core/pull/12287)
+ - [Custom hex serialization for some keyless structs](https://github.com/aptos-labs/aptos-core/pull/12295)
+ - [e2e tests for feature gating](https://github.com/aptos-labs/aptos-core/pull/12296)
+ - [Support for passkey-based EPKs & non-malleability signature fixes](https://github.com/aptos-labs/aptos-core/pull/12333)
+ - [Update verification key & test proof](https://github.com/aptos-labs/aptos-core/pull/12413)
+ - [Fix public inputs hash generation, fix serde deserialization, add Google as default OIDC provider in devnet](https://github.com/aptos-labs/aptos-core/pull/12476/files)
+ - [Fix feature gating & match alg fields](https://github.com/aptos-labs/aptos-core/pull/12521)
 
 ## Testing (Optional)
 
@@ -513,11 +719,11 @@ Specifically, with training wheels on, a break in our ZK relation implementation
 
 An important **liveness consideration** of this is that if the proving service is down, users will not be able to access their accounts. Nonetheless, if outages do happen we expect them to be brief and a price worth paying for securing our initial deployment.
 
-### Alternative recovery paths for when managing applications disappear
+### Recovery service
 
 Recall that keyless accounts are bound not just to the user but also to a managing application (e.g., a dapp or a wallet).
 
-Unfortunately, this **managing application could disappear** for various reasons:
+Unfortunately, this **managing application could disappear**. For example:
 
 1. Its OAuth `client_id` might be banned by the OIDC provider (for various reasons)
 2. An incompetent administrator loses the application’s OAuth `client_secret` or deletes the registered application from the OIDC provider
@@ -525,7 +731,24 @@ Unfortunately, this **managing application could disappear** for various reasons
 
 In any case, **if the managing application disappears, then users will no longer be able to access their keyless account** bound to that application, since they can no longer obtain a signed JWT without the application.
 
-To deal with this, we propose installing **alternative recovery paths**:
+The most viable option is to rely on a **recovery service** to help users re-gain access to their accounts. Specifically, a keyless signature obtained through the recovery service (with the user’s consent, of course) will be accepted by the blockchain validators as a valid keyless signature for *any* managing application. As a result, users can use the recovery service to rotate the key of their inaccessible accounts.
+
+As already explained above (**TODO:** ref), this recovery path must be enabled by setting the `client_id` override on-chain.
+
+The **advantages** of this approach are:
+
+1. It minimizes centralization risks, since the recovery service’s `client_id` can be set via governance proposal.
+2. Multiple such recovery services can be added and users can interact with the one they trust most.
+3. The recovery service is stateless and does not store signed JWTs of  previously-logged in users.
+4. A dishonest recovery service cannot, on its own, rotate the accounts of a user.
+
+A disadvantage of this approach is that if, and only if, a user signs into an **actively-malicious** recovery service, that service can steal all of that user’s accounts. So users must be vigilant about which recovery service they can use.
+
+To mitigate this problem, it may be possible to distribute a recovery service via MPC techniques. This would ensure that the signed JWT cannot be stolen by a colluding minority of the servers. This is left as future work.
+
+#### Other recovery paths
+
+While **alternative recovery paths** are possible, they are either prone to phishing attacks, do not work on all platforms, or require centralization:
 
 - For **email-based** OIDC providers, we can replace the ZKPoK of an OIDC signature with a ZKPoK of a DKIM-signed email (with a properly-formatted message). 
   - While this will be less user-friendly, it provides emergency recovery and continues to **preserve privacy**.
@@ -536,8 +759,9 @@ To deal with this, we propose installing **alternative recovery paths**:
   - For **Twitter**, a user could prove they own their Twitter account by tweeting a specially-crafted message
   - Similarly, for **GitHub**, users could do the same by posting a gist.
   - Given an HTTPS oracle, validators could verify such a tweet or a gist and allow the user to rotate their account's key. This would **not** be **privacy-preserving** since, at minimum, the validators would learn the user’s identity from the HTTPS URL.
-- Alternatively, all keyless accounts could be set up as a 1 out of 2[^multiauth] with a **recovery [passkey](#Passkeys)** sub-account. This way, the passkey, if backed up automatically (e.g., on Apple platforms), then it could be used to restore access to the account.
-  - A traditional SK sub-account could also be used but this would require the managing application to giver users the option to write the SK, which defeats the user-friendliness goals.
+  - This flow is also susceptible to phishing.
+- Alternatively, all keyless accounts could be set up as a 1 out of 2[^multiauth] with a **recovery [passkey](#Passkeys)** sub-account. This way, the passkey, if backed up automatically (e.g., on Apple platforms), could be used to restore access to the account.
+  - A traditional SK sub-account could also be used but this would require the managing application to prompt users to write down the SK, which defeats the user-friendliness goals from [here](#goals).
 
 - Alternatively, for popular applications, we could consider **manual patches**: e.g., adding an override for their `client_id` in our ZK relation. (But this brings about a centralization risk.)
 
@@ -683,7 +907,7 @@ Its design is outside the scope of this AIP, but here we highlight some of its k
 
 As long as the ZKP proving overhead in the browser and on mobile phones remains high, there will be a **ZK proving service** to help users compute their ZKPs fast. 
 
-Its design is outside the scope of this AIP, but here we highlight some of its key properties:
+Its design is described in [AIP-75](/aips/aip-75.md), but here we highlight some of its key properties:
 
 - If the service is down, users can still access their account (although more slowly), since they can always compute ZKPs on their own.
   - Unless the proving service is operating with “training wheels” on (see [below](#training-wheels))
@@ -697,7 +921,7 @@ Its design is outside the scope of this AIP, but here we highlight some of its k
 
 Transaction signatures for keyless accounts involve verifying an OIDC signature. This requires that validators **agree on the latest JWKs** (i.e., public keys) of the OIDC provider, which are periodically-updated at a provider-specific **OpenID configuration URL**. 
 
-The design and implementation of JWK consensus is outside the scope of this AIP, but here we highlight some of its key properties:
+The design and implementation of JWK consensus is described in [AIP-67](/aips/aip-67.md), but here we highlight some of its key properties:
 
 - The validators will frequently scan for JWK changes at every supported provider’s **OpenID configuration URL**
 - When a change is detected by a validator, that validator will propose the change via a one-shot consensus mechanism
@@ -706,6 +930,8 @@ The design and implementation of JWK consensus is outside the scope of this AIP,
 ## Changelog
 
 - _2024-02-29_: An [earlier version](https://github.com/aptos-foundation/AIPs/blob/71cc264cc249faf4ac23a3f441fb76a64278b51a/aips/aip-61.md) of this AIP referred to keyless accounts as **OpenID-based blockchain (OIDB)** accounts.
+- _2024-03-14_: Added Rust structs for keyless signatures and public keys.
+- _2024-03-14_: Augmented the keyless TXN signatures to account for the recovery service functionality and the extra public field functionality.
 
 ## References
 
