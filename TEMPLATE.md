@@ -19,14 +19,18 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
- > Summarize in 3-5 sentences what is the problem we’re solving for and how are we solving for it
+ > Summarize in 3-5 sentences.
+ > Define the problem we're solving.
+ > How does this document propose solving it.
+ > What are the goals and what is in scope? Any metrics?
 
 ...
 
-### Goals
+## Motivation and Impact
 
- > What are the goals and what is in scope? Any metrics?
- > Discuss the business impact and business value this change would impact.
+ > Describe the impetus for this change. What does it accomplish?
+ > Which audiences are impacted by this change? What type of action does the audience need to take?
+ > What might occur if we do not accept this proposal?
 
 ...
 
@@ -35,17 +39,9 @@ requires (*optional): <AIP number(s)>
  > What are we committing to not doing and why are they scoped out?
 
 ...
+# Proposed solution
 
-## Motivation
-
- > Describe the impetus for this change. What does it accomplish?
- > What might occur if we do not accept this proposal?
-
-...
-
-## Impact
-
- > Which audiences are impacted by this change? What type of action does the audience need to take?
+ > Define the straw person solution with enough details to make it clear why this is the preferred solution.
 
 ...
 
