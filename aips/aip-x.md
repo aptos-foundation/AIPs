@@ -1,5 +1,5 @@
 ---
-aip: 
+aip: 76
 title: Digital Assets Composability
 author: aladeenb, jczhang
 discussions-to:  https://github.com/aptos-foundation/AIPs/pull/278#issue
@@ -31,7 +31,7 @@ The hierarchy consists of three layers:
 - `Trait`: A wrapper for a `token-object` that serves as the child of the Composable, capable of holding digital assets and fungible assets.
 - `DA` (Digital Asset): A wrapper for a `token-object` representing the leaf of the tree and positioned as the child of the Trait. It can hold fungible assets and allow further extensibility in the hierarchy.
 
-<img src="image-4.png" alt="Alt text" width="400"> 
+<img src="./static/4.png" alt="Alt text" width="400"> 
 
 > ℹ️ Figure 1: *Wrappers illustration*
 
@@ -61,7 +61,7 @@ In the realm of tokens, creators willing to implement Composable NFT or cNFT wil
 
 Below is a visual example of how `hero.move` would look like using `aptos-token`:
 
-![Alt text](image-6.png)
+![Alt text](./static/6.png)
 > ℹ️ Figure 2: *hero.move using `AIP-22`*
 
 #### AIP-21
@@ -93,7 +93,7 @@ This hierarchical setup is achieved using `AIP-10` and `AIP-11` mainly, and desi
 
 Overall, a visual represenation looks something like this:
 
-<img src="image-5.png" alt="Alt text" width="600">
+<img src="./static/5.png" alt="Alt text" width="600">
 
 > ℹ️ Figure 3: *Hierarchical setup for composing digital assets*
 
@@ -110,7 +110,7 @@ The `uri` of the parent token is updated to reflect the composition of the child
 The solution supports the addition of new resources post-creation using `ExtendRef` capability introduced in `AIP-11`, providing the flexibility to add extra resources to the token. This facilitates customization of metadata via resources. `property_map` can then potentially be used to store the static metadata of the token, and resources can be used to store the dynamic metadata of the token. Example: `property_map` can store the sword type: "wooden", and resources can store the sword power: "100".
 In addition, the multi-layered structure of the framework hierarchy includes in its Layer 3 support for `DA`, which allows for extensibility for all `aptos-token` and developers to add further layers to the framework.
 
-![Alt text](image-7.png)
+![Alt text](./static/7.png)
 
 > ℹ️ Figure 4: *hero.move using the proposed standard*
 
@@ -185,7 +185,7 @@ This AIP would allow for defining traits like this:
 - Trait - basic sword.
 - DA - Healing lotion.
 
-<img src="image-3.png" alt="Alt text" width="250">
+<img src="./static/3.png" alt="Alt text" width="250">
 
 > ℹ️ Figure 5: *Example of a composable trait*
 
