@@ -347,7 +347,7 @@ In more detail, signature verification agains the PK $\mathsf{iss\\_val}, \maths
 2. Check the expiration date horizon is within bounds:
    1. Assert $\mathsf{exp\\_horizon} \in (0, \mathsf{max\\_exp\\_horizon})$, where $\mathsf{max\\_exp\\_horizon}$ is an on-chain parameter, as before.
 3. Check the EPK is not expired:
-   1. Assert $\mathsf{exp\\_date} < \texttt{current\\_block\\_time()}$, as before.
+   1. Assert $\texttt{current\\_block\\_time()} < \mathsf{exp\\_date}$, as before.
 4. Verify the ephemeral signature $\sigma_\mathsf{eph}$ under $\mathsf{epk}$ over the transaction $\mathsf{txn}$, as before.
 5. Fetch the correct PK of the OIDC provider, denoted by $\mathsf{jwk}$, as before.
 6. Verify the ZKPoK $\pi$, which agues that $\exists$ a *private input* $`\textbf{w}=[(\mathsf{aud\\_val}, \mathsf{uid\\_key}, \mathsf{uid\\_val}, r),(\sigma_\mathsf{oidc}, \mathsf{jwt}), \rho]`$ such that the relation $\mathcal{R}(\textbf{x}; \textbf{w})=1$ for the *public input* $\textbf{x} = [(\mathsf{iss\\_val}, \mathsf{jwk}, \mathsf{header}), (\mathsf{epk},    \mathsf{exp\\_date}), \mathsf{addr\\_idc}, \mathsf{exp\\_horizon}]$
