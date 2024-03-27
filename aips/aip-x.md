@@ -25,7 +25,6 @@ Currently there is no way of changing the name or max supply of a collection, no
 2. Users may want to adjust the max supply for a collection. This can occur if there needs to be adjustments in total supply, or simply rectifying mistakes.
 3. If a user wants to predict the address of a token before creating this on chain, this AIP would allow this by taking in the token and custom seed. From this, the address of the token can be known beforehand. An example of why this is needed is preparing metadata for tokens that are yet to be minted.
     1. Solidity provide this mechanism with contract deployment, via both **[CREATE](https://docs.openzeppelin.com/cli/2.8/deploying-with-create2#create)** and [**CREATE2**](https://docs.openzeppelin.com/cli/2.8/deploying-with-create2) opcodes. This enables users to send funds to an address before the smart contract has been deployed to the address.
-4. Users may want the same token name for all tokens in a collection, as well as predictable addresses. The current implementation would fail as it takes the name as the seed.
 
 Furthermore, there is no option to add property maps to an object after the creation of a token object. Currently the only option is to initialize property maps during creation of an object via `ConstructorRef`. Users may wish to allow adding properties on chain at a later stage.
 
