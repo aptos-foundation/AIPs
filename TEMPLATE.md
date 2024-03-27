@@ -19,14 +19,10 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
- > Summarize in 3-5 sentences what is the problem we’re solving for and how are we solving for it
-
-...
-
-### Goals
-
+ > Summarize in 3-5 sentences.
+ > Define the problem we're solving.
+ > How does this document propose solving it.
  > What are the goals and what is in scope? Any metrics?
- > Discuss the business impact and business value this change would impact.
 
 ...
 
@@ -36,16 +32,17 @@ requires (*optional): <AIP number(s)>
 
 ...
 
-## Motivation
+# High-level Overview
 
- > Describe the impetus for this change. What does it accomplish?
- > What might occur if we do not accept this proposal?
+ > Define the strawman solution with enough details to make it clear why this is the preferred solution.
+ > Please write a 2-3 paragraph high-level overview here and defer writing a more detailed description in [the specification section](#specification-and-implementation-details).
 
 ...
 
 ## Impact
 
  > Which audiences are impacted by this change? What type of action does the audience need to take?
+ > What might occur if we do not accept this proposal?
 
 ...
 
@@ -55,7 +52,7 @@ requires (*optional): <AIP number(s)>
 
 ...
 
-## Specification
+## Specification and Implementation Details
 
  > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
