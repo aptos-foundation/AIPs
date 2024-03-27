@@ -193,6 +193,14 @@ We plan to deploy these contracts as immutable with resource accounts. The signe
 
 If there are bugs in our modules and projects are using them, they will be susceptible to this. The modules are not upgradeable, and we would need to create a new module with the bug fixes, then deploy to a new address. This does not need to go through governance proposal, therefore the fix can be in mainnet much faster.
 
+## Security Considerations
+As the contracts will be deployed immutably, there is no risk of backward compatibility issues. However there may be issues with 
+the modules themselves, which could be a risk to the projects using them. 
+If for any reason the contracts need to be redeployed, the new modules will be deployed to a new address. 
+
+As of result, there will be a migration path to export the resource data from the old contract to the new contract.
+Separate migration contracts will be created to handle the migration logic.
+
 ### Reference Implementation
 
 **[Launchpad Example](https://github.com/aptos-labs/token-minter/blob/main/launchpad/sources/launchpad.move)**
