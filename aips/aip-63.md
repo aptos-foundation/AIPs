@@ -101,43 +101,53 @@ The paired fungible asset metadata address would be `0xA` for APT and arbitrary 
 
 Note: This AIP does not prompt the reverse conversion so the visibility of `fungible_asset_to_coin` is not public. Whenever `coin_to_fungible_asset<CoinType>` is called and the paired fungible asset does not exist, the coin module will automatically create a fungible asset metadata and add it to the mapping as to pair with `CoinType`. This paired fungible asset will have exactly the same name, symbol and decimals with the coin type.
 
-Function `maybe_convert_to_fungible_store` can remove the `CoinStore<CoinType>` and convert the coin left into the paired fungible asset and store it in the primary fungible store.
+Function `maybe_convert_to_fungible_store` can remove the `CoinStore<CoinType>` if exists and convert the coin left into the paired fungible asset and store it in the primary fungible store.
+
 ```rust
-
-fun maybe_convert_to_fungible_store<CoinType>(account: address) acquires CoinStore, CoinConversionMap, CoinInfo {
-    if (exists<CoinStore<CoinType>>(account)) {
-        let CoinStore<CoinType> {
-            coin,
-            frozen,
-            deposit_events,
-            withdraw_events
-        } = move_from<CoinStore<CoinType>>(account);
-        event::emit(CoinEventHandleDeletion {
-            event_handle_creation_address: guid::creator_address(event::guid(&deposit_events)),
-            deleted_deposit_event_handle_creation_number: guid::creation_num(event::guid(&deposit_events)),
-            deleted_withdraw_event_handle_creation_number: guid::creation_num(event::guid(&withdraw_events))
-        });
-        event::destory_handle(deposit_events);
-        event::destory_handle(withdraw_events);
-        let fungible_asset = coin_to_fungible_asset(coin);
-        let metadata = fungible_asset::asset_metadata(&fungible_asset);
+    fun maybe_convert_to_fungible_store<CoinType>(account: address) acquires CoinStore, CoinConversionMap, CoinInfo {
+        if (!features::coin_to_fungible_asset_migration_feature_enabled()) {
+            abort error::unavailable(ECOIN_TO_FUNGIBLE_ASSET_FEATURE_NOT_ENABLED)
+        };
+        let metadata = ensure_paired_metadata<CoinType>();
         let store = primary_fungible_store::ensure_primary_store_exists(account, metadata);
-        fungible_asset::deposit(store, fungible_asset);
-        // Note:
-        // It is possible the primary fungible store may already exist before this function call.
-        // In this case, if the account owns a frozen CoinStore and an unfrozen primary fungible store, this
-        // function would convert and deposit the rest coin into the primary store and freeze it to make the
-        // `frozen` semantic as consistent as possible.
-        fungible_asset::set_frozen_flag_internal(store, frozen);
-    };
-}
-
+        let store_address = object::object_address(&store);
+        if (exists<CoinStore<CoinType>>(account)) {
+            let CoinStore<CoinType> { coin, frozen, deposit_events, withdraw_events } = move_from<CoinStore<CoinType>>(
+                account
+            );
+            event::emit(
+                CoinEventHandleDeletion {
+                    event_handle_creation_address: guid::creator_address(
+                        event::guid(&deposit_events)
+                    ),
+                    deleted_deposit_event_handle_creation_number: guid::creation_num(event::guid(&deposit_events)),
+                    deleted_withdraw_event_handle_creation_number: guid::creation_num(event::guid(&withdraw_events))
+                }
+            );
+            event::destory_handle(deposit_events);
+            event::destory_handle(withdraw_events);
+            fungible_asset::deposit(store, coin_to_fungible_asset(coin));
+            // Note:
+            // It is possible the primary fungible store may already exist before this function call.
+            // In this case, if the account owns a frozen CoinStore and an unfrozen primary fungible store, this
+            // function would convert and deposit the rest coin into the primary store and freeze it to make the
+            // `frozen` semantic as consistent as possible.
+            fungible_asset::set_frozen_flag_internal(store, frozen);
+        };
+        if (!exists<MigrationFlag>(store_address)) {
+            move_to(&create_signer::create_signer(store_address), MigrationFlag {});
+        }
+    }
 ```
+
+When a CoinStore<CoinType> is decommissioned, with its remaining coins being transferred into the corresponding fungible asset, a CoinEventHandleDeletion event is triggered. This serves as a notification to observers, signaling the impending deletion of event handle identifiers for record.
+At the same time, if `maybe_convert_to_fungible_store` is called, the framework will create a `MigrationFlag` resource in the primary fungible store object indicates the user has migrated. Based on this flag, the API's behavior within the `coin` module will vary, as detailed in the case study provided.
 
 `Supply` and `balance` are modified correspondingly to reflect the sum of coin and the paired fungible asset.
 
 Also, to keep the capability semantics consistent, this AIP proposed 3 sets of helper functions to temporarily get the `MintRef`, `TransferRef` and `BurnRef` of the paired fungible asset from the `MintCapability`, `FreezeCapability` and `BurnCapability` of the coin so the move API from `fungible_asset.move` can be used too in new code.
 For example, the set of helper for `MintRef` is:
+
 ```rust
 #[view]
 /// Check whether `MintRef` is not taken out.
@@ -162,16 +172,44 @@ Same pattern is also adopted for `TransferRef` and `BurnRef`.
 
 
 ### Case Study
+
 Let's use APT coin as an example. Assume APT coin and FA are created and paired. 
 
-1. If a user has the `CoinStore<AptosCoin>` (not migrated):
-- `withdraw`/`burn_from`/`collect_into_aggregatable_coin`: APT coin will be drawn from `CoinStore<AptosCoin>` first. If its balance is not enough, then go withdraw more APT FA from `PrimaryFungibleStore` and convert it back to coin.
-- `deposit`: APT coin will be deposited to `CoinStore<AptosCoin>`.
-Note: Even user has not migrated the `CoinStore` they could get APT FA from other people via fungible asset module API but not coin module API.
-    
-2. After a user does not have the `CoinStore<AptosCoin>` (migrated):
-- `withdraw`/`burn_from`/`collect_into_aggregatable_coin`: APT FA will all be withdrawn from APT `PrimaryFungibleStore` if it exists and converted back to coin.
-- `deposit`: APT coin will be converted to FA and deposited to APT `PrimaryFungibleStore`, which will be created if does not exist.
+#### Case 1
+For user A who opts into this migration:
+- If the migration is triggered, user A's coins for that `CoinType` are all converted from `CoinStore` into `PrimaryFungibleStore` w/ `MigrationFlag`. `CoinStore` is deleted.
+- If more coins of that type are sent to user A, those coins will be automatically converted into FA via `coin::deposit`.
+- For user A, `coin::balance` takes into account the user's FA balance.
+- If `coin::withdraw` is called on A's account, it'll convert the specified amount of FA back into coins.
+- if `CoinType` is APT, to pay for gas, coin::burn_from will burn from A's `PrimaryFungibleStore` of APT.
+
+#### Case 2
+For another user B who didn't opt into this migration:
+- Someone sends them the corresponding FA through `primary_fungible_store::deposit`.
+- Now user B has both `CoinStore` and `PrimaryFungibleStore` w/o `MigrationFlag` for this asset type.
+- If more coins are sent to user B, these coins are deposited into `CoinStore`.
+- `coin::balance` takes the balance from both `CoinStore` and `PrimaryFungibleStore`.
+- `coin::withdraw` will withdraw from `CoinStore` first and then `PrimaryFungibleStore` if there's any deficit.
+
+#### Case 3
+For a new user C and specifically APT:
+- APT is transferred to C's address, this calls `account::create_account` if their account doesn't exist on chain. `CoinStore<AptosCoin>` is still created
+and now user C can follow the path of user A or B
+
+#### Case 4
+For user D who has not created an account on chain:
+- User D sends a sponsored transaction (someone else paying for this transaction).
+- The gas fee payer flow recognizes user D's account doesn't exist yet (no sequence number). It automatically creates the account by calling [account::create_account_if_does_not_exist](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/aptos-vm/src/aptos_vm.rs#L538)
+User's D account is now created on chain but doesn't have a CoinStore associated.
+- Someone sends user D APT as FA. Now User D has a `PrimaryFungibleStore` of APT w/o `MigrationFlag`.
+- User D can pay for gas from their FungibleStore and can send transactions on their own.
+- User D opts into FA migration for APT (still sponsored). There's no `CoinStore` to delete. `PrimaryFungibleStore` of APT is already created
+- User D is good from now similar to user A.
+
+#### Case 5
+For user E:
+User E opts into the FA migration and now has a `PrimaryFungibleStore` of APT with `MigrationFlag` and no `CoinStore<AptosCoin>`:
+- Someone calls `coin::register<AptosCoin>` for user E. This errors out and not allowed for users who have opted in with `MigrationFlag`. This wouldn't apply to user D before step 6 in their flow.
 
 `coin::is_account_registered` and `coin::register` are not deprecated yet but modified so `CoinStore<T>` cannot be created if the user has their primary fungible store of the paired FA of coin `T` created. So users of case 2 can never go back to case 1.
 For the long term plan, please refer to the [future plan](#future-potential)
