@@ -140,9 +140,9 @@ Here is a high-level flow.
 1. Once a block `B` is ordered, a validator reveals the wVUF of the block ID (denoted by `wVRF(B)`) by exchanging wVRF shares with peers, using its wVRF key shares,
    and sets it as the randomness seed of the block before putting it into the execution pipeline.
 1. In the execution of block `B`:
-  1. `wVRF(B)` is put on-chain in the special **block metadata transaction** that goes before any other transactions;
+  - `wVRF(B)` is put on-chain in the special **block metadata transaction** that goes before any other transactions;
     - New internal transaction type `BlockMetadataExt` is needed.
-  1. the `i`-th randomness sampling request of user transaction `UT` is responded with a hash of `(wVRF(B), UT, i)`.
+  - the `i`-th randomness sampling request of user transaction `UT` is responded with a hash of `(wVRF(B), UT, i)`.
 
 #### New data type: `BlockMetadataExt` internal transaction type
 For backward compatibility reasons, it is impossible to update the existing `BlockMetadata` transaction type to include block randomness seed.
