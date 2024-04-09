@@ -217,22 +217,22 @@ For on-chain randomness, validators need to perform the wDKG before the new epoc
 - Validators run the wDKG as described in the [previous section](#weighted-distributed-key-generation-using-wpvss) (in `DKGManager`, see the next section).
 - When the wDKG finishes, the validators finish the async reconfiguration by performing the tasks of epoch change and entering the new epoch.
 
-One implication of this design is that any request to change the `ValidatorSet` during the wDKG phase needs to be rejected.
+One implication of this design is that any request to change the `ValidatorSet` during the wDKG phase will be rejected.
 
 There is one more complication about the async reconfiguration due to *on-chain configuration* changes. On-chain configurations are special on-chain resources that control system behaviors (e.g., `ValidatorSet`, `ConsensusConfig`, `Features`). Updates of them are typically require an instant reconfiguration in the same transaction, to guarantee consistency among validators even under crashes. However, async reconfiguration cannot be instant (because it requires the wDKG to finish), and the on-chain configuration changes cannot be applied before the new epoch starts. 
 
 The solution is for the validators to buffer the on-chain configuration changes when the transaction is executed, run the wDKG, and then apply the buffered on-chain configuration changes when the new epoch starts. All on-chain configuration changes during the wDKG will be buffered and applied together when the new epoch starts. 
 
-#### How to land: `DKGManager`, a new validator component
+#### How to land: `DKGManager`: a new validator component
 `DKGManager` is a new component that should run on every validator node to do the folowing.
 - On `DKGStartEvent` triggered in the current epoch, run wDKG with peers.
   - It means to deal a transcript for the next validator set, exchange it with peers, and obtain an aggregated transcript with more than 1/3 voting power.
 - Once an aggregated transcript is obtained, wrap it as a `DKGResult` validator transaction and propose it into the validator transaction pool.
   - [Validator Transaction](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-64.md) is required to be enabled.
 - On `NewEpochEvent`, recall any proposed `DKGResult` transactions.
-- On crash restart, check the on-chain DKG state. If the DKG for the current epoch is in progress, participate it.
+- On crash restart, check the on-chain DKG state. If the DKG for the current epoch is in progress, participate in it.
 
-Implementation note: as long as the 1st proposed transcript can verify,
+Implementation note: as long as the eventually accepted wDKG transcript can verify,
 it is fine if validators equivocate on their transcripts or their local views of the aggregated transcript are different.
 This can be utilized to implement `DKGManager` without persisting any state.
 
