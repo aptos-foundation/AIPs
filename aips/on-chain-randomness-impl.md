@@ -117,28 +117,6 @@ Here is the description of the non-interactive wDKG designed and implemented for
 - Once each validator receives a secure-subset of *valid transcripts* from 66% of the stake, it aggregates the valid transcript into a single final *aggregated transcript* and passes it on to consensus. More specifically, the validator will propose the aggregated wPVSS transcript via a `ValidatorTransaction`. Upon committing on the first `ValidatorTransaction` that contains a valid aggregated wPVSS transcript, validators finish the wDKG and start the new epoch.
 - Finally, when the new epoch begins and the new validators are online, they can decrypt their shares of the secret from the aggregated transcript. At this point, the new validators will be ready to produce randomness for every block by evaluating a wVRF in a secret-shared manner, as we explain in a later section.
 
-#### Reconfiguration
-
-The reconfiguration is a procedure to:
-
-- Increment the on-chain epoch counter.
-- Compute the set of validators in the new epoch and their stake distribution, namely `ValidatorSet`.
-- Emit a `NewEpochEvent` to validators to restart some components and enter the new epoch.
-
-The current reconfiguration does the above steps in one [Move function call](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-framework/sources/reconfiguration.move#L96). 
-
-For on-chain randomness, validators need to perform the wDKG before the new epoch starts. Yet the computation of wDKG takes `ValidatorSet` of the next-epoch as input, so that the wDKG can setup shared secrets among next-epoch validators according to their stake distribution. Therefore, the new reconfiguration procedure for the on-chain randomness, referred to as ***async reconfiguration***, is a phase that includes the following steps.
-
-- To start the async reconfiguration, validators will compute the `ValidatorSet` of the next epoch, and start the wDKG.
-- Validators run the wDKG as described in the [previous section](#weighted-distributed-key-generation-using-wpvss).
-- When the wDKG finishes, the validators finish the async reconfiguration by performing the tasks of epoch change and entering the new epoch.
-
-One implication of this design is that any request to change the `ValidatorSet` during the wDKG phase will be rejected. 
-
-There is one more complication about the async reconfiguration due to *on-chain configuration* changes. On-chain configurations are special on-chain resources that control system behaviors (e.g., `ValidatorSet`, `ConsensusConfig`, `Features`). Some of them, when being updated by a governance proposal transaction, require an instant reconfiguration in the same transaction, to guarantee consistency among validators even under crashes. However, async reconfiguration cannot be instant (because it requires the wDKG to finish), and the on-chain configuration changes cannot be applied before the new epoch starts. 
-
-The solution is for the validators to buffer the on-chain configuration changes when the transaction is executed, run the wDKG, and then apply the buffered on-chain configuration changes when the new epoch starts. All on-chain configuration changes during the wDKG will be buffered and applied together when the new epoch starts. 
-
 #### Randomness Generation Using wVRFs
 
 In each epoch, the validators will collaborate to produce randomness for *every* block finalized by consensus, by evaluating a *weighted verifiable random function (wVRF)* using the shared secret established by the wDKG. 
@@ -148,11 +126,177 @@ In each epoch, the validators will collaborate to produce randomness for *every*
 
 Importantly, only 50% or more of the stake can compute the wVRF evaluation, which ensures **unpredictability**. Furthermore, the uniqueness property of wVRFs together with the secrecy of the wPVSS scheme ensure **unbiasability** against adversaries controlling less than 50% of the stake.
 
+#### How to land: an overview
+
+This and the following sub-sections show how to land the proposed wDKG & wVRFs to the existing system.
+Here is a high-level flow.
+1. When the current epoch expires/if triggered by a governance proposal,
+   the current validator set finalizes the next validator set and emits a `DKGStartEvent` that contains the new validator set info.
+1. On `DKGStartEvent`, validator component `DKGManager` runs wDKG with peers to obtain an aggregated wDKG transcript,
+   then publish it using the validator transaction framework.
+   - New validator transaction variant `DKGResult` is needed.
+1. Once the `DKGResult` validator transaction is executed, wDKG transcript is published on chain and the new epoch is entered.
+1. On new epoch, a validator decrypts its wVRF key shares from the wDKG transcript.
+1. Once a block `B` is ordered, a validator reveals the wVUF of the block ID (denoted by `wVRF(B)`) by exchanging wVRF shares with peers, using its wVRF key shares,
+   and sets it as the randomness seed of the block before putting it into the execution pipeline.
+1. In the execution of block `B`:
+  1. `wVRF(B)` is put on-chain in the special **block metadata transaction** that goes before any other transactions;
+    - New internal transaction type `BlockMetadataExt` is needed.
+  1. the `i`-th randomness sampling request of user transaction `UT` is responded with a hash of `(wVRF(B), UT, i)`.
+
+#### New data type: `BlockMetadataExt` internal transaction type
+For backward compatibility reasons, it is impossible to update the existing `BlockMetadata` transaction type to include block randomness seed.
+Therefore, we need a new type.
+
+```rust
+pub enum Transaction { // the internal transaction type
+    UserTransaction(SignedTransaction),
+    GenesisTransaction(WriteSetPayload),
+    BlockMetadata(BlockMetadata),
+    StateCheckpoint(HashValue),
+    ValidatorTransaction(ValidatorTransaction),
+    BlockMetadataExt(BlockMetadataExt), // new variant
+}
+
+pub enum BlockMetadataExt {
+    V0(BlockMetadata),
+    V1(BlockMetadataWithRandomness),
+}
+
+pub struct BlockMetadataWithRandomness {
+    pub id: HashValue,
+    pub epoch: u64,
+    pub round: u64,
+    pub proposer: AccountAddress,
+    pub previous_block_votes_bitvec: Vec<u8>,
+    pub failed_proposer_indices: Vec<u32>,
+    pub timestamp_usecs: u64,
+    pub randomness: Option<Randomness>, // The only new field compared with `BlockMetadata`
+}
+```
+
+While possible, adding the corresponding external transaction type potentially breaks the downstream ecosystem but does not provide too much value.
+It can be avoided by exporting `BlockMetadataWithRandomness` variant as the exiting `BlockMetadata` variant, the `randomness` field being ignored.
+
+#### New data type: `DKGResult` validator transaction type
+A new validator transaction type `DKGResult` is needed to hold wDKG transcripts.
+
+```rust
+pub enum ValidatorTransaction {
+    ObservedJWKUpdate(jwks::QuorumCertifiedUpdate),
+    DKGResult(DKGTranscript), // new variant
+}
+
+pub struct DKGTranscript {
+    pub metadata: DKGTranscriptMetadata,
+    pub transcript_bytes: Vec<u8>,
+}
+
+pub struct DKGTranscriptMetadata {
+    pub epoch: u64,
+    pub author: AccountAddress,
+}
+```
+
+
+#### How to land: new reconfiguration process: async reconfiguration
+
+The reconfiguration is a procedure to:
+
+- Increment the on-chain epoch counter.
+- Compute the set of validators in the new epoch and their stake distribution, namely `ValidatorSet`.
+- Emit a `NewEpochEvent` to validators to restart some components and enter the new epoch.
+
+The current reconfiguration does the above steps in one [Move function call](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/framework/aptos-framework/sources/reconfiguration.move#L96),
+triggered as part of the block metadata transaction.
+
+For on-chain randomness, validators need to perform the wDKG before the new epoch starts. Yet the computation of wDKG takes `ValidatorSet` of the next-epoch as input, so that the wDKG can setup shared secrets among next-epoch validators according to their stake distribution. Therefore, the new reconfiguration procedure for the on-chain randomness, referred to as ***async reconfiguration***, is a phase that includes the following steps.
+
+- The process is still triggered by epoch timeout in block metadata transactions.
+- To start the async reconfiguration, validators will finalize the `ValidatorSet` of the next epoch, and emit a `DKGStartEvent`.
+- Validators run the wDKG as described in the [previous section](#weighted-distributed-key-generation-using-wpvss) (in `DKGManager`, see the next section).
+- When the wDKG finishes, the validators finish the async reconfiguration by performing the tasks of epoch change and entering the new epoch.
+
+One implication of this design is that any request to change the `ValidatorSet` during the wDKG phase needs to be rejected.
+
+There is one more complication about the async reconfiguration due to *on-chain configuration* changes. On-chain configurations are special on-chain resources that control system behaviors (e.g., `ValidatorSet`, `ConsensusConfig`, `Features`). Updates of them are typically require an instant reconfiguration in the same transaction, to guarantee consistency among validators even under crashes. However, async reconfiguration cannot be instant (because it requires the wDKG to finish), and the on-chain configuration changes cannot be applied before the new epoch starts. 
+
+The solution is for the validators to buffer the on-chain configuration changes when the transaction is executed, run the wDKG, and then apply the buffered on-chain configuration changes when the new epoch starts. All on-chain configuration changes during the wDKG will be buffered and applied together when the new epoch starts. 
+
+#### How to land: `DKGManager`, a new validator component
+`DKGManager` is a new component that should run on every validator node to do the folowing.
+- On `DKGStartEvent` triggered in the current epoch, run wDKG with peers.
+  - It means to deal a transcript for the next validator set, exchange it with peers, and obtain an aggregated transcript with more than 1/3 voting power.
+- Once an aggregated transcript is obtained, wrap it as a `DKGResult` validator transaction and propose it into the validator transaction pool.
+  - [Validator Transaction](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-64.md) is required to be enabled.
+- On `NewEpochEvent`, recall any proposed `DKGResult` transactions.
+- On crash restart, check the on-chain DKG state. If the DKG for the current epoch is in progress, participate it.
+
+Implementation note: as long as the 1st proposed transcript can verify,
+it is fine if validators equivocate on their transcripts or their local views of the aggregated transcript are different.
+This can be utilized to implement `DKGManager` without persisting any state.
+
+Reference implementation: https://github.com/aptos-labs/aptos-core/blob/df715afc2ca6646bcdee63e44e30c549ebe14bf3/dkg/src/dkg_manager/mod.rs#L51
+
+#### How to land: consensus changes
+- When proposing new blocks, include `DKGResult` validator transactions.
+  - [Reference implementation](https://github.com/aptos-labs/aptos-core/blob/1de391c3589cf2d07cb423a73c4a2a6caa299ebf/consensus/src/liveness/proposal_generator.rs#L384-L403).
+  Come for free if [Validator Transaction](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-64.md) is enabled.
+
+- When verifying a block proposal, reject it if a `DKGResult` validator transaction is present but randomness is disabled.
+  - [Reference implmementation](https://github.com/aptos-labs/aptos-core/blob/1de391c3589cf2d07cb423a73c4a2a6caa299ebf/consensus/src/round_manager.rs#L687-L691).
+
+
+#### How to land: `RandManager` to convert ordered blocks to randomness-ready blocks
+A `RandManager` is needed between consensus and execution pipeline to do the following.
+- On epoch start tasks.
+  - Decrypt wVUF key shares from on-chain wDKG transcript.
+  - Generate augmented key pairs from wVRF key shares.
+  - Exchange the augmented pub-keys with peers, obtain a quorum-cert for its own augmented pub-keys.
+  - Exchange the quorum-certified augmented pub-keys with peers, and persist them for crash recovery.
+- Receive the stream of ordered blocks from consensus.
+- Ensure every ordered block has randomness seed (i.e., the wVRF evaludation of the block).
+  - The wVRF evaludation is obtained by exchanging wVRF shares with peers, using its own augmented key pairs to sign and peers augmented public keys to verify.
+- Forward randomness-ready blocks to the execution pipeline.
+
+See reference implementation [here](https://github.com/aptos-labs/aptos-core/blob/1de391c3589cf2d07cb423a73c4a2a6caa299ebf/consensus/src/rand/rand_gen/rand_manager.rs#L50).
+
+#### How to land: execution pipeline
+In execution pipeline, a randomness-ready block is processed into a transaction list,
+where the first transaction needs to be a `BlockMetadataExt` transaction to carry the block randomness seed.
+
+See reference implementation [here](https://github.com/aptos-labs/aptos-core/blob/1de391c3589cf2d07cb423a73c4a2a6caa299ebf/consensus/src/state_computer.rs#L203).
+
+#### How to land: Move VM changes
+The Move VM needs to be able to execute the new transaction variants `BlockMetadataExt` and `ValidatorTransaction::DKGResult`,
+which are the 2 phases of an async reconfiguration.
+
+A `BlockMetadataExt` transaction should do what a `BlockMetadata` transaction does plus the following differences.
+- On current epoch timeout, trigger async reconfiguration instead of instant reconfiguration.
+  Recall that to trigger async reconfiguration means to:
+  - finalize the next validator set,
+  - lock the validator set resources,
+  - emit a `DKGStartEvent` that contains the next validator set.
+- Write the block randomness seed on chain, if it is available.
+
+Like `BlockMetadata` transactions, `BlockMetadataExt` transactions should never abort.
+See reference implementation [here](https://github.com/aptos-labs/aptos-core/blob/1de391c3589cf2d07cb423a73c4a2a6caa299ebf/aptos-move/aptos-vm/src/aptos_vm.rs#L1935).
+
+A `ValidatorTransaction::DKGResult` transaction should do the following.
+- (a) Verify the aggregated wDKG transcript included.
+- Unlock the validator set resources.
+- Apply all pending on-chain config changes.
+- Publish wDKG transcript on chain.
+- Whatever is done in `BlockMetadata` transaction when epoch timeout is detected.
+
+Malicious validators can cause step (a) to fail, in which case should cause the transaction to be discarded.
+The remaining steps should never abort.
+See reference implementation [here](https://github.com/aptos-labs/aptos-core/blob/1de391c3589cf2d07cb423a73c4a2a6caa299ebf/aptos-move/aptos-vm/src/validator_txns/dkg.rs#L70).
+
+
 ## Reference Implementation
 
- > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
-
-...
+See the sub-sections above for the reference implementation of each component.
 
 ## Testing (Optional)
 
