@@ -367,7 +367,7 @@ so the new epoch won't come and buffered on-chain config updates won't be applie
 
 **Shared secret being a group element has limited applications**. One limitation of the current implementation is that the shared secret of the wDKG is a group element instead of the field element. This means the shared secret cannot be used for other applications such as threshold decryption.
 
-**Constraints on validator set size/total voting power**
+**Constraints on validator set size/total voting power.**
 If the validator set size is too large, or the total voting power of the validator set is too large,
 with small probability, the current rounding algorithm decides the wVRF parameters with the total weight being too large,
 which causes the wDKG transcript to be too large and exceeds some transaction limits,
