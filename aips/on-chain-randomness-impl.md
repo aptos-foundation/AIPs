@@ -1,7 +1,7 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Implementation of instant on-chain randomness
-author: Alin Tomescu (alin@aptoslabs), Zhuolun "Daniel" Xiang <daniel@aptoslabs.com>
+author: Alin Tomescu (alin@aptoslabs.com), Zhuolun "Daniel" Xiang (daniel@aptoslabs.com), Zhoujun Ma (zhoujun@aptoslabs.com)
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
