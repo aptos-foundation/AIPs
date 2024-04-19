@@ -1,21 +1,21 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: (AIP title)
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
-discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: <Draft | Last Call | Accepted | Final | Rejected>
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
-created: <mm/dd/yyyy>
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+aip: TBD
+title: Standardize Private Keys
+author: Greg Nazario - greg@aptoslabs.com
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/405
+Status: Draft
+last-call-end-date (*optional): 04/30/2024
+type: Standard (Ecosystem)
+created: 04/19/2024
+updated (*optional): 04/19/2024
+requires (*optional): N/A
 ---
 
 # AIP-X - Standardize Private Keys
 
 ## Summary
 
-This AIP defines how private keys should be represented off-chain. It provides a way for private keys to be diffentiated
+This AIP defines how private keys should be represented off-chain. It provides a way for private keys to be differentiated
 from addresses, and defines a way to determine which key scheme is associated.
 
 ### Goals
@@ -26,8 +26,9 @@ Private keys are indistinguishable from on-chain account addresses. This looks t
 differentiate private keys from on-chain addresses.
 
 The main goal is to prevent people from accidentally leaking their private keys on-chain. This is commonly caused by
-sending
-funds to a private key. After that, someone may find this private key and rotate the account's key on-chain.
+sending funds to a private key. Private keys, public keys, and account addresses are all represented today as 32-bytes or
+64-hex characters (with or without a 0x prefix).  After that, someone may find this private key and rotate the account's
+key on-chain.
 
 The secondary goal is to keep this change to be as seamless as possible.
 
@@ -58,40 +59,6 @@ Users will continue at their normal rate of losing their private keys, and their
 This affects users, and the wallets that they use. Wallets are the primary store of private keys, and any application
 that is a wallet (mobile, extension, or in-app) or tool with a wallet (Aptos CLI) would need to adopt any new standards
 around private keys, with backwards compatibility.
-
-## Alternative solutions
-
-> Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible
-> outcome?
-
-### Change Address format
-
-The address format could be changed from 64 hex characters, to another encoding. Other blockchains use bech32, and other
-schemes for encoding addresses. This would change both the length, and the character set, to automatically block private
-keys from being used in addresses.
-
-This solution is not suggested, because it requires every application, indexer, on-chain-representation, exchange, and
-user to change to the new format. Additionally, there needs to be backwards compatibility with the old address format,
-which would then not solve this issue.
-
-### Change Private key encoding to Base64
-
-The private key format could change from 64 hex characters to a base64 (or other encoding) of the key. This provides the
-ability for linters to check it, but be a regularly available format.
-
-This solution is not suggested, because this may lead to leakage of keys on base64 to hex converters. Private keys
-should
-never be posted into any website.
-
-### Only use mnemonics and paths
-
-For future private keys, only use mnemonics and paths, to provide an easy difference with private keys. The derivation
-path will differentiate between the private keys.
-
-This solution doesn't allow for custom private keys, nor does it allow for easy backwards compatibility of private keys.
-Most wallets already support mnemonics, but private keys are more specific to which derive path is used.
-
-This doesn't allow for backwards compatibility of current saved private keys, but it could be used in the future.
 
 ## Specification
 
@@ -158,6 +125,40 @@ None, since the old key will still be allowed to be imported.
 > - If there are issues, how can we mitigate or resolve them?
 
 I don't expect there to be any more issues than there are today with importing and saving of private keys.
+
+## Alternative solutions
+
+> Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible
+> outcome?
+
+### Change Address format
+
+The address format could be changed from 64 hex characters, to another encoding. Other blockchains use bech32, and other
+schemes for encoding addresses. This would change both the length, and the character set, to automatically block private
+keys from being used in addresses.
+
+This solution is not suggested, because it requires every application, indexer, on-chain-representation, exchange, and
+user to change to the new format. Additionally, there needs to be backwards compatibility with the old address format,
+which would then not solve this issue.
+
+### Change Private key encoding to Base64
+
+The private key format could change from 64 hex characters to a base64 (or other encoding) of the key. This provides the
+ability for linters to check it, but be a regularly available format.
+
+This solution is not suggested, because this may lead to leakage of keys on base64 to hex converters. Private keys
+should
+never be posted into any website.
+
+### Only use mnemonics and paths
+
+For future private keys, only use mnemonics and paths, to provide an easy difference with private keys. The derivation
+path will differentiate between the private keys.
+
+This solution doesn't allow for custom private keys, nor does it allow for easy backwards compatibility of private keys.
+Most wallets already support mnemonics, but private keys are more specific to which derive path is used.
+
+This doesn't allow for backwards compatibility of current saved private keys, but it could be used in the future.
 
 ## Future Potential
 
