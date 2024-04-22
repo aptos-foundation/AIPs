@@ -1,5 +1,5 @@
 ---
-aip: TBD
+aip: 80
 title: Standardize Private Keys
 author: Greg Nazario - greg@aptoslabs.com
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/405
@@ -11,7 +11,7 @@ updated (*optional): 04/19/2024
 requires (*optional): N/A
 ---
 
-# AIP-X - Standardize Private Keys
+# AIP-80 - Standardize Private Keys
 
 ## Summary
 
