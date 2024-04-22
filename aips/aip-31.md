@@ -14,7 +14,7 @@ updated: 4/16/2024
 
 ## Summary
 
-This AIP introduces the concept of allowlisting in delegation pools, allowing pool owners to control who can stake in their delegation pool. The feature includes mechanisms for adding or removing delegators from the allowlist and evicting delegators not on the allowlist.
+This AIP introduces the concept of allowlisting in delegation pools, allowing pool owners to control who can stake in their delegation pool. The feature includes mechanisms for adding or removing delegators from the allowlist and evicting delegators not on the allowlist. By default, a delegation pool is permissionless and does not have an allowlist, until the pool owner explicitly sets an allowlist using this feature.
 
 ## High-level overview
 
