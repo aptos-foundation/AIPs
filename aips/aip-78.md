@@ -179,6 +179,10 @@ public fun extend(ref: &ExtendRef, container: PropertyMap) {
 }
 ```
 
+## Reference Implementation
+1. [Main implementation](https://github.com/aptos-labs/aptos-core/pull/12737/files)
+2. [Update event](https://github.com/aptos-labs/aptos-core/pull/12807/files)
+
 ## Risks and Drawbacks
 
 **Collection module**
