@@ -1,5 +1,5 @@
 ---
-aip: 82
+aip: 83
 title: Framework-level Untransferable Fungible Asset Stores
 author: davidiw, 
 discussions-to (*optional): <a url pointing to the official discussion thread>
