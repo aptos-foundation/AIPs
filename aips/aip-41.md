@@ -13,7 +13,7 @@ requires (*optional): <AIP number(s)>
 
 # AIP-41 - Move APIs for randomness generation
 
-**Version:** 1.2
+**Version:** 1.3
 
 ## Summary
 
