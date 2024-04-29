@@ -218,8 +218,7 @@ aptos_governance::reconfigure(&framework_signer);
 
 Some reference implementation points.
 
-- Updated `ConsensusConfig` [here](https://github.com/aptos-labs/aptos-core/blob/be0ef975cee078cd7215b3aea346b2d02fb0843d/aptos-move/framework/aptos-framework/sources/configs/consensus_config.move#L34-L63).
-- Applied the new config update pattern [here](https://github.com/aptos-labs/aptos-core/pull/12420).
+- Updated `ConsensusConfig` [here](https://github.com/aptos-labs/aptos-core/blob/be0ef975cee078cd7215b3aea346b2dhttps://github.com/aptos-labs/aptos-core/blob/f1d583760848c118afe88dda329105d67eea35a2/aptos-move/framework/aptos-framework/sources/configs/consensus_config.move#L52-L69).
 
 #### Validator set locking during reconfiguration
 
