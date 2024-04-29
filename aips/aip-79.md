@@ -203,8 +203,8 @@ This is to avoid the situation where a validator restarts and operates with the 
 To support both instant reconfiguration (when randomness is off) and async reconfiguration (when randomness is on),
 the following changes are needed.
 
-- For `config_x`, there should be a `config_x::set_for_next_epoch()` governance function to buffer updates, as well as a `config_x::on_new_epoch()` function to be invoked on epoch switch to apply the updates.
-  - It's recommended to implement the `set_for_next_epoch` and `on_new_epoch` in a way that support both initialization and updates.
+- For `config_x`, there should be a `config_x::set_for_next_epoch()` governance function to buffer updates, as well as a `config_x::on_new_epoch()` function to be invoked at epoch time to apply the updates.
+  - It's recommended to implement the `set_for_next_epoch()` and `on_new_epoch()` in a way that supports both initialization and updates.
 - The existing apply-and-reconfigure APIs (e.g., `consensus_config::set()`) should be disabled unless it is in genesis.
 - The `aptos_governance::reconfigure()` function should invoke instant reconfiguration if randomness is off,
   or start async reconfiguration otherwise.
