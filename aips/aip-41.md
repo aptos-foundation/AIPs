@@ -1,6 +1,6 @@
 ---
 aip: 41
-title: Move APIs for randomness generation
+title: Move APIs for public randomness generation
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/185
 Status: Accepted
@@ -29,18 +29,6 @@ The only thing this AIP does assume of the _on-chain randomness_ is that it is *
 
 We believe that easy-to-use, secure randomness inside Move smart contracts will open up new possibilities for **randomized dapps (randapps)**: dapps whose core functionality requires an unbiasable and unpredictable source of entropy (e.g., games, randomized NFTs airdrops, raffles).
 
-## Real randomness versus pseudo-randomness
-
-There is wide-spread confusion about whether **real randomness** should be preferred to (cryptographic) **pseudo-randomness**. 
-
-"Real" randomness comes from random events in the universe (e.g., [radioactive decay](https://www.fourmilab.ch/hotbits/)). 
- 
-But the problem with "real" randomness is there is **no way** for a smart contract **to verify** that the provided "real" randomness is indeed real. In other words, a malicious randomness beacon could bias the "real" randomness in any way it wants and there would be no way for a smart contract to detect this. 
-
-This is where (cryptographic) pseudo-randomness shines. 
- 
-Unlike "real" randomness, pseduo-randomness is **cryptographically-verifiable**. This means there is code that one can write in a smart contract to verify the validity of the pseudo-randomness. Furthermore, pseudo-randomness is **provably-indistinguishable** from real randomness, assuming the hardness of certain cryptographic assumptions. In simpler words, no one can tell it's not real randomness anyway (unless they have its associated cryptographic proof and can verify it as a valid pseudo-randomness, of course).
-
 ## Motivation
 
 > Describe the impetus for this change. What does it accomplish? 
@@ -60,6 +48,37 @@ The impetus for this change is two-fold:
 > Which audiences are impacted by this change? What type of action does the audience need to take?
 
 Only **Move developers** are “affected”: they need to learn how to use this new `randomness` module, which is designed to be easy to understand & use.
+
+## Understanding different types of randomness
+
+### Public randomness versus secret randomness
+
+This AIP describes an API for generating **public** randomness.
+This means that everybody will learn the generated randomness.
+In other words, there is no way to keep the generated randomness **secret**.
+So applications that require **secrecy** should **NOT** use this API.
+
+For example:
+ 1. You should **not** use this API to generate secret keys
+ 2. You should **not** use this API to generate blinding factors for hiding commitments
+ 3. You should **not** use this API to generate a secret preimage of a hash (e.g., [S/KEY](https://en.wikipedia.org/wiki/S/KEY)-like schemes)
+
+Instead, you can safely use this API to publicly generate randomness:
+ 1. You can use this API to generate Fiat-Shamir challenges in interactive ZK protocols
+ 2. You can use this API to publicly-pick the winner of a raffle
+ 3. You can use this API to publicly-distribute airdrops to a list of eligible recipients
+
+### Real randomness versus pseudo-randomness
+
+There is wide-spread confusion about whether **real randomness** should be preferred over (cryptographic) **pseudo-randomness**. 
+
+"Real" randomness comes from random events in the universe (e.g., [radioactive decay](https://www.fourmilab.ch/hotbits/)). 
+ 
+But the problem with "real" randomness is there is **no way** for a smart contract **to verify** that the provided "real" randomness is indeed real. In other words, a malicious randomness beacon could bias the "real" randomness in any way it wants and there would be no way for a smart contract to detect this. 
+
+This is where (cryptographic) pseudo-randomness shines. 
+ 
+Unlike "real" randomness, pseduo-randomness is **cryptographically-verifiable**. This means there is code that one can write in a smart contract to verify the validity of the pseudo-randomness. Furthermore, pseudo-randomness is **provably-indistinguishable** from real randomness, assuming the hardness of certain cryptographic assumptions. In simpler words, no one can tell it's not real randomness anyway (unless they have its associated cryptographic proof and can verify it as a valid pseudo-randomness, of course).
 
 ## Rationale
 
