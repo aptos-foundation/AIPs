@@ -1,6 +1,6 @@
 ---
 aip: 41
-title: Move APIs for randomness generation
+title: Move APIs for public randomness generation
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/185
 Status: Accepted
