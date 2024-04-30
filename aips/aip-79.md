@@ -352,7 +352,54 @@ Malicious validators can cause step (a) to fail, in which case should cause the 
 The remaining steps should never abort.
 See the reference implementation [here](https://github.com/aptos-labs/aptos-core/blob/1de391c3589cf2d07cb423a73c4a2a6caa299ebf/aptos-move/aptos-vm/src/validator_txns/dkg.rs#L70).
 
+### Attack preventions in VM
 
+Some known attacks targeting randomness transactions should be prevented from VM side.
+
+#### Test-and-abort
+In a [test-and-abort attack](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md#test-and-abort-attacks),
+a dApp defines a public function for a user to:
+1. toss a coin, then
+2. get a reward if coin=1, or get a punishment otherwise.
+A malicious user can write another contract to invoke this public function and abort if there was no reward,
+and it will never receive punishments.
+
+To prevent this attack, randomness API call hander should ensure the call originates from a **private entry function**.
+(Reference implementation points
+[1](https://github.com/aptos-labs/aptos-core/blob/e5d6d257eefdf9530ce6eb5129e2f6cbbbea8b88/aptos-move/aptos-vm/src/aptos_vm.rs#L806-L811)
+[2](https://github.com/aptos-labs/aptos-core/blob/e5d6d257eefdf9530ce6eb5129e2f6cbbbea8b88/aptos-move/framework/aptos-framework/sources/randomness.move#L77)
+.)
+
+
+#### Undergasing attack
+In an [undergasing attack](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md#undergasing-attacks),
+a dApp defines a private entry function for a user to:
+1. toss a coin (gas cost: 9), then
+2. get a reward (gas cost: 10) if coin=1, or get multiple punishments (gas cost: 100) otherwise.
+A malicious user can control its account blanace so it covers at most 788 gas units (or run txn with `max_gas=108`), then invoke this function,
+and it will never receive punishments because the publishment path will abort.
+
+The following is done to prevent this attack.
+- The assumption 0: a randomness-consuming transaction uses no more than `X` gas units, in any execution path.
+- A user transaction is consider a *randomness transaction* only if the entry function being called has annotation `#[randomness]`.
+- During the execution of a *randomness transaction*, an amount worth `X` gas units from the gas payer's balance is locked.
+  Insufficient balance causes the transaction to be discarded.
+  - Reference implementation points
+    [1](https://github.com/aptos-labs/aptos-core/blob/5a963facfb58ef74611e6fcd6225be4cb2ac7ac2/aptos-move/framework/aptos-framework/sources/transaction_validation.move#L194)
+    [2](https://github.com/aptos-labs/aptos-core/blob/5a963facfb58ef74611e6fcd6225be4cb2ac7ac2/aptos-move/framework/aptos-framework/sources/transaction_validation.move#L344)
+    .
+- *Randomness transactions* are required to set `max_gas=X`. Otherwise the transaction is discarded.
+  - If `max_gas < X` is allowed, a malicious user can abort higher gas path by controlling `max_gas`.
+  - If `max_gas > X` is allowed, dApps that violate the assumption 0 are vulnerable: a malicious user can abort higher gas path by controlling the account balance.
+  - This breaks dApps that violate the assumption 0 by design: the execution paths the cost more than `X` gas units abort deterministically.
+  - [Reference implementation](https://github.com/aptos-labs/aptos-core/blob/5a963facfb58ef74611e6fcd6225be4cb2ac7ac2/aptos-move/aptos-vm/src/aptos_vm.rs#L2432-L2437).
+- Randomness API calls are only allowed in *randomness transactions*.
+  - [Reference implementation](https://github.com/aptos-labs/aptos-core/blob/5a963facfb58ef74611e6fcd6225be4cb2ac7ac2/aptos-move/aptos-vm/src/aptos_vm.rs#L806-L810).
+- In the reference implementation, `X` is an on-chain config and is set to 10000.
+  0.01 APTs under the price of 100 octas/gas unit.
+  - If `X` is too high, randomness will be too expensive to use.
+  - If `X` is too low, a single randomness transaction is allowed to do too little.
+  - [Reference implementation](https://github.com/aptos-labs/aptos-core/blob/5a963facfb58ef74611e6fcd6225be4cb2ac7ac2/types/src/on_chain_config/randomness_api_v0_config.rs#L14-L18).
 ## Testing (Optional)
 
 Unit tests, smoke tests, forge tests.
@@ -393,6 +440,10 @@ Here are some related transaction limits. As a prevention, the DKG transaction s
 
 - `max_bytes_per_write_op`: limit of the size of a single state item, 1MB currently.
 - `ValidatorTxnConfig::V1::per_block_limit_total_bytes`: limit of the total validator transaction size in one block, 2MB currently.
+
+**Minimum gas deposit**. A user transaction, if needs randomness, is required to set `max_gas=10000` due to the [current implementation of undergasing attack prevention](#undergasing-attack).
+SDK needs to be updated to support this.
+In the future, customized deposit amount per dApp should be supported, instead of a universal constant.
 
 ## Future Potential
 
