@@ -72,7 +72,7 @@ Instead, you can safely use this API to publicly generate randomness:
 
 ### Real randomness versus pseudo-randomness
 
-There is wide-spread confusion about whether **real randomness** should be preferred to (cryptographic) **pseudo-randomness**. 
+There is wide-spread confusion about whether **real randomness** should be preferred over (cryptographic) **pseudo-randomness**. 
 
 "Real" randomness comes from random events in the universe (e.g., [radioactive decay](https://www.fourmilab.ch/hotbits/)). 
  
