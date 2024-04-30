@@ -13,7 +13,7 @@ requires (*optional): <AIP number(s)>
 
 # AIP-41 - Move APIs for randomness generation
 
-**Version:** 1.2
+**Version:** 1.3
 
 ## Summary
 
@@ -21,9 +21,7 @@ requires (*optional): <AIP number(s)>
 
 This AIP proposes a new Move module called `aptos_framework::randomness` which enables smart contracts to **easily** and **securely** generate publicly-verifiable randomness.
 
-The proposed `randomness` module leverages an underlying _on-chain cryptographic randomness implementation_ run by the Aptos validators. This implementation, however, is **outside the scope** of this AIP and will be the focus of a different, future AIP. 
-
-**TODO:** _Link to on-chain randomness implementation AIP here._
+The proposed `randomness` module leverages an underlying _on-chain cryptographic randomness implementation_ run by the Aptos validators. This implementation, however, is **outside the scope** of this AIP and will be the focus of [a different AIP](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-79.md). 
 
 The only thing this AIP does assume of the _on-chain randomness_ is that it is **unbiasable** and **unpredictable**, even by a malicious minority of the validators (as weighed by stake).
 
