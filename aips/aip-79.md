@@ -400,6 +400,7 @@ The following is done to prevent this attack.
   - If `X` is too high, randomness will be too expensive to use.
   - If `X` is too low, a single randomness transaction is allowed to do too little.
   - [Reference implementation](https://github.com/aptos-labs/aptos-core/blob/5a963facfb58ef74611e6fcd6225be4cb2ac7ac2/types/src/on_chain_config/randomness_api_v0_config.rs#L14-L18).
+
 ## Testing (Optional)
 
 Unit tests, smoke tests, forge tests.
@@ -414,11 +415,11 @@ Further stress / performance testing done in `previewnet`.
 
 **DKG loses liveness**. In case of implementation bugs/bad configurations, DKG may never finish, so the epoch change won't finish and buffered on-chain config updates won't be applied. Note that the chain is still live in this case, but the validators cannot advance to new epochs.  
 
-*Mitigation*: Validators can force epoch change and disable randomness feature. The Aptos Labs need to deploy hotfix for full mitigation after debugging.
+*Mitigation*: Validators can force epoch change and disable randomness feature. A hotfix needs to be deployed for full mitigation after debugging.
 
 **Randomness generation loses liveness**. If this happens, the blockchain will halt as every block needs randomness to proceed for execution.
 
-*Mitigation*: Validators can disable randomness feature using local configuration overwrite and restart all validators to pause the randomness generation to bring the chain back alive as a temporary mitigation. The Aptos Labs need to deploy hotfix for full mitigation after debugging. 
+*Mitigation*: Validators can disable randomness feature using local configuration overwrite and restart all validators to pause the randomness generation to bring the chain back alive as a temporary mitigation. A hotfix needs to be deployed for full mitigation after debugging. 
 
 ### Other Risks:
 
@@ -442,7 +443,7 @@ Here are some related transaction limits. As a prevention, the DKG transaction s
 - `ValidatorTxnConfig::V1::per_block_limit_total_bytes`: limit of the total validator transaction size in one block, 2MB currently.
 
 **Minimum gas deposit**. A user transaction, if needs randomness, is required to set `max_gas=10000` due to the [current implementation of undergasing attack prevention](#undergasing-attack).
-SDK needs to be updated to support this.
+SDK/wallets may need to be updated to support this.
 In the future, customized deposit amount per dApp should be supported, instead of a universal constant.
 
 ## Future Potential
