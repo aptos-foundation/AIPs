@@ -1,6 +1,6 @@
 ---
 aip: 83
-title: Framework-level Untransferable Fungible Asset Stores
+title: Framework-level Untransferable Objects
 author: davidiw, 
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
@@ -14,30 +14,33 @@ requires: 21
   
 ## Summary
 
-For better control over assets on-chain providers must be able to completely freeze an address from accessing any of the provided asset and not just the existing fungible stores owned by the address.
+The Aptos object model offers an extensible data model that allows an object to masquerade as many distinct types. For example, an object can be both a fungible asset as well as a digital asset. Some asset classes have need for greater control as a result the existing framework is at odds with their goals. Specifically, many APIs expose adding new objects via the `ConstructorRef`, but the `ConstructorRef` can also be used to enable new transfer policies. As a result, there is currently no method to enforce certain transfer policies in the existing object model. This AIP introduces the first step toward providing greater control by offer a new method for constructing objects called `object::set_untransferable` that ensures that the object owner is set permanently regardless of any operations performed on the object during or after its creation.
 
-While the assets within a fungible asset stores can be frozen via `fungible_asset::set_frozen_flag`, that does not prevent the owner of the asset from creating new fungible stores and continue to access assets. This AIP introduces a new `fungible_asset::create_untransferable_store` API that ensures that asset providers can restrict access and offers users of the Aptos framework a unified API to generate all of their asset stores.
+The specific application that comes to mind is fungible assets, wherein a fungible asset stores can be frozen via `fungible_asset::set_frozen_flag`, however, that does not prevent the owner of the asset from sending and receiving new fungible stores and continue to access assets.
 
 ### Out of Scope
 
-This is not intended to be a completely general purpose solution as this is not extensible for applications outside of a pure fungible asset store. For example, some asset providers have used fungible asset stores, paired with digital assets to create various new concepts like asset time-locked assets and fungible digital assets. Due to the nature of the required restrictions, this targets only the specific application where a fungible asset store should never be moved.
+Longer term, it would be ideal to explore the concept of allowing a single object be more explicit about the allowed transfer rules. Perhaps that's more in exposing a dispatchable object transfer model, but that is outside the scope of this AIP.
 
 # High-level Overview
 
-During the creation of a new fungible asset via `add_fungibility`, the creator can also call `set_untransferable`, which will indicate that the underlying `create_store` function cannot be called by external applications and that the only way to create stores is via a new API: `create_untransferable_store`. The store created from `create_untransferable_store` will have the `object::transfer` method revoked to prevent transfers.
+During the creation of an object, any code with access to the `ConstructorRef` can call `object::set_untransferable` that will prevent any calls to `object::transfer` and `object::transfer_with_ref`. Similar functionality will be add to fungible asset metadata to indicate that stores created for a specific fungible asset should be made untransferable: `fungible_asset::set_untransferable`. Then all calls to `fungible_asset::create_store` for that metadata will by proxy call `object::set_untransferable`.
 
-If at any point in time, the creator decides to freeze an account, they need only freeze the primary fungible account, creating and freezing one, if it does not exist.
+As a result of this if the creator decides to freeze an account, they need only freeze the primary fungible account, creating and freezing one, if it does not exist.
 
 The freeze is enforced during withdraw and deposit. First the asset must be configured to go through alternative transfer functions, by freezing the fungible asset store and using the fungible asset metadata's `TransferRef` to facilitate transfers or by using the dispatchable as discussed in [AIP-73](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-73.md). When the user attempts to transfer, the alternative functions should first acquire the root owner of each provided store and verify that each of the provided stores root owners' primary accounts are not frozen. Only if those conditions are met can a withdraw or deposit occur on provided stores.
 
+This AIP also introduces a method to obtain the ultimate owner of an object due to the nested nature of objects in Aptos. That is a fungible asset store may be indirectly owned by a frozen account. `object::root_owner` is being introduced to determine the highest or ultimate owner of an object. This can then be used to evaluate properties associated with that identity.
+
 ## Impact
 
-The changes suggested herein make it easier for a unified approach for building applications that handle arbitrary types of fungible assets. Not approving of this places a burden on each project to instead create their own specialized dispatch for fungible assets that require this logic. This will substantially slow down adoption of assets which require stricter controls as each new asset would require an update to the dispatch table. Besides the maintenance cost, the dispatch table could also become incredibly inefficient over time due to loading too many external modules.
+The changes suggested herein make it easier for a unified approach for building applications that handle arbitrary types of objects and fungible assets. Not approving of this places a burden on each project to instead create their own specialized dispatch for objects that require this logic. This will substantially slow down adoption of objects that require stricter controls as each new asset would require an update to the dispatch table. Besides the maintenance cost, the dispatch table could also become incredibly inefficient over time due to loading too many external modules.
 
 ## Alternative solutions
 
 * Require each provider to build their own specialized function and then have each provider build their own dispatch function. As mentioned above this quickly becomes untenable and not scalable.
 * Leverage dynamic dispatch of store creation. This is feasible, but we would rather receive feedback on this requirement rather than exposing more dynamic dispatch to the framework at this time. This would likely result in adhoc implementations that might not be secure.
+* Build Fungible Asset Store specific logic. While feasible, it seems like having this logic at the core both simplifies the design and allows `create_store` to provide a consistent developer experience for those assets that need to be nontransferable.
 
 This solution unifies the solution and minimizes code.
 
@@ -47,6 +50,16 @@ This AIP introduces the following new functions:
 
 In `object.move`:
 ```
+#[resource_group_member(group = aptos_framework::object::ObjectGroup)]
+struct Immovable has key {}
+
+public fun set_untransferable(ref: &ConstructorRef) acquires ObjectCore {
+    let object = borrow_global_mut<ObjectCore>(ref.self);
+    object.allow_ungated_transfer = false;
+    let object_signer = generate_signer(ref);
+    move_to(&object_signer, Untransferable {});
+}
+
 public fun root_owner<T: key>(object: Object<T>): address acquires ObjectCore {
     let obj_owner = owner(object);
     while (is_object(obj_owner)) {
@@ -54,19 +67,25 @@ public fun root_owner<T: key>(object: Object<T>): address acquires ObjectCore {
     };
     obj_owner
 }
+
+public fun enable_ungated_transfer(ref: &TransferRef) acquires ObjectCore {
+    assert!(!exists<Immovable>(ref.self), error::permission_denied(ENOT_MOVABLE));
+    ...
+
+public fun generate_linear_transfer_ref(ref: &TransferRef): LinearTransferRef acquires ObjectCore {
+    assert!(!exists<Immovable>(ref.self), error::permission_denied(ENOT_MOVABLE));
+    ...
+
+
+public fun transfer_with_ref(ref: LinearTransferRef, to: address) acquires ObjectCore {
+    assert!(!exists<Immovable>(ref.self), error::permission_denied(ENOT_MOVABLE));
+    ...
 ```
 
 In `fungible_asset.move`:
 ```
-/// Defnes a fungible asset stores as being untransferable at the object layer.
 #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
-struct Untransferable has key { }
-
-/// For untransferable stores allow deletion by the root owner.
-#[resource_group_member(group = aptos_framework::object::ObjectGroup)]
-struct Deletable has key {
-    delete_ref: DeleteRef,
-}
+struct Untransferable has key {}
 
 /// Set that only untransferable stores can be create for this fungible asset.
 public fun set_untransferable(constructor_ref: &ConstructorRef) {
@@ -76,57 +95,23 @@ public fun set_untransferable(constructor_ref: &ConstructorRef) {
     move_to(metadata_signer, Untransferable {});
 }
 
-/// Creates an untransferable store.
-public fun create_untransferable_store<T>(account: &signer, metadata: Object<T>): Object<FungibleStore> {
-    let constructor_ref = object::create_object_from_account(account);
-    
-    // Freeze the object
-    let obj_transfer_ref = object::generate_transfer_ref(&constructor_ref);
-    object::disable_ungated_transfer(&obj_transfer_ref);
-    
-    if (object::can_generate_delete_ref(&constructor_ref)) {
-        let delete_ref = object::generate_delete_ref(&constructor_ref);
-        let store_signer = &object::generate_signer(&constructor_ref);
-        move_to(store_signer, Deletable { delete_ref });
-    };
-    create_store_internal(&constructor_ref, metadata)
+public fun is_untransferable<T: key>(metadata: Object<T>): bool {
+    exists<Untransferable>(object::object_address(&metadata))
 }
 
-/// Creates a store on an object during construction.
 public fun create_store<T: key>(
-    constructor_ref: &ConstructorRef,
+    constructor_ref: &ConstructorRef, 
     metadata: Object<T>,
 ): Object<FungibleStore> {
-    assert!(is_untransferable(metadata), error::permission_denied(EUNTRANSFERABLE_STORE));
-    create_store_internal(constructor_ref, metadata);
-}
-
-/// Allows removal of a store by owner if created by `create_untransferable_store`.
-public fun remove_my_store<T: key>(account: &signer, store: Object<T>) {
-    let obj_addr = object::object_address(&store);
-    assert!(exists<Deletable>(obj_addr), error::not_found(EFUNGIBLE_ASSET_DELETABLE));
-    assert!(object::root_owner(store) == signer::address_of(account), error::permission_denied(ENOT_OWNER));
-    let deletable = move_from<Deletable>(obj_addr);
-    remove_store(&deletable.delete_ref);
-}
-
-fun create_store_internal<T:key>(
-    constructor_ref: &ConstructorRef,
-    metadata: Object<T>,
-): Object<FungibleStore> {
-    let store_obj = &object::generate_signer(constructor_ref);
-    move_to(store_obj, FungibleStore {
-        metadata: object::convert(metadata),
-        balance: 0,
-        frozen: false,
-    });
-    object::object_from_constructor_ref<FungibleStore>(constructor_ref)
-}
+    if (is_immovable(metadata)) {
+        object::set_immovable(constructor_ref);
+    };
+    ...
 ```
 
 ## Reference Implementation
 
-Coming soon.
+https://github.com/aptos-labs/aptos-core/pull/13175
 
 ## Testing (Optional)
 
@@ -134,7 +119,7 @@ All functionality verified with unit tests. We have also devised a realistic exa
 
 ## Risks and Drawbacks
 
-There are no obvious exceptional risks or drawbacks except in terms of considering alternatives.
+It is possible that a module that creates objects via `ConstructorRef` introduces this new functionality rendering dependent modules invalid. of course, the those modles that create or manipulate objects can also break themselves arbitrarily.
 
 ## Security Considerations
 
