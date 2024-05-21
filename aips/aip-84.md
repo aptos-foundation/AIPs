@@ -1,9 +1,9 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 84
 title: Improving Gas Coverage
 author: vgao1996
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/427
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): TBA
 type: Standard (Gas)
 created: 03/24/2024
