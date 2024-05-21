@@ -1,5 +1,5 @@
 ---
-aip: 0
+aip: 84
 title: Improving Gas Coverage
 author: vgao1996
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/427
