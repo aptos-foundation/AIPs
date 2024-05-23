@@ -11,7 +11,7 @@ updated (*optional): 03/24/2024
 requires (*optional): N/A
 ---
 
-# AIP-X Improving Gas Coverage
+# AIP-84 Improving Gas Coverage
 
 Note: This proposal introduces gas charges for type creation and module loading during the execution of a transaction. It is served as retroactive as the issue addresses a security vulnerability.
 
