@@ -1,0 +1,3 @@
+Developers must search for third-party, off-chain solutions. Finally, storing thousands of URIs on-chain is not cheap.
+
+Developers could instead define a template per TokenCollection using SVG or similar, and define a function to pass in token metadata (and perhaps standard data such as current time or version number) to populate the template. Wallets could render the token image without needing to make network calls outside of aptos calls. Developers would no longer need to consider a way to perpetually host images off-chain. Projects would always be able to outlive their developers.
