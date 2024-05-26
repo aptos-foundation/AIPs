@@ -15,7 +15,7 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
-In this document I propose a standard for Collection image templates on-chain. Alongside a Collection, a developer could store a `CollectionImageTemplate`, containing an SVG template. A view function `get_image` called on a token in that collection would return this template and values from a token's PropertyMap to return enough data to render an SVG for that token. Token images could dynamically update based on the data changing, unlocking a variety of usecases.
+In this document I propose a standard for Collection image templates on-chain. Alongside a Collection, a developer could store a `CollectionImageTemplate`, containing an SVG template and a list of keys. To render an SVG from this template for a token in the collection, a wallet would fetch the template and keys, then use the keys to fetch values from that token's PropertyMap. The wallet would then use a provided library to parse the SVG template using the now built PropertyMap. Token images could dynamically update based on the underlying data changing, unlocking a variety of usecases in DeFi, Ticketing, and more.
 
 The current standard solution for images for tokens in a collection is to host them off-chain and point to them via uri. This is usually done with a CDN or via IPFS. This solution is brittle as the uri could break for many reasons: dns, cloud issues, lack of ipfs upkeep, etc. In an environment with easy perpetuity for logic (smart contracts), perpetuity for image hosting is still difficult. Additionally, storing thousands of uris on-chain takes a suprising amount of storage.
 
@@ -37,11 +37,9 @@ I aim to explain how a developer could store their template and property map val
 
 ### Out of Scope
 
-This proposal is NOT for hosting images or any kind of file storage on-chain. The goal is not to store raw data on the blockchain, but instead a single template that can be used repeatedly to represent many tokens.
+This proposal is NOT for hosting images or any kind of file storage on-chain. The goal is not to store finished data on the blockchain, but instead a single template that can be used repeatedly to represent many tokens.
 
 This proposal also does NOT recommend removing the option for individual token URIs. This is still a better option for many use cases.
-
-I do not go into detail about the client side code needed to render the images, but it would be helpful to wallet developers if a standard library was provided.
 
 # High-level Overview
 
@@ -113,7 +111,7 @@ Here are some example return values in our smiley example:
 
 With just these five variables, we've practically infinite combinations of generative Tokens:
 
-There are 256<sup>3</sup> combinations for each color. If we cap the size of the eyes from 1-10, then we have 256<sup>3</sup> _ 256<sup>3</sup> _ 256<sup>3</sup> _ 10 _ 10 or 4.72e23 combinations! But for the sake of argument, let's say there are just 10k combinations. Let's compare the template implementation with a version of this implemented today:
+There are 256<sup>3</sup> combinations for each color. If we cap the size of the eyes from 1-10, then we have 256<sup>3</sup> \* 256<sup>3</sup> \* 256<sup>3</sup> \* 10 \* 10 or 4.72e23 combinations! But for the sake of argument, let's say there are just 10k combinations. Let's compare the template implementation with a version of this implemented today:
 
 It is currently standard practice to include property maps on your Tokens to help marketplaces index and display traits/rarities. So for this calculation I will not include that as additional data to store on-chain, as it generally already exists.
 
@@ -121,7 +119,7 @@ The example image template is 364 bytes. Let's assume some extra data requiremen
 
 The standard developer would do the following: generate 10k random seeds offline, store all the images at a CDN or IPFS, then store 10000 image URIs on-chain for each token. an extremely efficient uri pattern might look something like this: hosting.site.io/smiley/00001.png. Each uri in this pattern is 32 bytes. To store 10,000 of these URIs, you need to store 10,000 \* 32 = 320 Kb! IPFS uris commonly include hashes rather than logical addresses, multiplying this number even higher. Some of these exceed 100 bytes, but let's consider that the upper bound. At 10,000 images, that's a full 1MB just to store all the URIs.
 
-In this example, we're getting 1000x storage efficiency by using a template. That allows us to make the maximum complexity (data size) of the template high without surpassing current data storage usage.
+In this example, we're getting 320-1000x storage efficiency by using a template. That allows us to make the maximum complexity (data size) of the template high without surpassing current data storage usage.
 
 On the marketplace side of things, to render 100 images a marketplace must make 100 GETs to a third party endpoint. With the template, as the marketplace already has the property maps, they simply need to fetch the template once and have now saved many magnitudes of network traffic!
 
@@ -138,7 +136,7 @@ The formatting here needs some more thought.
 
 ```
 <svg width="100" height="100" >
-  <!-- Format string, library would parse into svg/image (as used directly in option 2) -->
+  <!-- Format string, library would parse into svg/image -->
   ${{composite_address: 0x4567..., height: 35, width: 35, x: 35, y: 10}}
   <circle cx="50" cy="50" r="30" stroke="black" stroke-width="2" fill="${face_color}"/>
   ...
