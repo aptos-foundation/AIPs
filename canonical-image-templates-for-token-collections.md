@@ -5,8 +5,8 @@ author: Saul Dope (saul@mirage.money)
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
-created: <mm/dd/yyyy>
+type: Core, Interface, Application, Framework
+created: 05/25/2024
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
