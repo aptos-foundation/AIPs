@@ -1,3 +1,22 @@
 Developers must search for third-party, off-chain solutions. Finally, storing thousands of URIs on-chain is not cheap.
 
 Developers could instead define a template per TokenCollection using SVG or similar, and define a function to pass in token metadata (and perhaps standard data such as current time or version number) to populate the template. Wallets could render the token image without needing to make network calls outside of aptos calls. Developers would no longer need to consider a way to perpetually host images off-chain. Projects would always be able to outlive their developers.
+
+mirage logo version
+
+<svg width="184" height="149" viewBox="0 0 184 149" fill="none">
+<path d="M52.8231 0.452148H26.7109V26.5644H52.8231V0.452148Z" fill="${dot00}"/>
+<path d="M105.024 0.452148H78.9114V26.5644H105.024V0.452148Z" fill="${dot01}"/>
+<path d="M157.224 0.452148H131.111V26.5644H157.224V0.452148Z" fill="${dot02}"/>
+<path d="M26.7108 35.3773H0.598633V61.4895H26.7108V35.3773Z" fill="${dot03}"/>
+<path d="M78.9113 35.3772H52.7991V61.4894H78.9113V35.3772Z" fill="${dot04}"/>
+<path d="M131.111 35.3772H104.999V61.4894H131.111V35.3772Z" fill="${dot05}"/>
+<path d="M183.36 35.3772H157.248V61.4894H183.36V35.3772Z" fill="${dot06}"/>
+<path d="M131.136 148.602H157.248V122.49H131.136V148.602Z" fill="${dot07}"/>
+<path d="M78.9476 148.602H105.06V122.49H78.9476V148.602Z" fill="${dot08}"/>
+<path d="M26.7472 148.602H52.8594V122.49H26.7472L26.7472 148.602Z" fill="${dot09}"/>
+<path d="M157.248 113.665H183.36V87.5529H157.248V113.665Z" fill="${dot10}"/>
+<path d="M105.06 113.665H131.172V87.5529H105.06V113.665Z" fill="${dot11}"/>
+<path d="M52.8595 113.665H78.9717V87.5529H52.8595V113.665Z" fill="${dot12}"/>
+<path d="M0.610935 113.665H26.7231L26.7231 87.5529H0.610935L0.610935 113.665Z" fill="${dot13}"/>
+</svg>

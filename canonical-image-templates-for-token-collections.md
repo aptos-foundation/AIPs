@@ -54,11 +54,10 @@ struct TokenCollectionImageTemplate {
 }
 ```
 
-The SVG template in raw form would look something like this, with pipe in values stored in `${}`:
-
-An example smiley
+The SVG template in raw form would look something like this, with piped in values stored in `${}`:
 
 ```
+// An example svg_template of a smiley
 <svg width="100" height="100" >
   <circle cx="50" cy="50" r="30" stroke="black" stroke-width="2" fill="${face_color}"/>
   <circle cx="40" cy="40" r="${left_eye_size}" fill="${left_eye_color}"/>
@@ -67,16 +66,26 @@ An example smiley
 </svg>
 ```
 
-<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
-  <!-- Date string at the top -->
-  <text x="50" y="20" font-family="Arial" font-size="14" text-anchor="middle">2024-05-25</text>
-  
-  <!-- Smiley face -->
-  <circle cx="50" cy="60" r="30" stroke="black" stroke-width="2" fill="yellow"/>
-  <circle cx="40" cy="50" r="5" fill="black"/>
-  <circle cx="60" cy="50" r="5" fill="black"/>
-  <path d="M 40 70 Q 50 80, 60 70" stroke="black" stroke-width="2" fill="transparent"/>
-</svg>
+```
+// An example property_map_key for the properties of a smiley face
+[face_color, left_eye_size, left_eye_color, right_eye_size, right_eye_color]
+```
+
+When loading tokens owned by a user, after seeing an empty token URI field and checking to see that a `TokenCollectionImageTemplate` exists for the token's collection, a wallet would call a function named something like `get_templated_image_data` to fetch the necessary template and PropertyMap to render the SVG.
+
+Here are some example return values in our smiley example:
+
+```
+ {
+    face_color: "yellow",
+    left_eye_size: "5",
+    left_eye_color: "black",
+    right_eye_size: "5",
+    right_eye_color: "black"
+ }
+```
+
+![standard_smiley](/images/normal_smiley.svg)
 
 > Define the strawman solution with enough details to make it clear why this is the preferred solution.
 > Please write a 2-3 paragraph high-level overview here and defer writing a more detailed description in [the specification section](#specification-and-implementation-details).
