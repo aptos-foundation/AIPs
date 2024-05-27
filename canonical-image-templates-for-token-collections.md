@@ -115,13 +115,13 @@ There are 256<sup>3</sup> combinations for each color. If we cap the size of the
 
 It is currently standard practice to include property maps on your Tokens to help marketplaces index and display traits/rarities. So for this calculation I will not include that as additional data to store on-chain, as it generally already exists.
 
-The example image template is 364 bytes. Let's assume some extra data requirements for storing the property map keys vector, vector/object information overhead and triple that value to 1Kb.
+The example image template is 364 bytes. Let's assume some extra data requirements for storing the property map keys vector, vector/object information overhead and triple that value to 1KB.
 
-The standard developer would do the following: generate 10k random seeds offline, store all the images at a CDN or IPFS, then store 10000 image URIs on-chain for each token. an extremely efficient uri pattern might look something like this: hosting.site.io/smiley/00001.png. Each uri in this pattern is 32 bytes. To store 10,000 of these URIs, you need to store 10,000 \* 32 = 320 Kb! IPFS uris commonly include hashes rather than logical addresses, multiplying this number even higher. Some of these exceed 100 bytes, but let's consider that the upper bound. At 10,000 images, that's a full 1MB just to store all the URIs.
+The standard developer would do the following: generate 10k random seeds offline, store all the images at a CDN or IPFS, then store 10000 image URIs on-chain for each token. an extremely efficient uri pattern might look something like this: hosting.site.io/smiley/00001.png. Each uri in this pattern is 32 bytes. To store 10,000 of these URIs, you need to store 10,000 \* 32 = 320 KB! IPFS uris commonly include hashes rather than logical addresses, multiplying this number even higher. Some of these exceed 100 bytes, but let's consider that the upper bound. At 10,000 images, that's a full 1MB just to store all the URIs.
 
-In this example, we're getting _320-1000x_ storage efficiency by using a template. That allows us to make the maximum complexity (data size) of the template high without surpassing current data storage usage. At a template size of 32 Kb (or as described below, a composite of 4 templates 8 Kb each), we would still get 10-31x storage efficiency compared to URIs.
+In this example, we're getting _320-1000x_ storage efficiency by using a template. That allows us to make the maximum complexity (data size) of the template high without surpassing current data storage usage. At a template size of 32 KB (or as described below, a composite of 4 templates 8 KB each), we would still get 10-31x storage efficiency compared to URIs.
 
-On the marketplace side of things, to render 100 images a marketplace must make 100 GETs to a third party endpoint. With the template, as the marketplace already has the property maps, they simply need to fetch the template once and have now saved many magnitudes of network traffic! This would likely increase time to fully render speeds for most marketplaces.
+On the marketplace side of things, to render 100 images a marketplace must make 100 GETs to a third party endpoint. With the template, as the marketplace already has the property maps, they simply need to fetch the template once and have now saved many magnitudes of network traffic! This would likely decrease time to fully render speeds for most marketplaces.
 
 But what if we wanted to make a more complex Token while still keeping each template simple?
 
