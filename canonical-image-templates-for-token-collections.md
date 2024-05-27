@@ -48,7 +48,7 @@ A struct would be added to Collection.move, CollectionImageTemplate.
 ```
 struct CollectionImageTemplate {
     svg_template: vector<u8>, // bytes representing svg template
-    property_map_key: <vector<string>>
+    property_map_key: vector<string>
 }
 ```
 
@@ -224,6 +224,8 @@ I do not see an issue with backward compatibility on the contract side. Token an
 Composite Tokens are powerful but could be expensive networking wise. A solution would be some kind of "composite budget" within a template, eg 8 total references (calls to other tokens) with up to 2 recursions (nested calls).
 
 Storing many URIs is more expensive in many cases than storing a template. But fetching a wallet's worth of URIs is generally going to be less data than fetching a wallet's worth of templates. However, wallets do not have to make a second call to image providers. The marketplace example is more friendly to templates, fetching one template will come close to fetching URIs in bulk, but rendering all the templates via SVG will be much more efficient than fetching many images.
+
+Property maps are not strictly enforced, so tokens in a collection may have missing data needed to populate the image template. However, this can only occur to developer error. The same could be said for broken uri links.
 
 ## Security Considerations
 
