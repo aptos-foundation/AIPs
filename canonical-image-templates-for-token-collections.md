@@ -32,7 +32,7 @@ I aim to explain how a developer could store their template and property map val
 
 1. size of data on-chain stored for templates vs uris
 2. reduction of network calls for dynamics Token images
-3. uptick in Token developers that are interested in Tokens that don't a CDN or IPFS
+3. uptick in Token developers that are interested in Tokens that don't need a CDN or IPFS
 4. % of templated projects with "rotted images" vs % of uri projects with rotted links
 
 ### Out of Scope
