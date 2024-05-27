@@ -17,13 +17,13 @@ requires (*optional): <AIP number(s)>
 
 In this document I propose a standard for Collection image templates on-chain. Alongside a Collection, a developer could store a `CollectionImageTemplate`, containing an SVG template and a list of keys. To render an SVG from this template for a token in the collection, a wallet would fetch the template and keys, then use the keys to fetch values from that token's PropertyMap. The wallet would then use a provided library to parse the SVG template using the now built PropertyMap. Token images could dynamically update based on the underlying data changing, unlocking a variety of usecases in DeFi, Ticketing, and more.
 
-The current standard solution for images for tokens in a collection is to host them off-chain and point to them via uri. This is usually done with a CDN or via IPFS. This solution is brittle as the uri could break for many reasons: dns, cloud issues, lack of ipfs upkeep, etc. In an environment with easy perpetuity for logic (smart contracts), perpetuity for image hosting is still difficult. Additionally, storing thousands of uris on-chain takes a suprising amount of storage.
+The current standard solution for images for tokens in a collection is to host them off-chain and point to them via uri. This is usually done with a CDN or via IPFS. This solution is brittle as the uri could break for many reasons: dns, cloud issues, lack of ipfs upkeep, etc. In an environment with easy perpetuity for logic and data (smart contracts), perpetuity for image hosting is still difficult. Additionally, storing thousands of uris on-chain takes a suprising amount of storage.
 
 I aim to explain how a developer could store their template and property map values on each token, and how a wallet would render that token's image. I will also describe a variety of usecases.
 
 #### Goals of this proposal:
 
-1. Differentiate aptos by allowing developers to build an Token project that is 100% on-chain
+1. Differentiate aptos by allowing developers to build a Token project that is 100% on-chain
 2. Reduce non-aptos network calls for wallets
 3. Unlock on-chain dynamic Token images (images that change based on underlying data)
 4. Explore composite Tokens (Tokens built with other Tokens as components)
@@ -119,9 +119,9 @@ The example image template is 364 bytes. Let's assume some extra data requiremen
 
 The standard developer would do the following: generate 10k random seeds offline, store all the images at a CDN or IPFS, then store 10000 image URIs on-chain for each token. an extremely efficient uri pattern might look something like this: hosting.site.io/smiley/00001.png. Each uri in this pattern is 32 bytes. To store 10,000 of these URIs, you need to store 10,000 \* 32 = 320 Kb! IPFS uris commonly include hashes rather than logical addresses, multiplying this number even higher. Some of these exceed 100 bytes, but let's consider that the upper bound. At 10,000 images, that's a full 1MB just to store all the URIs.
 
-In this example, we're getting 320-1000x storage efficiency by using a template. That allows us to make the maximum complexity (data size) of the template high without surpassing current data storage usage.
+In this example, we're getting _320-1000x_ storage efficiency by using a template. That allows us to make the maximum complexity (data size) of the template high without surpassing current data storage usage. At a template size of 32 Kb (or as described below, a composite of 4 templates 8 Kb each), we would still get 10-31x storage efficiency compared to URIs.
 
-On the marketplace side of things, to render 100 images a marketplace must make 100 GETs to a third party endpoint. With the template, as the marketplace already has the property maps, they simply need to fetch the template once and have now saved many magnitudes of network traffic!
+On the marketplace side of things, to render 100 images a marketplace must make 100 GETs to a third party endpoint. With the template, as the marketplace already has the property maps, they simply need to fetch the template once and have now saved many magnitudes of network traffic! This would likely increase time to fully render speeds for most marketplaces.
 
 But what if we wanted to make a more complex Token while still keeping each template simple?
 
@@ -137,13 +137,15 @@ The formatting here needs some more thought.
 ```
 <svg width="100" height="100" >
   <!-- Format string, library would parse into svg/image -->
-  ${{composite_address: 0x4567..., height: 35, width: 35, x: 35, y: 10}}
+  ${{composite_address: 0x4567, height: 35, width: 35, x: 35, y: 10}}
   <circle cx="50" cy="50" r="30" stroke="black" stroke-width="2" fill="${face_color}"/>
-  ...
+
 </svg>
 ```
 
-...
+Imagine building an "Exodia" Token for Aptos. You could use a Bruh Bear as the head, AptoMingos as the legs, etc
+
+Suddenly you can rep multiple communities in a provably on-chain way
 
 ## Impact
 
@@ -153,7 +155,7 @@ For example, in a generative art NFT case, a developer can focus on defining the
 
 Dynamic Token images will unlock a myriad of usecases. The origin of this project is that I am an engineer at Mirage Protocol. I am building a web2 image server that takes in a token address (the token represents a position on our perpetual futures trading platform) and generates an image in response to the current status of the position. The idea is that you can just glance at a wallet and see "BTC Long 10x (+55%)" on the token. This way, you don't need to actually go to the frontend to see a high-level view. There are many issues with using a web2 server. Do wallets cache the images, and if so for how long? We also wouldn't want to get constant tps from a wallet in the background. We have to send the full image for each position each update, the networking costs are high.
 
-If we could instead define a template, we could publish a nice background on-chain, with the data for "Margin" "Perpetual" "PnL" "Liquidation Price" etc on top. By including composites in this proposal, we could also show the image from the FungibleAsset metadata. Wallets could update all the images simply by refreshing the associated token account resources.
+If we could instead define a template, we could publish a nice background on-chain, with the data for "Margin" "Perpetual" "PnL" "Liquidation Price" etc positioned in the template. By including composites in this proposal, we could also show the icons of the margin token and the perpetual being traded via the FungibleAsset metadata. Wallets could update all the images representing positions simply by refreshing the associated token account resources and getting the updated state, no refetching of the template is required.
 
 This idea could be extended for all DeFi instruments, but also far beyond that. Imagine getting an airplane ticket in your wallet. It could show you the gate and boarding time right in the wallet. A two day bonus xp pass to a video game that has a live countdown in your wallet. A basketball ticket that updates as a virtual "stub" with the final score and the MVP of the game.
 
@@ -211,8 +213,6 @@ Mostly included above but happy to dive into more details here as questions come
 
 To test, overall ensure rendering works end to end by using the svg building library and saving images using a simple node script. This can be iterated on until it works. Once implementation works, test limits of template size. Compare on-chain data read/write patterns/volume and wallet/frontend network traffic vs traditional UI method.
 
-...
-
 ## Risks and Drawbacks
 
 The biggest risks are vulnerabilities in wallets if arbitrary bytes in an on-chain field are expected to be SVG template data and what could happen if it wasn't. This needs to be explored further. With proper data sanitation this should be an avoidable issue. The library to render the SVGs should be carefully audited/reviewed.
@@ -223,11 +223,11 @@ I do not see an issue with backward compatibility on the contract side. Token an
 
 Composite Tokens are powerful but could be expensive networking wise. A solution would be some kind of "composite budget" within a template, eg 8 total references (calls to other tokens) with up to 2 recursions (nested calls).
 
+Storing many URIs is more expensive in many cases than storing a template. But fetching a wallet's worth of URIs is generally going to be less data than fetching a wallet's worth of templates. However, wallets do not have to make a second call to image providers. The marketplace example is more friendly to templates, fetching one template will come close to fetching URIs in bulk, but rendering all the templates via SVG will be much more efficient than fetching many images.
+
 ## Security Considerations
 
 Went into above.
-
-...
 
 ## Future Potential
 
@@ -249,7 +249,7 @@ My estimate is the code itself could be done by one developer in a few weeks, if
 
 ### Suggested developer platform support timeline
 
-Writing the template library will mostly just be a task of calling the right functions from collection.move and property_map.move, then finding and replacing template strings as needed. Once the template is populated, the image should function like a regular SVG, so no code to write SVG rendering will be necessary. The code should not be complicated here either, but the security concerns regarding the arbitrary bytes are not to be ignored and will consider some time.
+Writing the template library will mostly just be a task of calling the right functions from token/collection/property_map, then finding and replacing in template strings as needed. Once the template is populated, the image should function like a regular SVG, so no code to write SVG rendering will be necessary. The code should not be complicated here either, but the security concerns regarding the arbitrary bytes are not to be ignored and will take some time for consideration.
 
 There is also of course whatever general devrel pipeline is needed in regards to getting wallet / marketplace devs to update to use the library (or new version of aptos's library).
 
@@ -264,10 +264,8 @@ Documentation etc needed
 > - On testnet?
 > - On mainnet?
 
-...
-
 ## Open Questions (Optional)
 
-> Q&A here, some of them can have answers some of those questions can be things we have not figured out but we should
+I am very open to seeing alternative ideas, and if this idea has been tried before on another chain. Any comments are welcome.
 
-...
+Questions to be added later
