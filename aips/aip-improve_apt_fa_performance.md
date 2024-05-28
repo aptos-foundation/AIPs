@@ -16,7 +16,7 @@ requires (*optional): <AIP number(s)>
 ## Summary
 
 Multiple improvements for FAs in general, and APT FA in specific, allowing gas charging and interacting with FA / APT FA to be more performant.
-This AIP tackles issues of performance regression of moving APT from Coin to FA.
+This AIP implements the efficient “after-migration” path, which is necessary to keep high performance after migration of APT from Coin to FA completes.
 
 ### Out of Scope
 
@@ -24,7 +24,7 @@ APT Coin -> FA migration (AIP-63), making FA concurrent (AIP-70), etc
 
 # High-level Overview
 
-We will optimize most inefficient parts of the FA, as well as provide specialized functions for APT FA - that will bypass some of the general features FA have, that do not apply to APT itself (like freezing, dispatching, etc).
+To make the APT FA path most performant, we will optimize some of the hot paths in FA, as well as provide specialized functions for APT FA - that will bypass some of the general features FA have, that do not apply to APT itself (like freezing, dispatching, etc).
 
 ## Impact
 
@@ -32,9 +32,9 @@ Throughput of the blockchain will improve, and gas costs of transactions will re
 
 ## Specification and Implementation Details
 
-- Optimize and cache computation of address of a primary fungible store. Primary fungible store is a derived object, with it's address being computed in move, and being re-computed on every call. 
+- Optimize and cache computation of address of a primary fungible store. Primary fungible store is a derived object, with its address being computed in move, and being re-computed on every call. 
 For example, to pay gas with APT PFS, we need to compute address in prologue to confirm we have enough funds for max gas, and then we need to compute it again in epilogue to charge the consumed gas. We introduce efficient native implementation to optimize object derived address computation, which also caches the computation for the duration of the transaction.
-- Provide specialized apt_primary_fungible_store module, that bypasses checks that are not applicable / unnecessary for APT. PFS owner cannot change, and so ownership doesn't need to be rechecked (and so ObjectCore resource doesn't need to be fetched at all). APT fungible stores cannot be frozen, and it doesn't use dispatching functionality.
+- Provide specialized functions in aptos_account, for handling APT PFS, that bypasses checks that are not applicable / unnecessary for APT. PFS owner cannot change, and so ownership doesn't need to be rechecked (and so ObjectCore resource doesn't need to be fetched at all). APT fungible stores cannot be frozen, and it doesn't use dispatching functionality.
 - Provide flags that will allow, once APT Coin -> FA migration is complete, to move APT transfers and gas charging directly to new functions, avoiding all migrations costs.
 
 ## Reference Implementation
@@ -44,7 +44,7 @@ For example, to pay gas with APT PFS, we need to compute address in prologue to 
 
 ## Testing (Optional)
 
-Performance is measured via single-node-performance benchmarks on CI, over the 
+Performance is measured via single-node-performance benchmarks on CI, over all the different workloads provided in the test suite.
 
 ## Risks and Drawbacks
 
@@ -58,4 +58,4 @@ Performance is measured via single-node-performance benchmarks on CI, over the
 
 ## Timeline
 
-Targetted to be part of 1.13 release
+Targetted to be part of 1.14 release
