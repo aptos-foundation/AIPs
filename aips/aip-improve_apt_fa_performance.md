@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 85
 title: Improve APT FungibleAsset performance
 author: igor-aptos
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Improve APT FA performance 
+# AIP-85 - Improve APT FA performance 
 
 ## Summary
 
