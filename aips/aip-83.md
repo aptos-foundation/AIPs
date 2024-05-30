@@ -10,7 +10,7 @@ updated (*optional): <mm/dd/yyyy>
 requires: 21
 ---
 
-# AIP-82 - Framework-level Untransferable Fungible Asset Stores
+# AIP-83 - Framework-level Untransferable Fungible Asset Stores
   
 ## Summary
 
