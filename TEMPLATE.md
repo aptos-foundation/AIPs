@@ -32,7 +32,7 @@ requires (*optional): <AIP number(s)>
 
 ...
 
-# High-level Overview
+## High-level Overview
 
  > Define the strawman solution with enough details to make it clear why this is the preferred solution.
  > Please write a 2-3 paragraph high-level overview here and defer writing a more detailed description in [the specification section](#specification-and-implementation-details).
