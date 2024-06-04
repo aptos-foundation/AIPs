@@ -26,22 +26,18 @@ To vote on AIPs impacting the state of the Blockchain, go to https://governance.
 
 Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [click here](https://github.com/aptos-foundation/AIPs/wiki/Index-of-AIPs).
 
-| Number | Theme | Title  | Author |
+| Number | Category | Title  | Author |
 |:---|:---|:---|:---
-| [AIP-61](https://github.com/aptos-foundation/AIPs/issues/) | Cryptography | [OpenID blockchain (OIDB) accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)| Alin Tomescu |
-| [AIP-62](https://github.com/aptos-foundation/AIPs/issues/297) | Devex | [Wallet Standard](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-62.md)| 0xmaayan, hardsetting, NorbertBodziony |
-| [AIP-63](https://github.com/aptos-foundation/AIPs/issues/297) | Smart Contract | [Coin to Fungible Asset Migration](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-63.md)| lightmark, davidiw, movekevin |
-| [AIP-64](https://github.com/aptos-foundation/AIPs/issues/297) | Blockchain | [Validator Transaction Type](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-64.md)| zhoujun@aptoslabs.com, daniel@aptoslabs.com |
-| [AIP-65](https://github.com/aptos-foundation/AIPs/issues/297) | Gas | [Storage Fee for State Bytes refundable](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-65.md)| msmouse |
-| [AIP-66](https://github.com/aptos-foundation/AIPs/issues/297) | Cryptography | [Passkey Accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-66.md)| hariria |
-| [AIP-67](https://github.com/aptos-foundation/AIPs/issues/331) | Cryptography | [Native Consensus for JSON Web Key (JWK)](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md)| Zhoujun Ma (zhoujun@aptoslabs.com) |
-| [AIP-68](https://github.com/aptos-foundation/AIPs/issues/333) | Blockchain | [Reordering transactions in a block for fairness](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-68.md)| igor-aptos |
-| [AIP-69](https://github.com/aptos-foundation/AIPs/issues/349) | Smart Contract | [Start replication of Google JWKs on chain](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-69.md)| Zhoujun Ma (zhoujun@aptoslabs.com) |
-| [AIP-70](https://github.com/aptos-foundation/AIPs/issues/359) | Smart Contract | [Parallelize Fungible Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-70.md)| igor-aptos (https://github.com/igor-aptos), vusirikala (https://github.com/vusirikala) |
-| [AIP-71](https://github.com/aptos-foundation/AIPs/issues/367) | Smart Contract | [Refactor Aptos Framework Events with Module Events](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-71.md)| lightmark |
-| [AIP-72](https://github.com/aptos-foundation/AIPs/issues/370) | Devex | [Minting Standard for Digital Assets](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-72.md)| johnchanguk, jillxuu, briungri, bowenyang007 |
-| [AIP-73](https://github.com/aptos-foundation/AIPs/issues/374) | Smart Contract | [Dispatchable token standard](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-73.md)| Runtian Zhou |
-| [AIP-74](https://github.com/aptos-foundation/AIPs/issues/375) | Blockchain | [Increase block gas limit to account for concurrency increase](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-74.md)| Sital Kedia (skedia@aptoslabs.com), Igor Kabiljo (ikabiljo@aptoslabs.com) |
+| [AIP-76](https://github.com/aptos-foundation/AIPs/issues/402) | Smart Contract | [Digital Assets Composability](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-76.md)| aladeenb, jczhang |
+| [AIP-77](https://github.com/aptos-foundation/AIPs/issues/409) | Smart Contract | [Multisig V2 Enhancement](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-77.md)| junkil-park (https://github.com/junkil-park), movekevin (https://github.com/movekevin) |
+| [AIP-78](https://github.com/aptos-foundation/AIPs/issues/406) | Smart Contract | [Aptos Token Objects Framework Update](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-78.md)| johnchanguk |
+| [AIP-79](https://github.com/aptos-foundation/AIPs/issues/407) | Cryptography | [Implementation of instant on-chain randomness](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-79.md)| Alin Tomescu (alin@aptoslabs.com), Zhuolun "Daniel" Xiang (daniel@aptoslabs.com), Zhoujun Ma (zhoujun@aptoslabs.com) |
+| [AIP-80](https://github.com/aptos-foundation/AIPs/issues/405) | Ecosystem | [Standardize Private Keys](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-80.md)| Greg Nazario - greg@aptoslabs.com |
+| [AIP-81](https://github.com/aptos-foundation/AIPs/issues/419) | Cryptography | [Pepper service for keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-81.md)| Zhoujun Ma (zhoujun@aptoslabs.com) |
+| [AIP-82](https://github.com/aptos-foundation/AIPs/issues/XXX) | Smart Contract | [Transaction context extension](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-82.md)| junkil-park (https://github.com/junkil-park), lightmark (https://github.com/lightmark), movekevin (https://github.com/movekevin) |
+| [AIP-83](https://github.com/aptos-foundation/AIPs/issues/421) | Framework | [Framework-level Untransferable Fungible Asset Stores](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-83.md)| davidiw |
+| [AIP-84](https://github.com/aptos-foundation/AIPs/issues/427) | Gas | [Improving Gas Coverage](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-84.md)| vgao1996 |
+| [AIP-85](https://github.com/aptos-foundation/AIPs/issues/441) | Framework | [Improve APT FA performance](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-85.md)| igor-aptos |
 | ... | ... |||
 
 ## Types of AIPs
@@ -58,17 +54,17 @@ Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [
 | `Rejected` | A community decision has been made to not move forward with an AIP at this time.| 
 | `On Hold` | Some information is missing or prerequisites have not yet been completed. | 
 
-## Layer
+## Category
 * Framework
 * Core (Blockchain)
 * Gas
 * Cryptography
-* Platform
+* Ecosystem
 
 ## Providing Feedback on an AIP
 * Follow the discussion in the corresponding AIP issue
 * If you were designing this change, what would you want to communicate? Is it being communicated in the AIP?
-* As a community member, how are you impacted by this change? Does it provide enough information about the design and implementation details to assist with decision making? 
+* As a community member, how are you impacted by this change? Does it provide enough information about the design and implementation details to assist with decision making?
 
 ## Notice regarding rejected or stale AIPs
 * If an AIP Author is not actively engaging in their PR's and Issues, they will be closed after 14 days due to inactivity.
