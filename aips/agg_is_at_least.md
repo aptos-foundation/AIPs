@@ -65,7 +65,7 @@ None, provides the same functionality as before, just more efficiently
 
 ## Future Potential
 
-Once traits are deployed, `is_at_most`/`is_equal` utility methods will be provied as well. Until then, they can be derived from this one (assuming +1 doesn't overflow):
+Once traits are deployed, `is_at_most`/`is_equal` utility methods will be provided as well. Until then, they can be derived from this one (assuming +1 doesn't overflow):
  - for `is_at_most(agg, max_amount)`, you can do `!is_at_least(max_amount + 1)`
  - for `is_equal(agg, value)`, you can do `is_at_least(value) && !is_at_least(value + 1)`
 
