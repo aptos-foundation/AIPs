@@ -1,6 +1,6 @@
 ---
 aip: X
-title: Introduce aggregator_v2::is_at_least native API
+title: Introduce native API to evaluate aggregator value is greater or equal to given amount
 author: igor-aptos
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Introduce aggregator_v2::is_at_least native API 
+# AIP-X - Introduce native API to evaluate aggregator value is greater or equal to given amount
 
 ## Summary
 
