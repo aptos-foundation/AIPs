@@ -1,5 +1,5 @@
 ---
-aip: X
+aip: 87
 title: Introduce native API to evaluate aggregator value is greater or equal to given amount
 author: igor-aptos
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Introduce native API to evaluate aggregator value is greater or equal to given amount
+# AIP-87 - Introduce native API to evaluate aggregator value is greater or equal to given amount
 
 ## Summary
 
