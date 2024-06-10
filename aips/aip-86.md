@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 86
 title: BN254 elliptic curve arithmetic in Move
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/437
@@ -12,7 +12,7 @@ requires (*optional): 20
 
 ---
 
-# AIP-X: BN254 elliptic curve arithmetic in Move
+# AIP-86: BN254 elliptic curve arithmetic in Move
 
 ## Summary
 
