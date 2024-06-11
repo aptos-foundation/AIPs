@@ -48,7 +48,7 @@ A struct would be added to Collection.move, CollectionImageTemplate.
 ```
 struct CollectionImageTemplate {
     svg_template: vector<u8>, // bytes representing svg template
-    property_map_key: vector<string>
+    property_map_key: vector<string>,
 }
 ```
 
@@ -166,6 +166,18 @@ Art living off-chain is not the final form of blockchains. There needs to be a s
 The main alternative outcome is relying fully on web2 image servers to fulfill this purpose. This works but as explained above, has issues with varying wallet implementations and heavy burdens on developers. New developers trying to step into tokenated art projects are going to continute to be intimidated by hosting concerns. Many projects will continue to stop supporting their links and have only a dead uri remaining.
 
 As to alternatives to SVG, SVG is likely the best format to template as it is human readable therefore developer friendly. The main alternative here would be writing a custom standard, but that would both take much longer to propose and also be a larger burden on developers trying to use the product, as well as a much larger burden to maintain an external library. The main upside would be possible data size reductions on-chain.
+
+#### Base URI
+
+As @Rain proposed, collections could store a templated `base_uri` field in the same resource as the image template. It would hold a format string usable for tokens in the collection, eg `hosting.mirage.money/tokens/${object_address}.png`. This uri would be populated the same way the image template is, using the property map. This way, each token doesn't need to store the repeated prefix/suffixes, and can build the actual uri in the wallet when the image needs to be loaded.
+
+I think it makes sense to include this for collections that still want to use URIs. This gets all the storage efficiency mentioned above, though none of the dynamic token benefits.  It does restrict developers to using a single uri pattern for all tokens in the collection, but that is generally the case anyway.  Projects could still use the individual `token_uri` if desired.
+
+In the case that developers mistakenly (or perhaps strategically) provide multiple token images, this would be the precedence recommended to wallets from highest to lowest:
+
+1.  token_uri defined on the token
+2.  uri generated via base_uri
+3.  image template
 
 ## Specification and Implementation Details
 
