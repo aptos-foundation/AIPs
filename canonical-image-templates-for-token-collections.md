@@ -169,7 +169,7 @@ As to alternatives to SVG, SVG is likely the best format to template as it is hu
 
 #### Base URI
 
-As @Rain proposed, collections could store a templated `base_uri` field in the same resource as the image template. It would hold a format string usable for tokens in the collection, eg `hosting.mirage.money/tokens/${object_address}.png`. This uri would be populated the same way the image template is, using the property map. This way, each token doesn't need to store the repeated prefix/suffixes, and can build the actual uri in the wallet when the image needs to be loaded.
+As @JohnChangUK proposed, collections could store a templated `base_uri` field in the same resource as the image template. It would hold a format string usable for tokens in the collection, eg `hosting.mirage.money/tokens/${object_address}.png`. This uri would be populated the same way the image template is, using the property map. This way, each token doesn't need to store the repeated prefix/suffixes, and can build the actual uri in the wallet when the image needs to be loaded.
 
 I think it makes sense to include this for collections that still want to use URIs. This gets all the storage efficiency mentioned above, though none of the dynamic token benefits.  It does restrict developers to using a single uri pattern for all tokens in the collection, but that is generally the case anyway.  Projects could still use the individual `token_uri` if desired.
 
