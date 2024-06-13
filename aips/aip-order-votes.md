@@ -67,9 +67,9 @@ In most cases, a validator first receives the quorum certificate on the block `r
 
 ```
 pub struct OrderVoteMsg {
-	  order_vote: OrderVote
-    /// The quorum certificate on the block that is going to be ordered
-		quorum_cert: QuorumCert
+	order_vote: OrderVote
+    // The quorum certificate on the block that is going to be ordered
+	quorum_cert: QuorumCert
 }
 ```
 
@@ -126,7 +126,7 @@ Procedure process_order_vote_msg(order_vote_msg) {
 	commit_id <- order_vote_msg.order_vote.ledger_info.id
 	pending_order_votes[commit_id].add(order_vote.signature)
 	if |pending_order_votes[commit_id]| >= 2f+1 {
-	  // Add order_vote_msg.qc to the block store, if not already present
+	    // Add order_vote_msg.qc to the block store, if not already present
 		// Send the block with commit_id to execution
 		// Update highest_ordered_cert
 		finalize(order_vote.ledger_info)
