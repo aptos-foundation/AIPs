@@ -18,31 +18,31 @@ We define the consensus latency to be the time taken for validators to order a b
 
 We define the consensus latency to be the time taken for a proposed block to be ordered under the common case (where network is synchronous and the leader is non-faulty). In Jolteon consensus protocol, we consider a block is ordered when we obtain a 2-chain quorum certificate on the block. At the moment, Jolteon consensus protocol takes 4 hops of latency. In a nutshell, we are implementing the PBFT-style [1] ordering mechanism for the latency optimization. This is the timeline of the current consensus protocol for proposing and ordering a block `r`. 
 
-`Time t`:  The leader of block `r` creates and broadcasts the block `r`.
+- `Time t`:  The leader of block `r` creates and broadcasts the block `r`.
 
-`Time t+1`: All the other validators receive the block `r` and broadcasts a vote on `r`.
+- `Time t+1`: All the other validators receive the block `r` and broadcasts a vote on `r`.
 
-`Time t+2`: All the validators create a quorum certificate on the block `r` by aggregating the received votes. The next leader creates and broadcasts the block `r+1` . The block `r+1` includes the quorum certificate on the block `r` .  
+- `Time t+2`: All the validators create a quorum certificate on the block `r` by aggregating the received votes. The next leader creates and broadcasts the block `r+1` . The block `r+1` includes the quorum certificate on the block `r` .  
 
-`Time t+3`: All the validators receive the block `r+1` and broadcasts a vote on `r+1` . 
+- `Time t+3`: All the validators receive the block `r+1` and broadcasts a vote on `r+1` . 
 
-`Time t+4`: All the validators create a quorum certificate on the block `r+1` by aggregating the received votes. The validators now obtained a 2-chain quorum certificate on the block `r`. The validators now consider the block `r` as “ordered” and passes the block to the execution pipeline.
+- `Time t+4`: All the validators create a quorum certificate on the block `r+1` by aggregating the received votes. The validators now obtained a 2-chain quorum certificate on the block `r`. The validators now consider the block `r` as “ordered” and passes the block to the execution pipeline.
 
 This AIP aims to reduce the consensus latency from 4 hops to 3 hops. We start with the observation that the QC (Quorum Certificate) on the block `r+1` serves a dual purpose.
 
-The validators certify the block `r+1`.
+- The validators certify the block `r+1`.
 
-The validators create a 2-chain QC for the block `r` and order the block `r`.
+- The validators create a 2-chain QC for the block `r` and order the block `r`.
 
-All the validators have the QC on the block `r` at time t+2, but the validators effectively vote on this QC when they vote on the block `r+1` at time t+3. We aim to optimize the latency by letting the validators vote on the “QC of block `r`" at time t+2 without waiting to receive block `r+1`. We call these new type of votes as the “order votes”. The new timeline for ordering a block `r` looks as follows.
+All the validators have the QC on the block `r` at time `t+2`, but the validators effectively vote on this QC when they vote on the block `r+1` at time `t+3`. We aim to optimize the latency by letting the validators vote on the “QC of block `r`" at time `t+2` without waiting to receive block `r+1`. We call these new type of votes as the “order votes”. The new timeline for ordering a block `r` looks as follows.
 
-`Time t`:  The leader of block `r` creates and broadcasts the block `r`.
+- `Time t`:  The leader of block `r` creates and broadcasts the block `r`.
 
-`Time t+1`: All the other validators receive the block `r` and broadcasts a vote on `r`.
+- `Time t+1`: All the other validators receive the block `r` and broadcasts a vote on `r`.
 
-`Time t+2`: All the validators create a quorum certificate on the block `r` by aggregating the received votes. All the validators broadcasts on “order vote” on the created quorum certificate on the block `r`. The next leader creates and broadcasts the block `r+1` . The block `r+1` includes the quorum certificate on the block `r`.
+- `Time t+2`: All the validators create a quorum certificate on the block `r` by aggregating the received votes. All the validators broadcasts on “order vote” on the created quorum certificate on the block `r`. The next leader creates and broadcasts the block `r+1` . The block `r+1` includes the quorum certificate on the block `r`.
 
-`Time t+3`: All the validators receive the order votes and creates a quorum certificate on the order votes. The validators now obtained a 2-chain quorum certificate on the block `r`. The validators now consider the block `r` as “ordered” and passes the block to the execution pipeline. All the validators receive the block `r+1` and broadcasts a vote on `r+1`.
+- `Time t+3`: All the validators receive the order votes and creates a quorum certificate on the order votes. The validators now obtained a 2-chain quorum certificate on the block `r`. The validators now consider the block `r` as “ordered” and passes the block to the execution pipeline. All the validators receive the block `r+1` and broadcasts a vote on `r+1`.
 
 ## Specification
 
