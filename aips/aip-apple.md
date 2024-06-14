@@ -8,7 +8,7 @@ last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and
 type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
 created: 06/14/2024
 updated (*optional): <mm/dd/yyyy>
-requires (*optional): https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md
+requires (*optional): https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md 
 ---
 
 # AIP-X - Add Apple as a supported OIDC provider
@@ -44,9 +44,9 @@ requires (*optional): https://github.com/aptos-foundation/AIPs/blob/main/aips/ai
 
 ## Alternative solutions
 
- > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
+There are no alternatives. 
 
-...
+The decision is binary: Do we (not) want to support keyless accounts backed by Apple accounts?
 
 ## Specification and Implementation Details
 
