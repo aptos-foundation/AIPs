@@ -56,9 +56,27 @@ requires (*optional): https://github.com/aptos-foundation/AIPs/blob/main/aips/ai
 
 ## Reference Implementation
 
- > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
+The governance proposal that will be submitted is:
 
-...
+```rust
+script {
+    use aptos_framework::aptos_governance;
+    use aptos_framework::jwks;
+
+    fun main(core_resources: &signer) {
+        let core_signer = aptos_governance::get_signer_testnet_only(core_resources, @0x1);
+        let framework_signer = &core_signer;
+
+        jwks::upsert_oidc_provider(
+            framework_signer,
+            b"https://appleid.apple.com",
+            b"https://appleid.apple.com/.well-known/openid-configuration"
+        );
+
+        aptos_governance::reconfigure(framework_signer);
+    }
+}
+```
 
 ## Testing (Optional)
 
