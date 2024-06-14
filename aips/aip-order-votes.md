@@ -134,20 +134,6 @@ Procedure process_order_vote_msg(order_vote_msg) {
 }
 ```
 
-### Proof of Safety
-
-For safety, we need to ensure that if a block `B` at round `r` is ordered by aggregating enough order votes, any certified block `B'` for any round `r' > r` will have the block `B` as its ancestor. 
-
-If a block `B` at round `r` certified by `qc` is ordered by an order vote, there exists 2f+1 nodes that called `make_order_vote` and passed `safe_to_order_vote`. They have `highest_timeout_round < r` which means they haven’t send timeout for round `r`. Any timeout message they will send for rounds ≥ r has `highest_qc_round ≥ r`, since the values process the qc and update highest_qc_round before calling `make_order_vote(qc)`. Therefore any timeout_certificate will extend `B`.
-
-For leaders that include quorum_certificate in their proposal, the above 2f+1 nodes have `highest_qc_round ≥ r` and will not vote for blocks that do not extend `B`.
-
-Therefore any certified block with round `> r` must extend B.
-
-### Proof of Liveness
-
-Same as before, the change does not introduce any additional conditions for rest of the consensus protocol. Even if a validator fails to receive order votes for a block `r`, the validator can still order and execute the block `r` after receiving QC on the block `r+1`.
-
 ### Changes to certificate structure
 
 The order certificate and commit certificate were both of the type `QuorumCert` which contains VoteData of the block being certified, and the LedgerInfo of the block being ordered/committed. This means, the order certificate to order the block `r` would contain VoteData of block `r+1` and LedgerInfo of block `r`. With our new protocol, when a validator creates an order certificate by aggregating enough order votes on the block `r`, the validator may not have access to the block `r+1`. As the commit certificate is derived from the order certificate, we face the same issue in creating the commit certificate to commit the block `r`. 
