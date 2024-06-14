@@ -50,9 +50,10 @@ The decision is binary: Do we (not) want to support keyless accounts backed by A
 
 ## Specification and Implementation Details
 
- > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
+This AIP's implementation is very simple: we just submit a governance proposal to enable Apple support, described below.
 
-...
+If the proposal is accepted, the validators will start [JWK consensus](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md) to maintain a fresh view of Apple's JWKs.
+As a result, keyless accounts which are backed by Apple can now transact on chain.
 
 ## Reference Implementation
 
