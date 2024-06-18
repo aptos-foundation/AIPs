@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 88
 title: BlockEpilogue to replace StateCheckpoint transaction
 author: igor-aptos (https://github.com/igor-aptos)
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): AIP-57
 ---
 
-# AIP-X - BlockEpilogue to replace StateCheckpoint transaction
+# AIP-88 - BlockEpilogue to replace StateCheckpoint transaction
   
 ## Summary
 
