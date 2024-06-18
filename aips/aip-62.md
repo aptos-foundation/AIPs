@@ -125,9 +125,17 @@ onNetworkChange(newNetwork: NetworkInfo):Promise<void>
 `aptos:signAndSubmitTransaction*` method to sign and submit a transaction using the current connected account in the wallet.
 
 ```ts
-// `transaction: AnyRawTransaction` - a generated raw transaction created with Aptos’ TS SDK
+/**
+ * interface AptosSignAndSubmitTransactionInput {
+ *  gasUnitPrice?: number;  // defaults to estimated gas unit price
+ *  maxGasAmount?: number;  // defaults to estimated max gas amount
+ *  payload: InputGenerateTransactionPayloadData; // the transaction payload
+ * }
+ */
 
-signAndSubmitTransaction(transaction: AnyRawTransaction): Promise<UserResponse<PendingTransactionResponse>>;
+// `AptosSignAndSubmitTransactionInput` - the transaction details in a JSON format
+
+signAndSubmitTransaction(AptosSignAndSubmitTransactionInput): Promise<UserResponse<{string:hash}>>;
 ```
 
 `aptos:changeNetwork*` event for the dapp to send to the wallet to change the wallet’s current network
