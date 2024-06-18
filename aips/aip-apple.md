@@ -80,16 +80,18 @@ script {
  > - When can we expect the results?
  > - What are the test results and are they what we expected? If not, explain the gap.
 
-To be discussed.
+To be discussed more. For now:
+
+1. Make sure JWK consensus correctly handles Apple via smoke tests.
+2. Do a manual end-to-end test in devnet for an Apple keyless account.
 
 ## Security Considerations
 
- > - How can this AIP potentially impact the security of the network and its users? How is this impact mitigated?
- > - Are there specific parts of the code that could introduce a security issue if not implemented properly?
- > - Link tests (e.g. unit, end-to-end, property, fuzz) in the reference implementation that validate both expected and unexpected behavior of this proposal
- > - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
+There should be no code changes, beyond some tests.
 
-...
+Nonetheless, as is the case for any keyless account, the security of that account = the security of its OIDC provider. Currently, all keyless accounts rely on Google, so this AIP would give users the option to rely on Apple for their account's security.
+
+An argument could be made that this strengthens the liveness/durability of keyless accounts if they are set up as a 1-out-of-2 account with Google and Apple.
 
 ## Future Potential
 
