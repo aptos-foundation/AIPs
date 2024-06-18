@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 90
 title: Add Apple as a supported OIDC provider
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/452
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md 
 ---
 
-# AIP-X - Add Apple as a supported OIDC provider
+# AIP-90 - Add Apple as a supported OIDC provider
 
 ## Summary
 
