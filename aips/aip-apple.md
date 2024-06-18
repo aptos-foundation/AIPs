@@ -15,11 +15,6 @@ requires (*optional): https://github.com/aptos-foundation/AIPs/blob/main/aips/ai
 
 ## Summary
 
- > Summarize in 3-5 sentences.
- > Define the problem we're solving.
- > How does this document propose solving it.
- > What are the goals and what is in scope? Any metrics?
-
 We are proosing adding Apple as a supported OIDC provider for Aptos Keyless accounts.
 This would allow users to "Sign in with Apple" inside dapps and/or wallets.
 A net effect of this change would be that Aptos validators are going to periodically refresh their views of Apple's JWKs[^jwks] via JWK consensus[^aip-67].
