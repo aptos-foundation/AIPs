@@ -20,31 +20,26 @@ requires (*optional): https://github.com/aptos-foundation/AIPs/blob/main/aips/ai
  > How does this document propose solving it.
  > What are the goals and what is in scope? Any metrics?
 
-...
+We are proosing adding Apple as a supported OIDC provider for Aptos Keyless accounts.
+This would allow users to "Sign in with Apple" inside dapps and/or wallets.
+A net effect of this change would be that Aptos validators are going to periodically refresh their views of Apple's JWKs[^jwks] via JWK consensus[^aip-67].
+It is worth emphasizing that Apple's OIDC implementation is privacy-preserving and, as a result, prevents the mechanism for recovering Apple-based keyless accounts associated with disappeared dapps and/or wallets[^aip-61-recovery] (see ["Impact"](#impact)).
 
-### Out of Scope
+## Impact and risks
 
- > What are we committing to not doing and why are they scoped out?
+Apple's OIDC implementation is more privacy-preserving than Google's.
+Specifically, when the same Apple user signs in into two different applications, each application sees a different, application-specific `sub` identifier for the user.
+As a result, colluding applications cannot tell if they are authenticating the same user or not.
+In the OIDC standard, this privacy-preserving technique is referred to as _pairwise-pseudonymous identifiers (PPID)_[^ppid].
 
-...
+**Note:** Even if the application asks for the `email` field to be included, the Apple user can enable the "Hide my email" option when signing in, which results in an application-specific `email` field as well.
 
-## High-level Overview
-
- > Define the strawman solution with enough details to make it clear why this is the preferred solution.
- > Please write a 2-3 paragraph high-level overview here and defer writing a more detailed description in [the specification section](#specification-and-implementation-details).
-
-...
-
-## Impact
-
- > Which audiences are impacted by this change? What type of action does the audience need to take?
- > What might occur if we do not accept this proposal?
-
-...
+As a result of this, the approach for dealing with disappearing dapps for Apple keyless users described in AIP-61[^aip-61-recovery] does not apply, since it assumes different applications see the same `sub` for the same Apple user.
+This puts onus on either users or applications to guarantee recovery via some other mechanism (e.g., `t`-out-of-`n` accounts, passkeys[^passkeys]).
 
 ## Alternative solutions
 
-There are no alternatives. 
+There are no alternatives beyond continuing to rely on [Google as the only supported OIDC provider](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-69.md).
 
 The decision is binary: Do we (not) want to support keyless accounts backed by Apple accounts?
 
@@ -85,13 +80,7 @@ script {
  > - When can we expect the results?
  > - What are the test results and are they what we expected? If not, explain the gap.
 
-...
-
-## Risks and Drawbacks
-
- > - Express here the potential risks of taking on this proposal. What are the hazards? What can go wrong?
- > - Can this proposal impact backward compabitibility?
- > - What is the mitigation plan for each risk or drawback?
+To be discussed.
 
 ## Security Considerations
 
@@ -104,38 +93,33 @@ script {
 
 ## Future Potential
 
- > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in one year? In five years?
-
-...
+This will allow onboarding more users into the Aptos blockchain via keyless accounts[^aip-61].
 
 ## Timeline
 
 ### Suggested implementation timeline
 
- > Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
-
-...
+N/A, as this is an on-chain configuration change.
 
 ### Suggested developer platform support timeline
 
- > Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
+N/A, as this is an on-chain configuration change.
 
-...
+The SDK already handles additional OIDC providers.
 
 ### Suggested deployment timeline
 
- > Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
- > You are responsible for updating this AIP with a better estimate, if any, after the AIP passes the gatekeeper’s design review.
- >
- > - On devnet?
- > - On testnet?
- > - On mainnet?
-
-...
-
+As soon as possible. To be discussed and agreed upon.
 
 ## Open Questions (Optional)
 
- > Q&A here, some of them can have answers some of those questions can be things we have not figured out but we should
+**Key question:** What would be a user-friendly recovery mechanism[^aip-61-recovery] for OIDC providers like Apple that have PPIDs?
 
-...
+## References
+
+[^aip-61]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md
+[^aip-67]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md
+[^aip-61-recovery]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#recovery-service
+[^jwks]: https://appleid.apple.com/.well-known/openid-configuration
+[^passkeys]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-66.md
+[^ppid]: https://openid.net/specs/openid-connect-core-1_0.html#Terminology
