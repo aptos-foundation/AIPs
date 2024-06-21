@@ -36,7 +36,7 @@ The alternative solution is to manually implement the BN254 elliptic curve arith
 
 The BN254 Move module is efficiently implemented in `aptos_std::bn254_algebra`[^bn254-move] via native functions, in the same fashion as the BLS12-381 Move module in AIP-20[^aip-20].
 
-The implementation[^pr] uses the `ark-bn254` crate for the elliptic curve arithmetic.
+The implementation[^pr] uses the `ark-bn254` crate[^ark-bn254] for the elliptic curve arithmetic.
 
 ## Reference Implementation
 
@@ -139,7 +139,7 @@ One risk could be that the gas costs might not be well calibrated. This could ei
 
 ## Security Considerations
 
-The Move module is implemented using the `arkworks` library. 
+The Move module is implemented using the `arkworks` ecosystem, specifically, the `ark-bn254` crate[^ark-bn254]. 
 This library, although very popular, has not been audited.
 Bugs in this library would yield bugs in our Move module. Additional bugs could be present in our own use of `arkworks`.
 
