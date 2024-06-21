@@ -36,7 +36,7 @@ The alternative solution is to manually implement the BN254 elliptic curve arith
 
 The BN254 Move module is efficiently implemented in `aptos_std::bn254_algebra`[^bn254-move] via native functions, in the same fashion as the BLS12-381 Move module in AIP-20[^aip-20].
 
-The community pull request that implements it is [here](https://github.com/aptos-labs/aptos-core/pull/11142).
+The implementation[^pr] uses the `ark-bn254` crate for the elliptic curve arithmetic.
 
 ## Reference Implementation
 
@@ -184,3 +184,4 @@ None.
 [^eth-bn254]: https://eips.ethereum.org/EIPS/eip-196
 [^gnark-crypto]: https://github.com/Consensys/gnark-crypto
 [^keyless]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md
+[^pr]: https://github.com/aptos-labs/aptos-core/pull/11142
