@@ -148,6 +148,8 @@ As each validator need to broadcast the order vote to all the validators, the co
 
 Each validator need to verify the order votes from all the other validators, increasing the computational complexity.
 
+In a load test with mempool backlog set to 30k transactions, enabling order votes resulted in roughly 200 TPS higher throughput and 100 ms lower latency. There is no visible difference in the CPU, memory or disk usage of the validators.
+
 ## Release Plan
 
 As we introduce a new type of consensus message, this change is not backward compatible due to 2 reasons.
