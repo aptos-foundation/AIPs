@@ -176,6 +176,7 @@ None.
 ## References
 
 [^aip-20]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-20.md ↩
+[^ark-bn254]: https://crates.io/crates/ark-bn254
 [^barretenberg]: https://github.com/AztecProtocol/barretenberg
 [^bn254-move]: https://github.com/aptos-labs/aptos-core/blob/aptos-release-v1.12/aptos-move/framework/aptos-stdlib/sources/cryptography/bn254_algebra.move
 [^bn-curves]: https://eprint.iacr.org/2005/133
