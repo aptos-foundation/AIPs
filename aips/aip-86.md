@@ -139,7 +139,9 @@ One risk could be that the gas costs might not be well calibrated. This could ei
 
 ## Security Considerations
 
-The Move module is implemented using the `arkworks` library. Bugs in this library would yield bugs in our Move module. Additional bugs could be present in our own use of `arkworks`.
+The Move module is implemented using the `arkworks` library. 
+This library, although very popular, has not been audited.
+Bugs in this library would yield bugs in our Move module. Additional bugs could be present in our own use of `arkworks`.
 
 Such bugs could break the soundness and/or correctness of the Move applications built on top of this BN254 module.
 
