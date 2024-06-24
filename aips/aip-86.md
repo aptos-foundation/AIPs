@@ -36,7 +36,7 @@ The alternative solution is to manually implement the BN254 elliptic curve arith
 
 The BN254 Move module is efficiently implemented in `aptos_std::bn254_algebra`[^bn254-move] via native functions, in the same fashion as the BLS12-381 Move module in AIP-20[^aip-20].
 
-The community pull request that implements it is [here](https://github.com/aptos-labs/aptos-core/pull/11142).
+The implementation[^pr] uses the `ark-bn254` crate[^ark-bn254] for the elliptic curve arithmetic.
 
 ## Reference Implementation
 
@@ -139,7 +139,9 @@ One risk could be that the gas costs might not be well calibrated. This could ei
 
 ## Security Considerations
 
-The Move module is implemented using the `arkworks` library. Bugs in this library would yield bugs in our Move module. Additional bugs could be present in our own use of `arkworks`.
+The Move module is implemented using the `arkworks` ecosystem, specifically, the `ark-bn254` crate[^ark-bn254]. 
+This library, although very popular, has not been audited.
+Bugs in this library would yield bugs in our Move module. Additional bugs could be present in our own use of `arkworks`.
 
 Such bugs could break the soundness and/or correctness of the Move applications built on top of this BN254 module.
 
@@ -174,6 +176,7 @@ None.
 ## References
 
 [^aip-20]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-20.md ↩
+[^ark-bn254]: https://crates.io/crates/ark-bn254
 [^barretenberg]: https://github.com/AztecProtocol/barretenberg
 [^bn254-move]: https://github.com/aptos-labs/aptos-core/blob/aptos-release-v1.12/aptos-move/framework/aptos-stdlib/sources/cryptography/bn254_algebra.move
 [^bn-curves]: https://eprint.iacr.org/2005/133
@@ -181,3 +184,4 @@ None.
 [^eth-bn254]: https://eips.ethereum.org/EIPS/eip-196
 [^gnark-crypto]: https://github.com/Consensys/gnark-crypto
 [^keyless]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md
+[^pr]: https://github.com/aptos-labs/aptos-core/pull/11142
