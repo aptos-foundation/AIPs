@@ -55,6 +55,31 @@ pub enum BlockEndInfo {
 }
 ```
 
+Rest API will return transactions in this format:
+
+```
+{
+    "version":"1912",
+    "hash":"0x54a8efc93fc94f5b545dadb63da3d4dc192125c717b336dc446d55a5b553913f",
+    "state_change_hash":"0xafb6e14fe47d850fd0a7395bcfb997ffacf4715e0f895cc162c218e4a7564bc6",
+    "event_root_hash":"0x414343554d554c41544f525f504c414345484f4c4445525f4841534800000000",
+    "state_checkpoint_hash":"0x841a43956ca09a02b1c1cdadc65f24c390170aa666015a2e8f7ec5c9d6a3875f",
+    "gas_used":"0",
+    "success":true,
+    "vm_status":"Executed successfully",
+    "accumulator_root_hash":"0x6561976b4560ff25239dffc6cada70e7008dd42fc4d3df2eca6a86b6d2ec384d",
+    "changes":[],
+    "timestamp":"1719263322836578",
+    "block_end_info": {
+        "block_gas_limit_reached":false,
+        "block_output_limit_reached":false,
+        "block_effective_block_gas_units":0,
+        "block_approx_output_size":1163
+    },
+    "type":"block_epilogue_transaction"
+}
+```
+
 ## Impact
 
 StateCheckpoint transaction will stop being produced, and BlockEpilogue will be produced instead.
