@@ -22,7 +22,8 @@ However, OpenID Connect authenticates users based on personally-identifying info
 - The OpenID provider must **not** learn which account addresses are linked to which OpenID users.
 - The validators (and other outside observers) also must **not** learn the link between account addresses and OpenID users.
 
-To achieve privacy, a **zero-knowledge proof (ZKP)** is given by users to validators to authenticate transactions. Generating such a proof must be done each time a user logs in, and then each time the user's ephemeral public key expires[^spec], and is computationally intensive. To allow for users to log in quickly and on low-powered hardware, the proof computation must be offloaded to a **prover service**.
+To achieve privacy, a **zero-knowledge proof (ZKP)** is given by users to validators to authenticate transactions. Generating such a proof must be done each time a user logs in, and then each time the user's ephemeral public key expires[^spec], and is computationally intensive. 
+To allow for users to log in quickly and on low-powered hardware, the proof computation must be offloaded to a **prover service**.
 
 This AIP's focus will be the motivation, design and risks around this prover service.
 
@@ -36,7 +37,8 @@ The goals of the prover are as follows:
 
 ### Out of Scope
 
-Initially, there will **not** be any privacy for the user with respect to the prover service itself. The privacy guarantees will only be with respect to the OIDC provider and the blockchain. 
+Initially, there will **not** be any privacy for the user with respect to the prover service itself.
+The privacy guarantees will only be with respect to the OIDC provider and the blockchain. 
 
 That is, the prover service will **temporarily** learn the user's private information, while computing the ZKP, including:
 
@@ -48,11 +50,14 @@ The fact that the prover service learns this information creates some privacy an
 
 ## Motivation
 
-The prover service will allow for the most computationally intensive step during login to be offloaded to a powerful cloud VM instead of being done locally. This drastically reduces the time between when a user logs in with their keyless account to when that user is able to transact, from ~25 seconds to 3 seconds. In turn, this greatly improves the user experience of keyless accounts.
+The prover service will allow for the most computationally intensive step during login to be offloaded to a powerful cloud VM instead of being done locally. 
+This drastically reduces the time between when a user logs in with their keyless account to when that user is able to transact, from ~25 seconds to 3 seconds. 
+In turn, this greatly improves the user experience of keyless accounts.
 
 ## Impact
 
-The direct impact of this AIP will be on users of keyless accounts. The impact will be threefold:
+The direct impact of this AIP will be on users of keyless accounts. 
+The impact will be threefold:
 1. Users will have a much faster login experience than they would if proofs were generated client-side.
    + From preliminary benchmarks, generating proofs in-browser takes such a long time that is completely unusable. (i.e., > 25 seconds to generate the proof.)
    + In contrast, the time to generate the proof server-side is less than 3 seconds.
@@ -183,14 +188,13 @@ pub struct Groth16Proof {
 }
 ```
 
-
 ## Reference Implementation
 
 The code repository for the prover service can be found in [https://github.com/aptos-labs/prover-service](https://github.com/aptos-labs/prover-service).
 
 ## Risks and Drawbacks
  
-The main risks of the prover service fall into three categories:
+The main risks of the prover service fall into these categories:
 
 - **Liveness risks.** If the training wheels are **on** and the prover service is down, then some keyless users will not be able to transact.
   - This is because the blockchain validators expect a training wheels signature over the ZKP, which users will not be able to obtain with the prover service down.
@@ -210,12 +214,12 @@ The main risks of the prover service fall into three categories:
 
 The prover service is implemented and will be deployed as part of mainnet release v1.10.
 
-## Future Potential/Open Questions 
+## Future Potential/Open Questions
 
 To mitigate the privacy, cost and centralization risks described above, the following questions are key:
 
 * Can we design a new ZKP with fast proving time so as to allow for client-side proving, and thus eliminate the prover service altogether?
-* If not, can we design a prover service which is "blind", i.e., it does not learn any sensitive information about users? In principle, this is achievable via multi-party computation, but the implementation complexity could be very high.
+* If not, can we design a prover service which is "blind", i.e., it does not learn any sensitive information about users? In principle, this is achievable via multi-party computation, but the implementation (and deployment) complexity could be very high.
 
 ## References
 
