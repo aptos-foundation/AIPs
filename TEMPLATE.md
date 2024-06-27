@@ -43,7 +43,7 @@ requires (*optional): <AIP number(s)>
 
  > Which audiences are impacted by this change? What type of action does the audience need to take?
  > What might occur if we do not accept this proposal?
-
+ > List out other AIPs this AIP is dependent on
 ...
 
 ## Alternative solutions
@@ -61,7 +61,7 @@ requires (*optional): <AIP number(s)>
 ## Reference Implementation
 
  > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
-
+ > What is the feature flag(s)? If there is no feature flag, how will this be enabled?
 ...
 
 ## Testing (Optional)
