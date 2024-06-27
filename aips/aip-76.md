@@ -1,7 +1,7 @@
 ---
 aip: 76
 title: Digital Assets Composability
-author: aladeenb, jczhang
+author: aladeenb (aladeen@codeandledger.com), jczhang
 discussions-to:  https://github.com/aptos-foundation/AIPs/pull/278#issue
 Status: Draft
 last-call-end-date:
@@ -620,6 +620,5 @@ supposing the AIP passes the gatekeeper’s design review.
 
 ...
 
-- On devnet: by February 2024
-- On testnet: by March 2024
-- On mainnet: by late March 2024
+- On testnet: by March 2024 (`0x24fc1f4cc2c97eba9a33a90cc09cfb27e6cb63c17a80f00a954a57451bdbe644`)
+- On mainnet: by late March 2024 (`0xd758b832d4d8fcad58ac7363a6b87af342a6e0dfd25897aa65233c606526e8f4`)
