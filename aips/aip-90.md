@@ -15,10 +15,10 @@ requires (*optional): https://github.com/aptos-foundation/AIPs/blob/main/aips/ai
 
 ## Summary
 
-We are proosing adding Apple as a supported OIDC provider for Aptos Keyless accounts.
+We are proposing adding Apple as a supported OIDC provider for Aptos Keyless accounts.
 This would allow users to "Sign in with Apple" inside dapps and/or wallets.
-A net effect of this change would be that Aptos validators are going to periodically refresh their views of Apple's JWKs[^jwks] via JWK consensus[^aip-67].
-It is worth emphasizing that Apple's OIDC implementation is privacy-preserving and, as a result, prevents the mechanism for recovering Apple-based keyless accounts associated with disappeared dapps and/or wallets[^aip-61-recovery] (see ["Impact"](#impact)).
+This change requires Aptos validators to periodically refresh their views of Apple's JWKs[^jwks] via JWK consensus[^aip-67].
+It is worth emphasizing Apple's OIDC implementation is privacy-preserving, and, as a result, prevents the mechanism for recovering Apple-based keyless accounts associated with disappeared dapps and/or wallets[^aip-61-recovery] (see ["Impact"](#impact)).
 
 ## Impact and risks
 
@@ -40,7 +40,7 @@ The decision is binary: Do we (not) want to support keyless accounts backed by A
 
 ## Specification and Implementation Details
 
-This AIP's implementation is very simple: we just submit a governance proposal to enable Apple support, described below.
+This AIP's implementation is very simple: we submit a governance proposal to enable Apple support, described below.
 
 If the proposal is accepted, the validators will start [JWK consensus](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md) to maintain a fresh view of Apple's JWKs.
 As a result, keyless accounts which are backed by Apple can now transact on chain.
