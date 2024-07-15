@@ -16,7 +16,7 @@ requires:
 
 ## Summary
 
-Conflicting transactions requre sequential execution, and can waste resources and reduce throughput of the system.
+Conflicting transactions require sequential execution, and can waste resources and reduce throughput of the system.
 
 This AIP proposes to update the Transaction Shuffler logic to add other reasons for conflicts to how transactions are ordered in the block. In addition to using senders to spread out transactions (from [AIP-27](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-27.md)), this AIP will extend that to spread out adjacent transactions (in the proposed order) that are relevant to the same "use case", as an approximation of having higher likelihood of conflicting. Defining a "use case" as the author of the contract being invoked by the transaction, for now, the new algorithm gives transactions from non-dominant contract a better chance of surviving a potential block cut resulting from the conflicting transactions hitting the effective block gas limit early, without meaningfully affecting conflicting workload, unless the system is heavily overloaded.
 
@@ -26,7 +26,7 @@ The Transaction Shuffler being updated concerns only the ordering of transaction
 
 ## High-level Overview
 
-With [AIP-33](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-33.md) and [AIP-57](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-57.md), we cut blocks short at execution time whenever the block latency is estimated to be too long. Specificially, AIP-57 makes block gas limit be conflict aware, and once sequential workload exceeds single threads gas limit, block is cut (even if other threads had plenty of idle time). This is expected to happen in this particular situation where spikes of conflicting/sequential transactions from a popular module dominates the traffic, in which case most of the transactions from the proposed block are from a one single entry function and many "innocent transactions" from other modules / entry functions gets cut with the block limit being hit, resulting in wasted resources (idle cores) and universally degraded user experience. By spreading out transactions from the same use case, these "innocent transactions" gets pushed earlier in a block, allowing them to utilize those idle cores, and giving them a better chance to survive the cut, with most likely block itself being cut at the same single-thread block gas limit. This uses approximation that transaction from different use cases tend to utilize non-conflicting resources.
+With [AIP-33](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-33.md) and [AIP-57](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-57.md), we cut blocks short at execution time whenever the block latency is estimated to be too long. Specifically, AIP-57 makes block gas limit be conflict aware, and once sequential workload exceeds single threads gas limit, block is cut (even if other threads had plenty of idle time). This is expected to happen in this particular situation where spikes of conflicting/sequential transactions from a popular module dominates the traffic, in which case most of the transactions from the proposed block are from a one single entry function and many "innocent transactions" from other modules / entry functions gets cut with the block limit being hit, resulting in wasted resources (idle cores) and universally degraded user experience. By spreading out transactions from the same use case, these "innocent transactions" gets pushed earlier in a block, allowing them to utilize those idle cores, and giving them a better chance to survive the cut, with most likely block itself being cut at the same single-thread block gas limit. This uses approximation that transaction from different use cases tend to utilize non-conflicting resources.
 
 Similar to [AIP-27](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-27.md), the proposed algorithm tries to spread out "conflicting" transactions while generally maintaining the input order. While the shuffler used to consider the transaction sender as the sole factor of "conflict", we propose to consider two dimensions: the transaction sender and the "use case" of the transaction. At this point, the use case is defined as the author of the contract being called by the transaction, however it's imaginable to have more sophisticated ways to categorize transactions to exclusive use cases in the context of a block.
 
@@ -140,7 +140,7 @@ In a local testing cluster, in certain cases, simple platform
 ## Future Potential
 
 * Similar throughput considerations can be put inside the process of forming the initial block proposals by picking transactions from the mempool.
-* More sophisticated heuristics can be utilized to define "use cases", for example, but statically analyze the contracts and scripts being called, the transactions of a block can be categorized so that transaction across different categories are unlikely to access the same group of resources.
+* More sophisticated heuristics can be utilized to define "use cases", for example, by statically analyze the contracts and scripts being called, the transactions of a block can be categorized so that transaction across different categories are unlikely to access the same group of resources.
 
 ## Timeline
 
