@@ -3,7 +3,7 @@ aip: 62
 title: Wallet Standard
 author: 0xmaayan, hardsetting, NorbertBodziony
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/306
-Status: Adoption
+Status: Accepted
 last-call-end-date (*optional):
 type: Ecosystem Standard
 created: 29/01/2024
@@ -17,7 +17,7 @@ The Wallet standard defines a universal API for wallet and application interacti
 
 ## Motivation
 
-Most web wallets today come in the form of browser extensions. These extensions interact with dApps by injecting themselves to the global window object and exepct a dapp to detect them by reading the window object.
+Most web wallets today come in the form of browser extensions. These extensions interact with dApps by injecting themselves to the global window object and expect a dapp to detect them by reading the window object.
 There are several issues with the way it works today.
 
 1. This method requires the dapp to be made aware of how they can find these objects and must choose to support a limited number of wallets that may not be relevant to the user.
@@ -125,9 +125,17 @@ onNetworkChange(newNetwork: NetworkInfo):Promise<void>
 `aptos:signAndSubmitTransaction*` method to sign and submit a transaction using the current connected account in the wallet.
 
 ```ts
-// `transaction: AnyRawTransaction` - a generated raw transaction created with Aptos’ TS SDK
+/**
+ * interface AptosSignAndSubmitTransactionInput {
+ *  gasUnitPrice?: number;  // defaults to estimated gas unit price
+ *  maxGasAmount?: number;  // defaults to estimated max gas amount
+ *  payload: InputGenerateTransactionPayloadData; // the transaction payload
+ * }
+ */
 
-signAndSubmitTransaction(transaction: AnyRawTransaction): Promise<UserResponse<PendingTransactionResponse>>;
+// `AptosSignAndSubmitTransactionInput` - the transaction details in a JSON format
+
+signAndSubmitTransaction(AptosSignAndSubmitTransactionInput): Promise<UserResponse<{string:hash}>>;
 ```
 
 `aptos:changeNetwork*` event for the dapp to send to the wallet to change the wallet’s current network

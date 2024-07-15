@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 81
 title: Pepper service for keyless accounts
 author: Zhoujun Ma (zhoujun@aptoslabs.com)
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Pepper service for keyless accounts
+# AIP-81 - Pepper service for keyless accounts
 
 ## Summary
 

@@ -1,6 +1,6 @@
 ---
 aip: 41
-title: Move APIs for randomness generation
+title: Move APIs for public randomness generation
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/185
 Status: Accepted
@@ -11,37 +11,23 @@ updated (*optional): <07/28/2023>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-41 - Move APIs for randomness generation
+# AIP-41 - Move APIs for public randomness generation
 
-**Version:** 1.2
+**Version:** 1.3 (changelog [here](#Changelog))
 
 ## Summary
 
 > Include a brief description summarizing the intended change. This should be no more than a couple of sentences. 
 
-This AIP proposes a new Move module called `aptos_framework::randomness` which enables smart contracts to **easily** and **securely** generate publicly-verifiable randomness.
+This AIP proposes a new Move module called `aptos_framework::randomness` which enables smart contracts to **easily** and **securely**[^security] generate publicly-verifiable randomness.
 
-The proposed `randomness` module leverages an underlying _on-chain cryptographic randomness implementation_ run by the Aptos validators. This implementation, however, is **outside the scope** of this AIP and will be the focus of a different, future AIP. 
-
-**TODO:** _Link to on-chain randomness implementation AIP here._
+The proposed `randomness` module leverages an underlying _on-chain cryptographic randomness implementation_ run by the Aptos validators. This implementation, however, is **outside the scope** of this AIP and will be the focus of [a different AIP](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-79.md). 
 
 The only thing this AIP does assume of the _on-chain randomness_ is that it is **unbiasable** and **unpredictable**, even by a malicious minority of the validators (as weighed by stake).
 
 > Discuss the business impact and business value this change would impact.
 
 We believe that easy-to-use, secure randomness inside Move smart contracts will open up new possibilities for **randomized dapps (randapps)**: dapps whose core functionality requires an unbiasable and unpredictable source of entropy (e.g., games, randomized NFTs airdrops, raffles).
-
-## Real randomness versus pseudo-randomness
-
-There is wide-spread confusion about whether **real randomness** should be preferred to (cryptographic) **pseudo-randomness**. 
-
-"Real" randomness comes from random events in the universe (e.g., [radioactive decay](https://www.fourmilab.ch/hotbits/)). 
- 
-But the problem with "real" randomness is there is **no way** for a smart contract **to verify** that the provided "real" randomness is indeed real. In other words, a malicious randomness beacon could bias the "real" randomness in any way it wants and there would be no way for a smart contract to detect this. 
-
-This is where (cryptographic) pseudo-randomness shines. 
- 
-Unlike "real" randomness, pseduo-randomness is **cryptographically-verifiable**. This means there is code that one can write in a smart contract to verify the validity of the pseudo-randomness. Furthermore, pseudo-randomness is **provably-indistinguishable** from real randomness, assuming the hardness of certain cryptographic assumptions. In simpler words, no one can tell it's not real randomness anyway (unless they have its associated cryptographic proof and can verify it as a valid pseudo-randomness, of course).
 
 ## Motivation
 
@@ -54,7 +40,7 @@ The impetus for this change is two-fold:
 
 > What might occur if we do not accept this proposal?
 
-1. **No (secure) randapps**: randomized dapps will either (1) not be easily-enabled on Aptos, hampering ecosystem growth and/or (2) not be securely-enabled, due to the subtleness of importing external randomness on-chain (see discussion in [“Rationale”](#Rationale) below).
+1. **No (secure) randapps**: randomized dapps will either (1) not be easily-enabled on Aptos, hampering ecosystem growth and/or (2) not be securely-enabled, due to the subtleness of importing external randomness on-chain (see discussion in [“Rationale”](#Rationale) below). On the other hand, there are [subtleties with using this API as well](#security-considerations).
 2. **Stifled innovation:** Not accepting this proposal could be short-sighted as it would be closing the door to other MPC use cases, which other blockchains support, as hinted above
 
 ## Impact
@@ -62,6 +48,37 @@ The impetus for this change is two-fold:
 > Which audiences are impacted by this change? What type of action does the audience need to take?
 
 Only **Move developers** are “affected”: they need to learn how to use this new `randomness` module, which is designed to be easy to understand & use.
+
+## Understanding different types of randomness
+
+### Public randomness versus secret randomness
+
+This AIP describes an API for generating **public** randomness.
+This means that everybody will learn the generated randomness.
+In other words, there is no way to keep the generated randomness **secret**.
+So applications that require **secrecy** should **NOT** use this API.
+
+For example:
+ 1. You should **not** use this API to generate secret keys
+ 2. You should **not** use this API to generate blinding factors for hiding commitments
+ 3. You should **not** use this API to generate a secret preimage of a hash (e.g., [S/KEY](https://en.wikipedia.org/wiki/S/KEY)-like schemes)
+
+Instead, you can safely[^security] use this API to publicly generate randomness:
+ 1. You can use this API to generate Fiat-Shamir challenges in interactive ZK protocols
+ 2. You can use this API to publicly-pick the winner of a raffle
+ 3. You can use this API to publicly-distribute airdrops to a list of eligible recipients
+
+### Real randomness versus pseudo-randomness
+
+There is wide-spread confusion about whether **real randomness** should be preferred over (cryptographic) **pseudo-randomness**. 
+
+"Real" randomness comes from random events in the universe (e.g., [radioactive decay](https://www.fourmilab.ch/hotbits/)). 
+
+But the problem with "real" randomness is there is **no way** for a smart contract **to verify** that the provided "real" randomness is indeed real. In other words, a malicious randomness beacon could bias the "real" randomness in any way it wants and there would be no way for a smart contract to detect this. 
+
+This is where (cryptographic) pseudo-randomness shines. 
+
+Unlike "real" randomness, pseduo-randomness is **cryptographically-verifiable**. This means there is code that one can write in a smart contract to verify the validity of the pseudo-randomness. Furthermore, pseudo-randomness is **provably-indistinguishable** from real randomness, assuming the hardness of certain cryptographic assumptions. In simpler words, no one can tell it's not real randomness anyway (unless they have its associated cryptographic proof and can verify it as a valid pseudo-randomness, of course).
 
 ## Rationale
 
@@ -95,7 +112,7 @@ The module offers a suite functions for randomly-sampling a wide-variety of obje
 - `randomness::bytes(n)` uniformly samples a vector of `n` bytes.
 - `randomness::permutation(n)` returns a random shuffle of the vector `[0, 1, 2, ..., n-1]`.
 
-Contracts can safely sample multiple objects via repeated calls to these functions. For example, the code below samples two `u64`'s and one `u256`:
+Contracts can safely[^security] sample multiple objects via repeated calls to these functions. For example, the code below samples two `u64`'s and one `u256`:
 
 ```rust
 let n1 = randomness::u64_integer();
@@ -145,10 +162,9 @@ module raffle::raffle {
     use aptos_framework::aptos_coin::AptosCoin;
     use aptos_framework::coin;
     use aptos_framework::randomness;
-    use aptos_std::smart_vector;
-    use aptos_std::smart_vector::SmartVector;
     use aptos_framework::coin::Coin;
     use std::signer;
+    use std::vector;
 
     // We need this friend declaration so our tests can call `init_module`.
     friend raffle::raffle_test;
@@ -175,7 +191,7 @@ module raffle::raffle {
         move_to(
             deployer,
             Raffle {
-                tickets: smart_vector::empty(),
+                tickets: vector::empty(),
                 coins: coin::zero(),
                 is_closed: false,
             }
@@ -200,7 +216,7 @@ module raffle::raffle {
         coin::merge(&mut raffle.coins, coins);
 
         // Issue a ticket for that user
-        smart_vector::push_back(&mut raffle.tickets, signer::address_of(user))
+        vector::push_back(&mut raffle.tickets, signer::address_of(user))
     }
 
     /// Can only be called as a top-level call from a TXN, preventing **test-and-abort** attacks.
@@ -213,11 +229,11 @@ module raffle::raffle {
     public(friend) fun randomly_pick_winner_internal(): address acquires Raffle {
         let raffle = borrow_global_mut<Raffle>(@raffle);
         assert!(!raffle.is_closed, E_RAFFLE_HAS_CLOSED);
-        assert!(!smart_vector::is_empty(&raffle.tickets), E_NO_TICKETS);
+        assert!(!vector::is_empty(&raffle.tickets), E_NO_TICKETS);
 
         // Pick a random winner in [0, |raffle.tickets|)
-        let winner_idx = randomness::u64_range(0, smart_vector::length(&raffle.tickets));
-        let winner = *smart_vector::borrow(&raffle.tickets, winner_idx);
+        let winner_idx = randomness::u64_range(0, vector::length(&raffle.tickets));
+        let winner = *vector::borrow(&raffle.tickets, winner_idx);
 
         // Pay the winner
         let coins = coin::extract_all(&mut raffle.coins);
@@ -402,7 +418,7 @@ In this sense, randapps are just as susceptible to maliciously-introduced bugs a
 
 > Any security implications/considerations?
 
-Yes. We discuss them below.
+Yes[^security]. We discuss them below.
 
 ### Security consideration: Accidentally re-generating the same randomness
 
@@ -478,7 +494,69 @@ We can inspect the Move VM callstack to check if a `randomness` **native** funct
 
 ### Security consideration: Preventing undergasing attacks
 
-If developers were aware of undergasing attacks, they could carefully write their contracts to avoid them (e.g., use a commit and execute pattern, where the 1st TXN commits to the randomness and the 2nd TXN executes the outcome, branching on the randomness).
+#### The trusted admin design pattern
+
+This design patterns should help developers avoid all _undergasing attacks_ by assuming there is a trusted administrator that calls all `entry` functions which are susceptible to undergasing.
+
+This defense might not directly apply to all randapps. For example, the [coin toss example from above](#an-example-of-a-vulnerable-coin-tossing-function-in-a-game) would have to be modified such that the admin calls `coin_toss` on behalf of the player rather than the player itself.
+
+For other randapps, such as the raffle, it may be reasonable to have an admin that triggers the drawing. There, the new code would look like:
+
+```rust
+/// Can only be called **by the admin** as a top-level call from a TXN, preventing **test-and-abort** attacks.
+entry fun randomly_pick_winner(admin: signer) acquires Raffle {
+    assert!(is_admin(&admin), E_ONLY_ADMIN_CAN_DRAW);
+  
+    randomly_pick_winner_internal();
+}
+```
+
+#### The sample-and-consume design pattern
+
+This design pattern should help developers avoid all _undergasing attacks_.
+The idea is very simple.
+Instead of sampling and consuming the randomness in the same private entry function, this should be split across two entry functions which are called from two different transactions.
+This ensures that the randomness is sampled and fixed by the 1st transaction, while the 2nd transaction can safely consume it and execute an unbiasable outcome.
+
+> [!WARNING]
+> This defense is inefficient in that it requires two transactions to sample a random outcome. In the future, we hope to implement a [more efficient defense](#Deferred-Defend-by-setting-maximum-gas).
+
+We give an example of this defense below for the [coin toss example from above](#an-example-of-a-vulnerable-coin-tossing-function-in-a-game).
+
+```rust
+entry fun sample_coin_toss(player: signer) {
+   let player = get_player(player);
+   assert!(!player.has_tossed_coin, E_COIN_ALREADY_TOSSED);
+
+   // Toss a random coin
+   let random_coin = randomness::u32_range(0, 2);
+   // Commit to the random coin toss
+   player.has_tossed_coin = true;
+   player.random_coin = random_coin;
+}
+
+entry fun consume_coin_toss(player: signer) {
+   let player = get_player(player);
+   assert!(player.has_tossed_coin, E_COIN_NOT_TOSSED);
+
+   if (player.random_coin == 0) {
+       // If heads, give player 100 coins (low gas path)
+       award_hundred_coin(player);
+   } else /* player.random_coin == 1 */ {
+       // If tails, punish player (high gas path)
+       lose_twenty_coins(player);
+       lose_ten_health_points(player);
+       lose_five_armor_points(player);
+   }
+}
+```
+
+#### Deferred: Defend by setting maximum gas
+
+> [!WARNING]
+> Implementing this defense poses significant challenges and is for now deferred. For now, developers are encouraged to use the _sample-and-consume_ or _trusted admin_ design patterns discussed above to fully-defend themselves against this attack.
+
+If developers were aware of undergasing attacks, they could carefully write their contracts to avoid them (e.g., use a [sample-and-consume pattern](#the-sample-and-consume-design-pattern), where the 1st TXN _samples_ the randomness and the 2nd TXN "_consumes_" it, executing the outcome by acting on the randomness).
 Unfortunately, the subtlety of the attack and its defenses is rather high.
 We therefore seek to proactively defend developers.
 
@@ -490,7 +568,6 @@ In our proposed defense, the Move VM would enforce that randomness TXNs always:
 If the locked up amount is sufficiently high to cover any TXN's execution, this defense ensures that randomness TXNs can never be undergased, completely obviating this class of attacks.
 
 To identify if a TXN uses randomness and, therefore, if the gas lockup should be done, we propose adding a `#[randomness]` annotation to any (private) entry functions that sample randomness:
-
 
 ```rust
 #[randomness]
@@ -535,9 +612,17 @@ For posterity, past versions of this AIP were:
 - [v1.1](https://github.com/aptos-foundation/AIPs/blob/3e40b4e630eb8aa517b617799f8e578f5f937682/aips/aip-41.md), 
   - Switched API design to be `RandomNumberGenerator`-based
   - See [diff from v1.0 here](https://github.com/aptos-foundation/AIPs/compare/4577f34c8df6c52a213223cd62472ea59e3861ef..3e40b4e630eb8aa517b617799f8e578f5f937682?short_path=33dc9b1#diff-33dc9b179818e3c972be69b5f214313b233e2338fef599626ebe4895f4e5dc51).
-- v1.2 (current):
+- [v1.2](https://github.com/aptos-foundation/AIPs/blob/a7b84191fb27e9f897e311323479851963f49504/aips/aip-41.md):
   - Added protection against _test-and-abort_ attacks
   - Further simplified API by removing the `RandomNumberGenerator` struct.
   - Discussed linter-based checks and callstack-based checks to defend against test-and-abort attacks.
   - Discussed undergasing attacks and how to obviate them.
-  - See [diff from v1.1 here](https://github.com/aptos-foundation/AIPs/compare/3e40b4e630eb8aa517b617799f8e578f5f937682..HEAD).
+  - See [diff from v1.1 here](https://github.com/aptos-foundation/AIPs/compare/3e40b4e630eb8aa517b617799f8e578f5f937682..a7b84191fb27e9f897e311323479851963f49504).
+- v1.3 (current)
+  - Clarified that the maximum gas defense against undergasing attacks will not be immediately available and offered alternatives.
+  - Replaced `smart_vector` with `vector` since `borrow` charges differently, leading to undergasing.
+  - See [diff from v1.2 here](https://github.com/aptos-foundation/AIPs/compare/a7b84191fb27e9f897e311323479851963f49504..HEAD).
+
+## Footnotes
+
+[^security]: The initial `mainnet` deployment of AIP-41 will **not** address undergasing attacks, putting the onus on developers to protect themselves from it. This can be done most effectively by using either a _sample-and-consume_ or _trusted admin_ pattern as described in ["Security consideration: Preventing undergasing attacks"](#security-consideration-preventing-undergasing-attacks). In the future, special-purpose tools could be provided to detect lower-gas execution paths in the vulnerable code, which would allow developers to rewrite their contracts and avoid these design patterns.

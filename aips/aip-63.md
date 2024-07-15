@@ -19,9 +19,9 @@ This AIP proposes a global mapping between coin and fungible asset and allow `co
 
 The goal is to This AIP intends to achieve the following:
 - Start exposing FAs of existing coins to the ecosystem, so that they can prepare dapps and apps for FAs (FA only in the future). DeFi, wallets, and other applications can seamlessly understand FA and equivalent coin and use them equivalently and transparently via coin module.
-    - Automatically create a paired fungible asset metadata for a coin type at the coin creator address if it does not exist yet, including `AptosCoin`. Or the coin creator has the option to manually pair a fungible asset with a coin type.
+    - Automatically create a paired fungible asset metadata for a coin type at the coin creator address if it does not exist yet, including `AptosCoin`.
     - Create helper functions to convert between paired coin and fungible asset, with different visibilities.
-    - To make the change compatible with existing dApps using move API in the current coin standard, this AIP proposes to change a couple of functions in coin module to convert coin and its paired fungible asset when needed to keep the same function signature.
+    - To make the change compatible with existing dApps using move API in the current coin standard, this AIP proposes to change a couple of functions in coin module to convert coin and its paired fungible asset when necessary but keep the same function signature.
 - Give users option to migrate their `CoinStore<CoinType>` to `PrimaryFungibleStore` of the corresponding FA at any time to experience dapps built upon FA standard only.
 - Lay out a comprehensive plan migrating from coin to fungible asset, with the following requirements:
     - Do not break any existing on-chain dapps.
@@ -38,7 +38,7 @@ Before the widespread adoption of DeFi applications on the Aptos network, it's c
 
 ## Impact
 
-- Coin Creators: Each coin could be paired with one and only one fungible asset type. The existing capabilities such as `MintCapability`, `FreezeCapability`, and `BurnCapability` will be leveraged to get the corresponding `MintRef`, `TransferRef`, and `BurnRef` for the paired fungible asset.
+- Coin Creators: Each coin could be paired automatically with only one fungible asset type, created by the framework automatically. The existing capabilities such as `MintCapability`, `FreezeCapability`, and `BurnCapability` will be leveraged to get the corresponding `MintRef`, `TransferRef`, and `BurnRef` for the paired fungible asset.
 - Users: The process is designed to be smooth and uninterrupted, yet it necessitates proactive participation. The migration will be initiated when the user activates the migration function. Following the migration, all coins within a user's storage will be seamlessly transformed into their corresponding fungible asset forms and all the subsequence deposit will be redirected to the primary fungible store of the asset type.
 - DApps:
   - Smart contract: Existing dApps based on the coin standard won't be disrupted by this migration, as it's designed to be non-breaking. Users interacting with these protocols may get either coin or FA of the same asset type depending on whether they migrated or not. Same for withdraw. Once the migration is complete, all accounts will have their coin represented as fungible asset, enabling the ecosystem to develop using the fungible asset API and issue new fungible assets without a paired coin. 
@@ -60,15 +60,13 @@ Advantages of the proposal over 1:
 - Eliminates the need for manual intervention, no matter the coin creator is a normal account or resource account.
 - Maintains the original semantics of `MintCapability`, `FreezeCapability`, and `BurnCapability`, ensuring consistency with the corresponding fungible asset.
  
-2. Another alternative is an opt-in migration approach, where users explicitly approve to use FA as coin via an account-specific flag indicating whether they want to treat the paired coin and FA as the same asset or separate. In this case, if the user choose not migrate, APT FA sent to their account cannot be used as APT coin but a separate FA asset.
+2. Another alternative is an opt-in migration approach, where users explicitly approve to use FA as coin. In this case, if the user choose not migrate, APT FA sent to their account cannot be treated as APT coin but a separate FA asset.
  
 Advantages over option 2:
 - Less intrusive to user and dapps.
     - Average users only care about their assets but not the technical format of those assets which they may not understand the concepts. If they get 10 APT FA but fail to see that in balance, they will panic.
-    - Users don't have to enroll since the migration process will finally be promoted in a more aggresive way so the enrollment will not be necessary eventually.
     - Dapps will have less trouble to show the balance of a user depending on a flag under user's account. So the way to show balance will be consistent across different users.
-- Provides a migration process that is transparent and requires no active participation from users.
-- Avoid the flag resource and the cleanup afterwards.
+- Provides a migration process that is transparent and requires less hassle from users.
 - Addresses the issue of fragmented asset types transparently to users, which hinders the adoption and development of fungible asset standards. For instance, dApps may not function properly for users with a balance composed of both coin and fungible assets but not exclusively fungible assets. For example, a transaction would fail if a user attempts to transfer 20 APT using `fungible_asset::transfer` but only has 10 APT coins and 10 APT FA.
 - Option 2 doesn't reduce but increase engineering efforts, either internally or externally. In the long run, teams will still need to meet all requirements outlined in this proposal.
 
@@ -94,7 +92,7 @@ Those two helper functions perform the conversion:
 public fun coin_to_fungible_asset<CoinType>(coin: Coin<CoinType> ): FungibleAsset;
 
 // Conversion from fungible asset to coin. Not public to push the migration to FA.
-public fun fungible_asset_to_coin<CoinType>(fungible_asset: FungibleAsset):
+public(friend) fun fungible_asset_to_coin<CoinType>(fungible_asset: FungibleAsset):
 ```
 
 The paired fungible asset metadata address would be `0xA` for APT and arbitrary for other coins.
@@ -140,7 +138,7 @@ Function `maybe_convert_to_fungible_store` can remove the `CoinStore<CoinType>` 
     }
 ```
 
-When a CoinStore<CoinType> is decommissioned, with its remaining coins being transferred into the corresponding fungible asset, a CoinEventHandleDeletion event is triggered. This serves as a notification to observers, signaling the impending deletion of event handle identifiers for record.
+When a CoinStore<CoinType> is decommissioned, with its remaining coins being transferred into the corresponding fungible asset, a `CoinEventHandleDeletion` event is triggered. This serves as a notification to observers, signaling the impending deletion of event handle identifiers for record.
 At the same time, if `maybe_convert_to_fungible_store` is called, the framework will create a `MigrationFlag` resource in the primary fungible store object indicates the user has migrated. Based on this flag, the API's behavior within the `coin` module will vary, as detailed in the case study provided.
 
 `Supply` and `balance` are modified correspondingly to reflect the sum of coin and the paired fungible asset.
@@ -160,7 +158,7 @@ public fun get_paired_mint_ref<CoinType>(_: &MintCapability<CoinType>): (MintRef
 public fun return_paired_mint_ref(mint_ref: MintRef, receipt: MintRefReceipt);
 ```
 
-It is noted that move "Hot Potato" is adopted here to make sure the only one copy of `MintRef` can be "borrowed" with `&MintCapability` but must be returned in the same transaction at the end.
+It is noted that "Hot Potato" pattern is adopted here to make sure the only one copy of `MintRef` can be "borrowed" with `&MintCapability` but must be returned in the same transaction at the end.
 The definitino of `MintRefReceipt` is:
 ```rust
 // The hot potato receipt for flash borrowing MintRef.

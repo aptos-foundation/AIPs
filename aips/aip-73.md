@@ -115,11 +115,11 @@ This runtime check is needed because of the possible re-entrancy problem that co
 
 ## Reference Implementation
 
-Not implemented yet.
+Implemented on main.
 
 ## Risks and Drawbacks
 
-The biggest risk here is the potential re-entrancy problem that could be introduced by the dispatching logic. See security consideration section for details.
+We implemented a new runtime cyclic check to prevent dispatchable tokens to perform re-entrant operations. If such check is implemented incorrectly, re-entrancy attacks could happen. We've had our internal security team and OtterSec reviewed the check implemented.
 
 ## Security Considerations
 
@@ -251,7 +251,7 @@ public fun dispatchable_withdraw(...) {
 ```
 In this case, the reference safety property of Move is held, as the reference to `Lending` is already destructed after the `supply()` call. However, the code is still problematic. In the current Move setup, calling into functions defined in another module will have no way of mutating states that you care about. As a result, you only need to reason about local functions that can mutate those states. Such assumption will no longer be held with the introduction of dispatching. This could add huge overhead for smart contract developers to reason about their code's re-entrancy properties.
 
-### Proposed solution: new runtime checks for cyclic dependencies.
+### Solution implemented: new runtime checks for cyclic dependencies.
 
 In the analysis above, we demonstrated how acyclic assumption plays an important role in Move's static reference safety analysis and re-entrancy property. In the worst case scenario, developers will be able to create multiple mutable references to the same global value without being complained by Move's bytecode verifier. As a mitigation, we suggest we need to enforce such property at runtime. Meaning that  function cannot form a back edge in the call dependency graph. In the re-entrancy problem example, the call stack will look like following:
 

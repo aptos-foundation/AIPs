@@ -39,10 +39,6 @@ On-chain randomness interacts with and impacts our blockchain protocol running b
 **Ecosystem impact**.
 Downstreams such as indexer and SDK need to support the new transaction types added by this implementation, as described in [New transaction types](#new-transaction-types).
 
-**API usability**.
-To prevent the [undergasing attack](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md#undergasing-attacks), the current implementation requires randomness transactions' gas payers to have a minimum balance (such as 2 APT).
-More details can be found in [Drawbacks](#drawbacks).
-
 ## Alternative solutions
 
 **External trust and non-PoS**. 
@@ -200,30 +196,29 @@ On-chain configurations are special on-chain resources that control validator co
 E.g. the consensus component reloads `ConsensusConfig` on new epoch start;
 the block executor reloads `GasSchedule` and `Features` for every block.
 
-Currently, on-chain config updates are done by modifying the on-chain resources directly then immediately an instant reconfiguration
+Currently, on-chain config updates and initializations are done by modifying the on-chain resources directly then immediately an instant reconfiguration
 (defined [here](#how-to-land-new-reconfiguration-mode-async-reconfiguration)).
 This is to avoid the situation where a validator restarts and operates with the new config, while the others are on the old config.
 
 To support both instant reconfiguration (when randomness is off) and async reconfiguration (when randomness is on),
 the following changes are needed.
 
-- On-chain config updates should go to a buffer instead of being applied immediately.
-- In an epoch-switching transaction, all buffered updates should be applied.
-- The existing apply-and-reconfigure APIs (e.g., `consensus_config::set()`) should be disabled.
+- For `config_x`, there should be a `config_x::set_for_next_epoch()` governance function to buffer updates, as well as a `config_x::on_new_epoch()` function to be invoked at epoch time to apply the updates.
+  - It's recommended to implement the `set_for_next_epoch()` and `on_new_epoch()` in a way that supports both initialization and updates.
+- The existing apply-and-reconfigure APIs (e.g., `consensus_config::set()`) should be disabled unless it is in genesis.
 - The `aptos_governance::reconfigure()` function should invoke instant reconfiguration if randomness is off,
   or start async reconfiguration otherwise.
 
-These above allow the following config update pattern to work regardless of whether randomness is on/off.
+These changes allow the following config initialization/update pattern to work regardless of whether randomness is on/off.
 
 ```
-config_x::set_for_next_epoch(new_config);
+config_x::set_for_next_epoch(&framework_signer, new_config);
 aptos_governance::reconfigure(&framework_signer);
 ```
 
 Some reference implementation points.
 
-- Updated `ConsensusConfig` [here](https://github.com/aptos-labs/aptos-core/blob/be0ef975cee078cd7215b3aea346b2d02fb0843d/aptos-move/framework/aptos-framework/sources/configs/consensus_config.move#L34-L63).
-- Applied the new config update pattern [here](https://github.com/aptos-labs/aptos-core/pull/12420).
+- Updated `ConsensusConfig` [here](https://github.com/aptos-labs/aptos-core/blob/be0ef975cee078cd7215b3aea346b2dhttps://github.com/aptos-labs/aptos-core/blob/f1d583760848c118afe88dda329105d67eea35a2/aptos-move/framework/aptos-framework/sources/configs/consensus_config.move#L52-L69).
 
 #### Validator set locking during reconfiguration
 
@@ -357,6 +352,20 @@ Malicious validators can cause step (a) to fail, in which case should cause the 
 The remaining steps should never abort.
 See the reference implementation [here](https://github.com/aptos-labs/aptos-core/blob/1de391c3589cf2d07cb423a73c4a2a6caa299ebf/aptos-move/aptos-vm/src/validator_txns/dkg.rs#L70).
 
+### Test-and-abort attack preventions in VM
+
+In a [test-and-abort attack](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md#test-and-abort-attacks),
+a dApp defines a public function for a user to:
+1. toss a coin, then
+2. get a reward if coin=1, or get a punishment otherwise.
+A malicious user can write another contract to invoke this public function and abort if there was no reward,
+and it will never receive punishments.
+
+To prevent this attack, randomness API call hander should ensure the call originates from a **private entry function**.
+(Reference implementation points
+[1](https://github.com/aptos-labs/aptos-core/blob/e5d6d257eefdf9530ce6eb5129e2f6cbbbea8b88/aptos-move/aptos-vm/src/aptos_vm.rs#L806-L811)
+[2](https://github.com/aptos-labs/aptos-core/blob/e5d6d257eefdf9530ce6eb5129e2f6cbbbea8b88/aptos-move/framework/aptos-framework/sources/randomness.move#L77)
+.)
 
 ## Testing (Optional)
 
@@ -372,11 +381,11 @@ Further stress / performance testing done in `previewnet`.
 
 **DKG loses liveness**. In case of implementation bugs/bad configurations, DKG may never finish, so the epoch change won't finish and buffered on-chain config updates won't be applied. Note that the chain is still live in this case, but the validators cannot advance to new epochs.  
 
-*Mitigation*: Validators can force epoch change and disable randomness feature. The Aptos Labs need to deploy hotfix for full mitigation after debugging.
+*Mitigation*: Validators can force epoch change and disable randomness feature. A hotfix needs to be deployed for full mitigation after debugging.
 
 **Randomness generation loses liveness**. If this happens, the blockchain will halt as every block needs randomness to proceed for execution.
 
-*Mitigation*: Validators can disable randomness feature using local configuration overwrite and restart all validators to pause the randomness generation to bring the chain back alive as a temporary mitigation. The Aptos Labs need to deploy hotfix for full mitigation after debugging. 
+*Mitigation*: Validators can disable randomness feature using local configuration overwrite and restart all validators to pause the randomness generation to bring the chain back alive as a temporary mitigation. A hotfix needs to be deployed for full mitigation after debugging. 
 
 ### Other Risks:
 
@@ -398,31 +407,6 @@ Here are some related transaction limits. As a prevention, the DKG transaction s
 
 - `max_bytes_per_write_op`: limit of the size of a single state item, 1MB currently.
 - `ValidatorTxnConfig::V1::per_block_limit_total_bytes`: limit of the total validator transaction size in one block, 2MB currently.
-
-**Minimum gas deposit**. To prevent the [undergasing attack](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md#undergasing-attacks), the current implementation requires randomness transactions' gas payers to have a minimum balance of 2 APT to deposit enough gas in the transaction execution prologue, to ensure that execution cannot be aborted after the randomness call thus bias the randomness. More specifically, when executing a user transaction, the following additional steps are implemented.
-- Before prologue, VM determines if the txn requires deposit and the amount.
-- At the end of prologue, if deposit is required, VM burns the calculated amount from the gas payer's balance.
-- At the beginning of epilogue, if deposit was burned, VM mints and refunds the same amount back to the gas payer.
-
-For randomness transactions, the amount of required deposit is calculated as `min(A, B)`, where:
--  `A = (max_execution_gas + max_io_gas) * price_per_gas_unit + max_storage_fee`, and
--  `B = max_number_of_gas_units * price_per_gas_unit`.
-
-Here are some reference numbers used for mainnet.
-```
-max_execution_gas=920
-max_io_gas=1_000
-max_storage_fee=200_000_000
-max_number_of_gas_units=2_000_000
-price_per_gas_unit=100
-```
-Therefore, for a txn that directly or indirectly call randomness API, the required deposit is 200_000_000 octas, i.e., 2APT.
-
-The minimum gas deposit is required to prevent the undergasing attack, but may also block many potential applications that do not require such minimum balance. 
-Therefore, we may provide another set of `unsafe` randomness APIs that **do not** require minimum gas deposit but **is subject to** the undergasing attack.
-We will leave it to the developers to decide which APIs to use for the applications. 
-Such `unsafe` API will be described and discussed in a seperate future AIP, as this AIP only focuses on *safe* randomness API implementation. 
-
 
 ## Future Potential
 
