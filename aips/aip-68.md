@@ -1,6 +1,6 @@
 ---
 aip: 68
-title: Reordering transactions in a block for increasing throughput
+title: Use Case Aware Block Reordering
 author: igor-aptos (https://github.com/igor-aptos), msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/333
 Status: Accepted
@@ -11,7 +11,7 @@ updated: 07/15/2024
 requires:
 ---
 
-# AIP-68 - Reordering transactions in a block for increasing throughput
+# AIP-68 - Use Case Aware Block Reordering
 
 
 ## Summary
