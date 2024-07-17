@@ -64,9 +64,9 @@ requires (*optional): <AIP number(s)>
  > What is the feature flag(s)? If there is no feature flag, how will this be enabled?
 ...
 
-## Testing (Optional)
+## Testing 
 
- > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out)
+ > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out. Some examples include user stories, network health metrics, system metrics, E2E tests, unit tests, etc) 
  > - When can we expect the results?
  > - What are the test results and are they what we expected? If not, explain the gap.
 
