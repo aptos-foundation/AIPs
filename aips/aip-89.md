@@ -148,7 +148,9 @@ As each validator need to broadcast the order vote to all the validators, the co
 
 Each validator need to verify the order votes from all the other validators, increasing the computational complexity.
 
-In a load test with mempool backlog set to 30k transactions, enabling order votes resulted in roughly 200 TPS higher throughput and 100 ms lower latency. There is no visible difference in the CPU, memory or disk usage of the validators.
+For each consensus block, 130 mainnet validators sign and validate an order vote message. Assuming 5 blocks per second, each validator will sign 5 order votes per second, will receive and verify 650 order votes per second. Earlier, each validator broadcasts a proposal vote for each block. With the introduction of order votes, the number of consensus messages roughly doubles. The verification of an order vote message takes about 2.3 ms. As the regular proposal votes and order votes are verified in parallel, it increases the number of cores used for processing consensus messages. With 130 nodes, each order vote message is 1408 bytes long in-memory, and 699 bytes on the network. The order votes feature will thereby increase the network bandwidth by 445 KB/second.
+
+In a load test with 100 nodes at 5k TPS workload, the average total number of inbound network messages increased from 2165 to 2625 messages per second with order votes. The average total inbound traffic increased 1.31 MB/s to 1.54 MB/s. The average total number of outbound network messages increased from  to 2590 to 3080 messages per second. The average CPU usage increased from 1450% to 1640%. There is no visible change in the memory usage. The average I/O rate increased from 345 IO ops/sec to 375 IO ops/sec. The average end-to-end latency reduced from 1.5 seconds to 1.4 seconds.
 
 ## Release Plan
 
