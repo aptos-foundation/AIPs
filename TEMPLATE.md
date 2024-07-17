@@ -43,7 +43,7 @@ requires (*optional): <AIP number(s)>
 
  > Which audiences are impacted by this change? What type of action does the audience need to take?
  > What might occur if we do not accept this proposal?
-
+ > List out other AIPs this AIP is dependent on
 ...
 
 ## Alternative solutions
@@ -61,12 +61,12 @@ requires (*optional): <AIP number(s)>
 ## Reference Implementation
 
  > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
-
+ > What is the feature flag(s)? If there is no feature flag, how will this be enabled?
 ...
 
-## Testing (Optional)
+## Testing 
 
- > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out)
+ > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out. Some examples include user stories, network health metrics, system metrics, E2E tests, unit tests, etc) 
  > - When can we expect the results?
  > - What are the test results and are they what we expected? If not, explain the gap.
 
