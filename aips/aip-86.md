@@ -163,11 +163,9 @@ There is no such support needed.
 
 ### Suggested deployment timeline
 
-This is already deployed on devnet.
+This is already deployed and enabled on `devnet` and `testnet`.
 
-Enabled on testnet in the v1.12 release.
-
-Enabled on mainnet in the v1.14 release.
+It will be enabled on mainnet in the v1.16 release.
 
 ## Open Questions (Optional)
 
