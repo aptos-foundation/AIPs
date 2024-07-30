@@ -27,7 +27,7 @@ Lite Account will have all account related resources into the same `PrimaryFungi
 The new struct will be in `account.move`, previously fields in account v1. The optionality of a resource is determined by its existence. To be compatible with account v1, some fields will be converted to the counterpart in lite account if the lite account is migrated from v1.
 The potential resources are:
 - `LiteAccount`: It has one field, `sequence_number: u64`. If `squence_number == 0`, this resource does not exist.
-- `NativeAuthenticator`: It only has one field, `auth_key: Option<vector<u8>>`. This is the `authentication_key` in the current account module and `option::none()` replaced `ZERO_AUTH_KEY` to indicate native authentication is disabled on this account. If `auth_key == option::some(bcs::to_bytes(account_address))`, which is the default case, this resource does not exist.
+- `NativeAuthenticator`: It only has one field, `auth_key: Option<vector<u8>>`. This is the `authentication_key` in the current account module and `option::none()` replaced `ZERO_AUTH_KEY` to indicate native authentication is disabled on this account. If this resource does not exist, the authentication key defaults to `bcs::to_bytes(account_address)`.
 There are several other resources only for lite accounts migrated from v1 accounts and those will be covered in  [the specification section](#specification-and-implementation-details).
 
 There are several benefits:
@@ -64,7 +64,9 @@ A lite account can have up to 5 resources, they are:
 1. Account: it only has `sequence_number` , if it does not exist, the default is 0. When this account needs to bump the sequence number but it does not exist, prologue will create this resource with seq_num = 0.
 2. NativeAuthenticator: it only has an option of `authentication_key` that’s the same as that in v1. If the lite account does not have this field, it means the authenticator key is the address itself. Native authentication is only disabled when this resource has `None` as its field.
 3. The rest 3 optional resources are for lite account’s that’s migrated from v1 or created when used with v1 functions.
-   
+![Lite Account Structure](https://github.com/user-attachments/assets/11525db2-5960-4948-9308-50f7c1b5d421)
+
+
 #### Code
 
 In `account.move`:
@@ -136,7 +138,6 @@ Ecosystem projects that access account resource fields via node API will face di
 
 ### Why are they risks?
 The migration work alters previous assumptions, leading to potential breaks in offchain code that relies on onchain data. This could result in significant disruptions if not managed properly.
-Is there a way to mitigate the risks?
 
 ### Mitigation Strategy
 Similar to the FA migration, proactive measures include notifying and assisting dApp developers to update their code before launching the lite account and initiating the migration. This preparation helps ensure a smoother transition and minimizes disruptions.
