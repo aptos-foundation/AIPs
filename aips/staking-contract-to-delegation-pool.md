@@ -71,6 +71,44 @@ As described above, manually converting to a delegation pool requires:
 
 `aptos_framework::staking_contract` implements `destroy_staking_contract(staker: &signer, operator: address)` which will only be called by `aptos_framework::delegation_pool::initialize_delegation_pool_from_staking_contract`. This function destroys the `StakingContract` between `staker` and `operator` and returns the resource account storing the stake pool and the ownership capability.
 
+`destroy_staking_contract`:
+- extracts the `staking_contract::StakingContract` between *staker* and *operator* from the `staking_contract::Store` of *staker*
+- `distribute_internal` any existing *inactive* stake to *staker*, *operator* and any previous operators that still own some
+- `request_commission_internal` to allocate in-flight commission to *operator* in `StakingContract.distribution_pool` as *pending-inactive* stake
+- destructs `StakingContract` resource and returns its contents:
+    * `principal`: amount of *active* stake owned by *staker* after paying out commission to *operator* at the `request_commission_internal` step
+    * `pool_address`: address of resource account storing the stake pool (`stake::StakePool`)
+    * `owner_cap`: `stake::OwnerCapability` over the stake pool
+    * `commission_percentage` of *operator* on this staking contract
+    * `distribution_pool` tracking *pending-inactive* commission of *operator* (updated at the `request_commission_internal` step) and any previous operators + any stake unlocked by *staker*
+    * `signer_cap`: `account::SignerCapability` of resource account storing the stake pool
+- emits `DestroyStakingContractEvent(staker, operator)`
+
+`staking_contract::BeneficiaryForOperator` is a global config of *operator* within the `staking_contract` module and should not be destroyed.
+
+`initialize_delegation_pool_from_staking_contract`:
+- checks that the conversion feature is enabled
+- checks that *staker* doesn't already own a delegation pool
+- checks that there is no *pending-active* stake in order to avoid charging *staker* the *add-stake fee*
+- `destroy_staking_contract` and take ownership of `StakingContract`'s contents
+- converts `commission_percentage` to a 2-decimals precision format used within `delegation_pool` module
+- stores `owner_cap` on the resource account of `signer_cap`
+- creates the `delegation_pool::DelegationPool` resource:
+    * initialize `active_shares` and `inactive_shares` shares pools
+    * initialize `observed_lockup_cycle`
+    * initialize `pending_withdrawals`
+    * set `stake_pool_signer_cap` to `signer_cap`
+    * set `operator_commission_percentage` to `commission_percentage`
+    * set `total_coins_inactive` to 0: `distribute_internal` call ensures there is no *inactive* stake to be accounted for
+- allocates *active* shares, equivalent to `principal`, to *staker* in `active_shares` pool
+- allocates *pending-inactive* shares to each shareholder of `distribution_pool` in `inactive_shares(0)` pool
+- stores `DelegationPool` resource on the resource account of `signer_cap` also storing `StakePool`
+- stores `DelegationPoolOwnership` capability on *staker*
+- sets delegated voter of *staker* to their previous voter on the staking contract without waiting a lockup cycle to end on the stake pool
+
+`delegation_pool::BeneficiaryForOperator` could not have been created + published because *operator*'s signer is inaccessible.
+If the *operator* already has a beneficiary set for their delegation pools then use that address, otherwise *operator*'s address will be used by default.
+
 ## Reference Implementation
 
 There is a reference implementation at https://github.com/bwarelabs/aptos-core/tree/convert-staking-contract-to-delegation-pool
