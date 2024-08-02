@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 91
 title: Enum Types in the Move VM
 author: Wolfgang Grieskamp (wg@aptoslabs.comm)
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Enum Types in the Move VM
+# AIP-91 - Enum Types in the Move VM
 
 ## Summary
 
