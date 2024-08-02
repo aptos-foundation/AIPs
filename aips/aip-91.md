@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-91 - Simulation Enhancement
+# AIP-91 - Transaction Simulation Enhancement
 
 ## Summary
 
