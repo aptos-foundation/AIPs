@@ -54,7 +54,7 @@ fun get_name(data: &VersionedData): &String {
 
 This allows old code to continue to work without changes on features shared between enum variants.
 
-This AIP focuses on the extensions to the Move VM needed to implement enum types. The extensions are discussed in terms of the [Move Binary Format](https://github.com/aptos-labs/aptos-core/blob/main/third_party/move/move-binary-format/src/file_format.rs), including the new opcodes and their semantics. The implementation is in [PR #13812](https://github.com/aptos-labs/aptos-core/pull/13812).
+This AIP focuses on the extensions to the Move VM needed to implement enum types. The extensions are discussed in terms of the [Move Binary Format](https://github.com/aptos-labs/aptos-core/blob/main/third_party/move/move-binary-format/src/file_format.rs), including the new opcodes and their semantics.
 
 ### Out of Scope
 
@@ -223,6 +223,13 @@ A number of [transactional tests](third_party/move/move-compiler-v2/transactiona
 The enum upgrade logic is tested with [this e2e test](https://github.com/aptos-labs/aptos-core/blob/main/aptos-move/e2e-move-tests/src/tests/enum_upgrade.rs).
 
 There are more tests needed, specifically for the bytecode verifier. These are expected before the feature is available in `mainnet` ([#14074](https://github.com/aptos-labs/aptos-core/issues/14074)).
+
+## Reference Implementation
+
+- The core implementation is in [PR #13812](https://github.com/aptos-labs/aptos-core/pull/13812).
+- [PR #14124](https://github.com/aptos-labs/aptos-core/pull/14124) implements feature gating and adds other touches.
+- [PR #14144](https://github.com/aptos-labs/aptos-core/pull/14144) implements decorated enum values and resource viewer as well as API JSON representation.
+- [PR #14174](https://github.com/aptos-labs/aptos-core/pull/14174) refines serialization to use Serde's existing enum support, ensuring marshalling compatibility with Rust.
 
 
 ## Risks and Drawbacks
