@@ -1,5 +1,5 @@
 ---
-aip: 91
+aip: 92
 title: Transaction Simulation Enhancement
 author: junkil-park (https://github.com/junkil-park), movekevin (https://github.com/movekevin), gregnazario (https://github.com/gregnazario)
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-91 - Transaction Simulation Enhancement
+# AIP-92 - Transaction Simulation Enhancement
 
 ## Summary
 
