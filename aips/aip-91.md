@@ -1,6 +1,6 @@
 ---
 aip: 91
-title: Simulation Enhancement
+title: Transaction Simulation Enhancement
 author: junkil-park (https://github.com/junkil-park), movekevin (https://github.com/movekevin), gregnazario (https://github.com/gregnazario)
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
