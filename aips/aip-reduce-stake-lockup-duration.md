@@ -38,6 +38,12 @@ Despite the potential benefits, reducing the lock-up period introduces several r
 - Network Stability: Network stability might also be compromised due to more frequent unstaking, which could lead to volatility in validator participation and, consequently, in network security.
 - Perceived Decentralization: A shorter voting period restricts stakeholder review time, risking hasty decisions that may not benefit the network. It could empower a minority to dominate, undercutting inclusiveness and governance deliberation. This perception may erode confidence in Aptos' decentralization, possibly prompting decentralized governance proponents to consider alternative projects.
 
+Parties affected:
+- All token holders who participates in governance voting: need to review and react to each proposal with shorter time, also shorter time window to voice concerns and reject proposals.
+- Aptos Foundation board: for reviewing the proposal and make a decision within 3 days. There's lot of prep work can be done beforehand, but it would be a change of how Foundation reviews the source of truth and provide recommendations.
+- Delegated voters: have to react within 3 days to validate the proposal and cast the vote, which could land in weekends too.
+- Aptos core team: need to coordinate with the development cycle, testing process, provide writeup to the wider community to help with voting on proposals.
+
 ## Specification and Implementation Details
 
 Create on-chain governance proposal to reduce the lock-up period to 14 days and the voting period to 3 days.
