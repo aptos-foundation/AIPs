@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <mm/dd/yyyy>
 ---
 
-# AIP-90 - Reduce stake lockup duration to 14 days and governance voting duration to 3 days per community vote
+# Reduce stake lockup duration to 14 days and governance voting duration to 3 days per community vote
 
 ## Summary
 
@@ -44,10 +44,6 @@ Parties affected:
 - Delegated voters: have to react within 3 days to validate the proposal and cast the vote, which could land in weekends too.
 - Aptos core team: need to coordinate with the development cycle, testing process, provide writeup to the wider community to help with voting on proposals.
 
-## Specification and Implementation Details
-
-Create on-chain governance proposal to reduce the lock-up period to 14 days and the voting period to 3 days.
-
 Advantages:
 
 - Quicker Governance Decisions: A shorter voting period of 3 days allows the network to respond rapidly to changes and opportunities.
@@ -58,6 +54,14 @@ Disadvantages:
 - Operational Complexity: The reduced voting period requires validators and network participants to make decisions more quickly, which can increase the risk of rushed or poorly considered decisions.
 - Stakeholder Engagement: The shorter period may lead to participant burnout and disengagement, as the pace of governance becomes more demanding.
 - Perceived Centralization: A 3-day voting period might allow a smaller group of active participants to dominate decision-making, which could undermine the perception of decentralization.
+
+## Specification and Implementation Details
+
+Create on-chain governance proposal to reduce the lock-up period to 14 days and the voting period to 3 days.
+
+Configuration to update:
+- `recurring_lockup_duration_secs`
+- `voting_duration_secs`
 
 ### Suggested implementation timeline
 
