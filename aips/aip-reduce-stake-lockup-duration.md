@@ -1,6 +1,6 @@
 ---
 aip: 
-title: Reduce stake lockup duration to 14d and governance voting duration to 3d per community vote
+title: Reduce stake lockup duration to 14 days and governance voting duration to 3 days per community vote
 author: Tony (https://github.com/tony001242), Eric (eric@amnis.com)
 discussions-to (*optional): 
 Status: Draft
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <mm/dd/yyyy>
 ---
 
-# AIP-90 - Add Apple as a supported OIDC provider
+# AIP-90 - Reduce stake lockup duration to 14 days and governance voting duration to 3 days per community vote
 
 ## Summary
 
@@ -55,5 +55,5 @@ Disadvantages:
 
 ### Suggested implementation timeline
 
-The change should be available on mainnet in July 2024.
+The change should be available on mainnet in August 2024.
 
