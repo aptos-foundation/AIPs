@@ -1,5 +1,5 @@
 ---
-aip: X
+aip: 95
 title: Collection Permissions Update
 author: johnchanguk, briungri
 discussions-to (*optional):
@@ -10,7 +10,7 @@ created: 07/15/2024
 updated (*optional): <mm/dd/yyyy>
 ---
 
-# AIP-X - Collection Permissions Update
+# AIP-95 - Collection Permissions Update
 
 ## Summary
 
