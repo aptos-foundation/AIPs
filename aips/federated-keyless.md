@@ -93,13 +93,14 @@ Unfortunately, for IAMs like Auth0 and AWS Cognito, the `config_url` is **tenant
 - Existing JWK consensus infrastructure will likely not support more than 4,000 JWKs (so $\le$ 2,000 dapps).
 - Most dapps will not have enough stake to be able to propose their OIDC provider to Aptos governance.
 - It puts onus on Aptos governance to decide which dapps should be allowed to use keyless with their favorite OIDC provider.
+  - e.g., need to be able to clearly identify a “legitimate” OIDC provider / dapp, or risk adding too many to JWK consensus and potentially DoS
   - e.g., when seeing two proposals for the same Auth0 OIDC with different tenants (i.e., dapps), what would be a fair process to decide between the two?
 
 ## Specification and Implementation Details
 
  > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
-At a *high*-level, the [overview above](#high-level-overview) explains the main idea: create new federated keyless account type that points to a secondary source of truth for the JWKs of its OIDC provider. At a *lower* level, the [reference implementation section below](#reference-implementation) discusses the new Rust structs, Move structs and Move functions that are needed to enable this functionality.
+At a *high*-level, the [overview above](#high-level-overview) explains the main idea: create a new federated keyless account type that points to a secondary source of truth for the JWKs of its OIDC provider. At a *lower* level, the [reference implementation section below](#reference-implementation) discusses the new Rust structs, Move structs and Move functions that are needed to enable this functionality.
 
 Some noteworthy implementation details are:
 
@@ -236,6 +237,10 @@ With any change that introduces a new account type, there are two kinds of secur
 
 ### ZK circuit incompatibilities
 
+> [!NOTE]
+>
+> This security consideration applies to any approach that proposes relaxing the requirements on the OIDC providers for keyless, not just to the design proposed in this AIP.
+
 The `circom` implementation of the [keyless relation](#the-keyless-zk-relation-mathcalr) has been thoroughly tested with the supported OIDC providers in `0x1::jwks`. As a result, custom OIDC providers used in federated keyless accounts might not be fully supported. This could, in some cases, lock users out of their accounts.
 
 There are several mechanisms to mitigate against this:
@@ -245,6 +250,10 @@ There are several mechanisms to mitigate against this:
 3. In case of emergency, enable the [leaky mode](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#warm-up-leaky-signatures-that-reveal-the-users-and-apps-identity), which restores access to the federated keyless account by circumventing the ZK circuit, albeit at the cost of leaking the account’s user (`sub`) and application (`aud`) identity.
 
 ### Liveness and security of OIDC provider
+
+> [!NOTE]
+>
+> This security consideration applies to any approach that proposes relaxing the requirements on the OIDC providers for keyless, not just to the design proposed in this AIP.
 
 This AIP, in essence, is relaxing the requirements on keyless OIDC providers by allowing devs to specify where JWKs are to be found for a keyless account within that account’s address (i.e., `FederatedKeylessPublicKey`).
 
@@ -258,9 +267,17 @@ Furthermore, revocation of federated JWKs is currently not implemented, but coul
 
 ### IAM risks
 
+>  [!NOTE]
+>
+> This security consideration applies to any approach that proposes supporting IAM-based OIDC providers such as Auth0 for keyless, not just to the design proposed in this AIP.
+
 When using IAMs such as Auth0 or AWS Cognito, the IAM may allow the developer to impersonate its users, which would create account theft risks as discussed above. More research on IAMs and their properties is needed in order to provide a recommendation here.
 
 ### Malicious or compromised JWK publisher
+
+>  [!WARNING]
+>
+> This security consideration **only** applies to the design in this AIP, which relies on a trusted JWK publisher. Fortunately, easy mitigations are possible.
 
 Since dapp developers can act as their own JWK publishers, they can in effect easily impersonate any user on their app. Such impersonation may occur due to maliciousness or incompetence. For example, the secret key that is used to manage the `jwk_addr` is compromised.
 
@@ -268,7 +285,7 @@ Regarding maliciousness, even a traditional keyless dapp turned malicious can st
 
 The difference is that a malicious federated keyless dapp developer who also acts as the JWK publisher could more easily steal its users credentials or generate new ones, since it can replace the JWKs with malicious ones and does not need any victim user cooperation.
 
-To mitigate against account theft via such malicious JWK substitution, we propose using the ZK proving service and pepper service as a layer of defense. Specifically, these services can easily look up the correct JWKs (via the `config_url`) upon a ZKP or pepper request and not serve it if the JWT is not signed under the correct JWK. This will thwart the attack.
+To mitigate against account theft via such malicious JWKs, we propose using the ZK proving service and pepper service as a layer of defense. Specifically, these services can easily look up the correct JWKs (via the `config_url`) upon a ZKP or pepper request and not respond if the JWT is not signed under the correct JWK. This will thwart the attack since without a ZKP (or without a pepper), the attacker cannot access the account.
 
 ## Future Potential
 
