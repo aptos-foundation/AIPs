@@ -394,7 +394,15 @@ In more detail, signature verification against the PK $(\mathsf{iss\\_val}, \mat
 
    - Verify the **training wheels signature** $\sigma_\mathsf{tw}$ over the ZKP $\pi$ and the public inputs hash $\mathsf{pih}$ against 
 
-8. Verify the ZKPoK $\pi$, which agues existence of a **secret input** $\textbf{w}$ that satisfies a **ZK relation** $\mathcal{R}$ defined below:
+8. Verify the ZKPoK $\pi$, which agues existence of a **secret input** $\textbf{w}$ that satisfies the **keyless ZK relation** $\mathcal{R}$ defined [next](#the-keyless-zk-relation-mathcalr).
+
+**Zero-knowledge mode caveats** that we address later:
+
+1. The pepper $r$ is fetched by the user/wallet from the pepper service, which we describe briefly [in the appendix](#pepper-service)
+2. **Computing ZKPs is slow**. This will require a proving service, which we describe briefly [in the appendix](#(Oblivious)-ZK-proving-service)
+3. **Bugs in the ZK relation implementation** can be mitigated against using the [“training wheels” mode](#training-wheels)
+
+#### The keyless ZK relation $$\mathcal{R}$$
 
 ```math
 \mathcal{R}\begin{pmatrix}
@@ -424,7 +432,7 @@ In more detail, signature verification against the PK $(\mathsf{iss\\_val}, \mat
 \end{pmatrix}
 ```
 
-The **ZK relation $\mathcal{R}$** simply **performs the privacy-sensitive part of the verification** from the **leaky mode** above:
+The **ZK relation $\mathcal{R}$** simply **performs the privacy-sensitive part of the verification** from the [leaky mode](#warm-up-leaky-signatures-that-reveal-the-users-and-apps-identity) above:
 
 1. Verify that the public inputs hash $\mathsf{pih}$ is correctly derived by hashing the inputs in $\textbf{w}\_\mathsf{pub}$ with $H\_\mathsf{zk}$ (as explained above).
 2. Check the OIDC provider ID in the JWT:
@@ -451,13 +459,7 @@ The **ZK relation $\mathcal{R}$** simply **performs the privacy-sensitive part o
 > Importantly, the ZK proof $\pi$ leaks nothing about the privacy-sensitive inputs in $\textbf{w}$.
 
 > [!NOTE]
-> The additional $\mathsf{exp\\_horizon}$ variable is a layer of indirection. It ensures that when the $\mathsf{max\\_exp\\_horizon}$ parameter on chain changes ZKPs do not become stale since they take $\mathsf{exp\\_horizon}$ as an input, not $\mathsf{max\\_exp\\_horizon}$ .
-
-**Zero-knowledge mode caveats** that we address later:
-
-1. The pepper $r$ is fetched by the user/wallet from the pepper service, which we describe briefly [in the appendix](#pepper-service)
-2. **Computing ZKPs is slow**. This will require a proving service, which we describe briefly [in the appendix](#(Oblivious)-ZK-proving-service)
-3. **Bugs in the ZK relation implementation** can be mitigated against using the [“training wheels” mode](#training-wheels)
+> The additional $\mathsf{exp\\_horizon}$ variable is a layer of indirection. It ensures that when the $\mathsf{max\\_exp\\_horizon}$ parameter on chain changes ZKPs do not become stale since they take $\mathsf{exp\\_horizon}$ as an input, not $\mathsf{max\\_exp\\_horizon}$.
 
 ## Reference Implementation
 
