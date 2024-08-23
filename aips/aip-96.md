@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 96
 title: Federated Keyless accounts
 author: Alin Tomescu (alin@aptoslabs.com) 
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/490
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md), [AIP-75](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-75.md), [AIP-81](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-81.md)
 ---
 
-# AIP-X - Federated Keyless accounts
+# AIP-96 - Federated Keyless accounts
 
 ## Summary
 
