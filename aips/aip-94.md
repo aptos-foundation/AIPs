@@ -29,6 +29,10 @@ Several factors drive the consideration to reduce the lock-up period for staked 
 - Efficient Operation: Node operators sometimes miss the unlock date, leading to inefficiencies. Shorter lock-up periods could mitigate these issues by providing more frequent opportunities to adjust stakes, enhancing operational flexibility.
 - Lowering Depeg Risk: Typically, when unstaking on Aptos, users wait for 30 days for their token return. To avoid this, some opt to swap to APT on other platforms, risking depeg and losing a significant amount of their original asset. Reducing the unstaking time can help shorten the waiting period, allowing users to unstake faster without worrying about depeg risks, thus maintaining a more stable peg for LSD tokens.
 
+### Why updating voting duration while this AIP is focued on shoterning the lockup duration?
+
+To vote for a proposal, the stake pool’s remaining lockup must be **at least** as long as the proposal’s duration. If we shorten the lockup duration to 14 days without adjusting the voting duration, the chance of the stake pool to not have enough lockup time left to vote will be significant higher than before, which could result in a lot of operational pain for node operator to vote for a proposal or not able to vote. Because of this nature, when we adjusting the lockup duration, we would ideally adjust the voting duration accordingly to make governance process work smoothly. This can be revisit in the future on the implementation.
+
 ## Impact and risks
 
 Despite the potential benefits, reducing the lock-up period introduces several risks:
@@ -65,5 +69,5 @@ Configuration to update:
 
 ### Suggested implementation timeline
 
-The change should be available on mainnet in August 2024.
+The change should be available on mainnet in September 2024.
 
