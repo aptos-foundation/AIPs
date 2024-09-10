@@ -31,7 +31,7 @@ Several factors drive the consideration to reduce the lock-up period for staked 
 
 ### Why updating voting duration while this AIP is focued on shoterning the lockup duration?
 
-To vote for a proposal, the stake pool’s remaining lockup must be **at least** as long as the proposal’s duration (read more about Aptos Governance [here](https://aptos.dev/en/network/blockchain/governance)). If we shorten the lockup duration to 14 days without adjusting the voting duration, the chance of the stake pool to not have enough lockup time left to vote will be significant higher than before, which could result in a lot of operational pain for node operator to vote for a proposal or not able to vote. Because of this nature, when we adjusting the lockup duration, we would ideally adjust the voting duration accordingly to make governance process work smoothly. This can be revisit in the future on the implementation.
+To vote for a proposal, the stake pool’s remaining lockup must be **at least** as long as the proposal’s duration (read more about Aptos Governance [here](https://aptos.dev/en/network/blockchain/governance)). If we shorten the lockup duration to 14 days without adjusting the voting duration, the possibility that the stake pool lacks sufficient lockup duration for voting will be significant higher than before, which could result in operational pain for a node operator attempting to vote for a proposal and not being able to vote. Because of this nature, when we adjust the lockup duration, we should ideally adjust the voting duration accordingly to make the governance process work smoothly. This can be revisit in the future on the implementation.
 
 ## Impact and risks
 
