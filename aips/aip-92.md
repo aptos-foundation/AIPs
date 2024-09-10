@@ -2,7 +2,7 @@
 aip: 92
 title: Transaction Simulation Enhancement
 author: junkil-park (https://github.com/junkil-park), movekevin (https://github.com/movekevin), gregnazario (https://github.com/gregnazario)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/493
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Ecosystem)
@@ -32,7 +32,7 @@ This PR enhances the simulation functionality in several key ways:
 
 3. Improve Multisig Simulation Consistency:
    * Merges the Multisig payload simulation path with the execution path, ensuring consistency between simulation and actual execution.
-   * This resolves the issue of an onchain payload not being retrived (described [here](https://github.com/aptos-labs/aptos-core/issues/12703)).
+   * This resolves the issue of an onchain payload not being retrived (described [here](https://github.com/aptos-labs/aptos-core/issues/12703) and [here](https://github.com/aptos-labs/aptos-core/issues/8304)).
    * This also resolves the issue of inaccurate gas estimation for multisig transactions (described [here](https://github.com/aptos-labs/aptos-core/issues/12704)).
 
 These changes are aimed at improving the flexibility of the simulation environment, allowing developers to test transactions and interactions without the constraints of authentication keys and gas fee payments. Additionally, the changes enhance the accuracy of multisig transaction simulations, ensuring they are consistent with the actual execution.
@@ -75,11 +75,13 @@ The reference implementation includes multiple unit tests and end-to-end tests c
 
 This AIP allows skipping the auth key check and gas fee payment for the simulation. This feature is only available in the simulation and does not affect the actual execution of the transaction on the blockchain.
 
+If a transaction using `NoAccountAuthenticator` is submitted for execution, it will always fail with an `INVALID_SIGNATURE` error, as the authenticator cannot be verified.
+
 ## Timeline
 
 ### Suggested implementation timeline
 
-The implementation is planned to land on the `main` branch before the branch cut for v1.18.
+The implementation is planned to land on the `main` branch before the branch cut for v1.19.
 
 ### Suggested developer platform support timeline
 
@@ -87,5 +89,5 @@ The SDK will be updated to support this feature before it is released on the mai
 
 ### Suggested deployment timeline
 
-* On the devnet: with release v1.18
+* On the devnet: with release v1.19
 * On the testnet and mainnet: depends on the AIP approval process
