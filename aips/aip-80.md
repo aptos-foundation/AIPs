@@ -25,10 +25,11 @@ from addresses, and defines a way to determine which key scheme is associated.
 Private keys are indistinguishable from on-chain account addresses. This looks to change that by providing a solution to
 differentiate private keys from on-chain addresses.
 
-The main goal is to prevent people from accidentally leaking their private keys on-chain. This is commonly caused by
-sending funds to a private key. Private keys, public keys, and account addresses are all represented today as 32-bytes or
-64-hex characters (with or without a 0x prefix).  After that, someone may find this private key and rotate the account's
-key on-chain.
+The main goal is to prevent people from accidentally leaking their private keys on-chain.
+This can happen if a user confuses their private key with their address, which are both 32 bytes.
+For example, the user can copy-and-paste their private key (instead of their address) in a wallet when sending a payment to oneself.
+After that, someone may find this private key and rotate the account's key on-chain.
+The core problem is that private keys, public keys, and account addresses are all represented today as 32-bytes or 64-hex characters (with or without a 0x prefix).
 
 The secondary goal is to keep this change to be as seamless as possible.
 
