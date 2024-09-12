@@ -17,7 +17,7 @@ requires (*optional): <mm/dd/yyyy>
 
 Aptos (APT), the layer 1 blockchain that we’re building upon, employs a Proof of Stake (PoS) consensus mechanism, wherein validators stake tokens to participate in network operations and governance.
 Currently, Aptos has a 30-day lock-up period for staked tokens, one of the longest among layer 1 protocols. This duration aims to ensure network stability and robust on-chain governance. However, feedback from various stakeholders suggests that reducing this period might offer significant benefits.
-As such, we’re proposing some possible implementation options for our community to consider. We conducted a survey within the community, and the winning option is to reduce the lock-up period to 14 days and the voting period to 3 days. This combination offers the best trade-offs between shorter staking lockup and providing ample time for the community to vote on governance proposals on Aptos.
+As such, we’re proposing some possible implementation options for our community to consider (see it here https://x.com/AmnisFinance/status/1805072839508418622). We conducted a survey within the community, and the winning option is to reduce the lock-up period to 14 days and the voting period to 3 days. This combination offers the best trade-offs between shorter staking lockup and providing ample time for the community to vote on governance proposals on Aptos.
 
 ## Rationale
 
