@@ -1,7 +1,7 @@
 ---
 aip: 
 title: Private Entry Function for Multisig Account Creation
-author: yeptos (https://github.com/yeptos), gregnazario, lightmark?
+author: yeptos (https://github.com/yeptos), gregnazario (https://github.com/gregnazario)
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
@@ -31,6 +31,8 @@ The proposal introduces two new private entry functions in the `multisig_account
 
 These functions simplify the process of creating a multisig account from an existing account, regardless of its authentication key scheme. This is particularly useful for migrating from multi-key accounts to multisig accounts, which is currently not possible.
 
+This proposal mirrors changes implemented in commit https://github.com/aptos-labs/aptos-core/commit/fdc041f37e4cb17d2c7f4bb2e0ad784a3f007614, where a private entry function was introduced for account key rotation with a similar purpose.
+
 ## Impact
 
 This change will impact developers and users who want to create multisig accounts from existing accounts, especially those with authentication schemes other than Ed25519 and legacy MultiEd25519. It provides a more inclusive and flexible method for account migration and multisig setup.
@@ -47,7 +49,6 @@ One alternative solution could be to upgrade the on-chain signature verification
 
 This proposal offers a more user-friendly approach by introducing new private entry functions that work with a signer, providing a simpler migration path for all account types, regardless of their authentication scheme.
 
-
 ## Specification and Implementation Details
 
 This proposal introduces two new entry functions in the `multisig_account` module:
@@ -59,7 +60,7 @@ These functions are named following the convention of the `account::rotate_authe
 
 ## Reference Implementation
 
-// To be replaced with a pull request on aptos-core
+https://github.com/aptos-labs/aptos-core/pull/14645
 
 ## Testing 
 
@@ -74,10 +75,13 @@ These tests cover the basic functionality of the new functions.
 
 The `create_with_existing_account_and_revoke_auth_key_call` function rotates the auth key to 0x0 and revokes capability offers, which irreversibly changes account control. Developers and users should be well-informed about this consequence.
 
+For resource accounts or object accounts, alternative methods to obtain the signer may exist beyond the authentication key.
+
+Note that these considerations also apply to the existing `create_with_existing_account_and_revoke_auth_key` function and are not newly introduced by this proposal.
+
 ## Security Considerations
 
 The `create_with_existing_account_and_revoke_auth_key_call` function rotates the auth key to 0x0 and revokes capability offers, which irreversibly changes account control. Developers and users should be well-informed about this consequence.
-
 
 ## Future Potential
 
@@ -89,12 +93,12 @@ The `create_with_existing_account_and_revoke_auth_key_call` function rotates the
 
 ### Suggested implementation timeline
 
-// TODO
+Reference implementation with a pull request available: https://github.com/aptos-labs/aptos-core/pull/14645
 
 ### Suggested developer platform support timeline
 
-// TODO
+No additional SDK support is required.
 
 ### Suggested deployment timeline
 
-// TODO
+In the next release, upon further testing on devnet and testnet.
