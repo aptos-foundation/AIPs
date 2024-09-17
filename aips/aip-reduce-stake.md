@@ -59,7 +59,7 @@ Lowering the threshold to 1M APT will open up the governance process to a wider 
 
 This would be a simple configuration change in Aptos Framework. 
 
-```jsx
+```
 script {
     use aptos_framework::aptos_governance;
 
