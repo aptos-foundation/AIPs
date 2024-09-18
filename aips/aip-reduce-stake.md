@@ -81,7 +81,12 @@ script {
 - **Potential for Exploitative Behavior -** A lower proposing threshold might make it easier for malicious actors to submit proposals that could exploit vulnerabilities in the system, especially if they can more easily meet the new, lower stake requirement. This may increase the need for more stringent proposal review processes.
 - **Increased Governance Overhead -** With more proposals being submitted, the burden on the community to review, discuss, and vote on a higher volume of governance items could grow. This may lead to slower decision-making, voter fatigue, or reduced participation in governance, particularly on critical issues.
 
-Currently Aptos Network follows the Aptos Improvement Process for network updates, to address those risks, we need to further strengthen the review process and continue to hold a high quality bar. 
+### Mitigation
+Currently, the Aptos Network follows the Aptos Improvement Process (AIP) for network updates. To address associated risks, we need to further strengthen the review process while maintaining a high standard of quality.
+
+- Set up alerts for when a new proposal is submitted on-chain (this feature already exists, and the ecosystem can subscribe through Govscan notifications at https://govscan.live/settings).
+- The Aptos Maintainers and Aptos Foundation should review new proposals within 3 days to ensure they adhere to the AIP process. Proposals that do not comply with the AIP process will be rejected by the Aptos Foundation and must be resubmitted in accordance with the Aptos Improvement Process.
+- Proposals that fail to gain sufficient support will not pass governance and, consequently, will not be executed. This is safeguarded by our minimum proposal passing requirement.
 
 ## Timeline
 
