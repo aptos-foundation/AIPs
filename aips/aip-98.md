@@ -1,5 +1,5 @@
 ---
-aip: x
+aip: 98
 title: Reduce minimal stake required to submit governance proposal from 10M to 1M
 author: sherry-x
 discussions-to: 
@@ -11,7 +11,7 @@ updated:
 requires:
 ---
 
-# AIP Draft - Reduce minimal stake required to submit governance proposal from 10M to 1M
+# AIP 98 - Reduce minimal stake required to submit governance proposal from 10M to 1M
 
 ## Summary
 
