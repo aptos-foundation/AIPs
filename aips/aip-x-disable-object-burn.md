@@ -17,20 +17,21 @@ requires (*optional):
 
 Safe burn was originally described in [AIP-45](./aip-45.md), which allowed users to tombstone their objects and remove
 direct linkage of an undeletable, also known as *soulbound*, object to an account. This AIP seeks to disable safe
-object burn, as it caused extra complexity, and sometimes unexpected consequences. Owners of burned objects will still
-be able to unburn and recover their tombstoned objects.
+object burn, as it caused extra complexity, and sometimes unexpected consequences. Especially, this behavior became
+less clear when the burn address manages the object, while the owner was the original owner. Owners of burned objects
+will still be able to unburn and recover their tombstoned objects.
 
 ### Goals
 
 As a result of this AIP, users will still be able to unburn their burnt objects, but will not be able to burn any new
-undeletable objects. This will reduce complexity and some interesting edge cases associated.
+objects. This will reduce complexity and some interesting edge cases associated.
 
-If we delay enacting this, there may be more burnt objects, which could cause more unexpected behaviors around moving
-burnt objects to the burn address.
+If we delay enacting this, there may be more burnt objects, which increase risk to new protocols due to the nuanced
+behaviors around burnt objects.
 
 ### Out of Scope
 
-This removes the previous mitigation, since users cannot opt-out of receiving unsolicited content. Wallets or other
+This removes the previous mitigation, since users cannot opt out of receiving unsolicited content. Wallets or other
 platforms will need to come up with a standardized way of hiding unwanted items.
 
 Additionally, we will not be preventing unburning existing burnt objects at this time.
@@ -38,6 +39,7 @@ Additionally, we will not be preventing unburning existing burnt objects at this
 ## Motivation
 
 The purpose here is to remove burn to prevent confusion, and complexity around *soulbound* objects changing owners.
+There are some nuanced behaviors around burnt objects, and removing this functionality prevents those behaviors.
 Originally, this was meant mostly for being able to hide unwanted *soulbound* NFTs. But, there are more use cases for
 *soulbound* objects (e.g. primary fungible store), which can complicate functionality around them. Removing this
 functionality simplifies cases for builders, and can make it easier to accomplish things like allowlists on fungible
@@ -50,8 +52,12 @@ may not be able to work around burns.
 
 This impacts the following parties:
 
-* Users who have already burnt, or plan to burn owned *soulbound* objects
+* Users who plan to burn owned *soulbound* objects
 * Smart contract developers who use the `burn` or `unburn` functionality
+
+This does not impact the following parties:
+
+* Users who have already burnt owned *soulbound* objects. They still can unburn them.
 
 ## Alternative solutions
 
@@ -77,8 +83,8 @@ The following new functions will be added to `aptos_framework::object`:
 
 ```move
 module aptos_framework::object {
-  #[test_only]
-  public fun burn_object<T: key>(owner: &signer, object: Object<T>) {}
+    #[test_only]
+    public fun burn_object<T: key>(owner: &signer, object: Object<T>) {}
 }
 ```
 
@@ -128,12 +134,12 @@ The expectation is that this should ship as part of the next release after being
 
 ### Suggested developer platform support timeline
 
-One day of work, to remove `burn` from any documentation on the [aptos.dev](https://aptos.dev) website.
+* Explicitly remove `burn` from any documentation on the [aptos.dev](https://aptos.dev) website.
 
 ### Suggested deployment timeline
 
-Deployed as the next applicable framework release, after being approved.
+* It's suggested that it is deployed as part of Aptos release 1.20.
 
 ## Open Questions (Optional)
 
-None
+* None
