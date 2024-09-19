@@ -9,21 +9,51 @@ created: 2024-09-17
 
 # Problem statement
 
-Authentication key mapping has functional issues that render
-originating address mapping unsafe.
+Aptos authentication key rotation is accompanied by a global mapping from an
+authentication key to the address that it authenticates, the
+`OriginatingAddress` table. For more background see the [key rotation docs] and
+the [Ledger key rotation docs].
 
-Generally this means that address mappings can be lost, leading to
-account loss and ultimately inability to access funds purely from CLI.
+There are currently several issues with the `OriginatingAddress` table (which is
+supposed to be a one-to-one lookup table) that render the mapping unsafe in
+practice:
+
+1. Per [`aptos-core` #13517], `rotate_authentication_key_call` does not update
+   the `OriginatingAddress` table for an "unproven" key rotation without a
+   `RotationProofChallenge` (resolved in this AIP's reference implementation
+   with a new `set_originating_address` private entry function).
+1. During an operation that attempts to map an authentication key (which has
+   already been mapped) to a different originating address, the inner function
+   `update_auth_key_and_originating_address_table` overwrites the initial
+   mapping, rather than aborting. This oversight can lead to account loss if
+   someone accidentally attempts to rotate to the same authentication key twice
+   (resolved in this PR with `ENEW_AUTH_KEY_ALREADY_MAPPED` check), because they
+   will not be able to identify their account from private key alone unless they
+   keep an external record of the rotated accounts the private key in question
+   has been used to secure.
+1. Standard accounts that have not yet had their key rotated are not registered
+   in the `OriginatingAddress` table, such that two accounts can be
+   authenticated by the same authentication key: the original account whose
+   address is its authentication key, and another account that has had its
+   authentication key rotated to the authentication key of the original account.
+   Since `OriginatingAddress` is one-to-one, a dual-account situation can
+   inhibit indexing and OpSec (resolved in this PR with
+   `set_originating_address` private entry function).
 
 # Impact
 
-This impacts projects or users who have used key rotation functionality,
-in particular the unproven rotation used for exotic purposes like passkeys.
-
-For more, see:
-
-https://aptos.dev/en/build/guides/key-rotation
-https://aptos.dev/en/build/cli/trying-things-on-chain/ledger#authentication-key-rotation
+1. Without the changes proposed in this AIP's reference implementation,
+   unproven authentications (specifically those relying on
+   `rotate_authentication_key_call`) will result in an unidentifiable mapping,
+   such that users will be unable to identify accounts secured by their private
+   key unless they have maintained their own offchain mapping. This applies to
+   exotic wallets like passkeys.
+1. The overwrite behavior (described above) for
+   `update_auth_key_and_originating_address_table` can similarly result in an
+   inability to identify an account based on the private key.
+1. A user who authenticates two accounts with the same private key per the above
+   schema will experience undefined behavior during indexing and OpSec due to
+   the original one-to-one mapping assumption.
 
 # Summary
 
@@ -31,35 +61,9 @@ The onchain key rotation address mapping has functional issues which inhibit
 safe mapping of authentication key to originating address for standard accounts.
 I propose resolving these issues with the reference implementation.
 
-# Motivation
-
-There are currently several issues with the `OriginatingAddress` table (which is
-supposed to be a one-to-one lookup table) that render the mapping unsafe in
-practice:
-
-1. Per https://github.com/aptos-labs/aptos-core/issues/13517,
-   `rotate_authentication_key_call` does not update the `OriginatingAddress`
-   table for an "unproven" key rotation without a `RotationProofChallenge`.
-1. During an operation that attempts to map an authentication key (which has
-   already been mapped) to a different originating address, the inner function
-   `update_auth_key_and_originating_address_table` overwrites the initial
-   mapping, rather than aborting. This oversight can lead to account loss if
-   someone accidentally attempts to rotate to the same authentication key twice,
-   because they will not be able to identify their old account from private key
-   alone unless they keep an external record of the rotated accounts it has been
-   used to secure.
-1. Standard accounts that have not yet had their key rotated are not registered
-   in the `OriginatingAddress` table, such that two accounts can be
-   authenticated by the same authentication key: the original account whose
-   address is its authentication key, and another account that has had its
-   authentication key rotated to the authentication key of the original account.
-   Since `OriginatingAddress` is one-to-one, a dual-account situation can
-   inhibit indexing and OpSec.
-
 # Proposed solution
 
-Assorted checks and extra function logic in
-https://github.com/aptos-labs/aptos-core/pull/14309
+Assorted checks and extra function logic in [`aptos-core` #14309]
 
 # Alternative solutions
 
@@ -84,7 +88,7 @@ N/A
 
 # Reference implementations
 
-https://github.com/aptos-labs/aptos-core/pull/14309
+[`aptos-core` #14309]
 
 # Risks and drawbacks
 
@@ -95,8 +99,8 @@ private key to authenticate all their accounts) may find restrictive.
 # Security considerations
 
 Note that the function `account::set_originating_address` proposed in
-https://github.com/aptos-labs/aptos-core/pull/14309 must remain a private entry
-function to prevent unproven key rotation attacks.
+[`aptos-core` #14309] must remain a private entry function to prevent unproven
+key rotation attacks.
 
 # Multisig considerations
 
@@ -130,7 +134,7 @@ reference implementation intends to resolve).
 
 As requested by @thepom on 2024-09-17:
 
-1. Install the Aptos CLI [from source] using the changes in this PR.
+1. Install the Aptos CLI from source using the changes in [`aptos-core` #14309].
 1. Make a new test directory called `localnet-data`, then use it to start a
    localnet with the framework changes in this PR:
 
@@ -210,3 +214,8 @@ As requested by @thepom on 2024-09-17:
         --profile localnet-b \
         --save-to-profile localnet-b-secured-by-keyfile-a
     ```
+
+[`aptos-core` #13517]: https://github.com/aptos-labs/aptos-core/pull/13517
+[`aptos-core` #14309]: https://github.com/aptos-labs/aptos-core/pull/14309
+[key rotation docs]: https://aptos.dev/en/build/guides/key-rotation
+[Ledger key rotation docs]: https://aptos.dev/en/build/cli/trying-things-on-chain/ledger#authentication-key-rotation
