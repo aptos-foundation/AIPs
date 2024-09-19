@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: 99
 title: Disable Object Burn
 author: gregnazario (greg@aptoslabs.com)
 discussions-to (*optional): <a url pointing to the official discussion thread>
@@ -11,7 +11,7 @@ updated (*optional):
 requires (*optional):
 ---
 
-# AIP-X - Disable Safe Burn of User-Owned Objects
+# AIP-99 - Disable Safe Burn of User-Owned Objects
 
 ## Summary
 
