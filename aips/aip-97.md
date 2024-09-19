@@ -61,6 +61,21 @@ With second indices move to internal indexer, if public fullnodes want to still 
 - `/accounts/{address}/modules`
 - `/accounts/{address}/resources`
 
+### How is ledger_version handled between the internal indexer and other APIs when there is a discrepancy?
+- If the internal indexer is enabled, the node will return the latest version from the internal indexer as the most recent ledger information. This approach minimizes user disruption by eliminating the need for an upfront migration. Currently, the delay between the internal indexer and storage on devnet is under one second.
+
+- We will not introduce a separate field to distinguish between the internal indexer and other APIs at this time. This will only be considered if a clear need arises in the future.
+
+### What will the default configuration be for different node types?
+1. Validator and VFN (Validator Full Node):
+  - During the migration phase, the sharding configuration will default to OFF to ensure uninterrupted operation of existing nodes. After a gradual rollout, sharding will be enabled by default for any new nodes.
+The internal indexer will also default to OFF for validator nodes, as API calls are not typically directed towards validators or VFNs.
+  - Each validator operator can adjust these settings according to their specific needs.
+2. PFN (Public Full Node):
+  - Similarly, during migration, the sharding configuration will default to OFF to prevent disruptions. Each PFN operator will need to manually update the configuration to migrate their database. If the ecosystem widely adopts sharding mode, future nodes may have sharding enabled by default. Any such change will be announced in advance.
+- The internal indexer will also be OFF by default for PFNs. If an operator migrates to sharding mode, they should evaluate whether the additional account APIs are necessary for their specific use case.
+- Each full node provider can adjust the configuration as required. For instance, Aptos Labs will enable the internal indexer on its PFNs to avoid immediate impact on the ecosystem.
+
 ## Specification and Implementation Details
 
 ### Implementation
