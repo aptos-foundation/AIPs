@@ -71,3 +71,33 @@ Configuration to update:
 
 The change should be available on mainnet in September 2024.
 
+## FAQs
+
+- Q: Why is there a need for a proposal to reduce the stake lockup period to 14 days? 
+
+A: The proposal to reduce the lockup period from 30 to 14 days stems from some ecosystem members who expressed the need for more flexibility, aligning with industry standards, and reducing the risks associated with longer lock-up periods.
+
+- Q: Why propose to reduce the governance voting period to 3 days? 
+
+A: There’s an indirect impact to governance voting when reducing stake lockup time, as explained here. In the meantime, reducing the voting period ensures governance decisions can be made within the shorter 14-day lockup period. This adjustment will help avoid situations where validators cannot vote due to lockup duration issues, ensuring smooth governance participation.
+
+- Q: When will these changes be implemented? 
+
+A: If approved, the proposed changes are expected to be available on mainnet by September 19, 2024.
+
+- Q: What are the potential risks of reducing the lockup and voting periods? 
+
+A: While the reduction improves flexibility, it introduces risks such as operational complexity and governance challenges resulting in reduced validator engagement. Validators may face difficulties in tracking voting windows, and proposals may lack sufficient participation if voting is rushed.
+
+- Q: How will this impact the broader Aptos ecosystem? 
+
+A: All stakeholders, including token holders, validators, and the Aptos Foundation, will need to adapt to faster governance cycles, with shorter windows for decision-making and response times. The community will work closely to mitigate challenges and ensure smooth transitions.
+
+- Q: How does this benefit DeFi? 
+
+A: Shortening the lockup period could make Aptos more attractive by reducing the risks of depegging and enabling users to manage their assets more flexibly.
+
+- Q: What configuration changes will be made? 
+
+A: The lockup and voting durations will be adjusted on-chain, specifically updating the recurring_lockup_duration_secs and voting_duration_secs.
+
