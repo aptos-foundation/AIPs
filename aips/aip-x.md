@@ -2,13 +2,13 @@
 aip: 
 title: Private Entry Function for Multisig Account Creation
 author: yeptos (https://github.com/yeptos), gregnazario (https://github.com/gregnazario)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/498
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date:
 type: Standard (Framework)
 created: 9/10/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated:
+requires:
 ---
 
 # AIP-X - Private Entry Function for Multisig Account Creation
@@ -31,7 +31,7 @@ The proposal introduces two new private entry functions in the `multisig_account
 
 These functions simplify the process of creating a multisig account from an existing account, regardless of its authentication key scheme. This is particularly useful for migrating from multi-key accounts to multisig accounts, which is currently not possible.
 
-This proposal mirrors changes implemented in commit https://github.com/aptos-labs/aptos-core/commit/fdc041f37e4cb17d2c7f4bb2e0ad784a3f007614, where a private entry function was introduced for account key rotation with a similar purpose.
+This proposal mirrors changes implemented in commit [aptos-core@fdc041](https://github.com/aptos-labs/aptos-core/commit/fdc041f37e4cb17d2c7f4bb2e0ad784a3f007614), where a private entry function was introduced for account key rotation with a similar purpose.
 
 ## Impact
 
