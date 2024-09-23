@@ -22,23 +22,29 @@ practice:
    the `OriginatingAddress` table for an "unproven" key rotation without a
    `RotationProofChallenge` (resolved in this AIP's reference implementation
    with a new `set_originating_address` private entry function).
-1. During an operation that attempts to map an authentication key (which has
-   already been mapped) to a different originating address, the inner function
-   `update_auth_key_and_originating_address_table` overwrites the initial
-   mapping, rather than aborting. This oversight can lead to account loss if
-   someone accidentally attempts to rotate to the same authentication key twice
-   (resolved in this PR with `ENEW_AUTH_KEY_ALREADY_MAPPED` check), because they
-   will not be able to identify their account from private key alone unless they
-   keep an external record of the rotated accounts the private key in question
-   has been used to secure.
+1. When a given authentication key already has an entry in the
+   `OriginatingAddress` table (`t[ak] = a1`) and a key rotation operation
+   attempts to establish a mapping to a new account address, (`t[ak] = a2`), the
+   inner function `update_auth_key_and_originating_address_table` silently
+   overwrites the existing mapping rather than aborting, such that the owner of
+   authentication key `ak` is unable to identify account address `a1` purely
+   onchain from authentication key `ak`. Hence account loss may ensure if
+   someone accidentally maps the same authentication key twice but does not keep
+   an offchain record of all authenticated accounts (resolved in reference
+   implementation with `ENEW_AUTH_KEY_ALREADY_MAPPED` check).
 1. Standard accounts that have not yet had their key rotated are not registered
    in the `OriginatingAddress` table, such that two accounts can be
    authenticated by the same authentication key: the original account whose
    address is its authentication key, and another account that has had its
    authentication key rotated to the authentication key of the original account.
-   Since `OriginatingAddress` is one-to-one, a dual-account situation can
-   inhibit indexing and OpSec (resolved in this PR with
-   `set_originating_address` private entry function).
+   (This situation is possible even with proposed `ENEW_AUTH_KEY_ALREADY_MAPPED`
+   since account initialization logic does not create an `OriginatingAddress`
+   entry for a standard account when it is first initialized). Hence since
+   `OriginatingAddress` is intended to be one-to-one, a dual-account situation
+   can inhibit indexing and OpSec (resolved in reference implementation with
+   `set_originating_address` private entry function, which allows setting a
+   mapping for the original account address).
+
 
 # Impact
 
@@ -67,16 +73,12 @@ Assorted checks and extra function logic in [`aptos-core` #14309]
 
 # Alternative solutions
 
-Per @davidiw in a separate chat:
+Separately, @davidiw has proposed a primarily offchain and indexing-based
+approach to mapping authentication keys (see [AIP issue 487] more more detail).
 
-> something where we update the rotation command to take in new and removed keys
-> as well as any additional metadata that might be useful such as parameters for
-> the authkey type. Then we add to the indexer a set of all keys that point to
-> potential addresses.
-
-As I understand, this approach would require breaking changes and would
-introduce offchain indexing as an additional dependency in the authentication
-key mapping paradigm.
+However, such an approach would require breaking changes and would introduce
+offchain indexing as an additional dependency in the authentication key mapping
+paradigm.
 
 My solution, captured in the proposed reference implementation, offers a
 purely onchain solution to existing issues and does not require altering the
@@ -92,9 +94,9 @@ N/A
 
 # Risks and drawbacks
 
-Enforces a one-to-one mapping of private key to account address in the general
-case of following best practices, which extreme users (wishing to use one
-private key to authenticate all their accounts) may find restrictive.
+This proposal enforces a one-to-one mapping of private key to account address in
+the general case of following best practices, which extreme users (wishing to
+use one private key to authenticate all their accounts) may find restrictive.
 
 # Security considerations
 
@@ -104,10 +106,9 @@ key rotation attacks.
 
 # Multisig considerations
 
-In a separate chat, @davidiw asked about how the changes in the reference
-implementation will interact with multisig v2. Note that even without the
-changes in this PR, it is already possible for a multisig to have an entry in
-the `OriginatingAddress` table:
+Note that this AIP does not attempt to address multisig v2 effects, because even
+without the changes in this AIP, it is already possible for a multisig to
+(misleadingly) generate an entry in the `OriginatingAddress` table:
 
 1. Rotate account `A` to have a new authentication key, thus generating an entry
    in the `OriginatingAddress` table.
@@ -126,96 +127,14 @@ Ideally during next release
 
 # Future potentials
 
-Potentially in a separate update, logic to eradicate the existing multisig v2
-indexing issues mentioned above (which is outside the scope of what the
-reference implementation intends to resolve).
+In a separate update, logic to eradicate the existing multisig v2 indexing
+issues mentioned above (which is outside the scope of what the reference
+implementation intends to resolve).
 
 # Verifying changes in reference implementation
-
-As requested by @thepom on 2024-09-17:
-
-1. Install the Aptos CLI from source using the changes in [`aptos-core` #14309].
-1. Make a new test directory called `localnet-data`, then use it to start a
-   localnet with the framework changes in this PR:
-
-    ```sh
-    aptos node run-localnet --test-dir localnet-data
-    ```
-
-1. Save the localnet shell running off to the side.
-1. In a new shell, create a private key file:
-
-    ```sh
-    aptos key generate --output-file keyfile-a
-    ```
-
-1. Use it to create a localnet profile:
-
-    ```sh
-    aptos init \
-        --network local \
-        --private-key-file keyfile-a \
-        --profile localnet-a
-    ```
-
-1. Store the address:
-
-    ```sh
-    ADDR_A=<profile-address>
-    ```
-
-1. Use the new `originating_address` view function to observe that the account
-   does *not* have an entry in the `OriginatingAddress` table:
-
-    ```sh
-    aptos move view \
-        --args address:$ADDR_A \
-        --function-id 0x1::account::originating_address \
-        --profile localnet-a
-    ```
-
-1. Use the new `set_originating_address` private entry function to set a mapping
-   in the table:
-
-    ```sh
-    aptos move run \
-        --function-id 0x1::account::set_originating_address \
-        --profile localnet-a
-    ```
-
-1. Check the `originating_address` view function again and note the result:
-
-    ```sh
-    aptos move view \
-        --args address:$ADDR_A \
-        --function-id 0x1::account::originating_address \
-        --profile localnet-a
-    ```
-
-1. Now that you've established a one-to-one mapping for the authentication key,
-   the new check for `ENEW_AUTH_KEY_ALREADY_MAPPED` in
-   `update_auth_key_and_originating_address_table` will prevent another account
-   from rotating its authentication key to that of `keyfile-a`, thus preserving
-   a one-to-one mapping. To verify this, create a new profile:
-
-    ```sh
-    aptos init \
-        --network local \
-        --profile localnet-b
-    ```
-
-1. Press `enter` when prompted to generate a new private key for the profile.
-   Then observe the new guard against breaking the one-to-one mapping, by
-   trying to rotate the authentication key to that of `keyfile-a`:
-
-    ```sh
-    aptos account rotate-key \
-        --new-private-key-file keyfile-a \
-        --profile localnet-b \
-        --save-to-profile localnet-b-secured-by-keyfile-a
-    ```
 
 [`aptos-core` #13517]: https://github.com/aptos-labs/aptos-core/pull/13517
 [`aptos-core` #14309]: https://github.com/aptos-labs/aptos-core/pull/14309
 [key rotation docs]: https://aptos.dev/en/build/guides/key-rotation
 [Ledger key rotation docs]: https://aptos.dev/en/build/cli/trying-things-on-chain/ledger#authentication-key-rotation
+[AIP issue 487]: https://github.com/aptos-foundation/AIPs/issues/487
