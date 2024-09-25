@@ -2,23 +2,80 @@
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Safe onchain key rotation address mapping for standard accounts
 author: Alex Kahn (43892045+alnoki@users.noreply.github.com)
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/487
 Status: Draft
-type: Standard (Framework)
-created: 2024-09-17
+last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+type: Standard Framework
+created: 09/17/2024
+updated (*optional): <mm/dd/yyyy>
+requires (*optional): <AIP number(s)>
 ---
 
-# Problem statement
+# AIP-X - Safe onchain key rotation address mapping for standard accounts
+
+## Summary
+
+The onchain key rotation address mapping has functional issues which inhibit
+safe mapping of authentication key to originating address for standard accounts.
+This proposal resolves these issues by adding assorted checks and extra function logic. 
+
+### Out of Scope
+
+Note that this AIP does not attempt to address multisig v2 effects, because even
+without the changes in this AIP, it is already possible for a multisig to
+(misleadingly) generate an entry in the `OriginatingAddress` table:
+
+1. Rotate account `A` to have a new authentication key, thus generating an entry
+   in the `OriginatingAddress` table.
+2. Convert account `A` to a multisig via
+   `multisig_account::create_with_existing_account_and_revoke_auth_key`, which
+   will set the account's authentication key to `0x0`, but which will *not*
+   mutate the `OriginatingAddress` table, since it makes an inner call to
+   `account::rotate_authentication_key_internal`.
+3. The `OriginatingAddress` table then (incorrectly) reports that a mapping from
+   the authentication key (from before multisig conversion) to the multisig
+   address.
+
+## Impact
+
+1. Without the changes proposed in this AIP's reference implementation,
+   unproven authentications (specifically those relying on
+   `rotate_authentication_key_call`) will result in an unidentifiable mapping,
+   such that users will be unable to identify accounts secured by their private
+   key unless they have maintained their own offchain mapping. This applies to
+   exotic wallets like passkeys.
+1. The overwrite behavior (described above) for
+   `update_auth_key_and_originating_address_table` can similarly result in an
+   inability to identify an account based on the private key.
+1. A user who authenticates two accounts with the same private key per the above
+   schema will experience undefined behavior during indexing and OpSec due to
+   the original one-to-one mapping assumption.
+
+## Alternative solutions
+
+Separately, @davidiw has proposed a primarily offchain and indexing-based
+approach to mapping authentication keys (see [AIP issue 487] more more detail).
+
+However, such an approach would require breaking changes and would introduce
+offchain indexing as an additional dependency in the authentication key mapping
+paradigm.
+
+My solution, captured in the proposed reference implementation, offers a
+purely onchain solution to existing issues and does not require altering the
+existing design space or introducing an offchain dependency.
+
+## Specification and Implementation Details
 
 Aptos authentication key rotation is accompanied by a global mapping from an
 authentication key to the address that it authenticates, the
-`OriginatingAddress` table. For more background see the [key rotation docs] and
-the [Ledger key rotation docs].
+`OriginatingAddress` table. For more background see the [key rotation docs](https://aptos.dev/en/build/guides/key-rotation) and
+the [Ledger key rotation docs](https://aptos.dev/en/build/cli/trying-things-on-chain/ledger#authentication-key-rotation).
 
 There are currently several issues with the `OriginatingAddress` table (which is
 supposed to be a one-to-one lookup table) that render the mapping unsafe in
 practice:
 
-1. Per [`aptos-core` #13517], `rotate_authentication_key_call` does not update
+1. Per [`aptos-core` #13517](https://github.com/aptos-labs/aptos-core/pull/13517), `rotate_authentication_key_call` does not update
    the `OriginatingAddress` table for an "unproven" key rotation without a
    `RotationProofChallenge` (resolved in this AIP's reference implementation
    with a new `set_originating_address` private entry function).
@@ -45,96 +102,34 @@ practice:
    `set_originating_address` private entry function, which allows setting a
    mapping for the original account address).
 
+## Reference Implementation
 
-# Impact
+Assorted checks and extra function logic in [`aptos-core` #14309](https://github.com/aptos-labs/aptos-core/pull/14309)
 
-1. Without the changes proposed in this AIP's reference implementation,
-   unproven authentications (specifically those relying on
-   `rotate_authentication_key_call`) will result in an unidentifiable mapping,
-   such that users will be unable to identify accounts secured by their private
-   key unless they have maintained their own offchain mapping. This applies to
-   exotic wallets like passkeys.
-1. The overwrite behavior (described above) for
-   `update_auth_key_and_originating_address_table` can similarly result in an
-   inability to identify an account based on the private key.
-1. A user who authenticates two accounts with the same private key per the above
-   schema will experience undefined behavior during indexing and OpSec due to
-   the original one-to-one mapping assumption.
+## Testing 
 
-# Summary
+ > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out. Some examples include user stories, network health metrics, system metrics, E2E tests, unit tests, etc) 
+ > - When can we expect the results?
+ > - What are the test results and are they what we expected? If not, explain the gap.
 
-The onchain key rotation address mapping has functional issues which inhibit
-safe mapping of authentication key to originating address for standard accounts.
-This proposal resolves these issues by adding assorted checks and extra function logic. 
-
-# Proposed solution
-
-Assorted checks and extra function logic in [`aptos-core` #14309]
-
-# Alternative solutions
-
-Separately, @davidiw has proposed a primarily offchain and indexing-based
-approach to mapping authentication keys (see [AIP issue 487] more more detail).
-
-However, such an approach would require breaking changes and would introduce
-offchain indexing as an additional dependency in the authentication key mapping
-paradigm.
-
-My solution, captured in the proposed reference implementation, offers a
-purely onchain solution to existing issues and does not require altering the
-existing design space or introducing an offchain dependency.
-
-# Specification
-
-N/A
-
-# Reference implementations
-
-[`aptos-core` #14309]
-
-# Risks and drawbacks
+## Risks and drawbacks
 
 This proposal enforces a one-to-one mapping of private key to account address in
 the general case of following best practices, which extreme users (wishing to
 use one private key to authenticate all their accounts) may find restrictive.
 
-# Security considerations
+## Security considerations
 
 Note that the function `account::set_originating_address` proposed in
-[`aptos-core` #14309] must remain a private entry function to prevent unproven
+[`aptos-core` #14309])(https://github.com/aptos-labs/aptos-core/pull/14309) must remain a private entry function to prevent unproven
 key rotation attacks.
 
-# Multisig considerations
-
-Note that this AIP does not attempt to address multisig v2 effects, because even
-without the changes in this AIP, it is already possible for a multisig to
-(misleadingly) generate an entry in the `OriginatingAddress` table:
-
-1. Rotate account `A` to have a new authentication key, thus generating an entry
-   in the `OriginatingAddress` table.
-2. Convert account `A` to a multisig via
-   `multisig_account::create_with_existing_account_and_revoke_auth_key`, which
-   will set the account's authentication key to `0x0`, but which will *not*
-   mutate the `OriginatingAddress` table, since it makes an inner call to
-   `account::rotate_authentication_key_internal`.
-3. The `OriginatingAddress` table then (incorrectly) reports that a mapping from
-   the authentication key (from before multisig conversion) to the multisig
-   address.
-
-# Timelines
-
-Ideally during next release
-
-# Future potentials
+## Future Potential
 
 In a separate update, logic to eradicate the existing multisig v2 indexing
 issues mentioned above (which is outside the scope of what the reference
 implementation intends to resolve).
 
-# Verifying changes in reference implementation
+## Timeline
 
-[`aptos-core` #13517]: https://github.com/aptos-labs/aptos-core/pull/13517
-[`aptos-core` #14309]: https://github.com/aptos-labs/aptos-core/pull/14309
-[key rotation docs]: https://aptos.dev/en/build/guides/key-rotation
-[Ledger key rotation docs]: https://aptos.dev/en/build/cli/trying-things-on-chain/ledger#authentication-key-rotation
-[AIP issue 487]: https://github.com/aptos-foundation/AIPs/issues/487
+Ideally during next release
