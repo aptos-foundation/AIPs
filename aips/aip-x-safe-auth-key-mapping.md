@@ -53,16 +53,14 @@ without the changes in this AIP, it is already possible for a multisig to
 
 ## Alternative solutions
 
-Separately, @davidiw has proposed a primarily offchain and indexing-based
-approach to mapping authentication keys (see [AIP issue 487] more more detail).
+One alternative would be a primarily offchain and indexing-based
+approach to mapping authentication keys.
 
 However, such an approach would require breaking changes and would introduce
 offchain indexing as an additional dependency in the authentication key mapping
 paradigm.
 
-My solution, captured in the proposed reference implementation, offers a
-purely onchain solution to existing issues and does not require altering the
-existing design space or introducing an offchain dependency.
+The proposed solution offers a purely onchain solution to existing issues and does not require altering the existing design space or introducing an offchain dependency.
 
 ## Specification and Implementation Details
 
