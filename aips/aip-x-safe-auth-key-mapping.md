@@ -17,7 +17,7 @@ requires (*optional): <AIP number(s)>
 
 The onchain key rotation address mapping has functional issues which inhibit
 safe mapping of authentication key to originating address for standard accounts.
-This proposal resolves these issues by adding assorted checks and extra function logic. 
+This proposal resolves these issues by adding assorted checks and extra function logic.
 
 ### Out of Scope
 
@@ -44,10 +44,10 @@ without the changes in this AIP, it is already possible for a multisig to
    such that users will be unable to identify accounts secured by their private
    key unless they have maintained their own offchain mapping. This applies to
    exotic wallets like passkeys.
-1. The overwrite behavior (described above) for
+1. The overwrite behavior (described below) for
    `update_auth_key_and_originating_address_table` can similarly result in an
    inability to identify an account based on the private key.
-1. A user who authenticates two accounts with the same private key per the above
+1. A user who authenticates two accounts with the same private key per the below
    schema will experience undefined behavior during indexing and OpSec due to
    the original one-to-one mapping assumption.
 
@@ -102,13 +102,23 @@ practice:
 
 ## Reference Implementation
 
-Assorted checks and extra function logic in [`aptos-core` #14309](https://github.com/aptos-labs/aptos-core/pull/14309)
+Assorted checks and extra function logic in [`aptos-core` #14309](https://github.com/aptos-labs/aptos-core/pull/14309):
 
-## Testing 
+1. Function `set_originating_address()`: Private entry function to establish an
+   `OriginatingAddress` mapping for account reconciliation after an unproven
+   rotation or for an account that has just beencreated.
+1. Function `originating_address()`: View function to return the address mapped
+   to an authentication key
+1. Abort `ENEW_AUTH_KEY_SAME_AS_CURRENT` to prevent no-op rotations that can
+   introduce indexing issues.
+1. Abort `ENEW_AUTH_KEY_ALREADY_MAPPED` to prevent onchain account loss
+   from silent overwriting of existing mappings.
 
- > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out. Some examples include user stories, network health metrics, system metrics, E2E tests, unit tests, etc) 
- > - When can we expect the results?
- > - What are the test results and are they what we expected? If not, explain the gap.
+## Testing
+
+The reference implementation pairs with a
+[docs site walkthrough that I authored](https://aptos.dev/en/build/guides/key-rotation#key-rotation-with-the-aptos-cli), which demonstrates, documents,
+and verifies the functionality from the reference implementation.
 
 ## Risks and drawbacks
 
@@ -119,7 +129,7 @@ use one private key to authenticate all their accounts) may find restrictive.
 ## Security considerations
 
 Note that the function `account::set_originating_address` proposed in
-[`aptos-core` #14309])(https://github.com/aptos-labs/aptos-core/pull/14309) must remain a private entry function to prevent unproven
+[`aptos-core` #14309](https://github.com/aptos-labs/aptos-core/pull/14309) must remain a private entry function to prevent unproven
 key rotation attacks.
 
 ## Future Potential
