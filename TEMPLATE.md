@@ -26,7 +26,7 @@ requires (*optional): <AIP number(s)>
 
 ...
 
-### Out of Scope
+### Out of scope
 
  > What are we committing to not doing and why are they scoped out?
 
@@ -46,7 +46,7 @@ requires (*optional): <AIP number(s)>
  > List out other AIPs this AIP is dependent on
 ...
 
-## Alternative solutions
+## Alternative Solutions
 
  > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
 
@@ -103,13 +103,13 @@ requires (*optional): <AIP number(s)>
 
 ### Suggested developer platform support timeline
 
- > Describe the plan to have SDK, API, CLI, Indexer support for this feature is applicable. 
+ > **Optional:** Describe the plan to have SDK, API, CLI, Indexer support for this feature, if applicable. 
 
 ...
 
 ### Suggested deployment timeline
 
- > Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
+ > **Optional:** Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
  > You are responsible for updating this AIP with a better estimate, if any, after the AIP passes the gatekeeper’s design review.
  >
  > - On devnet?
