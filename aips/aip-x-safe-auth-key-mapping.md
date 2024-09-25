@@ -65,7 +65,7 @@ practice:
 
 The onchain key rotation address mapping has functional issues which inhibit
 safe mapping of authentication key to originating address for standard accounts.
-I propose resolving these issues with the reference implementation.
+This proposal resolves these issues by adding assorted checks and extra function logic. 
 
 # Proposed solution
 
