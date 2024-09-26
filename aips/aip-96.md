@@ -8,9 +8,8 @@ last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and
 type: <Standard (Core, Framework)>
 created: 08/21/2024
 updated (*optional): <mm/dd/yyyy>
-requires (*optional): [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md), [AIP-75](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-75.md), [AIP-81](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-81.md)
+requires (*optional): AIP-61 https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md, AIP-75 https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-75.md, AIP-81 https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-81.md
 ---
-
 # AIP-96 - Federated Keyless accounts
 
 ## Summary
