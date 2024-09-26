@@ -1,128 +1,151 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: Batched Execution Transaction
+title: TBD
 author: @runtian-zhou
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
-last-call-end-date (*optional): 06/25/2024
-type: Framework
-created: 06/11/2024
+last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+type:  Interface, Application
+created: 09/24/2024
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Batched Execution Transaction
+# AIP-X - Intent Transaction Builder TBD
   
-
 ## Summary
 
-Right now the users can interact with a Move contract via entry point function or script. Script can be a nice way of chaining multiple smart contract calls yet require users to compile scripts on their own end, which would be a problem for a light weight client setup.
 
-This AIP Introduce a new type of transaction payload that allows users to construct a lightweight "script" like transaction block. This would allow users to construct transaction in a more flexible manner without having to have compiler on the client side.
+Develop a new set of APIs in our SDKs to allow application builders to easily chain multiple Move operations in a single transaction.
 
 ### Out of Scope
 
-The new payload type will need to be transactional, meaning that all succeed or abort semantics need to be followed.
+In this AIP, we will focus solely on the transaction-building aspect. While this solution aims to enhance the composability of our ecosystem as part of the Aptos Intent standard, those standards will be proposed in future AIPs. This AIP will serve as a reference for those later efforts.
 
 ## High-level Overview
 
-Implement a new type of payload that chains a series of Move calls. For each call they can have raw bytes as input(as before) or select an output from a previous transaction.
+Currently, there are two ways to interact with the Aptos Blockchain:
+- EntryFunction Payload: Developers need only specify the function name they want to invoke and pass the corresponding arguments to the SDK.
+- Script Payload: Developers require a Move compiler to compile Move scripts into a compiled format, which is then used as the transaction payload.
+
+These two approaches offer significantly different developer experiences. EntryFunctionPayload is easy to build using our provided SDK, but requires the developer to deploy the entry function to the blockchain upfront, limiting composability. Script Payload provides full expressivity, allowing developers to call and compose any on-chain Move functions. However, it requires the use of the full Move compiler, which may not be practical in a browser-based environment. Currently, the only practical way to use a script is to compile it once, store the compiled bytes in binary format, and use that format in the SDK on the client side.
+
+Ideally, we want a solution that strikes a balance between these two approaches: allowing developers to easily compose Move functions in transactions on the client side without needing the entire Move compiler.
+
+We present the Aptos Intent Transaction Builder to address this challenge. The transaction builder API will be integrated into the SDK, allowing developers to chain multiple Move calls into a single transaction. The builder will be implemented in Rust, which will generate compiled Move script bytes directly from a sequence of Move calls, without requiring the full Move compiler or source code. This builder will be bundled into WASM for seamless integration into our TypeScript SDK.
+
+Additionally, we will introduce annotation logic to the indexer API so that the indexer/explorer can display the script in an intent format. This can be achieved by implementing a decompiler that reverse-engineers the code generation logic.
 
 ## Impact
 
-This would require changes in almost all infrastructure that we have, including:
-
-1. (P0) SDK Support: we need to introduce new apis in the SDK to support generating this new type of payload.
-2. (P0) Core node software: we will implement a command interpretation loop that execute calls one by one and check for the type and ability safety of Move.
-3. (P1) Wallet: wallet need to be able to display the payload nicely for better useability.
-4. (P1) Indexer: explorer need to be able to display the payload nicely for better visibility.
-5. (P1) CLI: Have a way to construct such payload in our aptos cli.
+Most of the changes will be in our SDK interfaces. This should significantly improve developer's experience to create transaction that invokes multiple Move function calls all at once. This would be particularly helpful for our defi developers as they would be able to implement features such as withdraw coin and put them into a lending protocol in one transaction.
 
 ## Alternative solutions
 
-We could also build a Script compilation engine on the client side rather than implementing an interpretation logic on the node side. However this means we need to ship a compiler (or a tiny code generator) to compile such payload into a compiled Move script format. Given the various SDK we need to support (TypeScript/Python), it is pretty hard to maintain this in the longer term.
-
-One possible approach is to build a tiny code generator in rust that takes dependency modules and payload, and generate the corresponding compiled bytecode. We could compile such binary into WASM and ship it with our typescript SDK.
+An alternative approach is to introduce a third payload type in our system and have the node software interpret this payload directly. While this could offer some performance improvements by bypassing the full bytecode verifier, it would require reimplementing several critical checks, such as type safety, ability constraints, and reference safety, that are already handled by the verifier. Duplicating this logic at the node level not only adds redundancy but also increases the risk of introducing security vulnerabilities.
 
 ## Specification and Implementation Details
 
-The new payload type will look like following:
+
+We will be introducing the following APIs in the ts-sdk:
 
 ```
-/// Arguments for each function.
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
-pub enum BatchArgument {
-    Raw(Vec<u8>),
-    PreviousResult(u16, u16),
+export type InputBatchedFunctionData = {
+  function: MoveFunctionId;
+  typeArguments?: Array<TypeArgument>;
+  /* Function argument could either be existing entry function argument or come from the output of a previous function */
+  functionArguments: Array<EntryFunctionArgumentTypes | BatchArgument | SimpleEntryFunctionArgumentTypes>;
+};
+
+export class AptosIntentBuilder {
+    /* Move function calls can return values. Those values can be passed to other functions by move, copy or reference */
+    async add_batched_calls(input: InputBatchedFunctionData): Promise<BatchArgument[]>;
 }
 
-/// Call a Move entry function.
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
-pub struct BatchedFunctionCall {
-    pub module: ModuleId,
-    pub function: Identifier,
-    pub ty_args: Vec<TypeTag>,
-    pub args: Vec<BatchArgument>,
-}
-
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize)]
-pub enum TransactionPayload {
-    ...
-    /// New payload type that allowed chaining of calls.
-    BatchedCalls(Vec<BatchedFunctionCall>),
+/* Existing TransactionBuilder */
+export class Build {
+    async batched_intents(args: {
+        sender: AccountAddressInput;
+        builder: (builder: AptosIntentBuilder) => Promise<AptosIntentBuilder>;
+        options?: InputGenerateTransactionOptions;
+        withFeePayer?: boolean;
+    }): Promise<SimpleTransaction>
 }
 ```
 
-The AptosVM will need to implement the interpretation logic to execute this chained calls and perform the type/ability checks required.
+With those new apis, developers can pass in a closure that builds up the Move call chains into one transaction. Here's an example:
 
-We also need to assess how this could impact our multisig transaction/multi agent transaction. In the implementation right now, the AptosVM follows the same signer creation rule as entry-point function, that is append appropriate signer when the callee function needs a signer. I'm not planning to change the signer generation process but in the future we might want to introduce the ability to specify the specific signer as argument rather than automatically append the signer.
+```
+const transaction = await _aptos.aptos.transaction.build.batched_intents({
+    sender: singleSignerED25519SenderAccount.accountAddress,
+    builder: async (builder) => {
+    /* return_1 should contain the withdrawed Coin<AptosCoin> */
+    let return_1 = await builder.add_batched_calls({
+        function: `0x1::coin::withdraw`,
+        functionArguments: [BatchArgument.new_signer(0), 1],
+        typeArguments: ["0x1::aptos_coin::AptosCoin"]
+    });
+
+    /* return_2 should contain the converted FungibleAsset */
+    let return_2 = await builder.add_batched_calls({
+        function: `0x1::coin::coin_to_fungible_asset`,
+        /* Pass the withdrawed Coin<AptosCoin> to the coin_to_fungible_asset */
+        functionArguments: [return_1[0]],
+        typeArguments: ["0x1::aptos_coin::AptosCoin"]
+    });
+
+    /* Deposit fungible asset into 
+    await builder.add_batched_calls({
+        function: `0x1::primary_fungible_store::deposit`,
+        functionArguments: [singleSignerED25519SenderAccount.accountAddress, return_2[0]],
+        typeArguments: []
+    });
+    return builder;
+    }
+});
+```
+
+The ts-sdk will be a WASM binary wrapper around a rust library that takes function call payloads and convert it into a serialized Move script that could be published to the blockchain. The WASM binary size should be minimal to be ported with the ts-sdk.
 
 ## Reference Implementation
 
-https://github.com/aptos-labs/aptos-core/pull/13559/files
+The rust library is implemented in: https://github.com/aptos-labs/aptos-core/tree/runtianz/aptos_intent
 
+The ts-sdk change is implemented in: https://github.com/aptos-labs/aptos-ts-sdk/tree/runtianz/intent_sdk
+
+We will extend this library to other sdks if we got explicit asks from the community.
+
+## Testing 
+
+Implemented tests in both rust library and ts-sdk.
 
 ## Risks and Drawbacks
 
-See Security Considerations section.
+Most of the changes should be on the client side so no significant risk to me. 
 
 ## Security Considerations
 
-We need to be extremely careful about the type, ability and reference safety here. The batched calls can pass values across different functions so it is crucial to make sure:
-1. No type confusion can be made.
-2. Ability of Move values need to be respected: cannot leave a non-droppable value not used.
-3. Passing references should be forbided for now.
+See Risk. 
 
 ## Future Potential
 
-With this new type of payload, users could do the following with this new transaction payload type:
-1. Specify the max amount of token they are willing to spend per transaction by sandwich their function call with calls to read out the balance before executing the entry function and then check the balance after.
-2. Composable NFT flow:
-    - Buy an NFT and then tip artist's account
-    - Buy and transfer an NFT to another user.
-3. DEX aggregators: Instead of having large smart contracts with every possible combination of DEX and swap length/path, Aggregators could offer just single swap functions on each DEX and then combine them on-the-fly within the transaction batch.
+We will be proposing Aptos Intent, which allowed users to specify conditional transfer of on-chain resources they own, such as fungible asset or NFT. Intents could be chain easily with this Intent Transaction Builder.
+
 
 ## Timeline
 
 ### Suggested implementation timeline
 
-The node software is already implemented. We are looking for getting this feature landed in mid July.
+All rust logics have been implemented.
 
 ### Suggested developer platform support timeline
 
-1. (P0) SDK Support: Mid July
-2. (P0) Core node software: Mid July
-3. (P1) Wallet: Mid August
-4. (P1) Indexer: Mid July
-5. (P1) CLI: Early August
+All ts-sdk/indexer logics have been implemented. We will see if there's other ask from other sdk.
 
 ### Suggested deployment timeline
 
-With our current release cadance, 1.17 would be the target.
+Merge the two changes towards the end of October 2024. We could then release a new version typescript sdk.
 
 
 ## Open Questions (Optional)
 
- > Q&A here, some of them can have answers some of those questions can be things we have not figured out but we should
-
-...
