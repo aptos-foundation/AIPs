@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - Intent Transaction Builder TBD
+# AIP-X - Script Builder TBD
   
 ## Summary
 
@@ -32,13 +32,24 @@ These two approaches offer significantly different developer experiences. EntryF
 
 Ideally, we want a solution that strikes a balance between these two approaches: allowing developers to easily compose Move functions in transactions on the client side without needing the entire Move compiler.
 
-We present the Aptos Intent Transaction Builder to address this challenge. The transaction builder API will be integrated into the SDK, allowing developers to chain multiple Move calls into a single transaction. The builder will be implemented in Rust, which will generate compiled Move script bytes directly from a sequence of Move calls, without requiring the full Move compiler or source code. This builder will be bundled into WASM for seamless integration into our TypeScript SDK.
+We present the Aptos Script Transaction Builder to address this challenge. The transaction builder API will be integrated into the SDK, allowing developers to chain multiple Move calls into a single transaction. The builder will be implemented in Rust, which will generate compiled Move script bytes directly from a sequence of Move calls, without requiring the full Move compiler or source code. This builder will be bundled into WASM for seamless integration into our TypeScript SDK.
 
-Additionally, we will introduce annotation logic to the indexer API so that the indexer/explorer can display the script in an intent format. This can be achieved by implementing a decompiler that reverse-engineers the code generation logic.
+Additionally, we will introduce annotation logic to the indexer API so that the indexer/explorer can display the script in a format that looks like the chained function calls. This can be achieved by implementing a decompiler that reverse-engineers the code generation logic.
 
 ## Impact
 
-Most of the changes will be in our SDK interfaces. This should significantly improve developer's experience to create transaction that invokes multiple Move function calls all at once. This would be particularly helpful for our defi developers as they would be able to implement features such as withdraw coin and put them into a lending protocol in one transaction.
+Given the difficulty of deploying Move script compiler onto user's client side, dapp developers usually have no choice but to encode all the ways in which a user may interact with their application in an entry function that is published on chain. This resulted in smart contracts being less composable and didn't fully leverage the composability of Move.
+
+For example, despite we have notion for `FungibleAsset` in our framework, the DeFi application cannot take `FungibleAsset` as input to their entry function. Instead, they will need to invoke `primary_fungible_store::withdraw` to get the `FungibleAsset` they need. Similarly in that entry function, they would need to deposit the `FungibleAsset` in order to pass Move's bytecode verifier. As a result, it is very hard to chain the calls together to perform multi-hop swaps using the DeFi's existing entry functions. 
+
+Another problem issue that would be mitigated by this AIP is that an entry function is opaque and there is no way to be explicit from the user about the intent of their transaction. There's no way for a user to tell how much `FungibleAsset` would be withdrawed from this transaction. We are working on a permissioned signer solution that would mitigate this issue but we could completely get around this issue by askign smart contracts to expose interfaces that could take assets directly, and use the script builder to chain up the calls.
+
+With this solution, we can construct a DeFi ecosystem that is both safer and more composable by chaining up following move calls:
+1. User withdraw `FungbileAsset` from their `FungibleStore`. 
+2. User pass the withdrawed `FungbileAsset` to the DeFi contract. This is safer as the user will no long need to pass `&signer` into the DeFi contract that would be used to withdraw the `FungbileAsset`.
+3. (Let's say the user calls an AMM protocol) AMM should return the user the `FungibleAsset` that the user desires.
+4. User can chain the returned value from step (3) with a call into another AMM protocol until the user get the expected asset.
+5. User deposit the asset into its own `FungibleStore`.
 
 ## Alternative solutions
 
@@ -57,16 +68,16 @@ export type InputBatchedFunctionData = {
   functionArguments: Array<EntryFunctionArgumentTypes | BatchArgument | SimpleEntryFunctionArgumentTypes>;
 };
 
-export class AptosIntentBuilder {
+export class AptosScriptBuilder {
     /* Move function calls can return values. Those values can be passed to other functions by move, copy or reference */
-    async add_batched_calls(input: InputBatchedFunctionData): Promise<BatchArgument[]>;
+    async add_move_call(input: InputBatchedFunctionData): Promise<BatchArgument>;
 }
 
 /* Existing TransactionBuilder */
 export class Build {
-    async batched_intents(args: {
+    async script_builder(args: {
         sender: AccountAddressInput;
-        builder: (builder: AptosIntentBuilder) => Promise<AptosIntentBuilder>;
+        builder: (builder: AptosScriptBuilder) => Promise<AptosScriptBuilder>;
         options?: InputGenerateTransactionOptions;
         withFeePayer?: boolean;
     }): Promise<SimpleTransaction>
@@ -76,28 +87,28 @@ export class Build {
 With those new apis, developers can pass in a closure that builds up the Move call chains into one transaction. Here's an example:
 
 ```
-const transaction = await _aptos.aptos.transaction.build.batched_intents({
+const transaction = await _aptos.aptos.transaction.build.script_builder({
     sender: singleSignerED25519SenderAccount.accountAddress,
     builder: async (builder) => {
     /* return_1 should contain the withdrawed Coin<AptosCoin> */
-    let return_1 = await builder.add_batched_calls({
+    let return_1 = await builder.add_move_call({
         function: `0x1::coin::withdraw`,
         functionArguments: [BatchArgument.new_signer(0), 1],
         typeArguments: ["0x1::aptos_coin::AptosCoin"]
     });
 
     /* return_2 should contain the converted FungibleAsset */
-    let return_2 = await builder.add_batched_calls({
+    let return_2 = await builder.add_move_call({
         function: `0x1::coin::coin_to_fungible_asset`,
         /* Pass the withdrawed Coin<AptosCoin> to the coin_to_fungible_asset */
-        functionArguments: [return_1[0]],
+        functionArguments: [return_1],
         typeArguments: ["0x1::aptos_coin::AptosCoin"]
     });
 
     /* Deposit fungible asset into 
-    await builder.add_batched_calls({
+    await builder.add_move_call({
         function: `0x1::primary_fungible_store::deposit`,
-        functionArguments: [singleSignerED25519SenderAccount.accountAddress, return_2[0]],
+        functionArguments: [singleSignerED25519SenderAccount.accountAddress, return_2],
         typeArguments: []
     });
     return builder;
