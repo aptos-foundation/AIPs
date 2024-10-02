@@ -1,7 +1,7 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Aptos Intent Framework
-author: runtian-zhou
+author: @runtian-zhou @ch4r10t33r @alnoki @fmhall
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
@@ -19,7 +19,7 @@ Designing a generic mechanism for declaring intents for trading between on chain
 
 ### Out of scope
 
-We will only be covering the intent declaration and execution logic. We are not going to touch the solving logic on how intents should be fulfilled and we will leave it for builders on Aptos to figure out.
+We will only be covering the intent declaration and execution logic in the framework. We are not going to touch the solving logic on how intents should be fulfilled and we will leave it for builders on Aptos to figure out.
 
 The current design of the intent framework facilitates on chain declaration of intents to simplify the problem. Ideally the intent should be declarable offchain as well using signed message but this is beyond the scope of the current AIP. We will provide a path on how we can enable features like this in the future.
 
@@ -35,27 +35,25 @@ We see intent as a programmable lock for on chain assets. Meaning:
 
 Logic here can then be translated into a Move struct that looks like the following:
 ```
-struct TradeIntent<Source, phantom Target, Args> has key {
+struct TradeIntent<Source, Args> has key {
     offered_resource: Source,
     argument: Args,
-    // Fn(Target, Args) -> ()
-    consumption_function: FunctionInfo,
     self_delete_ref: DeleteRef,
     expiry_time: u64,
+    witness_type: TypeInfo,
 }
 ```
 
-The `TradeIntent` is parameterized by three type parameters:
+The `TradeIntent` is parameterized by two type parameters:
 1. `Source`: Value that intent issuer is willing to give away
-2. `Target`: the type of value that the intent issuer is expecting.
-3. `Argument`: Intent user will use `Argument` as auxillary info to determine whether the unlock condition is met.
+2. `Argument`: Intent user will use `Argument` as auxillary info to determine whether the unlock condition is met.
 
-In the `TradeIntent`, we also register for a function pointer that can be set by the user, called `consumption_function`. The idea is that a transaction could only be committed if the intent issuer receives a value of `Target` type and also `consumption_function(target, argument)` is executed successfully. 
+In the `TradeIntent`, we also register for a witness type where the releasing `Source` can only be done when such witness is provided.
 
 The lifecycle of an intent will look like the following:
 1. User sends a transaction to the blockchain to create the trading intent by specifying the resource they can offer and the expected condition when such resource can be unlocked.
 2. The intent would be broadcasted using an event.
-3. Anyone can execute this intent as long as the `consumption_function` can be executed successfully.
+3. Anyone can execute this intent as long as the `Witness` can be provided.
     - We will expect intent solvers to actively monitor the available intents on chain and create transactions to claim the intent.
 
 With those types being generic, we can implement different trading intents easily:
@@ -92,63 +90,71 @@ We could potentially avoid the use of function pointers and use some witness pat
 
 ### Creating intents
 ```
-public fun create_intent<Source: store, Target, Args: store + drop>(
+public fun create_intent<Source: store, Args: store + drop, Witness: drop>(
     offered_resource: Source,
     argument: Args,
     expiry_time: u64,
-    consumption_function: FunctionInfo,
     issuer: address,
-): Object<TradeIntent<Source, Target, Args>>
+    _witness: Witness,
+): Object<TradeIntent<Source, Args>> 
 ```
-User can use this api to register a trading intent between `Source` and `Target` type on-chain. The intent can only be executed if `consumption_function` specified by the user can be executed successfuly. Intent always have an expiry time so that issuer can claim the resource back after the expiry time. Note that the return value of this function is wrapped in an `Object`. This is because we want anyone to be able to claim this intent by providing the address of this object.
+User can use this api to register a trading intent to offer a value of `Source` type. The intent can only be executed if anyone can provide a value of `Witness` type. Intent always have an expiry time so that issuer can claim the resource back after the expiry time. Note that the return value of this function is wrapped in an `Object`. This is because we want anyone to be able to claim this intent by providing the address of this object.
 
 Another note is that this procedure is an on-chain procedure. Ideally we should make this a signed message instead so that users don't need to publish this intent to everyone.
 
 ### Consuming intents
 ```
-struct TradeSession<phantom Target, Args> {
+struct TradeSession<Args> {
     argument: Args,
-    consumption_function: FunctionInfo,
+    witness_type: TypeInfo,
 }
 
-public fun start_intent_session<Source: store, Target, Args: store + drop>(
-    intent: Object<TradeIntent<Source, Target, Args>>,
-): (Source, TradeSession<Target, Args>)
+public fun get_argument<Args>(session: &TradeSession<Args>): &Args {
+    &session.argument
+}
 
-public fun finish_intent_session<Target, Args: store + drop>(
-    // Fn (Target, Args) -> ()
-    session: TradeSession<Target, Args>,
-    desired_target: Target,
+public fun start_intent_session<Source: store, Args: store + drop>(
+    intent: Object<TradeIntent<Source, Args>>,
+): (Source, TradeSession<Args>)
+
+public fun finish_intent_session<Witness: drop, Args: store + drop>(
+    session: TradeSession<Args>,
+    _witness: Witness,
 )
 ```
-There are two apis associated with claiming/consuming an on-chain intent. The first API will allow anyone to consume an intent object. Consumption of the intent object can release the resource locked in the intent temporarily. There will also be a hot potato type returned called `TradeSession`. Since this is a hot potato type, the transaction sender will have no choice but invoke the second `finish_intent_session` api which will require a value of `Target` type. The framework will then execute `consumption_function(desired_target, argument)` to make sure the `Target` value indeed matches with intent issuer's intention and consume this target value on issuer's behalf.
+There are two apis associated with claiming/consuming an on-chain intent. The first API will allow anyone to consume an intent object. Consumption of the intent object can release the resource locked in the intent temporarily. There will also be a hot potato type returned called `TradeSession`. Since this is a hot potato type, the transaction sender will have no choice but invoke the second `finish_intent_session` api which will require a value of `Witness` type. 
 
 ### Example: Defining an intent to receive a certain fungible asset.
 ```
 module aptos_framework::fungible_asset_intent_hooks {
-   struct FungibleAssetExchange has store, drop {
-       desired_metadata: Object<Metadata>,
-       desired_amount: u64,
-       issuer: address,
-   }
-   // Using any type here to avoid function pointer type instantiation…
-   public fun fa_to_fa_consumption(target: Any, argument: Any) {
-       let received_fa = hot_potato_any::unpack<FungibleAsset>(target);
-       let argument = hot_potato_any::unpack<FungibleAssetExchange>(argument);
-       assert!(
-           fungible_asset::metadata_from_asset(&received_fa) == argument.desired_metadata,
-           error::invalid_argument(ENOT_DESIRED_TOKEN)
-       );
-       assert!(
-           fungible_asset::amount(&received_fa) >= argument.desired_amount,
-           error::invalid_argument(EAMOUNT_NOT_MEET),
-       );
-       primary_fungible_store::deposit(argument.issuer, received_fa);
-   }
+    struct FungibleAssetLimitOrder has store, drop {
+        desired_metadata: Object<Metadata>,
+        desired_amount: u64,
+        issuer: address,
+    }
+
+    struct FungibleAssetRecipientWitness has drop {}
+
+    public fun finish_fa_receiving_session(
+        session: TradeSession<FungibleAssetLimitOrder>,
+        received_fa: FungibleAsset,
+    ) {
+        let argument = intent::get_argument(&session);
+        assert!(
+            fungible_asset::metadata_from_asset(&received_fa) == argument.desired_metadata,
+            error::invalid_argument(ENOT_DESIRED_TOKEN)
+        );
+        assert!(
+            fungible_asset::amount(&received_fa) >= argument.desired_amount,
+            error::invalid_argument(EAMOUNT_NOT_MEET),
+        );
+
+        primary_fungible_store::deposit(argument.issuer, received_fa);
+        intent::finish_intent_session(session, FungibleAssetRecipientWitness {})
+    }
 }
 ```
-Here we are defining an example of intent where the unlock condition is receiving a certain amount of a given fungible asset type. `Argument` type is instantiated to `FungibleAssetExchange` and `Target` type is instantated to `FungibleAsset` in this example. In the arugment, we specify the amount and the type of FA we would like to receive. The consumption function will then be implemented by first checking if the passed in `FungibleAsset` meets the requirement set in the `FungibleAssetExchange` and deposit the FA to the issuer's primary fungible storage if the conditions are met.
-
+Here we are defining an example of intent where the unlock condition is receiving a certain amount of a given fungible asset type. `Argument` type is instantiated to `FungibleAssetLimitOrder` and `Witness` type is instantated to `FungibleAssetRecipientWitness` in this example. In the arugment, we specify the amount and the type of FA we would like to receive. The check will then be implemented by first checking if the passed in `FungibleAsset` meets the requirement set in the `FungibleAssetLimitOrder` and deposit the FA to the issuer's primary fungible storage if the conditions are met. Once the checks are completed, we will provide the witness `FungibleAssetRecipientWitness` to complete this intent session.
 
 
 ## Reference Implementation
