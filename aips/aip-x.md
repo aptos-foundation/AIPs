@@ -196,3 +196,5 @@ WIP
 
 ## Open Questions (Optional)
 
+Should we have an allowlist or some custom logic on who is authorized to resolve an intent?
+
