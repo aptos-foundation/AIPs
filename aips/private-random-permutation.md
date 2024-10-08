@@ -23,7 +23,7 @@ Private random permutation is a generaic building block for dApps and can be wid
 
 While private random permutation is trivial to implement in a centralized setting where the special party is trusted and has a private communication channel with every normal party,
 there is currently no good way to achieve the same in an general dApp setting where normal parties are blockchain users and can only communicate by transacting publicly.
-The current (on-chain randomness API)[https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md] also doesn't solve the problem directly, as the result it produces is public.
+The current [on-chain randomness API](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-41.md) also doesn't solve the problem directly, as the result it produces is public.
 
 This AIP proposes a Move API to provide private random permutation for smart contract,
 and can potentially be implemented efficiently on Aptos using threshold cryptography.
@@ -43,9 +43,9 @@ validators generates:
   - $n$ random group elements $C_0, ..., C_{n-1}$ to represent original value $0, ..., n-1$ accordingly.
 - Validators collaborate to shuffle and veil all group elements using a multi-party shuffling protocol,
   resulting in $D_0=sC_{i_0}, ..., D_{n-1}=sC_{i_{n-1}}$ and published on chain (async delivery).
-- When validators reveil $D_i$ publicly per contract, they collabroate to compute and publish $s^{-1} * D_i$ (async delivery).
-- When validators reveil $D_j$ privately to a party per contract, where the party has a secret scalar $x$ and published $Y=xG$ on chain (async delivery), they collabroate to compute and publish $V_j = s^{-1} * [D_j + Y]$, so recipient party can locally learn the original value as $V_j - xH$.
-- When a party reveals an element $P$ that only itself has access to (and others only see the shuffled and veiled view $V_j$), the party publishes a zero-knowledge proof for a secret $x$ such that $x*H == V_j-P$.
+- When validators reveil $D_i$ publicly per contract, they collabroate to compute and publish $s^{-1}D_i$ (async delivery).
+- When validators reveil $D_j$ privately to a party per contract, where the party has a secret scalar $x$ and published $Y=xG$ on chain (async delivery), they collabroate to compute and publish $V_j = s^{-1}[D_j + Y]$, so recipient party can locally learn the original value as $V_j - xH$.
+- When a party reveals an element $P$ that only itself has access to (and others only see the shuffled and veiled view $V_j$), the party publishes a zero-knowledge proof for a secret $x$ such that $xH == V_j-P$.
 
 NOTE: some steps are marked "async delivery". It means the validators have to run some slow protocols offline to compute the reuslt. The result will probably be devliered in a future block via [validator transactions](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-64.md).
 
