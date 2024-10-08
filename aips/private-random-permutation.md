@@ -34,9 +34,9 @@ The actual implementation will be a separate AIP.
 
 # High-level Overview
 
-A prime-ordered group $G$ and its scalar field $F$ needs to be chosen.
+A prime-ordered group and its scalar field needs to be chosen.
 
-- Validators use a secret sharing mechanism to share a secret scalar $s$ and its inverse $s^{-1}$.
+- Validators share a secret scalar $s$ as well as its inverse $s^{-1}$.
 - Upon a $n$-permutation request from a transaction,
 validators generates:
   - a helper group element $G$ and collaborate to compute and publish $H=s^{-1}G$ (async delivery).
