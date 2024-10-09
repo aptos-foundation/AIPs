@@ -1,7 +1,7 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Aptos Intent Framework
-author: @runtian-zhou @ch4r10t33r @alnoki @fmhall
+author: @runtian-zhou @fmhall @ch4r10t33r @alnoki 
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
@@ -27,6 +27,75 @@ The intent system designed here also focus on the Aptos only setup and we are no
 
 ## High-level Overview
 
+### Motivation
+If a normal transaction specifies "how" an action should be performed, an intent specifies "what" the desired outcome of the action should be. At its core, it is an object signed by a user that contains certain constraints and conditions that must be satisfied by a valid solution. Intents are "journey-agnostic". As long as the ideal outcome is reached and valid according to the user, the execution specifics do not matter.
+
+Intents rely on the existence of "solvers", entities whose job it is to provide solutions to intents. Solvers help find solutions to user-desired outcomes, and can get paid for doing so.
+
+This has a couple key benefits for users and developers:
+
+- It pushes sophistication and cognitive overhead from users / clients to more specialized entities
+- It allows other entities to compete to provide the best solution for a user, often resulting in better execution / prices
+- It can simplify and speed up cross-chain interactions by pushing risk to "relayers" or "fillers" in exchange for a small fee.
+- Intents are inherently secure, since the outcome signed by the user must match the outcome of the solution. However, ensuring that this is possible typically requires an "intent settlement network".
+
+Intent is a particular concept for Aptos because Move has a unique way of encoding on chain assets. With Move, you can represent
+
+### Overview
+In the proposed intent framework, we see a couple of parties involved:
+1. Intent Creator (User): User will need to offer on chain resources they owned subject to a specific unlock condition.
+2. Intent Contract (dApp): A certain dApp will need to provide programmbale condition when the certain asset could be unlocked.
+3. Intent Solver System: A system will need to monitor the all the intents that's available and create transactions if it finds a lucrative intent. Solver will need to understand the Intent Contract to find out the proper solution.
+4. Intent Verification Framework: Aptos Framework will need to make sure resources can only be unlocked to the solution provider when the post condition contract is executed successfully.
+
+A typical user flow of intent should look like the following:
+1. User creates an intent suggesting:
+    - The asset it's going to offer.
+    - The post condition contract when the asset could be released to the solver.
+    - At the beginning we may integrate this creation process to the wallet with a set of known intent contracts. However, supporting 3rd party intent contract remains unknown to me.
+2. Intent needs to be broadcasted to the interested solver.
+    - In our initial implementation, intent creation could be done by executing a transaction. Such transaction can then emit an event to an event stream that solvers can subscribe themselves to.
+3. Intent Solver will maintain a local pool of intents for each type of intent contract and sythesize a path that would meet the exchange contract.
+4. Intent Solver will sign and submit transactions to process the intent.
+    - In our initial implementation, intent resolution is implemented first come first serve based. The first transaction that can resolve the intent will be able to get the resources wrapped in the intent.
+    - Intent resolution will be done by aptos framework code to make sure the solver did meet the condition listed in the intent contract.
+
+Aptos Labs will be responsible for implementing:
+1. A set of intent contracts to ramp up the system.
+2. Framework code for creating and validating intents.
+3. (TBD) SDK/Wallet support for creating an intent transaction.
+
+Aptos Labs is looking for potential partners to work on intent solver.
+
+## Impact
+
+With this design, we can develop a generic trading protocol between arbitray Move values that would allow us to build a robust and composable market between all asset types with flexible trading options that's comparable to those in tradfi.
+
+To get started, we can then use those building blocks to build trading intents between:
+- FA to FA order
+- Object to FA order
+- FA to Object order
+- Object to Object order
+
+Specifically for FA order, the intent contract can be implemented in various different ways, such as:
+1. Simple limit order
+2. Order which amount is a function over time.
+3. Order which amount is a function over oracle value.
+
+Since the framework is parameterized by those type parameters, we can even imagine trading other types of programmable Move resources. For example, one future direction would be to standarize the borrow/lending operation by issueing an NFT upon certain operations. Then we can implement intents such as:
+- Flashloan at this rate or lower
+- Variable-rate borrow position with Z APR or lower
+- APR between amount X and Y
+
+By declaring the intent to be trading FA that you own into a NFT that performs those certain operations. This could even bring up a entirely new sets of credit agencies to rate the credibility of each liquidity provider given those certain lending/borrowing NFTs.
+
+All those benefits can help us build a more composable DeFi ecosystem. Users no longer need to specify which protocol they would like to use. This would also incentize for a solution market to find out the right trading solution. Trading, borrowing and lending could be unified under this one framework of offering and claiming process.
+
+## Alternative Solutions
+
+
+## Specification and Implementation Details
+
 We see intent as a programmable lock for on chain assets. Meaning:
 - One party can declare:
   - Type of Asset they would like to trade in
@@ -36,7 +105,7 @@ We see intent as a programmable lock for on chain assets. Meaning:
 Logic here can then be translated into a Move struct that looks like the following:
 ```
 struct TradeIntent<Source, Args> has key {
-    offered_resource: Source,
+    dispensable_resource: Source,
     argument: Args,
     self_delete_ref: DeleteRef,
     expiry_time: u64,
@@ -63,35 +132,10 @@ With those types being generic, we can implement different trading intents easil
 - If `Source` is instantiated with `FungibleAsset`, it means we are giving out a certain fungible asset given certain condition.
    - This doesn't quite work because `FungibleAsset` is not storable. The real implementation would look like giving out ownership of a `FungibleStore`
 
-## Impact
-
-With this design, we can develop a generic trading protocol between arbitray Move values that would allow us to build a robust and composable market.
-
-We can then use those building blocks to build trading intents between:
-- FA to FA limit order
-- Object to FA limit order
-- FA to Object order
-- Object to Object order
-
-Since the framework is parameterized by those type parameters, we can even imagine trading other types of programmable Move resources. For example, one future direction would be to standarize the borrow/lending operation by issueing an NFT upon certain operations. Then we can implement intents such as:
-- Flashloan at this rate or lower
-- Variable-rate borrow position with Z APR or lower
-- APR between amount X and Y
-
-By declaring the intent to be trading FA that you own into a NFT that performs those certain operations. This could even bring up a entirely new sets of credit agencies to rate the credibility of each liquidity provider given those certain lending/borrowing NFTs.
-
-All those benefits can help us build a more composable DeFi ecosystem. Users no longer need to specify which protocol they would like to use. This would also incentize for a solution market to find out the right trading solution. Trading, borrowing and lending could be unified under this one framework of offering and claiming process.
-
-## Alternative Solutions
-
-We could potentially avoid the use of function pointers and use some witness pattern instead. However, this could bring some cumbersome user experience to the solver as they would need to produce the witness themselves.
-
-## Specification and Implementation Details
-
 ### Creating intents
 ```
 public fun create_intent<Source: store, Args: store + drop, Witness: drop>(
-    offered_resource: Source,
+    dispensable_resource: Source,
     argument: Args,
     expiry_time: u64,
     issuer: address,
@@ -167,7 +211,10 @@ Implemented tests in the framework.
 
 ## Risks and Drawbacks
 
-WIP
+### Frontrun Risk
+
+The intent claiming transaction can be front-runned by malicious mempool operator. Since anyone is able to sign transaction to claim intent solution, a malicous mempool operator can take the intent solving transaction submitted by the solver and sign the same transaction with its own address to be able to claim the lucrative ones. However, since txns usually won't stay too long in the mempool right now, it should not be a major concern at this point. In the future we might need some authentication schema for intent claiming process.
+
 
 ## Security Considerations
 
