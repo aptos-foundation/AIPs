@@ -1,8 +1,7 @@
 ---
 aip: 10X
 title: Add Firebase as a supported OIDC provider
-author: Oliver (alin@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/452
+author: Oliver He (oliver.he@aptoslabs.com)
 Status: Draft # | Last Call | Accepted | Final | Rejected>
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
