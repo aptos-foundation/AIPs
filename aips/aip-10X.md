@@ -101,21 +101,14 @@ This will allow onboarding more users into the Aptos blockchain via keyless acco
 
 ### Suggested implementation timeline
 
-N/A, as this is an on-chain configuration change.
-
+TBD
 ### Suggested developer platform support timeline
 
-N/A, as this is an on-chain configuration change.
-
-The SDK already handles additional OIDC providers.
+TBD
 
 ### Suggested deployment timeline
 
-As soon as possible. To be discussed and agreed upon.
-
-## Open Questions (Optional)
-
-**Key question:** What would be a user-friendly recovery mechanism[^aip-61-recovery] for OIDC providers like Apple that have PPIDs?
+TBD
 
 ## References
 
