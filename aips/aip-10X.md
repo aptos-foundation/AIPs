@@ -19,8 +19,7 @@ This would allow the instantiation of Keyless accounts using Firebase JWT creden
 This change requires Aptos validators to periodically refresh their views of Firebase's JWKs[^jwks] via JWK consensus[^aip-67].
 JWTs used to authenticate into Firebase apps are signed by the same set of keys across all Firebase applications.  Thus it makes sense to integrate the key set via JWK consensus.  Google uses the securetoken@system.gserviceaccount.com service account as the signer.
 
-https://securetoken.google.com/google/.well-known/openid-configuration
-
+The UWL of the well-known OpenId configuration is - https://securetoken.google.com/google/.well-known/openid-configuration
 
 ## Impact and risks
 
