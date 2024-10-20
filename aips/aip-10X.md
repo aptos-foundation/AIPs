@@ -32,6 +32,7 @@ The UWL of the well-known OpenId configuration is - https://securetoken.google.c
 ## Alternative solutions
 
 The alternative is to support these accounts via [Federated Keyless](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-96.md).  
+
 This comes with drawbacks as now every Keyless integration with Firebase needs to manage an account to update the JWK set.  This also introduces another point of variance when it comes to address derivation and it is needed to remember the address of the account chosen by the dApp developer to get the correct address.  Given that the JWKs update across all Firebase based Federated Keyless Accounts, it makes more sense to leverage JWK consensus[^aip-67].
 
 ## Specification and Implementation Details
