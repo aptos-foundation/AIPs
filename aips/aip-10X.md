@@ -118,5 +118,3 @@ TBD
 [^aip-81]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-81.md
 [^aip-61-recovery]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#recovery-service
 [^jwks]: https://appleid.apple.com/.well-known/openid-configuration
-[^passkeys]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-66.md
-[^ppid]: https://openid.net/specs/openid-connect-core-1_0.html#Terminology
