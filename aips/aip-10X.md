@@ -10,7 +10,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md 
 ---
 
-# AIP-90 - Add Firebase as a supported OIDC provider
+# AIP-10X - Add Firebase as a supported OIDC provider
 
 ## Summary
 
