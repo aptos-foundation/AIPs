@@ -1,7 +1,7 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Aptos Intent Framework
-author: @runtian-zhou @fmhall @ch4r10t33r @alnoki 
+author: @runtian-zhou @ch4r10t33r @alnoki @fmhall
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
@@ -15,11 +15,11 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
-Designing a generic mechanism for declaring intents for trading between on chain resources on Aptos. This would allow users to declare which operations they would like to perform upfront and let 3rd party builders to fill in the details on how this transactions should be executed.
+Designing a generic mechanism for declaring intents for offering on chain resources on Aptos. This would allow users to declare which operations they would like to perform upfront and let 3rd party builders to fill in the details on how this transactions should be executed.
 
 ### Out of scope
 
-We will only be covering the intent declaration and execution logic in the framework. We are not going to touch the solving logic on how intents should be fulfilled and we will leave it for builders on Aptos to figure out.
+We will only be covering the intent declaration and execution logic in this AIP. We are not going to touch the solving logic on how intents should be fulfilled and we will leave it for builders on Aptos to figure out.
 
 The current design of the intent framework facilitates on chain declaration of intents to simplify the problem. Ideally the intent should be declarable offchain as well using signed message but this is beyond the scope of the current AIP. We will provide a path on how we can enable features like this in the future.
 
@@ -39,7 +39,7 @@ This has a couple key benefits for users and developers:
 - It can simplify and speed up cross-chain interactions by pushing risk to "relayers" or "fillers" in exchange for a small fee.
 - Intents are inherently secure, since the outcome signed by the user must match the outcome of the solution. However, ensuring that this is possible typically requires an "intent settlement network".
 
-Intent is a particular concept for Aptos because Move has a unique way of encoding on chain assets. With Move, you can represent
+Intent is a particular concept for Aptos because Move has a unique way of encoding on chain assets. With Move, you can represent assets directly as on chain values that could be locked into contract directly and controlled programmable via Move code.
 
 ### Overview
 In the proposed intent framework, we see a couple of parties involved:
@@ -58,11 +58,11 @@ A typical user flow of intent should look like the following:
 3. Intent Solver will maintain a local pool of intents for each type of intent contract and sythesize a path that would meet the exchange contract.
 4. Intent Solver will sign and submit transactions to process the intent.
     - In our initial implementation, intent resolution is implemented first come first serve based. The first transaction that can resolve the intent will be able to get the resources wrapped in the intent.
-    - Intent resolution will be done by aptos framework code to make sure the solver did meet the condition listed in the intent contract.
+    - Intent resolution will be done by a library code to make sure the solver did meet the condition listed in the intent contract.
 
 Aptos Labs will be responsible for implementing:
 1. A set of intent contracts to ramp up the system.
-2. Framework code for creating and validating intents.
+2. Library code for creating and validating intents.
 3. (TBD) SDK/Wallet support for creating an intent transaction.
 
 Aptos Labs is looking for potential partners to work on intent solver.
@@ -144,8 +144,6 @@ public fun create_intent<Source: store, Args: store + drop, Witness: drop>(
 ```
 User can use this api to register a trading intent to offer a value of `Source` type. The intent can only be executed if anyone can provide a value of `Witness` type. Intent always have an expiry time so that issuer can claim the resource back after the expiry time. Note that the return value of this function is wrapped in an `Object`. This is because we want anyone to be able to claim this intent by providing the address of this object.
 
-Another note is that this procedure is an on-chain procedure. Ideally we should make this a signed message instead so that users don't need to publish this intent to everyone.
-
 ### Consuming intents
 ```
 struct TradeSession<Args> {
@@ -170,7 +168,7 @@ There are two apis associated with claiming/consuming an on-chain intent. The fi
 
 ### Example: Defining an intent to receive a certain fungible asset.
 ```
-module aptos_framework::fungible_asset_intent_hooks {
+module aptos_intent::fungible_asset_intent_hooks {
     struct FungibleAssetLimitOrder has store, drop {
         desired_metadata: Object<Metadata>,
         desired_amount: u64,
@@ -200,10 +198,28 @@ module aptos_framework::fungible_asset_intent_hooks {
 ```
 Here we are defining an example of intent where the unlock condition is receiving a certain amount of a given fungible asset type. `Argument` type is instantiated to `FungibleAssetLimitOrder` and `Witness` type is instantated to `FungibleAssetRecipientWitness` in this example. In the arugment, we specify the amount and the type of FA we would like to receive. The check will then be implemented by first checking if the passed in `FungibleAsset` meets the requirement set in the `FungibleAssetLimitOrder` and deposit the FA to the issuer's primary fungible storage if the conditions are met. Once the checks are completed, we will provide the witness `FungibleAssetRecipientWitness` to complete this intent session.
 
+The solver can then perform following script to claim the intent:
+```
+script {
+    fun main(core_resources: &signer, intent: Object<TradeIntent<Source, FungibleAssetLimitOrder>>) {
+        // `source` will be the resource locked inside the intent
+        // `session` is a hot potato that can only be destructed when certain FA is received
+        //  according to `FungibleAssetLimitOrder`
+        let (source, session) = intent::start_intent_session(intent);
+
+        // invoke code to trade source into the desired fungible asset
+        // solver can fill in arbitrary logic here, using any exchange and arbitrary many steps.
+        ...
+
+        // fa_token is the token obtained from the previous trading steps
+        fungible_asset_intent_hooks::finish_fa_receiving_session(session, fa_token);
+    }
+}
+```
 
 ## Reference Implementation
 
-
+https://github.com/aptos-labs/intent-framework/pull/2
 
 ## Testing 
 
@@ -213,7 +229,7 @@ Implemented tests in the framework.
 
 ### Frontrun Risk
 
-The intent claiming transaction can be front-runned by malicious mempool operator. Since anyone is able to sign transaction to claim intent solution, a malicous mempool operator can take the intent solving transaction submitted by the solver and sign the same transaction with its own address to be able to claim the lucrative ones. However, since txns usually won't stay too long in the mempool right now, it should not be a major concern at this point. In the future we might need some authentication schema for intent claiming process.
+As the system is first-come first-serve, the intent claiming transaction can be front-runned by whoever sees it - mempool operator, validator operator, etc. Since anyone is able to sign transaction to claim intent solution, anyone can take the intent solving transaction submitted by the solver and sign the same transaction with its own address to be able to claim the lucrative ones. If main value comes from finding the route, and not being willing to settle, privacy of submitted transactions will become imporatnt. Intent Solver might want to run a validator node or partner with validator operator. Additionally in the future, support for "secret transactions" , that are revealed only at the time of execution might be added.
 
 
 ## Security Considerations
@@ -225,7 +241,7 @@ WIP
 - We need offchain declaration of the intents
 - We can use this standard to incentivize for a credit score system for different DeFi lending protocol:
     - Implement borrow/lending action as an NFT, and implement scoring system for the NFT as the consumption condition.
-
+- This procedure is an on-chain procedure. Ideally we should make this a signed message instead so that users don't need to publish this intent to everyone.
 ## Timeline
 
 ### Suggested implementation timeline
