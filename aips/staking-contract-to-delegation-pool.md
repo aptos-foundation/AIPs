@@ -109,6 +109,35 @@ As described above, manually converting to a delegation pool requires:
 `delegation_pool::BeneficiaryForOperator` could not have been created + published because *operator*'s signer is inaccessible.
 If the *operator* already has a beneficiary set for their delegation pools then use that address, otherwise *operator*'s address will be used by default.
 
+New events have been added in order to track down the conversion:
+- `staking_contract::destroy_staking_contract`:
+```
+    struct DestroyStakingContractEvent has drop, store {
+        staker: address,
+        operator: address,
+    }
+```
+to identify a particular staking contract being destroyed
+- `delegation_pool::initialize_delegation_pool_from_staking_contract`:
+```
+    struct InitializeDelegationPoolFromStakingContract has drop, store {
+        staker: address,
+        operator: address,
+        pool_address: address,
+        principal: u64,
+        operator_commission_percentage: u64,
+    }
+```
+to notify that a new delegation pool has been created out of a staking contract of particular state and configs
+```
+    struct DistributePendingInactiveStakeFromStakingContract has drop, store {
+        pool_address: address,
+        recipient: address,
+        amount: u64,
+    }
+```
+to log each each individual distribution of *pending-inactive* stake to shareholders of the destroyed staking contract
+
 ## Reference Implementation
 
 There is a reference implementation at https://github.com/bwarelabs/aptos-core/tree/convert-staking-contract-to-delegation-pool
