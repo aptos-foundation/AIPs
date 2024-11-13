@@ -149,6 +149,10 @@ Design UTs to validate that:
 - the post-conversion state is consistent
 - the resulted delegation pool accepts delegations, staker is treated as a regular delegator and the commission is correctly distributed
 
+e2e testing will be executed on localnet or devnet/testnet.
+This would consist of deploying a validator attached to a staking contract and executing the conversion on it.
+
+All of the checks from above (and each testing scenario from the reference implementation) will be validated on the live network to ensure the conversion is sound.
 ## Risks and Drawbacks
 
 The beneficiary of operator is set to a possibly different address than the one used on the staking contract without operator's approval. This address is either the one already configured on the delegation-pool module or the operator themselves, which is an address still owned by the operator.
