@@ -14,11 +14,7 @@ requires (*optional):
 # AIP-X - Direct conversion from staking contract to delegation pool
 
 ## Summary
-
-The legacy staking contract cannot be directly converted to a delegation pool. The staker should unlock their entire stake from the staking contract and then delegate it to a newly created delegation pool.
-This results in downtime for the validator, leading to missed rewards and a temporary decrease in network's security.
-Furthermore, the operator needs to setup an extra validator node that must be synced at the time of staker's delegation (in order to achieve the least possible downtime).
-
+This AIP describes the implementation of an on-chain conversion of a staking contract to a delegation pool. This migration should cause no downtime for the validator and be seamless to the end users.
 The ideal conversion should be atomic: destroy the staking contract and, on top of its underlying stake pool, create a delegation pool of consistent stake ownership and configuration.
 
 ### Goals
@@ -59,6 +55,10 @@ While, state that will change:
 - beneficiary of operator: address already applying on delegation-pool module will be used
 
 ## Alternative solutions
+
+The legacy staking contract cannot be directly converted to a delegation pool. The staker should unlock their entire stake from the staking contract and then delegate it to a newly created delegation pool.
+This results in downtime for the validator, leading to missed rewards and a temporary decrease in network's security.
+Furthermore, the operator needs to setup an extra validator node that must be synced at the time of staker's delegation (in order to achieve the least possible downtime).
 
 As described above, manually converting to a delegation pool requires:
 - doubling the infrastructure for a brief period
