@@ -312,11 +312,11 @@ In more detail, signature verification against the PK $(\mathsf{iss\\_val}, \mat
 1. If using `email`-based IDs, ensure the email has been verified:
    - i.e., if $\mathsf{uid\\_key}\stackrel{?}{=}\texttt{"email"}$, assert $\mathsf{jwt}[\texttt{"email\\_verified"}] \stackrel{?}{=} \texttt{"true"}$
 1. Let $\mathsf{uid\\_val}\gets\mathsf{jwt}[\mathsf{uid\\_key}]$
-1. If $\mathsf{idc\\_aud\\_val}$ is set
-   - *Then:*
+1. Are we in normal mode? (i.e., is $\mathsf{idc\\_aud\\_val} \ne \bot$)
+   - *Then:* let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
+   - *Else:*
        + assert that $\mathsf{jwt}[\texttt{"aud"}]$ is an approved recovery service ID in the [`aud` override list](#aud-override-list), stored on chain
        + let $\mathsf{aud\\_val}\gets \mathsf{idc\\_aud\\_val}$
-   - *Else:* let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
 1. Assert $\mathsf{addr\\_idc} \stackrel{?}{=} H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$, using the pepper $r$ from the signature
 1. Verify that the PK matches the authentication key on-chain:
    - Assert $\mathsf{auth\\_key} \stackrel{?}{=} H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$
