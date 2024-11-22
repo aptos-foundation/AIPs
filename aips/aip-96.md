@@ -256,7 +256,7 @@ AIP-61 proposed a [recovery service](https://github.com/aptos-foundation/AIPs/bl
 
 Unfortunately, this recovery service mode is not likely to work with IAM providers, because their JWTs tend to have tenant-specific `iss` fields, whereas the recovery service mode requires the `iss` to be the same across different applications: i.e., the recovery mode validation logic requires the `iss` and `sub` in the address to match the `iss` and `sub` in the JWT, but does not match the address's `aud` field as long as the JWT's `aud` is allow-listed.
 
-Although it may be possible to relax this rule by also considering overriding the `iss`, careful investigation would be needed. (For example, JWT's from some IAM providers tend to have `sub` fields of the form `google|722112354821233219`, which already encode the OIDC provider's identity and the user's identity. This could, in principle, be leveraged for recovery.)
+Although it may be possible to relax this rule by also considering overriding the `iss`, careful investigation would be needed. (For example, JWT's from [some IAM providers](#example-of-auth0-jwt) tend to have `sub` fields of the form `google|722112354821233219`, which already encode the OIDC provider's identity and the user's identity. This could, in principle, be leveraged for recovery.)
 
 ### Liveness and security of OIDC provider
 
@@ -446,3 +446,67 @@ The configuration fetched from the OIDC configuration URL will look like:
 }
 ```
 
+### Example of Auth0 JWT
+Header:
+```
+{
+  "alg": "RS256",
+  "typ": "JWT",
+  "kid": "OYryNKGFtFhtHVOd1d_BU"
+}
+```
+
+Payload:
+```
+{
+  "iss": "https://dev-qtdgjv22jh0v1k7g.us.auth0.com/",
+  "aud": "dzqI77x0M5YwdOSUx6j25xkdOt8SIxeE",
+  "iat": 1732301555,
+  "exp": 1732337555,
+  "sub": "google-oauth2|113125232581163026067",
+  "sid": "68dqHtLsHCCzvT7-Nq-NjMZ4dNxjnMxJ",
+  "nonce": "17657958799152405058321932995845815790037598344919199315814344140953953492891"
+}
+```
+
+### Example of AWS Cognito JWT
+Header:
+{
+  "kid": "ZfQycLUrt9nraKNBwR5rw9tG/VjXIrPQT7sWDZ1DhhQ=",
+  "alg": "RS256"
+}
+
+Payload:
+```
+{
+  "custom:key_exists": "0",
+  "at_hash": "2ZYRkvmSM3PMNzsOZ5o5Tg",
+  "sub": "cfbc5d30-7626-4fd6-963d-dea685853673",
+  "cognito:groups": [
+    "ap-northeast-1_QUYTOCmLN_Google"
+  ],
+  "email_verified": false,
+  "iss": "https://cognito-idp.ap-northeast-1.amazonaws.com/ap-northeast-1_QUYTOCmLN",
+  "cognito:username": "google_113125232581163026067",
+  "nonce": "19165884403973631763335615088639144207110394844832509039322243492548588682178",
+  "origin_jti": "4d7ac6de-073b-494f-a4cb-68b8838308dd",
+  "aud": "1p110u14jnnd5e98qj55jkvn6h",
+  "identities": [
+    {
+      "userId": "113125232581163026067",
+      "providerName": "Google",
+      "providerType": "Google",
+      "issuer": null,
+      "primary": "true",
+      "dateCreated": "1732301386872"
+    }
+  ],
+  "token_use": "id",
+  "auth_time": 1732301421,
+  "custom:expiration": "1732304992",
+  "exp": 1732305021,
+  "iat": 1732301421,
+  "jti": "6ea5ee41-ab5c-4221-b95a-e13e6a4cd2b9",
+  "email": "aptos.keyless.test@gmail.com"
+}
+```
