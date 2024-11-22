@@ -43,7 +43,7 @@ Currently, a [keyless account’s public key](https://github.com/aptos-foundatio
 - the identity of the OIDC provider (`iss`)
 - a commitment, using a *pepper* as a blinding factor, to:
   - the identity of the user (`sub`)
-  - the identity of the application (`aud`)
+  - the identity of the managing application (`aud`)
 
 Normally, when verifying keyless TXN signatures for such an account, the validators use the `iss` to look up the OIDC provider’s JWKs in the `0x1::jwks::PatchedJWKs` resource, which acts as the **single source of truth** for an `iss`’s JWKs.
 
@@ -246,7 +246,17 @@ There are several mechanisms to mitigate against this:
 
 1. Test the ZK circuit on the JWTs of IAMs like Auth0, AWS Cognito and Okta and build up a list of supported **federated** OIDC providers.
 2. Encourage developers to use the default prover and pepper service in the Aptos SDK, which will allow-list these supported **federated** OIDC providers, thereby preventing developers from using an unsupported one early on.
-3. In case of emergency, enable the [leaky mode](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#warm-up-leaky-signatures-that-reveal-the-users-and-apps-identity), which restores access to the federated keyless account by circumventing the ZK circuit, albeit at the cost of leaking the account’s user (`sub`) and application (`aud`) identity.
+3. In case of emergency, enable the [leaky mode](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#warm-up-leaky-signatures-that-reveal-the-users-and-apps-identity), which restores access to the federated keyless account by circumventing the ZK circuit, albeit at the cost of leaking the account’s user (`sub`) and the managing application's (`aud`) identity.
+
+### Liveness of managing application
+
+Recall from [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#recovery-service) that a keyless account, including a federated one, remains accessible as long as its underlying (1) OIDC account and (2) managing application are both accessible. However, if the managing application goes offline/disappears (e.g., `dapp.xyz` is down), then users are no longer able to sign into their OIDC provider via the application, which means they cannot obtain signed JWTs from the OIDC provider, which in turn means they have no way of proving they own their keyless account. In effect, users would lose access to their keyless account.
+
+AIP-61 proposed a [recovery service](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#recovery-service) mode to allow a user to recover from an offline managing application. Specifically, the user can get a JWT from the recovery service (instead of the managing application). This JWT will have the same `iss` and `sub`/`email` fields as the one from the managing application, but would have a different `aud` field: i.e., the recovery service's `aud`. Nonetheless, this JWT can be accepted by Aptos validators as long as the recovery service `aud` is allow-listed in the [Keyless Move module](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#keyless_accountmove-move-module).
+
+Unfortunately, this recovery service mode is not likely to work with IAM providers, because their JWTs tend to have tenant-specific `iss` fields, whereas the recovery service mode requires the `iss` to be the same across different applications: i.e., the recovery mode validation logic requires the `iss` and `sub` in the address to match the `iss` and `sub` in the JWT, but does not match the address's `aud` field as long as the JWT's `aud` is allow-listed.
+
+Although it may be possible to relax this rule by also considering overriding the `iss`, careful investigation would be needed. (For example, JWT's from some IAM providers tend to have `sub` fields of the form `google|722112354821233219`, which already encode the OIDC provider's identity and the user's identity. This could, in principle, be leveraged for recovery.)
 
 ### Liveness and security of OIDC provider
 
