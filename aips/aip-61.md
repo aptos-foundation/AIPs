@@ -312,8 +312,11 @@ In more detail, signature verification against the PK $(\mathsf{iss\\_val}, \mat
 1. If using `email`-based IDs, ensure the email has been verified:
    - i.e., if $\mathsf{uid\\_key}\stackrel{?}{=}\texttt{"email"}$, assert $\mathsf{jwt}[\texttt{"email\\_verified"}] \stackrel{?}{=} \texttt{"true"}$
 1. Let $\mathsf{uid\\_val}\gets\mathsf{jwt}[\mathsf{uid\\_key}]$
-1. If $\mathsf{idc\\_aud\\_val}$ is set, assert that $\mathsf{jwt}[\texttt{"aud"}]$ is an approved recovery service ID in the [`aud` override list](#aud-override-list), stored on chain
-1. If $\mathsf{idc\\_aud\\_val}$ is set, let $\mathsf{aud\\_val}\gets \mathsf{idc\\_aud\\_val}$; otherwise, let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
+1. Are we in normal mode? (i.e., is $\mathsf{idc\\_aud\\_val} \ne \bot$)
+   - *Then:* let $\mathsf{aud\\_val}\gets\mathsf{jwt}[\texttt{"aud"}]$
+   - *Else:*
+       + let $\mathsf{aud\\_val}\gets \mathsf{idc\\_aud\\_val}$
+       + assert that $\mathsf{jwt}[\texttt{"aud"}]$ is an approved recovery service ID in the [`aud` override list](#aud-override-list), stored on chain
 1. Assert $\mathsf{addr\\_idc} \stackrel{?}{=} H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$, using the pepper $r$ from the signature
 1. Verify that the PK matches the authentication key on-chain:
    - Assert $\mathsf{auth\\_key} \stackrel{?}{=} H(\mathsf{iss\\_val}, \mathsf{addr\\_idc})$
@@ -443,11 +446,9 @@ The **ZK relation $\mathcal{R}$** simply **performs the privacy-sensitive part o
    - Assert $\mathsf{uid\\_val}\stackrel{?}{=}\mathsf{jwt}[\mathsf{uid\\_key}]$
 5. Check the address IDC uses the correct values:
    - Assert $\mathsf{addr\\_idc} \stackrel{?}{=} H'(\mathsf{uid\\_key}, \mathsf{uid\\_val}, \mathsf{aud\\_val}; r)$
-6. Are we in recovery mode? (i.e., is $\mathsf{override\\_aud\\_val} \stackrel{?}{=} \bot$)
-   - If so, check the managing application’s ID in the JWT: assert $\mathsf{aud\\_val}\stackrel{?}{=}\mathsf{jwt}[\texttt{"aud"}]$
-   
-   - Otherwise, do nothing, allowing the JWT’s `aud` to be different than the `aud` in the IDC
-   
+6. Are we in normal mode (i.e., we are not in recovery mode $\Leftrightarrow \mathsf{override\\_aud\\_val} = \bot$)
+   - *Then:* check the managing application’s ID in the JWT: assert $\mathsf{aud\\_val}\stackrel{?}{=}\mathsf{jwt}[\texttt{"aud"}]$
+   - *Else:* check that the recovery service’s ID is in the JWT:  assert $\mathsf{override\\_aud\\_val}\stackrel{?}{=}\mathsf{jwt}[\texttt{"aud"}]$
 7. Check the EPK is committed in the JWT’s `nonce` field:
    - Assert $\mathsf{jwt}[\texttt{"nonce"}] \stackrel{?}{=} H’(\mathsf{epk},\mathsf{exp\\_date};\rho)$
 8. Check the EPK expiration date is not too far off into the future:
