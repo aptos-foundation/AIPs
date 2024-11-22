@@ -471,10 +471,12 @@ Payload:
 
 ### Example of AWS Cognito JWT
 Header:
+```
 {
   "kid": "ZfQycLUrt9nraKNBwR5rw9tG/VjXIrPQT7sWDZ1DhhQ=",
   "alg": "RS256"
 }
+```
 
 Payload:
 ```
