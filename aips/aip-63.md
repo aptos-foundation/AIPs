@@ -2,7 +2,7 @@
 aip: 63
 title: Coin to Fungible Asset Migration
 author: lightmark, davidiw, movekevin
-Status: Draft
+Status: Accepted
 type: Standard
 created: <12/05/2023>
 ---
