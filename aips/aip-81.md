@@ -82,30 +82,16 @@ Some concrete VUF schemes applicable here:
 - [Pinkas VUF](https://eprint.iacr.org/2024/198.pdf).
 
 Below we refer to the VUF scheme being used in pepper calculation as `vuf`,
-and the evaluation function as `vuf.eval`.
+the evaluation function as `vuf.eval`,
+and the vuf output entropy as `vuf_entropy`.
 
-#### Asymmetric encryption
+#### Pepper base hasher
+A cryptographic hash function `H` with output bit-length `hash_bit_len` is needed to hash a VUF output into a bit string,
+for further processing.
 
-In addition, an asymmetric encryption with variable-length input is required to encrypt the pepper with end user's ESK,
-to ensure only the end user can see the pepper.
-Otherwise, anyone who has access to a leaked JWT can learn the account address by interacting with the pepper service.
-
-Here is an example asymmetric encryption scheme that combines ElGamal asymmetric encryption scheme and AES-256-GCM `(Aes256Gcm.enc, Aes256Gcm.dec)` symmetric encryption with variable-length input (assuming the ephemeral key pair is an Ed25519 key pair, scheme referred to as `ElGamalCurve25519Aes256Gcm` below).
-- Let `x, Y` be the Ed25519 key pair.
-- To ecrypt variable-lenth input `ptxt`:
-  - Pick a point `M` from the Ed25519's underlying prime-order group uniformly at random.
-  - Encrypt `M` using El-Gamal with public key `Y`. Denote by `C0, C1` the ciphertext, where `C0, C1` are 2 points on Curve25519.
-  - Hash `M` to an AES-256-GCM key `aes_key`.
-  - Encrypt `ptxt` using AES-256-GCM with encryption key `aes_key`. Denote by `ctxt` the variable-length AES ciphertext.
-  - The full ciphertext is `C0, C1, ctxt`.
-- To decrypt `C0, C1, ctxt`:
-  - Recover `M` from `C0, C1` using El-Gamal decryption and private key `x`.
-  - Hash `M` to an AES-256-GCM key `aes_key`.
-  - Decrypt `ptxt` from `ctxt` using AES-256-GCM decryption with `aes_key`.
-  - The final output is `ptxt`.
-
-Below we refer to the asymmetric encryption scheme being used as `asymmetric`,
-and its encryption algorithm as `asymmetric.enc`.
+#### Constraints on `vuf` and `H`
+At instantiation time, `vuf_entropy >= hash_bit_len ~= 256` must be ensured in order to get 256-bit pepper,
+as required by [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#peppers).
 
 ### Pepper service setup
 The ephemeral key pair scheme, along with the parameters `derive_nonce`, `vuf`, `asymmetric` should be chosen before deploying pepper.
@@ -125,38 +111,31 @@ assuming `vuf=Bls12381G1Bls`.
 
 ### Pepper request (the input)
 
-The pepper repquest from user to pepper service should be as follows.
-See the comments in the examples for detailed description.
+The pepper request from user should contain the following data items.
+- User ephemeral public key (EPK)
+- EPK expiry date
+- EPK blinder
+- JWT
+- UID key (optional, default value: `"sub"` )
+- Derivation path (optional, default value: `"m/44'/637'/0'/0'/0'"`)
+
+Here's an example request in JSON.
 
 ```JSON
 {
-  /// User's ephemeral public key (EPK), serialized and hexlified.
-  "epk": "002020fdbac9b10b7587bba7b5bc163bce69e796d71e4ed44c10fcb4488689f7a144",
-
-  /// The EPK expiry date, represented in seconds seince unix epoch.
-  "exp_date_secs": 1710800689,
-
-  /// The EPK blinding factor, hexlified.
-  "epk_blinder": "00000000000000000000000000000000000000000000000000000000000000",
-
-  /// A JWT issued by the provider for the end user logging in to the dApp with the specified EPK.
+  "epk": "002020fdbac9b10b7587bba7b5bc163bce69e796d71e4ed44c10fcb4488689f7a144", // EPK serialized and hexlified
+  "exp_date_secs": 1710800689, // The EPK expiry date represented in seconds seince unix epoch
+  "epk_blinder": "00000000000000000000000000000000000000000000000000000000000000", // The EPK blinder hexlified
   "jwt_b64": "xxxx.yyyy.zzzz",
-
-  /// Optional. Determines which JWT claim to read user ID from. Defaults to `"sub"`.
   "uid_key": "email",
-  
-  /// Optional. If the `aud` claim in the JWT represents a special account recovery app, and `aud_override` is specified in the request,
-  /// the pepper service should compute pepper for the `aud_override` instead of the original `aud` in JWT.
-  ///
-  /// This helps end users to transact with the account in case
-  /// the OIDC provider blocked the app and stopped generating JWTs for it.
-  "aud_override": "some-client-id-of-some-banned-google-app",
+  "derivation_path": "m/44'/637'/0'/0'/0'"
 }
 ```
 
 ### Pepper request verification
 
-The pepper request should be rejected if any check below fails.
+Following the notation from the JSON example above,
+the pepper request should be rejected if any of the following checks fails.
 
 - `epk` should be valid.
 - Decoding `jwt_b64` into JSONs `jwt.header`, `jwt.payload`, `jwt.sig` should succeed,
@@ -173,20 +152,20 @@ The pepper request should be rejected if any check below fails.
 
 ### Pepper processing
 - Let `uid_val` be the user ID from `jwt.payload` indicated by `uid_key`.
-- Let `aud` be the effective client ID determined by `jwt.payload.aud` and `aud_override`.
-- Let `input` be a canonical serialization of data items `jwt.payload.iss, uid_key, uid_val, aud`.
-- Compute `pepper` as `vuf.eval(vuf_sk, input)`.
-- Let `pepper_bytes` be a serialization of the VUF output `pepper`.
-- Compute `pepper_encryped` as `asymmetric.enc(epk, pepper_bytes)`.
+- Compute `pepper_input` to be a canonical serialization of data items `(jwt.payload.iss, uid_key, uid_val, jwt.payload.aud)`.
+- Compute `pepper_base` as `vuf.eval(vuf_sk, input)`.
+- Compute `master_pepper` as `H(pepper_base)`.
+- Optionally:
+  - compute `derived_pepper` from `master_pepper` and `derivation_path`,
+    following key derivation scheme [SLIP-0010](https://github.com/satoshilabs/slips/blob/master/slip-0010.md).
+  - compute the `IdCommitment` as defined in [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#public-keys) and derive the initial account address.
+- Return `derived_pepper` and optionally the initial account address.
 
-### Pepper response (the output)
-
-The pepper response from the pepper service to the user should simply be the pepper encrypted by the EPK, hexlified, and wrapped in a JSON.
-
-Below is an example pepper response, assuming `vuf=Bls12381G1Bls` and `asymmetric=ElGamalCurve25519Aes256Gcm`.
+Below is an example pepper JSON response used in the reference implementation, assuming VUF scheme `Bls12381G1Bls` is used.
 ```JSON
 {
-  "signature_encrypted": "6e0cf0dfdffbd22d0108195b54949b7840c3b7e4c9168f0899b60950f16e52cd54f0306cb8e76eda9fb3d5be6890cd3fc2c0cb259e3578dab6c7496b6d64553d4463a18aecf5bc3fc629cd88f9a78221b05b4d04d1a0a20292ed11f4197c5169227c86a6775b1c2990709cadf010cbf624763d68783eb466892d69a70c3c95a9fdffe5917e4554871db915b0"
+  "pepper": "854bd1eb56dfe35467493723360bb547a3f06c7ffc0c59733191fb05e8743f", // `derived_pepper` hexlified
+  "address": "0x56f36f5c9fd3f07f9ae0704b7980dd2598afebdd1dc952c60775cd9a5c7c0731" // the initial account address
 }
 ```
 
