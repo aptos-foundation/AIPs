@@ -117,7 +117,8 @@ The pepper request from user should contain the following data items.
 - EPK blinder
 - JWT
 - UID key (optional, default value: `"sub"` )
-- Derivation path (optional, default value: `"m/44'/637'/0'/0'/0'"`)
+- [SLIP-0010](https://github.com/satoshilabs/slips/blob/master/slip-0010.md) derivation path
+  (optional, default value: `"m/44'/637'/0'/0'/0'"`)
 
 Here's an example request in JSON.
 
