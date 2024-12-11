@@ -68,7 +68,6 @@ The nonce is then sent to the OIDC provider and signed as part of JWT payload.
 
 The same function needs to be implemented as [part of the ZK relation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#snark-friendly-hash-functions),
 so SNARK-friendly hash function should be preferred.
-The reference implementation uses Poseidon hash function over BN254.
 
 #### Verifiable unpredictable function (VUF)
 Roughly speaking, a VUF is a mapping `f(x)` implicitly determined by a key pair `sk, pk` such that:,
@@ -93,19 +92,20 @@ for further processing.
 At instantiation time, `vuf_entropy >= hash_bit_len ~= 256` must be ensured in order to get 256-bit pepper,
 as required by [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#peppers).
 
-### Pepper service setup
-The ephemeral key pair scheme, along with the parameters `derive_nonce`, `vuf`, `asymmetric` should be chosen before deploying pepper.
-
-Additionally, depending on the choice `vuf`, a VUF key pair should also be generated and stored securely for the pepper service to read.
+### Instantiation in reference implementation
+The reference implementation uses:
+- Poseidon hash function over BN254 as the nonce derivation funciton;
+- Pinkas VUF as the VUF;
+- [`BCSCryptoHash` of struct `PinkasPepper`](https://github.com/aptos-labs/aptos-core/blob/807a2dbb186f088f347d568e0de63b1da6a6129e/keyless/pepper/common/src/vuf/bls12381_g1_bls.rs#L38-L39)
+   as the pepper bash hasher.
 
 ### Publish VUF public key
 The pepper service should publish its VUF public key by opening an endpoint for anyone to fetch its public key.
 
-Here is an example response where the VUF public key is serialized, hexlified and wrapped in a JSON,
-assuming `vuf=Bls12381G1Bls`.
+Here is an example response from the reference implementation.
 ```JSON
 {
-  "public_key": "b601ec185c62da8f5c0402d4d4f987b63b06972c11f6f6f9d68464bda32fa502a5eac0adeda29917b6f8fa9bbe0f498209dcdb48d6a066c1f599c0502c5b4c24d4b057c758549e3e8a89ad861a82a789886d69876e6c6341f115c9ecc381eefd"
+  "public_key": "b601ec185c62da8f5c0402d4d4f987b63b06972c11f6f6f9d68464bda32fa502a5eac0adeda29917b6f8fa9bbe0f498209dcdb48d6a066c1f599c0502c5b4c24d4b057c758549e3e8a89ad861a82a789886d69876e6c6341f115c9ecc381eefd" // pinkas vuf public key serialized and hexlified
 }
 ```
 
@@ -153,16 +153,23 @@ the pepper request should be rejected if any of the following checks fails.
 
 ### Pepper processing
 - Let `uid_val` be the user ID from `jwt.payload` indicated by `uid_key`.
-- Compute `pepper_input` to be a canonical serialization of data items `(jwt.payload.iss, uid_key, uid_val, jwt.payload.aud)`.
+- Obtain byte string `pepper_input` as [BCS serialization](https://github.com/aptos-labs/bcs)
+  of data items `(jwt.payload.iss, uid_key, uid_val, jwt.payload.aud)`.
 - Compute `pepper_base` as `vuf.eval(vuf_sk, input)`.
 - Compute `master_pepper` as `H(pepper_base)`.
 - Optionally:
-  - compute `derived_pepper` from `master_pepper` and `derivation_path`,
-    following key derivation scheme [SLIP-0010](https://github.com/satoshilabs/slips/blob/master/slip-0010.md).
-  - compute the `IdCommitment` as defined in [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#public-keys) and derive the initial account address.
-- Return `derived_pepper` and optionally the initial account address.
+  - derive byte string `derived_pepper` from `(master_pepper, derivation_path)`
+    per key derivation scheme [SLIP-0010](https://github.com/satoshilabs/slips/blob/master/slip-0010.md);
+  - derive byte string `id_commitment` from `(derived_pepper, jwt.payload.aud, uid_key, uid_val)`
+    per [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#public-keys);
+  - obtain an [`AnyPublicKey`](https://github.com/aptos-labs/aptos-core/blob/807a2dbb186f088f347d568e0de63b1da6a6129e/types/src/transaction/authenticator.rs#L1099) object `pk`
+    by upcasting `(jwt.payload.iss, id_commitment)`;
+  - obtain byte string `keyless_pk_bytes` as [BCS serialization](https://github.com/aptos-labs/bcs) of `pk`;
+  - compute byte string `auth_key` as SHA3-256 of concatenation of `keyless_pk_bytes` and byte `0x02`, where `0x02` represents the account authenticator single key mode;
+  - obtain `initial_account_address := auth_key`.
+- Return `derived_pepper` and optionally `initial_account_address`.
 
-Below is an example pepper JSON response used in the reference implementation, assuming VUF scheme `Bls12381G1Bls` is used.
+Below is an example pepper JSON response used in the reference implementation.
 ```JSON
 {
   "pepper": "854bd1eb56dfe35467493723360bb547a3f06c7ffc0c59733191fb05e8743f", // `derived_pepper` hexlified
