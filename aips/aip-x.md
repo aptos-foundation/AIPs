@@ -1,6 +1,6 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: Privacy-preserving pepper service for Keyless accounts
+title: Oblivious pepper service for Keyless accounts
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft # <Draft | Last Call | Accepted | Final | Rejected>
@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): 61, 81
 ---
 
-# AIP-X - Privacy-preserving pepper service for Keyless accounts
+# AIP-X - Oblivious pepper service for Keyless accounts
 
 ## Summary
 
@@ -147,7 +147,7 @@ Here, $H\_\mathsf{vuf}$ is a hash function mapping an arbitrary number of bytes 
 > 1. In normal made (i.e., $\mathsf{override\\_aud\\_val} = \bot$), the $\mathsf{aud\_val}$ over which the VUF is evaluated is a secret witness but is matched in the JWT.
 > 2. In recovery made (i.e., $\mathsf{override\\_aud\\_val} \ne \bot$), the $\mathsf{aud\_val}$ over which the VUF is evaluated is a secret witness but is **NOT** matched in the JWT. This allows the recovery service to provide any $\mathsf{aud\_val}$ as input, depending on what application the user selects during recovery. Note that, in this mode, the pepper service does not learn what managing application the user is recovering his account for.
 
-#### A less privacy-preserving ZK relation $\mathcal{R}$
+#### A less oblivious ZK relation $\mathcal{R}$
 
 The relation above can be changed to expose the $\textcolor{red}{\mathsf{aud\_val}}$ as a public input rather than a secret witness. This leaks the managing application IDs to the pepper service, but allows it to build a database of application IDs that have been used by Keyless users, which is useful during [account recovery](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md#recovery-service).
 
@@ -203,6 +203,10 @@ This is just **an informational AIP**. Over time, we may include links to implem
  > - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
 
 ...
+
+**TODO:** SK is still a concern
+
+**TODO:** timing channels are still a concern
 
 ## Future Potential
 
