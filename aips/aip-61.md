@@ -363,8 +363,8 @@ where:
 3. $(\mathsf{header}$, $\mathsf{epk}$, $\sigma_\mathsf{eph}$, $\mathsf{exp\\_date})$ are [as before](#warm-up-leaky-signatures-that-reveal-the-users-and-apps-identity), except:
    - The ephemeral signature $\sigma_\mathsf{eph}$ now additionally encompasses the ZKP $\pi$, to protect against malleability attacks.
 
-4. $\mathsf{exp\\_horizon}$, which is $\le \mathsf{max\\_exp\\_horizon}$; the $\mathsf{exp\\_date}$ must be between $\mathsf{jwt}[\texttt{"iat"}]$ and $\mathsf{jwt}[\texttt{"iat"}]+\mathsf{exp\\_horizon}$
-5. $\mathsf{extra\_field}$​ is an **optional** field that is matched in the JWT and **publicly**-revealed (e.g., if the user wants to reveal their email, `extra_field` is set to `“email”:”alice@gmail.com”`)
+4. $\mathsf{exp\\_horizon}$ is $\le \mathsf{max\\_exp\\_horizon}$ and ensures that the $\mathsf{exp\\_date}$ lies between $\mathsf{jwt}[\texttt{"iat"}]$ and $\mathsf{jwt}[\texttt{"iat"}]+\mathsf{exp\\_horizon}$
+5. $\mathsf{extra\\_field}$​ is an **optional** field that is matched in the JWT and **publicly**-revealed (e.g., if the user wants to reveal their email, $\mathsf{extra\\_field}$​ is set to `“email”:”alice@gmail.com”`)
 6. $\mathsf{override\\_aud\\_val}$ is an **optional** field used for [account recovery](#recovery-service). If set, this field contains the override `aud` value (i.e., the `client_id` of the recovery service), which otherwise would be hidden by the ZKP in the JWT payload’s `aud` field. If this is set, the ZKP relation (described next) will check that this override `aud` matches the JWT’s `aud` and forego matching it to the IDC’s `aud` (similar to the leaky mode above).
 7. $\sigma_\mathsf{tw}$ is an **optional** **training wheels signature** over the ZKP for the [training wheels mode](#training-wheels).
 8. $\pi$ is a **zero-knowledge proof of knowledge (ZKPoK)** for the the ZK relation $\mathcal{R}$, which performs the privacy-oriented verification (discussed below).
