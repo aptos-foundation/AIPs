@@ -34,7 +34,7 @@ requires (*optional): <AIP number(s)>
 
 ## High-level Overview
 
- > Define the strawman solution with enough details to make it clear why this is the preferred solution.
+ > Define the straw man solution with enough details to make it clear why this is the preferred solution.
  > Please write a 2-3 paragraph high-level overview here and defer writing a more detailed description in [the specification section](#specification-and-implementation-details).
 
 ...
@@ -66,7 +66,7 @@ requires (*optional): <AIP number(s)>
 
 ## Testing 
 
- > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out. Some examples include user stories, network health metrics, system metrics, E2E tests, unit tests, etc) 
+ > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out. Some examples include user stories, network health metrics, system metrics, E2E tests, unit tests, etc.) 
  > - When can we expect the results?
  > - What are the test results and are they what we expected? If not, explain the gap.
 
@@ -75,7 +75,7 @@ requires (*optional): <AIP number(s)>
 ## Risks and Drawbacks
 
  > - Express here the potential risks of taking on this proposal. What are the hazards? What can go wrong?
- > - Can this proposal impact backward compabitibility?
+ > - Can this proposal impact backward compatibility?
  > - What is the mitigation plan for each risk or drawback?
 
 ## Security Considerations
@@ -121,6 +121,6 @@ requires (*optional): <AIP number(s)>
 
 ## Open Questions (Optional)
 
- > Q&A here, some of them can have answers some of those questions can be things we have not figured out but we should
+ > Q&A here, some of them can have answers some of those questions can be things we have not figured out, but we should
 
 ...
