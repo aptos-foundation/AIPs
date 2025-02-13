@@ -11,28 +11,30 @@ created: 02/14/2024
 
 ## Summary
 
-Domain-based Account Abstraction (Domain AA) extends the existing Account Abstraction (AA) framework on Aptos by enabling authentication based on domains. Rather than using a single account's address or signature scheme, Domain AA allows for the authentication of accounts based on domain-specific logic, providing a more flexible and secure way to manage cross-chain signatures. This approach also allows for deterministic account address generation based on the `account_identity` and `function_info` of the domain.
+Domain-based Account Abstraction (Domain AA) extends the existing Account Abstraction (AA) framework on Aptos by enabling authentication based on domains.
+This allows registering secondary authentication schemes (as an alterantive to native Ed25519), with identical user experience to it. Rather than having each user register it's own authentication function, Domain AA allows for registering a full domain of addresses to be authenticated with same authentication function. That avoids a need for each account to have a different starting authentication and to need to initialize AA (from it). This allows providing a more flexible and secure way to manage cross-chain signatures. This approach also allows for deterministic account address generation based on the `account_identity` and `function_info` of the domain.
 
 ### Out of scope
 
 How to properly design an domain AA authentication function/module is out of scope.
 
 ## High-level Overview
-In Domain AA, authentication is scoped to a domain. Each domain has a distinct authentication function that is whitelisted and governed by the Aptos framework. The authentication logic is not tied to a specific account but instead relies on the domain and account identity. Here's how it works:
+In Domain AA, authentication is scoped to a domain. You can register an authentication function, which then creates a domain. The authentication logic is not tied to a specific account but instead relies on the domain and account identity. Here's how it works:
 
 1. The user provides an `account_identity`, which is included in the authentication data (`auth_data`).
 2. Based on the `account_identity` and the associated `function_info`, the system derives an account address for authentication.
-3. The `function_info` used for authentication must be registered in a global whitelist maintained by governance to prevent unauthorized usage.
+3. The `function_info` used for authentication must be registered in a global whitelist.
 4. If the authentication data matches the domain’s registered logic, the system authenticates the account and authorizes the transaction.
 
-This domain-scoped approach allows for more advanced use cases such as cross-chain integration and delegated signing.
+This domain-scoped approach allows for registering different authentication schemes, as an alternative to Ed25519, enabling more advanced use cases such as cross-chain integration or different authentication schemes.
+
+Currently, registering a new authentication function and domain with it is made to require governance proposal, to make sure more scrutiny is placed on those, as they generate an alternative to native Ed25519. Whether to require governance long term or not, is something to be figured out.
 
 ### Why is this approach superior to other options?
 
 - **Enhanced Flexibility**: By decoupling authentication from specific account addresses, Domain AA enables domain-specific authentication logic, making it possible to implement complex workflows.
 - **Cross-chain Compatibility**: This method enables seamless cross-chain signature integration, where external accounts can authenticate on Aptos by deriving the correct address from their `account_identity` and the domain's `function_info`.
 - **Scalability**: Domains are designed to scale, allowing multiple authentication schemes across different use cases without requiring per-account configuration.
-- **Governance-Driven Security**: The whitelist mechanism ensures that only authorized authentication functions are used, and it is governed to maintain security at scale.
  
 ## Impact
 
@@ -120,7 +122,7 @@ The above PR has smoke test for domain AA.
 
 ## Security Considerations
 - Cross-chain Signatures: Since this model allows external accounts to authenticate using domain-specific signatures, it is crucial to prevent unauthorized access. Specifically, account_identity should be securely handled to ensure that impersonation is not possible. This is mitigated by using the whitelist mechanism and by ensuring that the derived account address corresponds to the correct identity.
-- Governance: The governance process for adding and removing authentication functions in the domain’s whitelist ensures that only authorized signatures are used. Mismanagement of governance could lead to unauthorized functions being added to the whitelist, posing security risks.
+- Governance: The governance process for adding and removing authentication functions in the domain’s whitelist ensures that only authorized signatures are used. Mismanagement of governance could lead to unauthorized functions being added to the whitelist, posing security risks for users using those domains. 
 
 ## Timeline
 
