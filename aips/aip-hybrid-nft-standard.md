@@ -332,17 +332,19 @@ Implementation should only take one week of work, from the reference implementat
 Optionally, switching for determining which transfer function to use, may need to be added to the TS SDK, to ease
 onboarding of wallets. This would need probably a week of work.
 
+### Suggested templating timeline
+
+It should takes a week to create a basic quick start example contract with a few reveal options. And example script to create hybrid assets.
+
 ### Suggested deployment timeline
 
 This can be deployed entirely separately of the framework, and I'm not sure that it belongs directly in 0x4.
 
-It can be deployed in Devnet immediately, Testnet after a few weeks, and Mainnet after a few weeks after.
 
 ## Open Questions (Optional)
 
-- How to handle custom staging of NFTs?
 - How to handle custom reveals of NFTs?
-- How to handle different behaviors of transfers on NFTs? Currently tied to one implementation.
+A few templates on simple reveal while transfer, basic randomness reveal function will be provided.
 
 ## Future Potential
 
