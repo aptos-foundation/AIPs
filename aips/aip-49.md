@@ -10,7 +10,7 @@ created: 09/28/2023
 updated (*optional): <mm/dd/yyyy>
 ---
 
-# AIP-49 - Secp256k1 Ecdsa for Transaction Authentication
+# AIP-49 - Secp256k1 ECDSA for Transaction Authentication
   
 Despite our desire to see more diverse key algorithms supported in hardware cryptographic platforms, the primary Aptos key algorithm, Ed25519, has yet to be adopted broadly across the ecosystem. `secp256k1` ECDSA remains the incumbent and is broadly supported. This AIP introduces support `secp256k1` ECDSA as a transaction authenticator for Aptos.
 
@@ -20,7 +20,7 @@ In Aptos, each transaction contains a transaction authenticator that includes a 
 
 ## Motivation
 
-* Many organizations already have support for `secp256k1` Ecdsa but not Ed25519
+* Many organizations already have support for `secp256k1` ECDSA but not Ed25519
 * Hardware crypto has not broadly adopted Ed25519 yet remain compatible with `secp256k1` ECDSA
 
 ## Specification
