@@ -28,17 +28,12 @@ Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [
 
 | Number | Category | Title  | Author |
 |:---|:---|:---|:---
-| [AIP-90](https://github.com/aptos-foundation/AIPs/issues/453) | Framework | [Add Apple as a supported OIDC provider](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-90.md)| Alin Tomescu (alin@aptoslabs.com) |
-| [AIP-91](https://github.com/aptos-foundation/AIPs/issues/484) | Framework | [Enum Types in the Move VM](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-91.md)| AIP Author |
-| [AIP-92](https://github.com/aptos-foundation/AIPs/issues/493) | Smart Contract | [Transaction Simulation Enhancement](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-92.md)| junkil-park (https://github.com/junkil-park), movekevin (https://github.com/movekevin), gregnazario (https://github.com/gregnazario) |
-| [AIP-93](https://github.com/aptos-foundation/AIPs/issues/485) | Blockchain | [Consensus Observer](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-93.md)| Josh Lind (https://github.com/JoshLind) & Zekun Li (https://github.com/zekun000) |
-| [AIP-94](https://github.com/aptos-foundation/AIPs/issues/488) | Governance | [Reduce stake lockup duration to 14 days and governance voting duration to 3 days per community vote](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-94.md)| Tony (https://github.com/tony001242), Eric (eric@amnis.com) |
-| [AIP-95](https://github.com/aptos-foundation/AIPs/issues/489) | Smart Contract | [Collections Permission Update](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-95.md)| johnchanguk, briungri |
-| [AIP-96](https://github.com/aptos-foundation/AIPs/issues/490) | Smart Contract | [Federated Keyless accounts](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-96.md)| Alin Tomescu (alin@aptoslabs.com), davidiw, heliuchuan |
-| [AIP-97](https://github.com/aptos-foundation/AIPs/issues/501) | Blockchain | [Storage Format Change](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-97.md)| grao1991 |
-| [AIP-98](https://github.com/aptos-foundation/AIPs/issues/502) | Governance | [Reduce minimal stake required to submit governance proposal from 10M to 1M](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-98.md)| sherry-x |
-| [AIP-99](https://github.com/aptos-foundation/AIPs/issues/503) | Smart Contract | [Disable Safe Burn of User-Owned Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-99.md)| gregnazario (greg@aptoslabs.com) |
-| [AIP-100](https://github.com/aptos-foundation/AIPs/issues/498) | Framework | [Private Entry Function for Multisig Account Creation](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-100.md)| yeptos (https://github.com/yeptos), gregnazario (https://github.com/gregnazario) |
+| [AIP-109](https://github.com/aptos-foundation/AIPs/issues/545) | Framework | [Hide Unwanted Soulbound Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-109.md)| gregnazario |
+| [AIP-110](https://github.com/aptos-foundation/AIPs/issues/551) | Governance | [Lower the Threshold for Passing a Governance Proposal from 400M APT to 300M APT](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-110.md)| sherry-x |
+| [AIP-111](https://github.com/aptos-foundation/AIPs/issues/555) | Blockchain | [Transaction Execution Replay Backward Compatibility Policy](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-111.md)| sherry-x |
+| [AIP-112](https://github.com/aptos-foundation/AIPs/issues/562) | Standard Language | [Function Values in the Move VM](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-112.md)| Wolfgang Grieskamp |
+| [AIP-113](https://github.com/aptos-foundation/AIPs/issues/563) | Framework | [Domain-based Account Abstraction](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-113.md)| igor-aptos, lightmark |
+| [AIP-114](https://github.com/aptos-foundation/AIPs/issues/564) | Framework | [Increase Coin Symbol Byte Length](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-114.md)| gregnazario |
 | ... | ... |||
 
 ## Types of AIPs
