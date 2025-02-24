@@ -12,7 +12,7 @@ requires: 62
 
 ## Summary
 
-The "Sign in with Aptos" (SIWA) standard introduces a secure and user-friendly way for users to authenticate to off-chain resources by proving ownership of their Aptos account. It simplifies the authentication process by replacing the traditional `connect` + `signMessage` flow in the wallet standard with a streamlined one-click `signIn` method. SIWA leverages Aptos accounts to avoid reliance on traditional schemes like SSO while incorporating security measures to combat phishing attacks and improve user visibility.
+The "Sign in with Aptos" (SIWA) standard introduces a secure and user-friendly way for users to authenticate to off-chain resources by proving ownership of their Aptos accounts. It simplifies the authentication process by replacing the traditional `connect` + `signMessage` flow in the wallet standard with a streamlined one-click `signIn` method. SIWA leverages Aptos accounts to avoid reliance on traditional schemes like SSO while incorporating security measures to combat phishing attacks and improve user visibility.
 
 ### Out of scope
 
@@ -61,7 +61,7 @@ With a **Sign in with Aptos (SIWA)** flow, we address key challenges by enabling
 
 ## High-level Overview
 
-The SIWA flow will introduce a new method `signIn` to the wallet standard where it will perform a "connect" and "sign message" operations in one step. As part of this flow, a new standardized message format and signing algorithm will be introduced. The wallet will be responsible for constructing messages into this standardized format and presenting an authentication flow using a human-readable UI (as well as flagging potentially malicious messages).
+The SIWA flow will introduce a new method `signIn` to the wallet standard where it will perform "connect" and "sign message" operations in one step. As part of this flow, a new standardized message format and signing algorithm will be introduced. The wallet will be responsible for constructing messages into this standardized format and presenting an authentication flow using a human-readable UI (as well as flagging potentially malicious messages).
 
 ![Figure 5: Sign in with Aptos Flow](./static/11.png)
 
@@ -79,8 +79,6 @@ This AIP significantly impacts both developers and end-users:
 
 - **Improved Experience:** Replacing the cumbersome `connect` + `signMessage` flow with a single-step `signIn` method simplifies the login process, making it more intuitive and user-friendly.
 - **Transparency and Trust:** The standardized message format ensures that users can easily understand what they are signing.
-
-The introduction of SIWA is transformative for the ecosystem, as it enables developers to create robust backends tied to secure, blockchain-based account authentication. It opens doors for operations that don’t need to be on the blockchain, such as storing profile information, rate limiting, and more.
 
 ## Alternative Solutions
 
@@ -685,7 +683,7 @@ export default function SignInPage() {
 
 ## Testing
 
-The new `@aptos-labs/siwa` package will have its utilities tested to ensure that validation is done correctly. Coverage is most important here. In addition, signature verification methods will be used from the `@aptos-labs/ts-sdk`, it's important that signature verification methods are supported and tested.
+The new `@aptos-labs/siwa` package will have its utilities tested to ensure that validation is done correctly. Coverage is most important here. In addition, signature verification methods will be used from the `@aptos-labs/ts-sdk`, it's important that signature verification methods are supported, correct, and tested.
 
 ## Risks and Drawbacks
 
