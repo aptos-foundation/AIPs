@@ -65,7 +65,7 @@ The implementation adds three key components to the `object_code_deployment` mod
 1. AuthRef struct:
 ```move
 /// Authorization reference for an object that has code published to it
-struct AuthRef has store {
+struct AuthRef has drop, store {
     object_address: address
 }
 ```
