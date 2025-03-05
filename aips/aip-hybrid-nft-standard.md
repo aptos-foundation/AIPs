@@ -1,7 +1,7 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Aptos Hybrid Asset (HA) Standard
-author: @gregnazario, @cylim226, @decidethatlater, @HugeMongooose, @SuperSecretRare, @0xYZMIN
+author: gregnazario, cylim226, decidethatlater, HugeMongooose, SuperSecretRare, 0xYZMIN
 discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
 last-call-end-date (*optional): 10/15/2024
