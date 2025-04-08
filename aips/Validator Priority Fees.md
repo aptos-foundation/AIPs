@@ -69,20 +69,29 @@ Solana’s experience highlights the risks of a dysfunctional native fee market.
 
  > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
-...
+**Burn rate:**
+Fixed at 100 Octas/GU. Any excess goes to the proposer. No changes to transaction format or APIs.  
+_Rationale: preserves UX compatibility while enabling a simple, tunable priority fee mechanism._
 
-- **Burn rate:** To make the transition seamless for users while maximizing the burn, we fix the burn on 100 Octas/GU. 
-- **Operators and Stakers:** Validators are now able to earn additional income via priority fees, which raises the question of how to distribute this income between the operators and the stakers? An on-chain mechanism enforcing an agreed upon sharing of the fees is worthwhile. Similarly to the mechanism for sharing the protocol rewards which is done via a tunable parameter specifying the operator commission from the protocol rewards, we add a parameter sepecifying the operator comission from the pririty fees. This enables for flexibility and allows the market to determine the correct sharing ratio.
-- **Execution pool:** In the execution pool a tx might be included in a block by validator A, but only executed later together with txns from a later block (eg. a block proposed by validator B). Nevertheless, the priority fees go to the including validator -- validator A.
-- **Preparations for Quorum Store's incentives:** Thinking forward, we prerare the ground for future mechanisms that might tackle the Quorum Store incentives issues. Specifically, we prepare for the possibility of multiple fee receipients from a single tx. This includes (1) maintaining a field per tx accounting for fee receipients, (2) accumulating the fees across an epoch and distributing them at the end (to avoid many small distribution and small value problems).
+**Operator/staker sharing:**
+Introduce a tunable priority_fee_commission parameter, mirroring the existing protocol rewards commission.  
+_Rationale: allows on-chain enforcement of fair revenue sharing, while letting the market determine the appropriate split._
+
+**Execution pool semantics:**
+Priority fees are assigned to the including validator, regardless of when or by whom the transaction is executed.  
+_Rationale: aligns incentives with inclusion decisions, which reflect prioritization logic._
+
+**Quorum Store prep (forward compatibility):**
+  (1) Add a per-transaction field to track fee recipients.
+  (2) Accumulate and distribute fees at epoch boundaries.  
+ _Rationale: enables future extensions (e.g., multi-recipient fees) while avoiding micro-distributions and fragmentation._
 
 ## Reference Implementation
 
  > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
  > What is the feature flag(s)? If there is no feature flag, how will this be enabled?
-...
 
-@Guoteng
+A reference implementation is in progress under the ownership of @Guoteng. Links to relevant code and modules will be added once available.
 
 ## Testing 
 
@@ -90,8 +99,20 @@ Solana’s experience highlights the risks of a dysfunctional native fee market.
  > - When can we expect the results?
  > - What are the test results and are they what we expected? If not, explain the gap.
 
-...
+(Only a suggestion. Feel free to change @Guoteng.)
 
+- Unit tests:
+  - Validate correct fee splitting between burn and proposer under varying gas prices.
+  - Check enforcement of the 'priority_fee_commission' parameter.
+  - Ensure proposer reward attribution is consistent with inclusion logic in the execution pool.
+
+- Integration tests:
+  - Submit transactions with varying fees; verify accounting and reward flows.
+  - Simulate block proposals and cross-validator execution (via exec-pool) to verify inclusion-based attribution.
+
+- Protocol tests (devnet/testnet):
+  - Observe validator behavior under competitive fee conditions.
+  - Monitor for regressions in gas estimation, transaction inclusion, and price metrics.
 
 
 ## Risks and Drawbacks
@@ -100,9 +121,17 @@ Solana’s experience highlights the risks of a dysfunctional native fee market.
  > - Can this proposal impact backward compatibility?
  > - What is the mitigation plan for each risk or drawback?
 
-- **Publicity.** Risk of drawing attention to the (currently) low participation incentives for validators.
-- **Single dimensionality.** The prescribed mechanism only relates to gas fees. In practice, our blocks have multidimensional limits, which include storage costs, IO and #txns. These are not accounted for in the priority mechanism. A future transition to a multidimensional gas market will require a corresponding adaptation to the priority mechanism.
-- **Gas estimation.** Our users are typically not sophisticated when it comes to gas consumptio. They often set the gas limit irrespectivaly of the tx actual requirements. This makes it hard to estimate the total fee going to the validator from the tx.  
+**Publicity risk:**
+The proposed change may highlight the current lacuna in validator participation rewards.
+This could prompt scrutiny but also serves to justify broader improvements to validator incentives.
+
+**Single-dimensionallity:**
+The mechanism only accounts for gas fees, while block limits are actually multidimensional — including storage, IO, and transaction count.
+This mismatch means a less efficient market. A future move to a multidimensional gas market will require extending the prioritization mechanism accordingly.
+
+**Unreliable gas estimates from users:**
+Many users overestimate gas limits, often without regard to actual usage.
+This introduces noise into the auction: it becomes harder to predict the real priority fee being paid, and it weakens the correlation between fee and marginal cost or value. However, a relatively good heuristic for the block packing problem is exactly based on the price per GU metric, which is the unaffected by the submitted gas limit.
 
 ## Security Considerations
 
@@ -111,16 +140,22 @@ Solana’s experience highlights the risks of a dysfunctional native fee market.
  > - Link tests (e.g. unit, end-to-end, property, fuzz) in the reference implementation that validate both expected and unexpected behavior of this proposal
  > - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
 
-...
+Our proposal introduces minimal new attack surface, as it does not alter transaction execution logic or consensus behavior. However, a few considerations apply:
+
+**Fee accounting correctness:**
+The split between burn and validator reward must be precisely enforced. Incorrect fee calculations, rounding errors, or overflows—particularly in multi-recipient contexts—could result in loss or misallocation of funds.  
+Mitigation: unit and integration tests should validate all fee flows, including edge cases (e.g., maximum gas price, zero burn, multi-recipient distributions).
+
+**Auction griefing via inflated priority fees:**
+Users may submit high-fee transactions solely to crowd out competitors. While they still pay the declared fee, this behavior can degrade UX.  
+Mitigation: the economic cost of griefing is internalized by the attacker; further mitigation may require separate work on spam filtering or reservation (eg. future) auction design.
 
 ## Future Potential
 
  > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in one year? In five years?
 
-...
-
-The addition of a priority fee to the protocol will result in a built-in market for txns ordering in a block. This would facilitate arbitrage competition in an open and transparent manner. It will significantly reduce the economic incentive for side markets for ordering that are typically less fair and are easier to use for frontrunning/sandwiching.
-
+The addition of a priority fee results in a built-in market for transaction ordering within a block. This enables arbitrage competition to occur in an open and transparent way.
+The presence of such a mechanism significantly reduces the economic incentive to create side markets for ordering — markets that tend to be opaque, less fair, and more easily exploited for strategies such as frontrunning and sandwiching.
 
 ## Timeline
 
@@ -152,7 +187,6 @@ The addition of a priority fee to the protocol will result in a built-in market 
 
  > Q&A here, some of them can have answers some of those questions can be things we have not figured out, but we should
 
-...
 
-**Q.** Why a priority fee per GU? Why not per tx?  
-**A.** Because a priority payment per tx introduces the following vulnerability. A single tx paying a slightly higher amount but requiring substential more effort (measured in GU). This also leads to an side market for grouping multiple txns into a single huge tx, which is inefficient. 
+**Q. Why implement the priority fee per gas unit (GU) rather than per transaction?**  
+A fee per transaction introduces a misalignment between the fee paid and the actual cost imposed on the network. A user could submit a single transaction that pays slightly more in total than others but consumes significantly more gas, skewing validator incentives. This would favor bundling multiple actions into large, complex transactions, which is inefficient and may encourage new forms of off-chain coordination. A per-GU priority fee ensures better alignment between user bids and execution costs.
