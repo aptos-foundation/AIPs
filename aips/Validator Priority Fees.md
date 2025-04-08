@@ -46,14 +46,23 @@ Exactly like today, a user specifies a price per GU for a tx (minimum of 100 Oct
  > Which audiences are impacted by this change? What type of action does the audience need to take?
  > What might occur if we do not accept this proposal?
  > List out other AIPs this AIP is dependent on
+
 ...
-This is a cornerstone of a well functioning fee market. 
+This is a cornerstone of a well functioning fee market. Traders, and any other user that competes for ordering priority, will benefit from a seamless method of payment to the validator deciding on the order. Validators will enjoy a built-in, incentive compatible, mechanism that benefits them for their role as the "de-facto" arbiters of the txns-order competition.
+
+Without priority fees, there is no incentive for the validators to order txns according to clear and transparent rules. Since we expect trading to ramp up, this incentive incompatibility is likely to grow enough such that external "black market" mechanism will emerge. These external markets benefit the  players who participate in them on the expense of the others in a manner that often cannibilize on the fairness of the system (fairness in the sense that the rules are the same for different players).
 
 ## Alternative Solutions
 
  > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
 
 ...
+
+Alternative 1. No burn, all to validator.    &nbsp;&nbsp; We opted not to use this mechanism because of the extra economical value that burning offers. For example, it helps balance inflation automatically based on market demand.
+
+Alternative 2. 50-50. Similar to Solana, 50% is burned and 50% goes to the validator.    &nbsp;&nbsp; This mechanism is problematic since it still encourges "side-channel agreements". For example: user A, instead of bidding 500 Octas/GU, an bid 100 Octas/GU while also paying the validator -- in a side channel -- 300 Octas/GU. In this way both user A and the validator benefit from using the side channel instead of the explicit fee market. (This example also serves as a crisp demonstration for the benefit of a fixed burn rate.)
+
+Alternative 3. Using a 3rd party as a market maker (what Jito does for Solana).   &nbsp;&nbsp; Solana is an interesting case study in which the built-in fee market was disfunctional (due to several reasons). As the economic value of the competition for order grew, the need for a better functioning market became urgent, hushering in an external (side-channel) ordering service -- Jito. However, such an external service has negative implications for most of the involved players. It (1) introduces a strong centralization force to the eco-system, (2) imposes a tax on the users that is going to the service provider (in addition to what goes to the validators), and (3) might cause a dependency for the blockchain efficient functioning on an external service.  
 
 ## Specification and Implementation Details
 
