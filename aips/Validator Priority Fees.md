@@ -58,17 +58,22 @@ Without priority fees, there is no incentive for the validators to order txns ac
 
 ...
 
-Alternative 1. No burn, all to validator.    &nbsp;&nbsp; We opted not to use this mechanism because of the extra economical value that burning offers. For example, it helps balance inflation automatically based on market demand.
+**Alternative 1.** No burn, all to validator.    &nbsp;&nbsp; We opted not to use this mechanism because of the extra economical value that burning offers. For example, it helps balance inflation automatically based on market demand.
 
-Alternative 2. 50-50. Similar to Solana, 50% is burned and 50% goes to the validator.    &nbsp;&nbsp; This mechanism is problematic since it still encourges "side-channel agreements". For example: user A, instead of bidding 500 Octas/GU, an bid 100 Octas/GU while also paying the validator -- in a side channel -- 300 Octas/GU. In this way both user A and the validator benefit from using the side channel instead of the explicit fee market. (This example also serves as a crisp demonstration for the benefit of a fixed burn rate.)
+**Alternative 2.** 50-50. Similar to Solana, 50% is burned and 50% goes to the validator.    &nbsp;&nbsp; This mechanism is problematic since it still encourges "side-channel agreements". For example: user A, instead of bidding 500 Octas/GU, an bid 100 Octas/GU while also paying the validator -- in a side channel -- 300 Octas/GU. In this way both user A and the validator benefit from using the side channel instead of the explicit fee market. (This example also serves as a crisp demonstration for the benefit of a fixed burn rate.)
 
-Alternative 3. Using a 3rd party as a market maker (what Jito does for Solana).   &nbsp;&nbsp; Solana is an interesting case study in which the built-in fee market was disfunctional (due to several reasons). As the economic value of the competition for order grew, the need for a better functioning market became urgent, hushering in an external (side-channel) ordering service -- Jito. However, such an external service has negative implications for most of the involved players. It (1) introduces a strong centralization force to the eco-system, (2) imposes a tax on the users that is going to the service provider (in addition to what goes to the validators), and (3) might cause a dependency for the blockchain efficient functioning on an external service.  
+**Alternative 3.** Using a 3rd party as a market maker (what Jito does for Solana).   &nbsp;&nbsp; Solana is an interesting case study in which the built-in fee market was disfunctional (due to several reasons). As the economic value of the competition for order grew, the need for a better functioning market became urgent, hushering in an external (side-channel) ordering service -- Jito. However, such an external service has negative implications for most of the involved players. It (1) introduces a strong centralization force to the eco-system, (2) imposes a tax on the users that is going to the service provider (in addition to what goes to the validators), and (3) might cause a dependency for the blockchain efficient functioning on an external service.  
 
 ## Specification and Implementation Details
 
  > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
 ...
+
+- **Burn rate:** To make the transition seamless for users while maximizing the burn, we fix the burn on 100 Octas/GU. 
+- **Operators and Stakers:** Validators are now able to earn additional income via priority fees, which raises the question of how to distribute this income between the operators and the stakers? An on-chain mechanism enforcing an agreed upon sharing of the fees is worthwhile. Similarly to the mechanism for sharing the protocol rewards which is done via a tunable parameter specifying the operator commission from the protocol rewards, we add a parameter sepecifying the operator comission from the pririty fees. This enables for flexibility and allows the market to determine the correct sharing ratio.
+- **Execution pool:** In the execution pool a tx might be included in a block by validator A, but only executed later together with txns from a later block (eg. a block proposed by validator B). Nevertheless, the priority fees go to the including validator -- validator A.
+- **Preparations for Quorum Store's incentives:** Thinking forward, we prerare the ground for future mechanisms that might tackle the Quorum Store incentives issues. Specifically, we prepare for the possibility of multiple fee receipients from a single tx. This includes (1) maintaining a field per tx accounting for fee receipients, (2) accumulating the fees across an epoch and distributing them at the end (to avoid many small distribution and small value problems).
 
 ## Reference Implementation
 
