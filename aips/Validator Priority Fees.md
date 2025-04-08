@@ -81,6 +81,8 @@ Without priority fees, there is no incentive for the validators to order txns ac
  > What is the feature flag(s)? If there is no feature flag, how will this be enabled?
 ...
 
+@Guoteng
+
 ## Testing 
 
  > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out. Some examples include user stories, network health metrics, system metrics, E2E tests, unit tests, etc.) 
@@ -89,11 +91,17 @@ Without priority fees, there is no incentive for the validators to order txns ac
 
 ...
 
+
+
 ## Risks and Drawbacks
 
  > - Express here the potential risks of taking on this proposal. What are the hazards? What can go wrong?
  > - Can this proposal impact backward compatibility?
  > - What is the mitigation plan for each risk or drawback?
+
+- **Publicity.** Risk of drawing attention to the (currently) low participation incentives for validators.
+- **Single dimensionality.** The prescribed mechanism only relates to gas fees. In practice, our blocks have multidimensional limits, which include storage costs, IO and #txns. These are not accounted for in the priority mechanism. A future transition to a multidimensional gas market will require a corresponding adaptation to the priority mechanism.
+- **Gas estimation.** Our users are typically not sophisticated when it comes to gas consumptio. They often set the gas limit irrespectivaly of the tx actual requirements. This makes it hard to estimate the total fee going to the validator from the tx.  
 
 ## Security Considerations
 
@@ -109,6 +117,9 @@ Without priority fees, there is no incentive for the validators to order txns ac
  > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in one year? In five years?
 
 ...
+
+The addition of a priority fee to the protocol will result in a built-in market for txns ordering in a block. This would facilitate arbitrage competition in an open and transparent manner. It will significantly reduce the economic incentive for side markets for ordering that are typically less fair and are easier to use for frontrunning/sandwiching.
+
 
 ## Timeline
 
@@ -141,3 +152,6 @@ Without priority fees, there is no incentive for the validators to order txns ac
  > Q&A here, some of them can have answers some of those questions can be things we have not figured out, but we should
 
 ...
+
+**Q.** Why a priority fee per GU? Why not per tx?  
+**A.** Because a priority payment per tx introduces the following vulnerability. A single tx paying a slightly higher amount but requiring substential more effort (measured in GU). This also leads to an side market for grouping multiple txns into a single huge tx, which is inefficient. 
