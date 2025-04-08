@@ -22,24 +22,25 @@ requires (*optional): <AIP number(s)>
  > How does this document propose solving it.
  > What are the goals and what is in scope? Any metrics?
 
-There is currently no mechanism in the protocol that incentivizes validators to prioritize higher priced txns. Thus, a built-in priority market does not exist, leading to "black market" solutions. As we focus on trading use cases, the need for a priority market for fair competition rises (eg. facilitating open competitions for MEV opportunities in arbitrage). We propose a change to the current gas fee behavior.
-Currently, it is fully burned, instead, we suggest to implement a partial burn with the remaining going to the validator. Specifically, the first 100 Octas per gas-unit (GU) are burned and the additional Octas -- if exists -- go directly to the validator that proposed the block which includes the tx. 
+There is currently no mechanism in the Aptos protocol that incentivizes validators to prioritize higher-priced transactions. As a result, no built-in priority fee market exists, which encourages the emergence of informal or "black market" mechanisms for transaction ordering. This becomes increasingly problematic as trading use cases grow, particularly those involving arbitrage opportunities, where fair and open competition over ordering is essential.
+
+This proposal introduces a simple and incentive-compatible mechanism for priority fees. We modify the current gas fee behavior so that only the first 100 Octas per gas unit (GU) are burned. Any excess over that threshold is paid directly to the validator who proposes the block containing the transaction. This allows users to compete for inclusion and ordering by paying validators directly, in a transparent and protocol-native way. 
 
 
 ### Out of scope
 
  > What are we committing to not doing and why are they scoped out?
 
-Incentives relating to Quorum Store. Other fees (eg. storage). Incentives for voting on blocks. Execution/Commit-certificate incentives.
-
+This AIP does not address incentives for the Quorum Store, storage, block voting, or execution/commit certificates. These areas are important and may be addressed in future AIPs.
 
 ## High-level Overview
 
  > Define the straw man solution with enough details to make it clear why this is the preferred solution.
  > Please write a 2-3 paragraph high-level overview here and defer writing a more detailed description in [the specification section](#specification-and-implementation-details).
 
-...
-Exactly like today, a user specifies a price per GU for a tx (minimum of 100 Octas/GU). Unllike today, when the tx is executed only 100 Octas/GU is being burned with the remining going to the validator proposing the block. This, in effect, provides a mechanism for users to pay directly to validators for prioritizing the tx over competing txns.
+Users continue to specify a gas price per gas unit (GU) when submitting transactions, with a minimum of 100 Octas/GU. The key change is that only the first 100 Octas/GU are burned; any excess is paid directly to the validator that proposes the block containing the transaction.
+
+There is no change to the transaction submission APIs — users interact with the system exactly as they do today. This preserves compatibility while enabling a native mechanism for users to bid for execution priority by offering additional fees to validators. The result is a transparent, protocol-aligned incentive structure for transaction ordering.
 
 ## Impact
 
@@ -47,22 +48,22 @@ Exactly like today, a user specifies a price per GU for a tx (minimum of 100 Oct
  > What might occur if we do not accept this proposal?
  > List out other AIPs this AIP is dependent on
 
-...
-This is a cornerstone of a well functioning fee market. Traders, and any other user that competes for ordering priority, will benefit from a seamless method of payment to the validator deciding on the order. Validators will enjoy a built-in, incentive compatible, mechanism that benefits them for their role as the "de-facto" arbiters of the txns-order competition.
+This proposal establishes a foundational mechanism for a well-functioning transaction fee market. Traders and other users who compete for ordering priority gain a seamless, protocol-native way to pay validators through an auction embedded in the gas price. Validators, in turn, are rewarded transparently and incentive-compatibly for their role as arbiters of transaction ordering.
 
-Without priority fees, there is no incentive for the validators to order txns according to clear and transparent rules. Since we expect trading to ramp up, this incentive incompatibility is likely to grow enough such that external "black market" mechanism will emerge. These external markets benefit the  players who participate in them on the expense of the others in a manner that often cannibilize on the fairness of the system (fairness in the sense that the rules are the same for different players).
+Without a native priority fee mechanism, validators lack clear incentives to order transactions based on economically transparent rules. As trading activity increases, this misalignment is likely to encourage the rise of external, opaque ordering markets. These side channels benefit participants with privileged access and can erode fairness by creating unequal conditions for different users.
 
 ## Alternative Solutions
 
  > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
 
-...
+**Alternative 1:** No burn, all fees to validator.
+We considered redirecting the entire gas fee to the block proposer, but opted against it due to the economic value of burning. A fixed burn helps regulate inflation and aligns overall tokenomics with market demand.
 
-**Alternative 1.** No burn, all to validator.    &nbsp;&nbsp; We opted not to use this mechanism because of the extra economical value that burning offers. For example, it helps balance inflation automatically based on market demand.
+**Alternative 2:** 50/50 split (e.g., Solana’s model).
+A 50/50 burn-split is problematic because it still encourages side-channel payments. For example, a user could submit a transaction with the minimum fee (100 Octas/GU) and pay a validator off-chain to prioritize it, bypassing the auction. This weakens the incentive to participate in the transparent, protocol-defined fee market. A fixed burn threshold eliminates this vector and ensures users compete in-protocol.
 
-**Alternative 2.** 50-50. Similar to Solana, 50% is burned and 50% goes to the validator.    &nbsp;&nbsp; This mechanism is problematic since it still encourges "side-channel agreements". For example: user A, instead of bidding 500 Octas/GU, an bid 100 Octas/GU while also paying the validator -- in a side channel -- 300 Octas/GU. In this way both user A and the validator benefit from using the side channel instead of the explicit fee market. (This example also serves as a crisp demonstration for the benefit of a fixed burn rate.)
-
-**Alternative 3.** Using a 3rd party as a market maker (what Jito does for Solana).   &nbsp;&nbsp; Solana is an interesting case study in which the built-in fee market was disfunctional (due to several reasons). As the economic value of the competition for order grew, the need for a better functioning market became urgent, hushering in an external (side-channel) ordering service -- Jito. However, such an external service has negative implications for most of the involved players. It (1) introduces a strong centralization force to the eco-system, (2) imposes a tax on the users that is going to the service provider (in addition to what goes to the validators), and (3) might cause a dependency for the blockchain efficient functioning on an external service.  
+**Alternative 3:** External ordering services (e.g., Jito on Solana).
+Solana’s experience highlights the risks of a dysfunctional native fee market. As MEV and arbitrage value grew, an external solution (Jito) emerged to coordinate ordering. While effective, it comes with trade-offs: (1) centralization pressure, (2) an additional economic layer extracting fees from users, and (3) growing reliance on off-chain infrastructure for core network functionality. Our proposal avoids these issues by embedding the ordering market directly into the protocol.
 
 ## Specification and Implementation Details
 
