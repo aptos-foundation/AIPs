@@ -1,17 +1,15 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
-title: (Validator Priority Fees)
-author: <a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s). Details are below.>
-discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: <Draft | Last Call | Accepted | Final | Rejected>
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
-created: <mm/dd/yyyy>
+title: Validator Priority Fees
+author: guy-goren
+Status: Draft
+type: Standard (Core)
+created: <04/09/2025>
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-X - (AIP title)
+# AIP-X - Validator Priority Fees
   
 (Please give a temporary file name to your AIP when first drafting it, such as `aip-x.md`. The AIP manager will assign a number to it after reviewing.)
 
@@ -24,11 +22,14 @@ requires (*optional): <AIP number(s)>
  > How does this document propose solving it.
  > What are the goals and what is in scope? Any metrics?
 
-...
+There is currently no mechanism in the protocol that incentivizes validators to prioritize higher priced txns. Thus, a built-in priority market does not exist, leading to "black market" solutions. As we focus on trading use cases, the need for a priority market for fair competition rises (eg. facilitating open competitions for MEV opportunities in arbitrage). We propose a change to the current gas fee behavior.
+Currently, it is fully burned, instead, we suggest to implement a partial burn with the remaining going to the validator. Specifically, the first 100 octas per gas unit are burned but the additional (if exists) goes directly to the validator that proposed the block which includes the tx. 
+
 
 ### Out of scope
 
  > What are we committing to not doing and why are they scoped out?
+Batch incentives design. Storage fees. Voter fees. Execution/Commit-certificate incentives.
 
 ...
 
