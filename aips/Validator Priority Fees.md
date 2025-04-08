@@ -23,15 +23,15 @@ requires (*optional): <AIP number(s)>
  > What are the goals and what is in scope? Any metrics?
 
 There is currently no mechanism in the protocol that incentivizes validators to prioritize higher priced txns. Thus, a built-in priority market does not exist, leading to "black market" solutions. As we focus on trading use cases, the need for a priority market for fair competition rises (eg. facilitating open competitions for MEV opportunities in arbitrage). We propose a change to the current gas fee behavior.
-Currently, it is fully burned, instead, we suggest to implement a partial burn with the remaining going to the validator. Specifically, the first 100 octas per gas unit are burned but the additional (if exists) goes directly to the validator that proposed the block which includes the tx. 
+Currently, it is fully burned, instead, we suggest to implement a partial burn with the remaining going to the validator. Specifically, the first 100 Octas per gas-unit (GU) are burned and the additional Octas -- if exists -- go directly to the validator that proposed the block which includes the tx. 
 
 
 ### Out of scope
 
  > What are we committing to not doing and why are they scoped out?
-Batch incentives design. Storage fees. Voter fees. Execution/Commit-certificate incentives.
 
-...
+Incentives relating to Quorum Store. Other fees (eg. storage). Incentives for voting on blocks. Execution/Commit-certificate incentives.
+
 
 ## High-level Overview
 
@@ -39,6 +39,7 @@ Batch incentives design. Storage fees. Voter fees. Execution/Commit-certificate 
  > Please write a 2-3 paragraph high-level overview here and defer writing a more detailed description in [the specification section](#specification-and-implementation-details).
 
 ...
+Exactly like today, a user specifies a price per GU for a tx (minimum of 100 Octas/GU). Unllike today, when the tx is executed only 100 Octas/GU is being burned with the remining going to the validator proposing the block. This, in effect, provides a mechanism for users to pay directly to validators for prioritizing the tx over competing txns.
 
 ## Impact
 
@@ -46,6 +47,7 @@ Batch incentives design. Storage fees. Voter fees. Execution/Commit-certificate 
  > What might occur if we do not accept this proposal?
  > List out other AIPs this AIP is dependent on
 ...
+This is a cornerstone of a well functioning fee market. 
 
 ## Alternative Solutions
 
