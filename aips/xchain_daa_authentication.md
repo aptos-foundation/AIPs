@@ -107,6 +107,35 @@ Looking at what each field in the message is and what is it used for:
   used raw directly as a nonce. Alternatively, it could've been designed to have aptos_txn_digest inside the message, and nonce be
   a separate user-controlled nonce, but that seems unnecessary.
 
+Verification implementation is:
+```
+    public fun authenticate(account: signer, aa_auth_data: AbstractionAuthData): signer {
+        let entry_function_name = entry_function_name(transaction_context::entry_function_payload().destroy_some()
+        let (base58_public_key, domain) = deserialize_abstract_public_key(aa_auth_data.derivable_abstract_public_key());
+        let digest_utf8 = string_utils::to_string(aa_auth_data.digest()).bytes();
+
+        let public_key = new_validated_public_key_from_bytes(to_public_key_bytes(&base58_public_key));
+        assert!(public_key.is_some(), EINVALID_PUBLIC_KEY);
+        let abstract_signature = deserialize_abstract_signature(aa_auth_data.derivable_abstract_signature());
+        match (abstract_signature) {
+            SIWSAbstractSignature::MessageV1 { signature: signature_bytes } => {
+                let message = construct_message(&base58_public_key, &domain, entry_function_name, digest_utf8);
+
+                let signature = new_signature_from_bytes(signature_bytes);
+                assert!(
+                    ed25519::signature_verify_strict(
+                        &signature,
+                        &public_key_into_unvalidated(public_key.destroy_some()),
+                        message,
+                    ),
+                    EINVALID_SIGNATURE
+                );
+            },
+        };
+        account
+    }
+```
+
 ## Reference Implementation
 
 https://github.com/aptos-labs/aptos-core/pull/16236#discussion_r2029411835
