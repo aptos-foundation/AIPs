@@ -1,13 +1,13 @@
 ---
 aip: TBD
 title: x-chain DAA authentication using Sign-in-With-Solana
-author: igor-aptos, brian, 0xmaayan, lightmark
+author: igor-aptos, brian, 0xmaayan, lightmark, hardsetting
 Status: Draft
 type: Framework
 created: 04/08/2024
 ---
 
-# AIP-X - (AIP title)
+# AIP-X - x-chain DAA authentication using Sign-in-With-Solana
   
 ## Summary
 
@@ -32,13 +32,23 @@ Alternatively, wallets from other chains can implement integration with Aptos na
 
 ## Specification and Implementation Details
 
-User is required to sign following message using Sign-in-with-Solana:
+dApp is required to issue Sign-in-with-Solana request to the wallet with:
+```
+solanaWallet.signIn!{
+    address: solana_base58_public_key,
+    domain,
+    nonce: aptos_txn_digest,
+    statement: "To execute transaction <entry_function_name> on Aptos blockchain (<network_name>).",
+}
+```
+
+This will generate a signature of the following full message:
 
 ```
 <domain> wants you to sign in with your Solana account:
 <base58_public_key>
 
-To execute transaction <entry_function_name> on Aptos blockchain (<network_name>).
+To execute transaction <entry_function> on Aptos blockchain (<network_name>).
 
 Nonce: <aptos_txn_digest>
 ```
@@ -47,7 +57,7 @@ And submit transaction to Aptos with Authenticator:
 
 ```
 AccountAuthenticator::Abstraction {
-    function_info: FunctionInfo::from("0x1::daa_siws::authenticate"),
+    function_info: FunctionInfo::from("0x1::solana_derivable_account::authenticate"),
     auth_data: AbstractionAuthData::DerivableV1 {
         signing_message_digest: aptos_txn_digest,
         abstract_signature: bcs::to_bytes(SIWSAbstractSignature::RawSignature {
@@ -74,10 +84,10 @@ with types:
     }
 ```
 
-And above message will be authorized with `0x1::daa_siws::authenticate`, 
+And above message will be authorized with `0x1::solana_derivable_account::authenticate`, 
 for aptos account with address derevied from function_info and abstract_public_key with account_abstraction::derive_account_address.
 
-`0x1::daa_siws::authenticate` will generate the required text message format, 
+`0x1::solana_derivable_account::authenticate` will generate the required text message format, 
 and verify that `sign_in_with_solana_signature` from `abstract_signature` is 
 correct signature of that message, from a Ed25519 public_key from `abstract_public_key`.
 
@@ -86,13 +96,16 @@ Looking at what each field in the message is and what is it used for:
   This sandboxes each `domain` into separate Aptos account, providing better isolation and security.
 - `base58_public_key` is base58 representation of Ed25519 public key kept inside the Solana Wallet, 
   making sure that only owner can create such transactions
-- `entry_function_name` is a string representation of an Aptos entry function transaction will execute. 
-  This restricts usage to only entry function (i.e. preventing scripts, etc), but is made required as it is the main 
+- `entry_function` is a string representation of an Aptos entry function transaction will execute. It contains address, module name and function name,
+  for example `0x1::primary_fungible_store::transfer`.
+  This restricts usage to only entry functions (i.e. preventing scripts, etc), but is made required as it is the main 
   human-readable information about the transaction that user can read and understand.
 - `network_name` is string representation of chain_id on which transaction can be executed on, 
   with: "mainnet" for 1, "testnet" for 2, "local" for 4, and "custom network <chain_id>" for others
 - `aptos_txn_digest` is the digest of the Aptos transaction that you want to execute. All details about the transaction itself, 
-  and replay protection is inside of the transaction. 
+  and replay protection is inside of the transaction. Note: "aptos_txn_digest" is guaranteed to be unique on Aptos, so it can be
+  used raw directly as a nonce. Alternatively, it could've been designed to have aptos_txn_digest inside the message, and nonce be
+  a separate user-controlled nonce, but that seems unnecessary.
 
 ## Reference Implementation
 
@@ -108,8 +121,12 @@ Verified payload signed with Sign-in-with-Solana with Phantom is verified correc
   will allow diffent (potentially malicious) websites to execute transactions
 - If sign_message with above payload is used directly (which is generally discouraged from users to sign), `domain` will not be verified, 
   and it is on the user to understand risks 
-- Using this flow doesn't provide "siimulation" information to the user, so user has less information about what is being signed.
-  For that, direct wallet support would be needed
+- Using this flow doesn't provide "simulation" information to the user (dapp could run simulation, but cannot be forced to), so user has less information about what is being signed.
+  For that, direct wallet support would be needed.
+- Without simulation, entry function is places inside the message, to help user understand better what it is authorizing. This is a balance between given user too much information
+  (so it doesn't review it closely), like full json representation of the Aptos transaction, and having users sign without much information. It is a question if adding arguments to the entry    function within the message itself is useful, they can give more context, but can also be quite large and hardly understandable.
+- Note that actual address of the module where entry function is will be printed, while a lot UIs (explorer, wallet, etc) might maintain list of common ecosystem projects and addresses,
+  and give users more easily understandable name. In order to do so here, we would need to maintain such list onchain, so there are tradeoffs to be considered.
 
 ## Future Potential
 
