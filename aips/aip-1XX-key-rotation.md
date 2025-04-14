@@ -101,7 +101,7 @@ Neither such solutions provides a comprehensive, standardized and safe way to ro
 
 1. Add Move modules to represent Secp256r1, Keyless and Federated Keyless public keys and wrapper structs AnyPublicKey and MultiKey.
 
-2. Introduce the entry functions to support backup keys on keyless accounts.
+2. Introduce the entry functions to add a backup key on keyless accounts.
 `entry fun add_ed25519_backup_key_on_keyless_account(account: &signer, keyless_public_key: vector<u8>, backup_key: vector<u8>, backup_key_proof: vector<u8>)`
 It will
     - Verify the provided keyless_public_key is a well defined AnyPublicKey of Keyless variant.
@@ -112,6 +112,7 @@ It will
     - Call `rotate_authentication_key_call` with the auth key of the MultiKey in the previous step
     - Emit an event KeyRotationToPublicKey recording the change.
 
+3. Introduce the entry functions to rotate a backup key on keyless accounts.
 `entry fun replace_ed25519_backup_key_on_keyless_account(account: &signer, keyless_with_backup_multi_key: vector<u8>, new_backup_key: vector<u8>, new_backup_key_proof: vector<u8>)`
 It will
     - Deserialize keyless_with_backup_multi_key into a MultiKey struct.  
@@ -123,7 +124,7 @@ It will
     - Call `rotate_authentication_key_call` with the auth key of the MultiKey in the previous step
     - Emit an event KeyRotationToPublicKey recording the change.
 
-3. Add the entry function 
+4. Add the entry function
 `entry fun rotate_authentication_key_from_public_key(account: &signer, new_public_key_scheme: u8, new_public_key_bytes: vector<u8>)`
 It will
     - Deserialize the public key to ensure it is well formed based on the scheme.
@@ -131,6 +132,19 @@ It will
     - Rotate the authentication key by calling `rotate_authentication_key_call`
     - Emit an event KeyRotationToPublicKey recording the change.
 
+5. Add representation for  Secp256r1, Keyless and Federated Keyless signatures and wrapper structs AnySignature and MultiSignature.
+
+6. Add Move natives to verify signatures
+
+7. Add entry function `entry fun rotate_to_multi_key_with_proofs(account: &signer, required_sigs: u8, public_keys: vector<vector<u8>>, proofs: vector<vector<u8>>, proof_bitmap: vector<u8>)`
+It will
+    - Parse the public keys and signatures (proofs)
+    - Verify the proof_bitmap is well defined
+        - All bits are within the range of public_keys.length()
+        - The number of bits set is equal to proofs.length()
+    - Verify the signatures with the corresponding public key as defined by the proof_bitmap.
+    - Rotate the authentication key derived from public_keys
+    - Emit an event KeyRotationToPublicKey recording the change (mark verified public keys)
 
 ## Reference Implementation
 
