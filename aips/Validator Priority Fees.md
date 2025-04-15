@@ -1,7 +1,7 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Validator Priority Fees
-author: guy-goren
+author: guy-goren, Guoteng Rao
 Status: Draft
 type: Standard (Core)
 created: <04/09/2025>
@@ -17,11 +17,6 @@ requires (*optional): <AIP number(s)>
 
 ## Summary
 
- > Summarize in 3-5 sentences.
- > Define the problem we're solving.
- > How does this document propose solving it.
- > What are the goals and what is in scope? Any metrics?
-
 There is currently no mechanism in the Aptos protocol that incentivizes validators to prioritize higher-priced transactions. As a result, no built-in priority fee market exists, which encourages the emergence of informal or "black market" mechanisms for transaction ordering. This becomes increasingly problematic as trading use cases grow, particularly those involving arbitrage opportunities, where fair and open competition over ordering is essential.
 
 This proposal introduces a simple and incentive-compatible mechanism for priority fees. We modify the current gas fee behavior so that only the first 100 Octas per gas unit (GU) are burned. Any excess over that threshold is paid directly to the validator who proposes the block containing the transaction. This allows users to compete for inclusion and ordering by paying validators directly, in a transparent and protocol-native way. 
@@ -29,14 +24,9 @@ This proposal introduces a simple and incentive-compatible mechanism for priorit
 
 ### Out of scope
 
- > What are we committing to not doing and why are they scoped out?
-
 This AIP does not address incentives for the Quorum Store, storage, block voting, or execution/commit certificates. These areas are important and may be addressed in future AIPs.
 
 ## High-level Overview
-
- > Define the straw man solution with enough details to make it clear why this is the preferred solution.
- > Please write a 2-3 paragraph high-level overview here and defer writing a more detailed description in [the specification section](#specification-and-implementation-details).
 
 Users continue to specify a gas price per gas unit (GU) when submitting transactions, with a minimum of 100 Octas/GU. The key change is that only the first 100 Octas/GU are burned; any excess is paid directly to the validator that proposes the block containing the transaction.
 
@@ -44,17 +34,11 @@ There is no change to the transaction submission APIs — users interact with th
 
 ## Impact
 
- > Which audiences are impacted by this change? What type of action does the audience need to take?
- > What might occur if we do not accept this proposal?
- > List out other AIPs this AIP is dependent on
-
 This proposal establishes a foundational mechanism for a well-functioning transaction fee market. Traders and other users who compete for ordering priority gain a seamless, protocol-native way to pay validators through an auction embedded in the gas price. Validators, in turn, are rewarded transparently and incentive-compatibly for their role as arbiters of transaction ordering.
 
 Without a native priority fee mechanism, validators lack clear incentives to order transactions based on economically transparent rules. As trading activity increases, this misalignment is likely to encourage the rise of external, opaque ordering markets. These side channels benefit participants with privileged access and can erode fairness by creating unequal conditions for different users.
 
 ## Alternative Solutions
-
- > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
 
 **Alternative 1:** No burn, all fees to validator.
 We considered redirecting the entire gas fee to the block proposer, but opted against it due to the economic value of burning. A fixed burn helps regulate inflation and aligns overall tokenomics with market demand.
@@ -66,8 +50,6 @@ A 50/50 burn-split is problematic because it still encourages side-channel payme
 Solana’s experience highlights the risks of a dysfunctional native fee market. As MEV and arbitrage value grew, an external solution (Jito) emerged to coordinate ordering. While effective, it comes with trade-offs: (1) centralization pressure, (2) an additional economic layer extracting fees from users, and (3) growing reliance on off-chain infrastructure for core network functionality. Our proposal avoids these issues by embedding the ordering market directly into the protocol.
 
 ## Specification and Implementation Details
-
- > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
 
 **Burn rate:**
 Fixed at 100 Octas/GU. Any excess goes to the proposer. No changes to transaction format or APIs.  
@@ -91,7 +73,7 @@ _Rationale: aligns incentives with inclusion decisions, which reflect prioritiza
  > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
  > What is the feature flag(s)? If there is no feature flag, how will this be enabled?
 
-A reference implementation is in progress under the ownership of @Guoteng. Links to relevant code and modules will be added once available.
+A reference implementation is in progress under the ownership of **@Guoteng**. Links to relevant code and modules will be added once available.
 
 ## Testing 
 
@@ -99,7 +81,7 @@ A reference implementation is in progress under the ownership of @Guoteng. Links
  > - When can we expect the results?
  > - What are the test results and are they what we expected? If not, explain the gap.
 
-(Only a suggestion. Feel free to change @Guoteng.)
+(Only a suggestion. Feel free to change **@Guoteng**.)
 
 - Unit tests:
   - Validate correct fee splitting between burn and proposer under varying gas prices.
@@ -117,10 +99,6 @@ A reference implementation is in progress under the ownership of @Guoteng. Links
 
 ## Risks and Drawbacks
 
- > - Express here the potential risks of taking on this proposal. What are the hazards? What can go wrong?
- > - Can this proposal impact backward compatibility?
- > - What is the mitigation plan for each risk or drawback?
-
 **Publicity risk:**
 The proposed change may highlight the current lacuna in validator participation rewards.
 This could prompt scrutiny but also serves to justify broader improvements to validator incentives.
@@ -135,11 +113,6 @@ This introduces noise into the auction: it becomes harder to predict the real pr
 
 ## Security Considerations
 
- > - How can this AIP potentially impact the security of the network and its users? How is this impact mitigated?
- > - Are there specific parts of the code that could introduce a security issue if not implemented properly?
- > - Link tests (e.g. unit, end-to-end, property, fuzz) in the reference implementation that validate both expected and unexpected behavior of this proposal
- > - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
-
 Our proposal introduces minimal new attack surface, as it does not alter transaction execution logic or consensus behavior. However, a few considerations apply:
 
 **Fee accounting correctness:**
@@ -151,8 +124,6 @@ Users may submit high-fee transactions solely to crowd out competitors. While th
 Mitigation: the economic cost of griefing is internalized by the attacker; further mitigation may require separate work on spam filtering or reservation (eg. future) auction design.
 
 ## Future Potential
-
- > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in one year? In five years?
 
 The addition of a priority fee results in a built-in market for transaction ordering within a block. This enables arbitrage competition to occur in an open and transparent way.
 The presence of such a mechanism significantly reduces the economic incentive to create side markets for ordering — markets that tend to be opaque, less fair, and more easily exploited for strategies such as frontrunning and sandwiching.
@@ -184,9 +155,6 @@ The presence of such a mechanism significantly reduces the economic incentive to
 
 
 ## Open Questions (Optional)
-
- > Q&A here, some of them can have answers some of those questions can be things we have not figured out, but we should
-
 
 **Q. Why implement the priority fee per gas unit (GU) rather than per transaction?**  
 A fee per transaction introduces a misalignment between the fee paid and the actual cost imposed on the network. A user could submit a single transaction that pays slightly more in total than others but consumes significantly more gas, skewing validator incentives. This would favor bundling multiple actions into large, complex transactions, which is inefficient and may encourage new forms of off-chain coordination. A per-GU priority fee ensures better alignment between user bids and execution costs.
