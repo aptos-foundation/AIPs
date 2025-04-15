@@ -55,7 +55,9 @@ Will relaxing withdraw constraint affect DeFi protocols that takes dispatchable 
 
 ## Security Considerations
 
-See above.
+This change removes a framework-level guardrail that ensures at least the expected amount was withdrawn. With this check gone, it is now the responsibility of the asset implementer to enforce correct withdrawal semantics.
+
+While this increases flexibility (e.g., for yield-bearing tokens), it also opens room for misbehaving or malicious hooks that under-withdraw. Protocols integrating with dispatchable assets should not rely on framework-enforced behavior and are encouraged to apply their own validations — which is something they should already be doing as a best practice.
 
 ## Timeline
 
