@@ -59,7 +59,7 @@ Without a native priority fee mechanism, validators lack clear incentives to ord
 **Alternative 1:** No burn, all fees to validator.
 We considered redirecting the entire gas fee to the block proposer, but opted against it due to the economic value of burning. A fixed burn helps regulate inflation and aligns overall tokenomics with market demand.
 
-**Alternative 2:** 50/50 split (e.g., Solana’s model).
+**Alternative 2:** 50/50 split (e.g., Solana’s model until SIMD96).
 A 50/50 burn-split is problematic because it still encourages side-channel payments. For example, a user could submit a transaction with the minimum fee (100 Octas/GU) and pay a validator off-chain to prioritize it, bypassing the auction. This weakens the incentive to participate in the transparent, protocol-defined fee market. A fixed burn threshold eliminates this vector and ensures users compete in-protocol.
 
 **Alternative 3:** External ordering services (e.g., Jito on Solana).
