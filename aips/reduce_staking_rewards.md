@@ -89,7 +89,7 @@ often, staking yields are substantially lower than other DeFi options (e.g., [le
 
 ### how to further incentivize ecosystem?
 
-these existing staking rewards can be shifting to incentivize other key L1 metrics such as liquidity, gas subsidies, grants
+these previous rewards going to staker could be shifting to incentivize other key L1 metrics such as: liquidity, gas subsidies, grants
 
 additionally we should put thought into how to incentivize additional validator metrics such as community participation, geographic distribution and figuring out how to scale the satoshi coefficient into the thousands on high-performance hardware 
 
