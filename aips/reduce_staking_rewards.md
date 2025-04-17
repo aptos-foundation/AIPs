@@ -81,18 +81,18 @@ often, staking yields are substantially lower than other DeFi options (e.g., [le
 
 ## further discussion
 
-- how to further incentivize validators?
+### how to further incentivize validators?
 
 1. give the priority gas from the block to validators [burn or split base gas](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md)
 2. [foundation delegation program](https://solana.org/delegation-program)
 3. [bundles, block-building APIs](https://jito-foundation.gitbook.io/mev/solana-mev/jitos-mev-priorities)
 
-- how to further incentivize ecosystem?
+### how to further incentivize ecosystem?
 
 these existing staking rewards can be shifting to incentivize other key L1 metrics such as liquidity, gas subsidies, grants
 
 additionally we should put thought into how to incentivize additional validator metrics such as community participation, geographic distribution and figuring out how to scale the satoshi coefficient into the thousands on high-performance hardware 
 
-- next generation economics?
+### next generation economics?
 
 proof-of-liquidity, restaking
