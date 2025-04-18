@@ -21,18 +21,18 @@ these changes are intended as a first-step to redesigning aptos economics to mor
 
 the primary motivation for this change is the current staking rate is too high discouraging capital efficiency. this change will bring aptos base staking rewards in-line with other layer-1 blockchains [1].
 
-the aptos staking yield serves as a defi "risk-free" rate, proving a base-yield on ecosystem participants who lock capital on-chain. similar to the central-banks, aptos governance can modify the "risk-free" staking rate to motivate economic behavior
+the aptos staking rewards serves as a defi "risk-free" rate, proving a base-rewards on ecosystem participants who lock capital on-chain. similar to the central-banks, aptos governance can modify the "risk-free" staking rate to motivate economic behavior
 
-lower staking rewards encourage participants to seek out opportunities that have associated costs or risks but earn more yield than the "risk-free" staking rate:
+lower staking rewards encourage participants to seek out opportunities that have associated costs or risks but earn more rewards than the "risk-free" staking rate:
 
 - restaking
 - depin infra: RPC, bundles, indexing
 - MEV
-- alternative sources of defi yield
+- alternative sources of defi rewards
 
-however, rewards also serve as an incentive for long-term holding of APT; all things equal, less ecosystem yield means less incentive to hold APT
+however, rewards also serve as an incentive for long-term holding of APT; all things equal, less ecosystem rewards means less incentive to hold APT
 
-we expect this will be offset by (1) the reduction in inflation from this AIP and (2) new yield generating opportunities launching in the next 6 months
+we expect this will be offset by (1) the reduction in inflation from this AIP and (2) new rewards generating opportunities launching in the next 6 months
 
 
 ### out of scope
@@ -75,7 +75,7 @@ significant expansion rates are used to bootstrap a blockchain, with the predomi
 
 ![image.png](https://media.aptosfoundation.org/1709093797-aptos-tokenomics-overview-chart.jpg)
 
-often, staking rewards are substantially lower than other DeFi options (e.g., [lending](https://app.ariesmarkets.xyz/lending) or liquidity providing), so competing purely on yield is less likely. on the other hand, staking on aptos does not require taking on risk, with a relatively short lockup
+often, staking rewards are substantially lower than other DeFi options (e.g., [lending](https://app.ariesmarkets.xyz/lending) or liquidity providing), so competing purely on rewards is less likely. on the other hand, staking on aptos does not require taking on risk, with a relatively short lockup
 
 
 ## further discussion
