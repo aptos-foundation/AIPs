@@ -13,8 +13,7 @@ created: 4/17/2025
 
 adjustments to the APT monetary expansion rate:
 
-- **reduce the staking reward rate to 4% (~1bps / 7 epochs) over the next 6 months (2160 epochs)** (currently ~7%)
-- **after 6 months, decrease at the previous rate (currently at 1.5%).**
+- **reduce staking by 1% each month, over the next 3 months, resulting in a 3.79% staking rewards rate
 
 these changes are intended as a first-step to redesigning aptos economics to more effectively support the ecosystem. we propose implementing these changes over 6 months to allow time to assess and mitigate any impacts
 
