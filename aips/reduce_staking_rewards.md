@@ -1,5 +1,5 @@
 ---
-aip: (this is determined by the AIP Manager, leave it empty when drafting)
+aip: AIP-119
 title: reduce staking rewards
 author: moonshiesty - moonshiesty@protonmail.com
 Status: Draft
