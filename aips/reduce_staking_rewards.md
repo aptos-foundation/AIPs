@@ -43,7 +43,7 @@ we considered more complex solutions but i believe before deciding on any long-t
 
 ### impact on the validator set
 
-below we se an APT-price sensitivity table for validators with a (common) commission rate of 5%. Based on a survey, the high end of costs for validators is ~35,000$, which is the number we used for the table. (however the average cost of running a validator )
+below we se an APT-price sensitivity table for validators with a (common) commission rate of 5%. Based on a survey, the high end of costs for validators is ~35,000$, which is the number we used for the table. (however the cost to spec the hardware on latitude.sh are ~15k)
 
 | stake delegated | profits with 7%;
 APT=5$ | profits with 7%;
