@@ -1,7 +1,7 @@
 ---
 aip: (this is determined by the AIP Manager, leave it empty when drafting)
 title: Validator Priority Fees
-author: guy-goren, Guoteng Rao
+author: guy-goren, Guoteng Rao, Zekun Li
 Status: Draft
 type: Standard (Core)
 created: <04/09/2025>
