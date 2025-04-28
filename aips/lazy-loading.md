@@ -203,6 +203,8 @@ to provide access to script cache. This way loading script can be implemented in
 ### 2. New `..Loader` traits.
 
 Both Eager and Lazy Loading are hiddent behind a set of new traits added (listed below).
+All traits take a `GasMeter` implementation to charge gas, and a traversal context.
+Traversal context contains modules that were "visited" so far by a single transaction - i.e., a set of metered modules.
 
 ```rust
 pub trait StructDefinitionLoader {
@@ -218,7 +220,7 @@ pub trait StructDefinitionLoader {
 `StructDefinitionLoader` is used when converting runtime types to layouts, or building depth formulas for types.
 Eager Loader does not do any metering here.
 For Lazy Loading, it is important if this is called by the VM (the the gas is charged for the module loaded to access the definition) or in the native context.
-For more details about native context support see [Specification and Implementation Details, section 5](#5-native-context).
+For more details about native context support see [Specification and Implementation Details, section 5](#5-native-context-and-value-serialization).
 
 ```rust
 pub trait FunctionDefinitionLoader {
@@ -258,21 +260,12 @@ pub trait ModuleMetadataLoader {
 }
 ```
 `ModuleMetadataLoader` used to query metadata for the module, when resolving a Move resource in the Move VM or in native context.
-For Lazy Loading, it is important if this is called by the VM or in native context, and is described in a later section (see [Specification and Implementation Details, section 5](#5-native-context))
+For Lazy Loading, it is important if this is called by the VM or in native context, and is described in a later section (see [Specification and Implementation Details, section 5](#5-native-context-and-value-serialization))
 
 ```rust
 pub struct LegacyLoaderConfig {
     pub charge_for_dependencies: bool,
     pub charge_for_ty_tag_dependencies: bool,
-}
-
-impl LegacyLoaderConfig {
-    pub fn noop() -> Self {
-        Self {
-            charge_for_dependencies: false,
-            charge_for_ty_tag_dependencies: false,
-        }
-    }
 }
 
 pub trait InstantiatedFunctionLoader {
@@ -338,13 +331,41 @@ Finally, `ScriptLoader` adds ability to meter and load scripts.
 
 ### 3. Type Depth Checks
 
+TODO
+
 ### 4. Layout Construction
 
-### 5. Native Context
+TODO
 
-### 6. Value Serialization
+### 5. Native Context and Value Serialization
 
-### 7. Module Cyclic Dependencies Detection
+In native context, there is no access to `GasMeter` trait.
+At the same time, modules can be accessed in native context when:
+
+1. Runtime types are converted to type layouts (serialization, native `exists_at` implementation).
+2. Fucntion values captured argument layouts are constructed for string formatting natives.
+3. Move values containing unresolved function values are serialized (captured argument layouts are constructed).
+4. In native dynamic dispatch.
+
+While (4) is not a problem because native dynamic dispatch ensure modules are loaded and metered by returning `NativeResult::LoadModule { .. }`, (1-3) are challenging for Lazy Loading: native function can access a module that needs to be charged, but there is no gas meter to do that.
+
+In order to keep the implementation simple, we opt for a simple solution: native function type arguments are pre-processed to pre-charge for all modules (by simply constructing layouts for all).
+This way type to layout conversion in native context should always be metered.
+This solves (1).
+
+For (2) and (3), we claim that all modules accessed when captured argument layouts are constructed must have been metered by lazy Loader.
+Indeed, layouts are constructed for closures in resolved state, i.e., when they originate from `PackClosure` or `PackClosureGeneric` bytecode instruction.
+It means that the captured arguments are coming from the stack (constructed duriing execution) or from storage.
+If coming from the stack, modules where values are defined must have been metered and loaded.
+If coming from the storage, the value was deserialzied and its layotu was constructed (this means all modules have been already loaded).
+
+As a result, Lazy Loader does not meter gas in native context, instead only checking for the invariant that modules have been charged for (i.e., added to the transaction context).
+
+TODO
+
+### 6. Module Cyclic Dependencies Detection
+
+TODO
 
 
 ## Reference Implementation
