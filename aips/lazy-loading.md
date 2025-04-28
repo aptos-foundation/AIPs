@@ -1,6 +1,6 @@
 ---
 aip:
-title: Lazy Code Loading
+title: Lazy Loading
 author: George Mitenkov (george@aptoslabs.com)
 discussions-to:
 Status: Draft
@@ -11,73 +11,86 @@ updated: 04/28/2025
 requires: N/A
 ---
 
-# AIP-X - Lazy Code Loading
+# AIP-X - Lazy Loading
 
 ## Summary
 
-Currently, when calling a Move entry function or a script:
-  1. Gas is charged for all its transitive dependencies and friends, limiting the size of the transitive closure of dependencies-friends to some [limit](https://github.com/aptos-labs/aptos-core/blob/d641f201a1ec26c1f55078e4977931f83cfe3512/aptos-move/aptos-gas-schedule/src/gas_schedule/transaction.rs#L251).
-  2. Prior to execution, Move VM loads and verifies all its transitive dependencies.
-  3. Entry function or script are actually executed.
+When executing an entry function or a script payload, all their transitive Move module dependencies and friends are traversed first.
+During the traversal, the gas is charged for every module in the transitive closure, and the closure's size is checked to be within [limits](https://github.com/aptos-labs/aptos-core/blob/d641f201a1ec26c1f55078e4977931f83cfe3512/aptos-move/aptos-gas-schedule/src/gas_schedule/transaction.rs#L251).
+After the traversal, all modules in the closure are verified, and the payload is finally executed.
+Similarly, when publishing a Move package, the transitive closure of package's dependencies and friends is traversed first to meter gas and enforce that the closure's size is bounded.
+We call this approach to meter, load and publish Move modules *Eager Loading*.
 
-Similarly, metering of module dpendencies is performed when publishing a Move package.
+Eager Loading turns out to be overly restrictive for real use cases, and DeFi in patrticular.
+For example, DEX aggregators facilitate token swaps across multiple decentralized exchanges using a single contract.
+They usally include many DEXes as dependencies and struggle with Eager Loading:
 
-Exisitng metering approach turns out to be overly restrictive for real use cases, and Decentralized Finance (DeFi) in patrticular.
-For example, there are contracts that aggregate Decentralized Exchanges (DEXes) allowing the blockchain users to easily swap tokens.
-Because aggregators inlcude many DEXes as dependencies, it is possible that:
+  - An aggregator may not be able to add a DEX as a dependnecy due to limits on the size of the transitive closure.
+  - If one of the dependency DEXes upgrades to use more dependencies, the aggregator contract may become unusable (any call to its functions will hit the limit after the dependency upgrade).
 
-- It is no longer possible to add a DEX dependnecy due to limits on the size of the transitive closure of dependencies.
-- One of the used DEXes upgrades to use more dependencies, making the aggregator unusable (any call to aggregator functions hits the limit after the upgrade).
+As a result, Eager Loading makes writing Move contracts with many dependencies very challenging, if not impossible.
 
-Eager metering and loading of dependencies makes it challenging to write Move contracts like DEX aggregators.
-There are also other issues because transactions traverse transitive dependencies for all Move entry functions and scripts.
-Even if transaction is only using a few modules, the gas needs to be paid for all its transitive closure of dependencies.
-Additionally, unnecessary traversals for every transaction hurt performance. 
+There are also other problems due to Eager Loading.
+Even if transaction is only using a few modules at runtime, all its transitive dependencies will be traversed for gas metering purposes.
+This increases the gas costs for transactions, and also hurts performance (transaction accesses dependencies not used for execution). 
 
-This AIP proposes *Lazy Loading* - a different approach to loading and publishing of Move modules to address the aforementioned challenges.
-In summary, when calling a Move entry function or a script, modules are metered and loaded **only when used**.
-When publishing a Move package, only modules in a package and its immediate dependencies and friends get charged.
+This AIP proposes *Lazy Loading* - a different approach to metering, loading and publishing of Move modules.
+When calling an entry function or a script, *modules are metered and loaded only when they are used*.
+When publishing a Move package, only modules in a package and their immediate dependencies and friends are metered and loaded.
 
-With lazy loading:
+Lazy Loading solves the aforementioned challenges associated with Eager Loading:
 
-1. Move contracts should no longer face any challenges due to limits on the size of the transitive closure of dependencies (e.g., DEX aggregators).
-2. Transaction gas fees are decreased.
-3. Transactions are executed faster: TODO: copy numbers from below.
+  1. Move contracts no longer hit limits on the size of the transitive closure of dependencies (e.g., DEX aggregators).
+  2. Transaction gas fees are decreased.
+  3. Transactions are executed faster: TODO: copy numbers from below.
 
 ### Out of scope
 
-- Ability for developers to specify if a Move function call requires lazy or eager linking for code loading.
-- Ability for developers to specify lazy or eager linking checks when publishing packages.
+Lazy Loading is implemented as a part of Move VM infrastructure, and is not directly accessible by developers.
+As a result, the following is left out of scope:
+
+- Ability for developers to specify if a Move function call should use lazy or eager loading.
+- Ability for developers to specify lazy or eager loading when publishing packages.
 
 
 ## High-level Overview
 
-Move VM APIs are changed to couple gas charging and module loading, in order to prevent unmetered accesses.
+A new set of APIs is introduced to couple gas charging and module loading, in order to prevent any unmetered accesses.
 ```rust
+/// Dummy trait that can be implemented with custom module metering and loading logic.
 pub trait ExampleLoader {
-    fn load_struct_definition(
+    fn load_something_that_loads_modules(
         &self,
-        // Used to dispatch a call to the metering logic for modules.
+        // Can be used to meter gas for modules.
         gas_meter: &mut impl GasMeter,
-        // Tracks all modules that were metered in this transaction so far.
+        // Can be used to track modules that were already metered.
         traversal_context: &mut TraversalContext,
         // All other arguments to load modules: e.g., module identifier, function name, etc.
         ..
-    ) -> Result<..>;
+    ) -> Result<Something, SomeError>;
 }
 ```
-The APIs are implemented as traits, so the implementation can be configured to use different metering and loading and schemes.
+The APIs are simply traits, and so the implementation can be configured to use different metering and loading schemes (unmetered, eager, lazy, etc.).
+Move VM APIs have been adapted to work with the new traits (with an option to maintain backwards-compatibility with Eager Loading).
 
-The table below summarizes how modules are charged in Aptos VM and Move VM.
+The table below summarizes when modules are metered and loaded with Eager Loading and Lazy Loading.
 
-| Module Loading | Eager | Lazy |
+|| Eager Loading | Lazy Loading|
 |:--|:--|:--|
-| Entry function call | | | 
-| Script call | | |
-| Transaction argument validation | | |
-| View function | | |
-| Module publishing | | |
-| Module publishing | | |
+| Aptos VM calls an entry function or a script. | Traverse and charge gas for all transitive module dependencies and friends. Charge gas for all modules that *may* be loaded when converting transaction type arguments to runtime types. | Charge gas for the module of the entry function. Charge gas for all modules used when converting transaction type arguments to runtime types. Charge gas for modules used in transaction argument construction. |
+| Aptos VM calls a view function. | No metering. | Charge gas for the module of the view function. Charge gas for all modules used when converting transaction type arguments to runtime types. Charge gas for modules used in transaction argument construction. |
+| Aptos VM processes package publish. | Charge gas for all modules in a bundle, and their old versions (if exist). Traverse and charge gas for all remaining transitive module dependencies and friends of a package. | Charge gas for all modules in a bundle, and their old versions (if exist). Charge gas for all immediate module dependencies and friends of a package. Charge gas for all modules loaded during resource group scope verification. |
+| Move VM calls a function. | No metering. | Charge gas for module of the target function. |
+| Move VM resolves a closure (function value). | Traverse and charge gas for all transitive module dependencies and friends. Charge gas for all modules that *may* be loaded when converting transaction type arguments to runtime types. | Charge gas for module of the target function. |
+| Move VM checks type depth (pack/unpack instructions). | No metering. | Charge gas for every module used during depth formula construction. |
+| Move VM constructs type layout | No metering. | Charge gas for every module used during layout construction. |
+| Move VM fetches module metadata to load a resource. | No metering. | Charge gas for accessed module. |
+| Move VM serializes a function value. | No metering. | No metering. |
+| Move VM calls a native function | No metering. | Charge gas for module of the target function. Charge gas for all modules used by the function type arguments (if any). |
+| Move VM construct type layout in native context. | No metering. | No metering. |
+| Move VM fetches module metadata to load a resource in native context. | No metering. | No metering. |
+| Move VM loads a module in native dynamic dispatch [AIP-73](aip-73.md). | Traverse and charge gas for all transitive module dependencies and friends. | Charge gas for the module. |
+| Move VM loads a fucntion in native dynamic dispatch [AIP-73](aip-73.md). | No metering. | No metering. |
 
 ## Impact
 
