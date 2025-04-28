@@ -361,8 +361,6 @@ If coming from the storage, the value was deserialzied and its layotu was constr
 
 As a result, Lazy Loader does not meter gas in native context, instead only checking for the invariant that modules have been charged for (i.e., added to the transaction context).
 
-TODO
-
 ### 6. Module Cyclic Dependencies Detection
 
 TODO
