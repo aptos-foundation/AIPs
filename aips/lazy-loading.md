@@ -92,6 +92,10 @@ The table below summarizes when modules are metered and loaded with Eager Loadin
 | Move VM loads a module in native dynamic dispatch [AIP-73](aip-73.md). | Traverse and charge gas for all transitive module dependencies and friends. | Charge gas for the module. |
 | Move VM loads a fucntion in native dynamic dispatch [AIP-73](aip-73.md). | No metering. | No metering. |
 
+Importantly, with Lazy Loading certain checks can no longer be enforced statically during module publish.
+For example, the check to detect cyclic module dependencies is moved to runtime.
+See [Specification and Implementation Details](#specification-and-implementation-details)) for more discussions on such checks. 
+
 ## Impact
 
 Developers do not need to change their workflow when writing Move contracts.
@@ -162,7 +166,185 @@ However, conceptually this is still lazy loading but:
 
 ## Specification and Implementation Details
 
-### 1. TODO
+### 1. Changes to `ModuleStorage` and `CodeStorage`.
+
+Exisitng `ModuleStorage` interface is refactored to highlight that module accesses are unmetered. For example:
+```rust
+/// Returns the deserialized module, or [None] otherwise. An error is returned if:
+///   1. the deserialization fails, or
+///   2. there is an error from the underlying storage.
+///
+/// Note: this API is not metered!
+fn unmetered_get_deserialized_module(
+    &self,
+    address: &AccountAddress,
+    module_name: &IdentStr,
+) -> VMResult<Option<Arc<CompiledModule>>>;
+```
+The APIs of `ModuleStorage` are limited to only module accesses, and should not be used directly unless it is safe to do so.
+The reference implementation uses comments like `// MODULE METERING SAFETY: proof` to specify why the module access is unmetered, and to 
+
+The `CodeStorage` trait is changed to
+```rust
+pub trait CodeStorage:
+    ModuleStorage + ScriptCache<Key = [u8; 32], Deserialized = CompiledScript, Verified = Script>
+{
+}
+
+impl<
+        T: ModuleStorage
+            + ScriptCache<Key = [u8; 32], Deserialized = CompiledScript, Verified = Script>,
+    > CodeStorage for T
+{
+}
+```
+to provide access to script cache. This way loading script can be implemented in a custom way for Eager or Lazy Loading.
+
+### 2. New `..Loader` traits.
+
+Both Eager and Lazy Loading are hiddent behind a set of new traits added (listed below).
+
+```rust
+pub trait StructDefinitionLoader {
+    fn load_struct_definition(
+        &self,
+        gas_meter: &mut impl GasMeter,
+        // Note: same as TraversalContext but a trait (to be abple to pass dummy context where needed).
+        traversal_context: &mut dyn ModuleTraversalContext,
+        idx: &StructNameIndex,
+    ) -> PartialVMResult<Arc<StructType>>;
+}
+```
+`StructDefinitionLoader` is used when converting runtime types to layouts, or building depth formulas for types.
+Eager Loader does not do any metering here.
+For Lazy Loading, it is important if this is called by the VM (the the gas is charged for the module loaded to access the definition) or in the native context.
+For more details about native context support see [Specification and Implementation Details, section 5](#5-native-context).
+
+```rust
+pub trait FunctionDefinitionLoader {
+    fn load_function_definition(
+        &self,
+        gas_meter: &mut impl GasMeter,
+        traversal_context: &mut dyn ModuleTraversalContext,
+        module_id: &ModuleId,
+        function_name: &IdentStr,
+    ) -> VMResult<(Arc<Module>, Arc<Function>)>;
+}
+```
+`FunctionDefinitionLoader` is used when resolving a function (Move VM call, closure resolution, or when dispatching from the native context).
+Eager Loader does not do any metering here, while Lazy Loader ensures the access to function definition that loads a new module is metered.
+
+```rust
+pub trait NativeModuleLoader {
+    fn charge_native_result_load_module(
+        &self,
+        gas_meter: &mut impl GasMeter,
+        traversal_context: &mut TraversalContext,
+        module_id: &ModuleId,
+    ) -> PartialVMResult<()>;
+}
+```
+`NativeModuleLoader` is here to support `NativeResult::LoadModule { .. }`.
+Native call returns this result when there is a dynamic dispatch using (AIP-73)[aip-73.md].
+
+```rust
+pub trait ModuleMetadataLoader {
+    fn load_module_metadata(
+        &self,
+        gas_meter: &mut impl GasMeter,
+        traversal_context: &mut dyn ModuleTraversalContext,
+        module_id: &ModuleId,
+    ) -> PartialVMResult<Vec<Metadata>>;
+}
+```
+`ModuleMetadataLoader` used to query metadata for the module, when resolving a Move resource in the Move VM or in native context.
+For Lazy Loading, it is important if this is called by the VM or in native context, and is described in a later section (see [Specification and Implementation Details, section 5](#5-native-context))
+
+```rust
+pub struct LegacyLoaderConfig {
+    pub charge_for_dependencies: bool,
+    pub charge_for_ty_tag_dependencies: bool,
+}
+
+impl LegacyLoaderConfig {
+    pub fn noop() -> Self {
+        Self {
+            charge_for_dependencies: false,
+            charge_for_ty_tag_dependencies: false,
+        }
+    }
+}
+
+pub trait InstantiatedFunctionLoader {
+    fn load_instantiated_function(
+        &self,
+        config: &LegacyLoaderConfig,
+        gas_meter: &mut impl GasMeter,
+        traversal_context: &mut TraversalContext,
+        module_id: &ModuleId,
+        function_name: &IdentStr,
+        ty_args: &[TypeTag],
+    ) -> VMResult<LoadedFunction>;
+}
+```
+`InstantiatedFunctionLoader` is used to load entrypoints: entry or view functions, closures, and even private functions if visibility is bypassed.
+Additional `LegacyLoaderConfig` passed as an argument allows to cleanly implement Eager Loading as well.
+
+```rust
+pub trait ClosureLoader: InstantiatedFunctionLoader {
+    fn load_closure(
+        &self,
+        gas_meter: &mut impl GasMeter,
+        traversal_context: &mut TraversalContext,
+        module_id: &ModuleId,
+        function_name: &IdentStr,
+        ty_args: &[TypeTag],
+    ) -> PartialVMResult<Rc<LoadedFunction>>;
+}
+```
+
+`ClosureLoader` is reponsible to resolve a closure, loading the function and converting its type arguments to runtime types.
+Implementation simply uses `InstantiatedFunctionLoader` to meter and load modules correctly.
+
+```rust
+pub trait Loader:
+    ClosureLoader
+    + FunctionDefinitionLoader
+    + ModuleMetadataLoader
+    + NativeModuleLoader
+    + StructDefinitionLoader
+    + InstantiatedFunctionLoader
+{
+    fn unmetered_module_storage(&self) -> &dyn ModuleStorage;
+}
+```
+`Loader` is the main trait that encapsulates all metering and loading of modules.
+Move VM expects a `Loader` to be provided (instead of `ModuleStorage`), which can either be unmetered, eager, or lazy.
+Note that the cast to `&dyn ModuleStorage` is needed for native support.
+
+```rust
+pub trait ScriptLoader {
+    fn load_script(
+        &self,
+        config: &LegacyLoaderConfig,
+        gas_meter: &mut impl GasMeter,
+        traversal_context: &mut TraversalContext,
+        serialized_script: &[u8],
+        ty_args: &[TypeTag],
+    ) -> VMResult<LoadedFunction>;
+}
+```
+Finally, `ScriptLoader` adds ability to meter and load scripts.
+
+### 3. Type Depth Checks
+
+### 4. Layout Construction
+
+### 5. Native Context
+
+### 6. Value Serialization
+
+### 7. Module Cyclic Dependencies Detection
 
 
 ## Reference Implementation
