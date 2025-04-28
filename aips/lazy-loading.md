@@ -144,7 +144,7 @@ With lazy loading, module loading in view functions is charged because limits du
 
 TODO: copy from docs
 
-#### Historical Replay Benchmarks:
+#### Historical Replay Benchmarks
 
 TODO: copy from docs
 
