@@ -385,7 +385,12 @@ As a result, Lazy Loader does not meter gas in native context, instead only chec
 
 ### 6. Module Cyclic Dependencies Detection
 
-TODO
+With lazy loading, cyclic modules can end up on chain.
+However, they are still not allowed to be used in any way that actually forms a cycle.
+
+1. For type depth checks, the implementation enforces that struct definitions are not recursive.
+2. For function calls, re-entrancy checker is modified to enter module lock on cross-contract regular call for re-entrancy (i.e., cyclic modules) detection.
+3. For layouts (TODO, consider if this is important for layouts)
 
 
 ## Reference Implementation
