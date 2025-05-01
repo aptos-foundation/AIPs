@@ -371,6 +371,18 @@ If coming from the storage, the value was deserialzied and its layotu was constr
 
 As a result, Lazy Loader does not meter gas in native context, instead only checking for the invariant that modules have been charged for (i.e., added to the transaction context).
 
+#### Implementation
+
+**Option 1:** 
+  - For native context, pre-charge gas for type arguments (e.g., by constructing layouts)
+  - Layout constructions in natives assert that modules were visited.
+  - Same for function values.
+
+**Option 2:** 
+  - For native context, it can only access modules from the "allowed list" that acts as a cache that maps a type argument to its layout.
+    TODO: Consider storing decoration data instead of annotated layouts as well.
+  - For function values: can use type layouts from cache if avilable, but sometimes it is not: (e.g. in Block-STM). 
+
 ### 6. Module Cyclic Dependencies Detection
 
 TODO
