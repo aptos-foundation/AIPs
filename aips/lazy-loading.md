@@ -79,7 +79,7 @@ The table below summarizes when modules are metered and loaded with Eager Loadin
 |:--|:--|:--|
 | Aptos VM calls an entry function or a script. | Traverse and charge gas for all transitive module dependencies and friends. Charge gas for all modules that *may* be loaded when converting transaction type arguments to runtime types. | Charge gas for the module of the entry function. Charge gas for all modules used when converting transaction type arguments to runtime types. Charge gas for modules used in transaction argument construction. |
 | Aptos VM calls a view function. | No metering. | Charge gas for the module of the view function. Charge gas for all modules used when converting transaction type arguments to runtime types. Charge gas for modules used in transaction argument construction. |
-| Aptos VM processes package publish. | Charge gas for all modules in a bundle, and their old versions (if exist). Traverse and charge gas for all remaining transitive module dependencies and friends of a package. | Charge gas for all modules in a bundle, and their old versions (if exist). Charge gas for all immediate module dependencies and friends of a package. Charge gas for all modules loaded during resource group scope verification. |
+| Aptos VM processes package publish. | Charge gas for all modules in a bundle, and their old versions (if exist). Traverse and charge gas for all remaining transitive module dependencies and friends of a package. | Charge gas for all modules in a bundle, and their old versions (if exist). Charge gas for all immediate module dependencies and friends of a package. Check friends are in the package. Charge gas for all modules loaded during resource group scope verification. |
 | Move VM calls a function. | No metering. | Charge gas for module of the target function. |
 | Move VM resolves a closure (function value). | Traverse and charge gas for all transitive module dependencies and friends. Charge gas for all modules that *may* be loaded when converting transaction type arguments to runtime types. | Charge gas for module of the target function. |
 | Move VM checks type depth (pack/unpack instructions). | No metering. | Charge gas for every module used during depth formula construction. |
@@ -331,11 +331,21 @@ Finally, `ScriptLoader` adds ability to meter and load scripts.
 
 ### 3. Type Depth Checks
 
-TODO
+Type depth checks are done by Move VM interpreter when packing structs, enums or vectors.
+During the checks, struct definitions are loaded.
+With lazy loading, the algorithm charges gas for loading the module where a strcut definition is defined (if it is a first access).
+
+The algorithm has been adjusted to detect cyclic dependencies between structs, e.g.,
+```
+module 0x1::B { struct B { a: A } }
+module 0x1::B { struct A { b: B } }
+```
+This is needed because at publishing time cyclic checks can no longer be perfomed, as Aptos VM checks only immediate dependencies of a package being published.
 
 ### 4. Layout Construction
 
-TODO
+Similarly to type depth checks, layout construction is now also charged for any module loads that happen at runtime.
+In non-native context, this is as simple as type depth checks.
 
 ### 5. Native Context and Value Serialization
 
@@ -378,12 +388,13 @@ Reference implementation:
 4. [#16462](https://github.com/aptos-labs/aptos-core/pull/16462)
 5. [#16464](https://github.com/aptos-labs/aptos-core/pull/16464)
 6. [#16479](https://github.com/aptos-labs/aptos-core/pull/16479)
+7. [#16513](https://github.com/aptos-labs/aptos-core/pull/16513)
 
 
 ## Testing 
 
 - [x] Exiting tests to see that `EagerLoader` is a compatible implementation.
-- [ ] Replay run to check that `EagerLoader` is a compatible implementation.
+- [x] Replay run to check that `EagerLoader` is a compatible implementation.
 - [x] Unit tests and mocks for subcomponents (depth checks, layout construction).
 - [ ] Unit tests for gas metering with `LazyLoader` enabled.
 - [ ] Tests to catch metering invariant violations, module cyclic dependencies.
