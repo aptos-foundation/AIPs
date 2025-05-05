@@ -123,7 +123,7 @@ As the key in `nonces_ordered_by_exp_time` starts with expiration time, it's eas
 
 To check if a given `(address, nonce)` pair exists in the nonce history, we use `nonce_to_exp_time_map`. 
 
-**Garbage collection:** We use the above 2 map approach to facilitate effective garbage collection. When a new transaction is supposed to be validated, we call `check_and_insert_nonce` method to make sure the transaction is not replay of a previous transaction. If the (address, nonce) pair is valid, then we first try to garbage collect from the bucket before inserting the given (address, nonce, exp time) tuple inside the nonce history. To make sure we have a bounded behavior, we restrict to garbage collecting at most 5 entries.
+**Garbage collection:** We use the above 2 map approach to facilitate effective garbage collection. When a new transaction is supposed to be validated, we call `check_and_insert_nonce` method to make sure the transaction is not replay of a previous transaction. If the (address, nonce) pair is valid, then we first try to garbage collect from the bucket before inserting the given (address, nonce, exp time) tuple inside the nonce history. To make sure we have a bounded behavior, we restrict to garbage collecting at most 5 entries. To make sure we avoid any edge cases, we retain the (address, nonce) pair in the nonce history upto around 1 minute after the transaction expires. So the same (address, nonce) pair cannot be reused for slight more than 1 minute after the previous transaction with the same (address, nonce) pair expires.
 
 **Prefilling nonce history:** Table in Aptos is designed in such a way that each table entry (Bucket in our case) is stored in a different storage slot. In Aptos, creating a new storage slot is way more expensive than updating the data in existing storage slot. To minimize the gas cost for the user, we prefill the nonce history with 50k buckets, so the user only needs to pay bucket update cost, but not the bucket creation cost. The module contains `add_nonce_bucket` method to facilitate this.
 
@@ -136,7 +136,7 @@ To check if a given `(address, nonce)` pair exists in the nonce history, we use 
 - If a stateless account sends a sequence number based transaction with sequence number = 0, then the prologue will create an `0x1::Account` resource with sequence number 0, and the account will no longer be stateless.
 - If a stateless account sends a sequence number based transaction with sequence number > 0, then the prologue will discard the transaction.
 
-**How to choose the nonce?:** We recommend the user to pick a random nonce in `u64` range. Suppose, if the user sends a transaction with (address = a, nonce = n, expiration time = t). Before time t passes, if the user sends another transaction with same address, nonce pair, then the transaction will be discarded. However, after time t, the nonce entry will be garbage collected from the nonce history. And the user is allowed to reuse the same address, nonce pair for another transaction.
+**How to choose the nonce?:** For the sake of simplicity, we recommend the user to pick a random nonce in `u64` range. However, we also note that once an (address, nonce) pair is garbage collected from nonce history, the same (address, nonce) pair can be reused in another transaction safely. Suppose, if the user commits a transaction with (address = a, nonce = n, expiration time = t). We use an invariant that the user cannot send another transaction with (address = a, nonce = n, expiration time = t') if `t' <= t + 130 seconds`.
 
 This AIP introduces a new onchain feature flag called `ORDERLESS_TRANSACTIONS`. If this flag is disabled, all the transactions crafted in the new format will be discarded by the VM.
 
@@ -167,7 +167,7 @@ enum ReplayProtector {
 }
 ```
 
-Here, we use the term `ReplayProtector` that could be either a nonce or sequence number. A `(address, sequence number)` can uniquely identify a committed transaction. However, it’s important to note that `(address, nonce)` doesn’t uniquely identify a committed transaction, as the same nonce could be reused after 60 seconds (when the previous transaction with same nonce expires).
+Here, we use the term `ReplayProtector` that could be either a nonce or sequence number. A `(address, sequence number)` can uniquely identify a committed transaction. However, it’s important to note that `(address, nonce)` doesn’t uniquely identify a committed transaction, as the same nonce could be reused after a few minutes (when the previous transaction with same nonce expires and is garbage collected from nonce history).
 
 **Max expiration time**: Orderless transactions can have a max expiration time of at most 60 seconds into the future. Orderless transactions with longer expiration time are discarded by prologue. There are no such limits on expiration time for sequence number based transactions.
 
