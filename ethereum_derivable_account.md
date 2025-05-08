@@ -38,7 +38,7 @@ dApp is required to issue Sign-in-with-Ethereum request to the wallet with:
 ethereumWallet.signMessage{
     address: ethereum_address,
     domain,
-    uri: domain,
+    uri: <scheme>://<domain>,
     chainId: aptos_chain_id,
     nonce: aptos_txn_digest,
     statement: "To execute transaction <entry_function_name> on Aptos blockchain (<network_name>).",
@@ -53,9 +53,9 @@ This will generate a signature of the following full message:
 <domain> wants you to sign in with your Ethereum account:
 <ethereum_address>
 
-To execute transaction <entry_function> on Aptos blockchain (<network_name>).
+Please confirm you explicitly initiated this request from <domain>. You are approving to execute transaction <entry_function> on Aptos blockchain (<network_name>).
 
-URI: <domain>
+URI: <scheme>://<domain>
 Version: 1
 Chain ID: <aptos_chain_id>
 Nonce: <aptos_txn_digest>
@@ -70,6 +70,7 @@ AccountAuthenticator::Abstraction {
     auth_data: AbstractionAuthData::DerivableV1 {
         signing_message_digest: aptos_txn_digest,
         abstract_signature: bcs::to_bytes(SIWEAbstractSignature::EIP1193DerivedSignature {
+            scheme: url_scheme,
             issued_at: date_iso_string,
             signature: sign_in_with_ethereum_signature,
         }),
@@ -86,6 +87,7 @@ with types:
 ```
 enum SIWEAbstractSignature has drop {
   EIP1193DerivedSignature {
+      scheme: String,
       issued_at: String,
       signature: vector<u8>,
   },
@@ -133,7 +135,8 @@ Verification implementation is:
         let digest_utf8 = string_utils::to_string(aa_auth_data.digest()).bytes();
         let abstract_signature = deserialize_abstract_signature(aa_auth_data.derivable_abstract_signature());
         let issued_at = abstract_signature.issued_at.bytes();
-        let message = construct_message(&abstract_public_key.ethereum_address, &abstract_public_key.domain, entry_function_name, digest_utf8, issued_at);
+        let scheme = abstract_signature.scheme.bytes();
+        let message = construct_message(&abstract_public_key.ethereum_address, &abstract_public_key.domain, entry_function_name, digest_utf8, issued_at, scheme);
         let public_key_bytes = recover_public_key(&abstract_signature.signature, &message);
 
         // 1. Skip the 0x04 prefix (take the bytes after the first byte)
