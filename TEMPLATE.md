@@ -276,7 +276,7 @@ struct CollectionMetadata has drop, store {
 
 This is built around the following flow:
 
-1. The Marketplace Smart Contract is deployed immutably using a Resource Account. The Resource Account's operational **`SignerCapability` is retained** and securely managed by the marketplace contract (or a trusted component within the marketplace's control) for authorizing specific autonomous operations.
+1. The Marketplace Smart Contract is deployed immutably using a Resource Account. The Resource Account's operational **`SignerCapability` is not retained**.
 2. Listing Creation (`place_listing`):
     1. Seller calls `place_listing` (signed by Seller)
     2. A new Listing object is created
@@ -311,7 +311,6 @@ https://github.com/aptos-labs/on-chain-nft-marketplace
 
 Security Risks:
 
-- If the retained RA `SignerCapability` is compromised, the attacker can gain the ability to initiate and sign transactions, potentially drain marketplace-owned resources (like collected fees)
 - Given that contract controls the escrow of valuable NFTs and handles payment flows, vulnerabilities in logic could lead to:
     - Loss of NFTs from the escrow
     - Incorrect distribution of funds (price, royalties, fees)
