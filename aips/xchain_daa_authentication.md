@@ -1,13 +1,14 @@
 ---
-aip: TBD
+aip: AIP-121
 title: x-chain DAA authentication using Sign-in-With-Solana
 author: igor-aptos, brian, 0xmaayan, lightmark, hardsetting
 Status: Draft
 type: Framework
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/600
 created: 04/08/2024
 ---
 
-# AIP-X - x-chain DAA authentication using Sign-in-With-Solana
+# AIP-121 - x-chain DAA authentication using Sign-in-With-Solana
   
 ## Summary
 
@@ -38,7 +39,7 @@ solanaWallet.signIn!{
     address: solana_base58_public_key,
     domain,
     nonce: aptos_txn_digest,
-    statement: "To execute transaction <entry_function_name> on Aptos blockchain (<network_name>).",
+    statement: "Please confirm you explicitly initiated this request from <domain>. You are approving to execute transaction <entry_function_name> on Aptos blockchain (<network_name>).",
 }
 ```
 
@@ -48,7 +49,7 @@ This will generate a signature of the following full message:
 <domain> wants you to sign in with your Solana account:
 <base58_public_key>
 
-To execute transaction <entry_function> on Aptos blockchain (<network_name>).
+Please confirm you explicitly initiated this request from <domain>. You are approving to execute transaction <entry_function_name> on Aptos blockchain (<network_name>).
 
 Nonce: <aptos_txn_digest>
 ```
@@ -149,7 +150,8 @@ Verified payload signed with Sign-in-with-Solana with Phantom is verified correc
 - If Sign-in-with-Solana is used in the Wallet, `domain` is verified, and warning is given to the user. If user ignores the warning - they 
   will allow diffent (potentially malicious) websites to execute transactions
 - If sign_message with above payload is used directly (which is generally discouraged from users to sign), `domain` will not be verified, 
-  and it is on the user to understand risks 
+  and it is on the user to understand risks. `Please confirm you explicitly initiated this request from <domain>. ` should help users check.
+    - Wallets can better protect users by detecting the Sign-in-with-Solana message format within sign_message, and rejecting it/issuing a warning.
 - Using this flow doesn't provide "simulation" information to the user (dapp could run simulation, but cannot be forced to), so user has less information about what is being signed.
   For that, direct wallet support would be needed.
 - Without simulation, entry function is places inside the message, to help user understand better what it is authorizing. This is a balance between given user too much information
