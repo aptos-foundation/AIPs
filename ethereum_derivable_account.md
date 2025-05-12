@@ -35,16 +35,12 @@ Alternatively, wallets from other chains can implement integration with Aptos na
 dApp is required to issue Sign-in-with-Ethereum request to the wallet with:
 
 ```
-ethereumWallet.signMessage{
-    address: ethereum_address,
-    domain,
-    uri: <scheme>://<domain>,
-    chainId: aptos_chain_id,
-    nonce: aptos_txn_digest,
-    statement: "To execute transaction <entry_function_name> on Aptos blockchain (<network_name>).",
-    version: "1",
-    issuedAt: new Date()
-}
+const statement = `Please confirm you explicitly initiated this request from ${domain}. You are approving to execute transaction ${human_readable_aptos_entry_function} on Aptos blockchain (${network_name}).`
+
+const prefix = `${domain} wants you to sign in with your Ethereum account:\n${address}\n\n${statement}`
+const suffix = `URI: ${scheme}://${domain}\nVersion: 1\nChain ID: ${aptos_chain_id}\nNonce: ${aptos_txn_digest}\nIssued At: ${new Date().toISOString()}`
+
+ethereumWallet.signMessage(`${prefix}\n${suffix}`)
 ```
 
 This will generate a signature of the following full message:
