@@ -1,9 +1,10 @@
 ---
-aip: TBD
+aip: 122
 title: x-chain DAA authentication using Sign-in-With-Ethereum
 author: igor-aptos, brian, 0xmaayan, hardsetting
 Status: Draft
 type: Framework
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/601
 created: 04/17/2025
 ---
 
