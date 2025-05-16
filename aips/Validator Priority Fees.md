@@ -56,8 +56,8 @@ Fixed at 100 Octas/GU. Any excess goes to the proposer. No changes to transactio
 _Rationale: preserves UX compatibility while enabling a simple, tunable priority fee mechanism._
 
 **Operator/staker sharing:**
-Introduce a tunable priority_fee_commission parameter, mirroring the existing protocol rewards commission.  
-_Rationale: allows on-chain enforcement of fair revenue sharing, while letting the market determine the appropriate split._
+Use the existing fee_commission parameter, mirroring the existing protocol rewards commission.  
+_Rationale: simplifies implementation while allowing on-chain enforcement of fair revenue sharing._
 
 **Execution pool semantics:**
 Priority fees are assigned to the including validator, regardless of when or by whom the transaction is executed.  
