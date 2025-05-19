@@ -7,7 +7,7 @@ Status: Draft
 last-call-end-date: N/A
 type: Core
 created: 04/28/2025
-updated: 05/01/2025
+updated: 05/19/2025
 requires: N/A
 ---
 
@@ -55,7 +55,7 @@ As a result, the following is left out of scope:
 
 ## High-level Overview
 
-A new set of APIs is introduced to couple gas charging and module loading, in order to prevent any unmetered accesses.
+A new set of APIs is introduced to couple gas metering and module loading, in order to prevent any unmetered accesses.
 ```rust
 /// Dummy trait that can be implemented with custom module metering and loading logic.
 pub trait ExampleLoader {
@@ -112,12 +112,12 @@ if (some_variable > 10) {
 ```
 Hence, it will also not benefit from lazy loading because `other_module::some_function` will be loaded even if the branch is not taken.
 
-The drawbacks of lazy loading (runtime cyclic dependency detection) are mitigated by Aptos CLI and Aptos Move Compiler.
-They enforce that cyclic modules cannot be compiled, or accidentally published on-chain.
+Even though Aptos CLI and Aptos Move Compiler do not allow cyclic dependencies between different modules, with lazy loading, it is possible to attempt to publish such modules on-chain.
+However, this is not recommended because the Move VM will detect a cycle at runtime and return an error.
 
 ### Backwards Compatibility
 
-Lazy loading is not backwards compatible with eager loading due to difference in gas charging.
+Lazy loading is not backwards compatible with eager loading due to difference in gas charging and module loading semantics.
 
 ### Gas Costs and Limits
 
@@ -128,14 +128,16 @@ Replaying historical workloads with lazy loading feature enabled allows to estim
 
 TODO: copy block gas usage from docs
 
-#### Known Cases of Increased Gas Usage
+**Known Cases of Increased Gas Usage**
 
-However, it is possible to run into corner cases where gas costs increase with lazy loading.
+During reply, we found that it is possible to run into corner cases where gas costs increase with lazy loading.
 These are attributed to cases where eager loader was not charging gas (whether this was a bug or a feature).
 
-View functions are one of these cases.
-Previously, module loading in view functions was not charged (which is acceptable, because metering was done when the view function was published).
-With lazy loading, module loading in view functions is charged because limits during module publish are too relaxed.
+For example, there are no charges for module loading when calling a view function.
+Note that this is acceptable with Eager Loading.
+The metering was done when the view function was published, so there is a striict upper bound on how many modules can the view function load.
+With lazy loading, this is no longer the case: limits during module publish are too relaxed making it possible to publish many more modules. 
+Hence, module loading in view functions is charged when lazy loading is enabled.
 
 
 ###  Performance
@@ -401,11 +403,15 @@ Lazy loading is gated by a boolean flag in `VMConfig` and a feature flag (`ENABL
 Reference implementation:
 1. [#16394](https://github.com/aptos-labs/aptos-core/pull/16394)
 2. [#16459](https://github.com/aptos-labs/aptos-core/pull/16459)
-3. [#16461](https://github.com/aptos-labs/aptos-core/pull/16461)
-4. [#16462](https://github.com/aptos-labs/aptos-core/pull/16462)
-5. [#16464](https://github.com/aptos-labs/aptos-core/pull/16464)
-6. [#16479](https://github.com/aptos-labs/aptos-core/pull/16479)
-7. [#16513](https://github.com/aptos-labs/aptos-core/pull/16513)
+3. [#16576](https://github.com/aptos-labs/aptos-core/pull/16576) 
+4. [#16461](https://github.com/aptos-labs/aptos-core/pull/16461)
+5. [#16588](https://github.com/aptos-labs/aptos-core/pull/16588)
+6. [#16589](https://github.com/aptos-labs/aptos-core/pull/16589)
+7. [#16590](https://github.com/aptos-labs/aptos-core/pull/16590)
+8. [#16462](https://github.com/aptos-labs/aptos-core/pull/16462)
+9. [#16464](https://github.com/aptos-labs/aptos-core/pull/16464)
+10. [#16479](https://github.com/aptos-labs/aptos-core/pull/16479)
+11. [#16513](https://github.com/aptos-labs/aptos-core/pull/16513)
 
 
 ## Testing 
@@ -467,5 +473,5 @@ Given that, enforcing acyclic dependency graph at runtime for regular static cal
 
 ## Timeline
 
-Devent: 1.31 or 1.32 releases. 
+Devent: 1.32 release.
 Testnet and mainnet: TBD.
