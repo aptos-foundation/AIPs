@@ -161,7 +161,7 @@ However, conceptually this is still lazy loading but:
 1. More gas is charged when loading a module (dependencies need to be accounted for).
 
 2. Linking checks to dependencies are redundant because correct linking is guaranteed by module upgrades, compatibility checks and paranoid mode.
-   With function values (#AIP-112)[aip-112.md], load-time linking checks cannot even be performed. 
+   With function values (#AIP-112)[aip-112.md], load-time linking checks are also not performed, due to dynamic nature of calls. 
 
 3. Dependencies are still loaded lazily.
 
@@ -183,8 +183,8 @@ fn unmetered_get_deserialized_module(
     module_name: &IdentStr,
 ) -> VMResult<Option<Arc<CompiledModule>>>;
 ```
-The APIs of `ModuleStorage` are limited to only module accesses, and should not be used directly unless it is safe to do so.
-The reference implementation uses comments like `// MODULE METERING SAFETY: proof` to specify why the module access is unmetered, and to 
+The APIs of `ModuleStorage` are limited to module accesses only, and should not be used directly unless it is safe to do so.
+The reference implementation uses comments like `// MODULE METERING SAFETY: proof` to specify why the module access is unmetered.
 
 The `CodeStorage` trait is changed to
 ```rust
@@ -200,11 +200,11 @@ impl<
 {
 }
 ```
-to provide access to script cache. This way loading script can be implemented in a custom way for Eager or Lazy Loading.
+to provide access to script cache. This way loading scripts can be implemented in a custom way for both Eager or Lazy Loading.
 
 ### 2. New `..Loader` traits.
 
-Both Eager and Lazy Loading are hiddent behind a set of new traits added (listed below).
+Both Eager and Lazy Loading are hidden behind a set of new traits (listed below).
 All traits take a `GasMeter` implementation to charge gas, and a traversal context.
 Traversal context contains modules that were "visited" so far by a single transaction - i.e., a set of metered modules.
 
@@ -214,15 +214,13 @@ pub trait StructDefinitionLoader {
         &self,
         gas_meter: &mut impl GasMeter,
         // Note: same as TraversalContext but a trait (to be abple to pass dummy context where needed).
-        traversal_context: &mut dyn ModuleTraversalContext,
+        traversal_context: &mut impl ModuleTraversalContext,
         idx: &StructNameIndex,
     ) -> PartialVMResult<Arc<StructType>>;
 }
 ```
 `StructDefinitionLoader` is used when converting runtime types to layouts, or building depth formulas for types.
-Eager Loader does not do any metering here.
-For Lazy Loading, it is important if this is called by the VM (the the gas is charged for the module loaded to access the definition) or in the native context.
-For more details about native context support see [Specification and Implementation Details, section 5](#5-native-context-and-value-serialization).
+Eager Loader does not do any metering there.
 
 ```rust
 pub trait FunctionDefinitionLoader {
@@ -235,8 +233,8 @@ pub trait FunctionDefinitionLoader {
     ) -> VMResult<(Arc<Module>, Arc<Function>)>;
 }
 ```
-`FunctionDefinitionLoader` is used when resolving a function (Move VM call, closure resolution, or when dispatching from the native context).
-Eager Loader does not do any metering here, while Lazy Loader ensures the access to function definition that loads a new module is metered.
+`FunctionDefinitionLoader` is used when resolving a function (Move VM call, closure resolution, tests).
+Eager Loader does not do any metering there, while Lazy Loader ensures the access to function definition that loads a new module is metered.
 
 ```rust
 pub trait NativeModuleLoader {
@@ -248,21 +246,20 @@ pub trait NativeModuleLoader {
     ) -> PartialVMResult<()>;
 }
 ```
-`NativeModuleLoader` is here to support `NativeResult::LoadModule { .. }`.
-Native call returns this result when there is a dynamic dispatch using (AIP-73)[aip-73.md].
+`NativeModuleLoader` is used to support `NativeResult::LoadModule { .. }`.
+Native call returns this result when there is a native dynamic dispatch using (AIP-73)[aip-73.md].
 
 ```rust
 pub trait ModuleMetadataLoader {
     fn load_module_metadata(
         &self,
         gas_meter: &mut impl GasMeter,
-        traversal_context: &mut dyn ModuleTraversalContext,
+        traversal_context: &mut impl ModuleTraversalContext,
         module_id: &ModuleId,
     ) -> PartialVMResult<Vec<Metadata>>;
 }
 ```
 `ModuleMetadataLoader` used to query metadata for the module, when resolving a Move resource in the Move VM or in native context.
-For Lazy Loading, it is important if this is called by the VM or in native context, and is described in a later section (see [Specification and Implementation Details, section 5](#5-native-context-and-value-serialization))
 
 ```rust
 pub struct LegacyLoaderConfig {
@@ -297,9 +294,8 @@ pub trait ClosureLoader: InstantiatedFunctionLoader {
     ) -> PartialVMResult<Rc<LoadedFunction>>;
 }
 ```
-
 `ClosureLoader` is reponsible to resolve a closure, loading the function and converting its type arguments to runtime types.
-Implementation simply uses `InstantiatedFunctionLoader` to meter and load modules correctly.
+Implementation simply calls into `InstantiatedFunctionLoader` to meter and load modules correctly.
 
 ```rust
 pub trait Loader:
@@ -314,8 +310,8 @@ pub trait Loader:
 }
 ```
 `Loader` is the main trait that encapsulates all metering and loading of modules.
-Move VM expects a `Loader` to be provided (instead of `ModuleStorage`), which can either be unmetered, eager, or lazy.
-Note that the cast to `&dyn ModuleStorage` is needed for native support.
+Move VM expects a `Loader` to be provided (instead of `ModuleStorage`), which can either be eager or lazy.
+Note that the cast to `&dyn ModuleStorage` is needed for native support only and to be able to resolve serialization data of a function value in Move VM.
 
 ```rust
 pub trait ScriptLoader {
@@ -331,68 +327,123 @@ pub trait ScriptLoader {
 ```
 Finally, `ScriptLoader` adds ability to meter and load scripts.
 
-### 3. Type Depth Checks
+### 3. Module Publishing in Aptos VM
+
+With lazy loading, there is a change how Aptos VM charges gas for published modules and verifies them.
+On publish of a module bundle `M`, the gas is charge in the following way:
+
+1. All old modules in `M` (those that are upgraded) are metered.
+2. All modules in `M` are metered (to account for new code).
+3. All immediate dependencies and all immediate friends of modules in `M` that are not in `M` themselves are metered.
+
+The bundle is verified such that:
+
+1. All modules in `M` are locally verified.
+2. For all modules in `M` that is upgraded, compatibility checks are performed.
+3. For all modules in `M`, a check that the friends it declares are in `M` is made. If this is not the case, an error is returned (`FRIEND_NOT_FOUND_IN_MODULE_BUNDLE = 1135`). This ensures that friend exists and can link to the module which declared it as a friend.
+4. For all modules in `M`, a linking check is performed for its immediate dependencies. Note that immediate dependencies are sifficient because modules in storage and not in `M` cannot fail linking checks thanks to compatibility rules.
+
+In this setting, it is now possible to publish larger packages on-chain, without worrying about hitting dependency limits.
+We note, however, that Aptos VM no longer enforces that the module dependencies form an acyclic graph at publishing time.
+Now, only Aptos CLI or Aptos Move Compiler enforce that there are no cyclic module dependencies.
+This is further enforced by the VM at runtime: checks to detect recursive struct / enum definitions, or re-entrancy on function calls have been added.
+
+### 4. Type Depth Checks
 
 Type depth checks are done by Move VM interpreter when packing structs, enums or vectors.
 During the checks, struct definitions are loaded.
 With lazy loading, the algorithm charges gas for loading the module where a strcut definition is defined (if it is a first access).
 
 The algorithm has been adjusted to detect cyclic dependencies between structs, e.g.,
-```
-module 0x1::B { struct B { a: A } }
-module 0x1::B { struct A { b: B } }
-```
-This is needed because at publishing time cyclic checks can no longer be perfomed, as Aptos VM checks only immediate dependencies of a package being published.
 
-### 4. Layout Construction
+```move
+module 0x1::b {
+  struct B { a: A }
+}
+
+module 0x1::a {
+  enum A {
+    Constructed { value: u64 },
+    // Even if this variant is never constructed, creating `A::Constructed` will still
+    // fail because of the cycle between `B` and `A::NeverConstructed`
+    NeverConstructed { b: B },
+  }
+}
+```
+
+This is needed because at publishing time cyclic checks can no longer be perfomed, as Aptos VM checks only immediate dependencies of a package being published.
+If there is a cycle detected at runtime, a new status code `RUNTIME_CYCLIC_MODULE_DEPENDENCY = 4040` is returned.
+
+### 5. Serialized Function Data
+
+Serialization function data is needed when 1) functon value is being serialized and 2) when displaying function value (via `0x1::string_utils.move`).
+If function is in resolved state (i.e., created by `CallClosure` instruction), then when fetching serialization function data the layouts of captured arguments will be constructed.
+The challenge is that at this point there is no access to gas meter, and so modules that are loaded when a layout is constructed cannot be easily charged.
+
+We observe that there is no need to perform this gas charging.
+We only need to consider resolved closures because they construct layouts for captured arguments.
+We note that resolved state means the closure has been constructed by the current session, and so, the captured arguments are coming from the operand stack.
+We now show that the layout of a struct / enum in captured argument must have visited all modules needed to construct this layout.
+
+Captured struct/enums can be either constructed from storage bytes, or from Pack instructions.
+If coming from storage, we must have constructed a layout already and so the modules are visited.
+If constructed in interpreter:
+
+  1. Generic fields must have been instantiated, and
+
+  2. All modules the fields use the module of the struct/enum must be loaded (otherwise there is no other way to create fields and the struct/enum itself).
+     For (2): this is not strictly true for enums. It is possible to construct variant A::V1 { x: 0 } while not all modules from other variant A::V2 { y: ..., } are loaded and added to the traversal context.
+     What makes (2) to hold is a type depth check.
+     The interpreter constructs depth formulas for structs/enums, which eagerly checks all variants.
+     Hence, all modules must have been visited.
+
+The design for lazy loading ensures that when getting the serialization data, all modules have been accessed.
+This is done by propagating traversal context throughout the VM all the way down to value (de)serialization.
+When constructing layouts there, a check is made to see if the module has been visited and metered, and if not, an invariant violation is returned.
+
+### 6. Layout Construction
 
 Similarly to type depth checks, layout construction is now also charged for any module loads that happen at runtime.
 In non-native context, this is as simple as type depth checks.
+Likewise, there are checks for recusrive struct / enum definitions, now performed at runtime.
 
-### 5. Native Context and Value Serialization
+### 7. Layout Construction for Native Context
 
-In native context, there is no access to `GasMeter` trait.
-At the same time, modules can be accessed in native context when:
+In native context, layouts can also be constructed, e.g., when calling `0x1::bcs::to_bytes<T>(v: &T)1, layout for `T` is constructed.
+Unfortunately, there is no access to `GasMeter` trait, and so for lazy loading we implement metering in the following way.
 
-1. Runtime types are converted to type layouts (serialization, native `exists_at` implementation).
-2. Fucntion values captured argument layouts are constructed for string formatting natives.
-3. Move values containing unresolved function values are serialized (captured argument layouts are constructed).
-4. In native dynamic dispatch.
+-  A special native function `native fun load_layout<T>()` is introduced, which returns a native result (only if lazy loading is enabled, otherwise it is a no-op):
 
-While (4) is not a problem because native dynamic dispatch ensure modules are loaded and metered by returning `NativeResult::LoadModule { .. }`, (1-3) are challenging for Lazy Loading: native function can access a module that needs to be charged, but there is no gas meter to do that.
+```rust
+pub enum NativeResult {
+    ...
+    LoadLayouts {
+        tys: Vec<Type>,
+        annotated: bool,
+    },
+}
+```
 
-In order to keep the implementation simple, we opt for a simple solution: native function type arguments are pre-processed to pre-charge for all modules (by simply constructing layouts for all).
-This way type to layout conversion in native context should always be metered.
-This solves (1).
+- The VM, when seeing this result will create a layout for the specified types, and add to a local per-session layout cache.
+  This cache contains all layouts a native function can use.
+  The subsequent native call, e.g., to emit an event or to serialize a value using BCS, will get the layout from cache (if it is not in the cache - an invariant violation is returned).
+  This way the layout has been metered and constructed, and the native can safely use it.
 
-For (2) and (3), we claim that all modules accessed when captured argument layouts are constructed must have been metered by lazy Loader.
-Indeed, layouts are constructed for closures in resolved state, i.e., when they originate from `PackClosure` or `PackClosureGeneric` bytecode instruction.
-It means that the captured arguments are coming from the stack (constructed duriing execution) or from storage.
-If coming from the stack, modules where values are defined must have been metered and loaded.
-If coming from the storage, the value was deserialzied and its layotu was constructed (this means all modules have been already loaded).
+### 8. Module Metadata for Native Context
 
-As a result, Lazy Loader does not meter gas in native context, instead only checking for the invariant that modules have been charged for (i.e., added to the transaction context).
+Module metadata accesses are also charged with lazy loading.
+Similarly to layouts, native context can try to access module metadata for native `0x1::exists_at<T>(addr: address)` implementation.
+However, because layout of `T` is pre-computed for this function, it must load all modules used in `T` and in particular, the module where `T`s instantiation is defined.
+As a result, it is safe t not meter this access in native context.
+Lazy loader ensures that is is indeed safe by checking at runtime that the module is indeed visited.
 
-#### Implementation
+### 9. Function Calls and Re-entrancy
 
-**Option 1:** 
-  - For native context, pre-charge gas for type arguments (e.g., by constructing layouts)
-  - Layout constructions in natives assert that modules were visited.
-  - Same for function values.
+Funcion calls are resolved lazily, with only the callee's module being loaded (no transitive closure).
 
-**Option 2:** 
-  - For native context, it can only access modules from the "allowed list" that acts as a cache that maps a type argument to its layout.
-    TODO: Consider storing decoration data instead of annotated layouts as well.
-  - For function values: can use type layouts from cache if avilable, but sometimes it is not: (e.g. in Block-STM). 
-
-### 6. Module Cyclic Dependencies Detection
-
-With lazy loading, cyclic modules can end up on chain.
-However, they are still not allowed to be used in any way that actually forms a cycle.
-
-1. For type depth checks, the implementation enforces that struct definitions are not recursive.
-2. For function calls, re-entrancy checker is modified to enter module lock on cross-contract regular call for re-entrancy (i.e., cyclic modules) detection.
-3. For layouts (TODO, consider if this is important for layouts)
+Recall that with lazy loading, cyclic modules can end up on chain.
+To prevent possible re-entrancy, VM locks the module when a function is called (unlocking it when the call returns control to the caller's frame).
+The locking mechanism re-uses one implemented for (AIP-73)[aip-73.md], returning an error on any (even safe) re-entrancy.
 
 
 ## Reference Implementation
@@ -401,17 +452,17 @@ The feature is code complete and is currently being tested.
 Lazy loading is gated by a boolean flag in `VMConfig` and a feature flag (`ENABLE_LAZY_LOADING`).
 
 Reference implementation:
-1. [#16394](https://github.com/aptos-labs/aptos-core/pull/16394)
-2. [#16459](https://github.com/aptos-labs/aptos-core/pull/16459)
-3. [#16576](https://github.com/aptos-labs/aptos-core/pull/16576) 
-4. [#16461](https://github.com/aptos-labs/aptos-core/pull/16461)
-5. [#16588](https://github.com/aptos-labs/aptos-core/pull/16588)
-6. [#16589](https://github.com/aptos-labs/aptos-core/pull/16589)
-7. [#16590](https://github.com/aptos-labs/aptos-core/pull/16590)
-8. [#16462](https://github.com/aptos-labs/aptos-core/pull/16462)
-9. [#16464](https://github.com/aptos-labs/aptos-core/pull/16464)
-10. [#16479](https://github.com/aptos-labs/aptos-core/pull/16479)
-11. [#16513](https://github.com/aptos-labs/aptos-core/pull/16513)
+1. [#16394](https://github.com/aptos-labs/aptos-core/pull/16394): Refactoring to prepare lazy loading integration.
+2. [#16459](https://github.com/aptos-labs/aptos-core/pull/16459): `Loader` trait and support for metering for type depth formula construction.
+3. [#16576](https://github.com/aptos-labs/aptos-core/pull/16576): Metering support for captured arguments in function values.
+4. [#16461](https://github.com/aptos-labs/aptos-core/pull/16461): New type to layout converter and metering support in non-native context. 
+5. [#16588](https://github.com/aptos-labs/aptos-core/pull/16588): Native context support for layout metering.
+6. [#16589](https://github.com/aptos-labs/aptos-core/pull/16589): Metering support for native dynamic dispatch (`LoadModule`).
+7. [#16590](https://github.com/aptos-labs/aptos-core/pull/16590): Metering support for module metadata (no publishing).
+8. [#16462](https://github.com/aptos-labs/aptos-core/pull/16462): Metering support for functions and closures, Move VM to use `Loader` everywhere.
+9. [#16464](https://github.com/aptos-labs/aptos-core/pull/16464): Metering support for module publish in Aptos VM.
+10. [#16479](https://github.com/aptos-labs/aptos-core/pull/16479): End-to-end integration, implemantation of lazy verification and loading.
+11. [#16513](https://github.com/aptos-labs/aptos-core/pull/16513): Enables lazy loading frature as default, adds tests and addresses remaining TODOs.
 
 
 ## Testing 
