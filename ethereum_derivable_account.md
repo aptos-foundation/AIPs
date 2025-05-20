@@ -36,17 +36,6 @@ Alternatively, wallets from other chains can implement integration with Aptos na
 dApp is required to issue Sign-in-with-Ethereum request to the wallet with:
 
 ```
-const statement = `Please confirm you explicitly initiated this request from ${domain}. You are approving to execute transaction ${human_readable_aptos_entry_function} on Aptos blockchain (${network_name}).`
-
-const prefix = `${domain} wants you to sign in with your Ethereum account:\n${address}\n\n${statement}`
-const suffix = `URI: ${scheme}://${domain}\nVersion: 1\nChain ID: ${aptos_chain_id}\nNonce: ${aptos_txn_digest}\nIssued At: ${new Date().toISOString()}`
-
-ethereumWallet.signMessage(`${prefix}\n${suffix}`)
-```
-
-This will generate a signature of the following full message:
-
-```
 <domain> wants you to sign in with your Ethereum account:
 <ethereum_address>
 
@@ -163,7 +152,7 @@ Verified payload signed with Sign-in-with-Ethereum with Metamask is verified cor
 
 - If Sign-in-with-Ethereum is used in the Wallet, `domain` is verified, and warning is given to the user. If user ignores the warning - they
   will allow diffent (potentially malicious) websites to execute transactions
-- If sign_message with above payload is used directly (which is generally discouraged from users to sign), `domain` will not be verified,
+- If the wallet does not implement Sign-in-with-Ethereum and the regular `persoanl_message` method is used directly (which is generally discouraged from users to sign), `domain` will not be verified,
   and it is on the user to understand risks
 - Using this flow doesn't provide "simulation" information to the user (dapp could run simulation, but cannot be forced to), so user has less information about what is being signed.
   For that, direct wallet support would be needed.
