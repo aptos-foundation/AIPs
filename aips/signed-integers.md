@@ -2,7 +2,7 @@
 aip: 
 title: Signed Integers in Aptos Standard Library
 author: 0xAnto (anto@kanalabs.io), 0xbe1 (0xbe1@thalalabs.xyz)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/608
 Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core)
