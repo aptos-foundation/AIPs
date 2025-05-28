@@ -413,7 +413,7 @@ Likewise, there are checks for recusrive struct / enum definitions, now performe
 
 ### 7. Layout Construction for Native Context
 
-In native context, layouts can also be constructed, e.g., when calling `0x1::bcs::to_bytes<T>(v: &T)1, layout for `T` is constructed.
+In native context, layouts can also be constructed, e.g., when calling `0x1::bcs::to_bytes<T>(v: &T)`, layout for `T` is constructed.
 Unfortunately, there is no access to `GasMeter` trait, and so for lazy loading we implement metering in the following way.
 
 -  A special native function `native fun load_layout<T>()` is introduced, which returns a native result (only if lazy loading is enabled, otherwise it is a no-op):
