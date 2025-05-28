@@ -42,7 +42,7 @@ Lazy Loading solves the aforementioned challenges associated with Eager Loading:
 
   1. Move contracts no longer hit limits on the size of the transitive closure of dependencies (e.g., DEX aggregators).
   2. Transaction gas fees are decreased.
-  3. Transactions are executed faster: TODO: copy numbers from below.
+  3. Transactions can even be executed faster.
 
 ### Out of scope
 
@@ -124,31 +124,35 @@ Lazy loading is not backwards compatible with eager loading due to difference in
 In general, lazy loading should always decrease the gas usage of a single transaction because gas is only charged for modules that are actually used.
 It is also less likely to hit limits on the number of dependencies: thanks to not loading the transitive closures of dependnecies.
 
-Replaying historical workloads with lazy loading feature enabled allows to estimate gas savings, summarized in the table below.
+Replaying historical workloads with lazy loading feature enabled allows to estimate gas savings, example sown below.
+This figure shows block gas usage for mainnet transactions for versions [2719042368, 2719042916), with 61 blocks in total.
 
-TODO: copy block gas usage from docs
+![](../diagrams/lazy-loading/block-gas-usage.png)
+
+As we can see in the figure, lazy loading does provide significant gas savings of arounde 10-20%, sometimes jumping to 60% for small blocks with many dependencies.
 
 **Known Cases of Increased Gas Usage**
 
 During reply, we found that it is possible to run into corner cases where gas costs increase with lazy loading.
 These are attributed to cases where eager loader was not charging gas (whether this was a bug or a feature).
+For example, we can deduce from the figure above that 2/61 blocks have small increase in their gas usages.
 
 For example, there are no charges for module loading when calling a view function.
 Note that this is acceptable with Eager Loading.
-The metering was done when the view function was published, so there is a striict upper bound on how many modules can the view function load.
+The metering was done when the view function was published, so there is a strict upper bound on how many modules can the view function load.
 With lazy loading, this is no longer the case: limits during module publish are too relaxed making it possible to publish many more modules. 
 Hence, module loading in view functions is charged when lazy loading is enabled.
 
 
 ###  Performance
 
-#### Synthetic `single-node-performance` Benchmarks
+The goal of lazy loading is not to improve performace.
+Still, our experimental evaluation shows thar lazy loading performs better or on par with eager loading, as the figure below suggests, replaying for mainnet transactions for versions [2719042368, 2719042916), with 61 blocks in total.
 
-TODO: copy from docs
+![](../diagrams/lazy-loading/block-runtime.png)
 
-#### Historical Replay Benchmarks
-
-TODO: copy from docs
+We can see that the first blocks get faster because the number of module accesses (cache misses) is reduced.
+Once the cache contains most of used contracts, we observe that lazy loading has on par performance, or provide small improvements thanks to avoiding excessive loading of modules.
 
 
 ## Alternative Solutions
