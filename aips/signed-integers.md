@@ -110,7 +110,7 @@ module aptos_std::i64 {
 
 ## Reference Implementation
 
-Complete implementation available at: https://github.com/0xAnto/move-integers
+Proposed PR: [https://github.com/aptos-labs/aptos-core/pull/16735](https://github.com/aptos-labs/aptos-core/pull/16735)
 
 ## Testing 
 
