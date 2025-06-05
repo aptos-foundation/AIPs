@@ -12,7 +12,7 @@ created: 4/25/2025
 
 ## Summary
 
-This AIP changes the structure of a user transaction to support the upcoming orderless transactions feature. To support the orderless transaction feature, we had to add some extra information inside a user transaction. This AIP creates a way to add extra information info inside a user transaction.
+This AIP changes the structure of a user transaction to support the upcoming turbo transactions feature. To support the turbo transaction feature, we had to add some extra information inside a user transaction. This AIP creates a way to add extra information info inside a user transaction.
 
 Each transaction contains a `TransactionPayload` which could be either an entry function, script, or multisig. In this AIP, we add a new variant of `TransactionPayload` that can store both an executable (such as entry function, script), and some extra information. 
 
@@ -24,9 +24,9 @@ Aptos supports replay protection as follows. Each account should have a `0x1::Ac
 
 In order to create the `0x1::Account` resource, it costs 0.001 APT at the moment. So, that’s the base fee for a new user to use the blockchain. To reduce the cost, we wish to eliminate the need for user to create a `0x1::Account` resource to use the blockchain. This requires us to support an alternate replay protection mechanism that doesn’t use sequence numbers.
 
-For this, we introduce orderless transactions. These transactions contain a `nonce` value (which could be picked randomly). The blockchain stores the list of (sender address, nonce) pairs of transactions committed in the last 60 seconds. When a transaction is submitted to the blockchain, the transaction is executed only if the (sender address, nonce) pair isn’t stored in the nonce table. We restrict the transaction expiration time to 60 seconds. So, the transaction can’t be replayed before its expiration time.
+For this, we introduce turbo transactions. These transactions contain a `nonce` value (which could be picked randomly). The blockchain stores the list of (sender address, nonce) pairs of transactions committed in the last 60 seconds. When a transaction is submitted to the blockchain, the transaction is executed only if the (sender address, nonce) pair isn’t stored in the nonce table. We restrict the transaction expiration time to 60 seconds. So, the transaction can’t be replayed before its expiration time.
 
-For the orderless transaction feature, we have to add new information (nonce) to a user transaction. At the moment, the transaction payload only stores an executable (entry function, script, multisig). To support this feature, we create a new transaction payload variant that will store both an executable and some extra information.
+For the turbo transaction feature, we have to add new information (nonce) to a user transaction. At the moment, the transaction payload only stores an executable (entry function, script, multisig). To support this feature, we create a new transaction payload variant that will store both an executable and some extra information.
 
 This AIP describes the changes in the transaction format. AIP X (link) describes the structure of the nonce table and how the replay protection is done.
 
@@ -75,9 +75,9 @@ enum TransactionExtraConfig {
 }
 ```
 
-The `TransactionExtraConfig` contains an optional nonce field. If this field is set to some value, then the transaction is interpreted as an orderless transaction. If this field is set to None, then transaction is a regular sequence number based transaction. The user transaction contains a `sequence_number: u64` field which was mandatory. This is left untouched. For orderless transactions, this field is ignored by the VM code. We recommend setting the sequence number to `u64::MAX` when using orderless transactions.
+The `TransactionExtraConfig` contains an optional nonce field. If this field is set to some value, then the transaction is interpreted as an turbo transaction. If this field is set to None, then transaction is a regular sequence number based transaction. The user transaction contains a `sequence_number: u64` field which was mandatory. This is left untouched. For turbo transactions, this field is ignored by the VM code. We recommend setting the sequence number to `u64::MAX` when using turbo transactions.
 
-The `TransactionExtraConfig` also contains an optional multisig_address field. If this field is set to some value, then the transaction is interpreted as a multisig transaction.
+The `TransactionExtraConfig` also contains an optional multisig_address field. If this field is set to some value, then the transaction is interpreted as a multisig transaction. Earlier, when we introduced multisig transactions, we needed to store both multisig address along with an entry function payload inside the transaction. Back then, for simplicity, we chose to combine both into `Multisig` transaction payload variant. In this AIP, as we are introducing the `TransactionExtraConfig` in order to support adding extra information to the transaction, we chose to utilize this functionality for multisig transactions as well and added the multisig_address field in `TransactionExtraConfig`.
 
 The `TransactionPayloadInner` and `TransactionExtraConfig` are versioned and designed to be extensible, in case more information needs to be added to support future applications.
 
