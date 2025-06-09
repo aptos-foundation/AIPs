@@ -53,8 +53,6 @@ Migrated Events
 | :---------------------------------: | :------------------------------------: | :-------------------------------: | :------------------: |
 |            account.move             |            KeyRotationEvent            |            KeyRotation            |   +account:address   |
 |         aptos_account.move          |  DirectCoinTransferConfigUpdatedEvent  |  DirectCoinTransferConfigUpdated  |  + account:address   |
-|              coin.move              |              DepositEvent              |              Deposit              |  + account:address   |
-|              coin.move              |             WithdrawEvent              |             Withdraw              |  + account: address  |
 |             object.move             |             TransferEvent              |             Transfer              |                      |
 |        aptos_governance.move        |          CreateProposalEvent           |          CreateProposal           |                      |
 |        aptos_governance.move        |               VoteEvent                |               Vote                |                      |
