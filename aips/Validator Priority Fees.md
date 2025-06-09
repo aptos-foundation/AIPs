@@ -52,7 +52,7 @@ Solana’s experience highlights the risks of a dysfunctional native fee market.
 ## Specification and Implementation Details
 
 **Burn rate:**
-Fixed at 100 Octas/GU. Any excess goes to the proposer. No changes to transaction format or APIs.  
+Reduced to 90 Octas/GU. Minimum paymnet remains at 100 Octas/GU. Any excess goes to the proposer. No changes to transaction format or APIs.  
 _Rationale: preserves UX compatibility while enabling a simple, tunable priority fee mechanism._
 
 **Operator/staker sharing:**
@@ -70,22 +70,12 @@ _Rationale: aligns incentives with inclusion decisions, which reflect prioritiza
 
 ## Reference Implementation
 
- > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
- > What is the feature flag(s)? If there is no feature flag, how will this be enabled?
-
 A reference implementation is in progress under the ownership of **@Guoteng**. Links to relevant code and modules will be added once available.
 
 ## Testing 
 
- > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out. Some examples include user stories, network health metrics, system metrics, E2E tests, unit tests, etc.) 
- > - When can we expect the results?
- > - What are the test results and are they what we expected? If not, explain the gap.
-
-(Only a suggestion. Feel free to change **@Guoteng**.)
-
 - Unit tests:
   - Validate correct fee splitting between burn and proposer under varying gas prices.
-  - Check enforcement of the 'priority_fee_commission' parameter.
   - Ensure proposer reward attribution is consistent with inclusion logic in the execution pool.
 
 - Integration tests:
@@ -128,7 +118,7 @@ Mitigation: the economic cost of griefing is internalized by the attacker; furth
 The addition of a priority fee results in a built-in market for transaction ordering within a block. This enables arbitrage competition to occur in an open and transparent way.
 The presence of such a mechanism significantly reduces the economic incentive to create side markets for ordering — markets that tend to be opaque, less fair, and more easily exploited for strategies such as frontrunning and sandwiching.
 
-## Timeline
+<!--- ## Timeline
 
 ### Suggested implementation timeline
 
@@ -152,7 +142,7 @@ The presence of such a mechanism significantly reduces the economic incentive to
  > - On mainnet?
 
 ...
-
+--->
 
 ## Open Questions (Optional)
 
