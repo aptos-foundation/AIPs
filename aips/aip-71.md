@@ -53,13 +53,10 @@ Migrated Events
 | :---------------------------------: | :------------------------------------: | :-------------------------------: | :------------------: |
 |            account.move             |            KeyRotationEvent            |            KeyRotation            |   +account:address   |
 |         aptos_account.move          |  DirectCoinTransferConfigUpdatedEvent  |  DirectCoinTransferConfigUpdated  |  + account:address   |
-|              coin.move              |              DepositEvent              |              Deposit              |  + account:address   |
-|              coin.move              |             WithdrawEvent              |             Withdraw              |  + account: address  |
 |             object.move             |             TransferEvent              |             Transfer              |                      |
 |        aptos_governance.move        |          CreateProposalEvent           |          CreateProposal           |                      |
 |        aptos_governance.move        |               VoteEvent                |               Vote                |                      |
 |        aptos_governance.move        |           UpdateConfigEvent            |           UpdateConfig            |                      |
-|             block.move              |             NewBlockEvent              |             NewBlock              |                      |
 |             block.move              |        UpdateEpochIntervalEvent        |        UpdateEpochInterval        |                      |
 |   aptos-token-objects/token.move    |             MutationEvent              |             Mutation              |   + token:address    |
 | aptos-token-objects/collection.move |             MutationEvent              |             Mutation              | + collection:address |
@@ -121,48 +118,20 @@ Migrated Events
 |       token_event_store.move        |         DescriptionMutateEvent         |         DescriptionMutate         |                      |
 |       token_event_store.move        |           RoyaltyMutateEvent           |           RoyaltyMutate           |                      |
 |       token_event_store.move        |           MaxiumMutateEvent            |           MaximumMutate           |                      |
+|             token.move              |             DepositEvent               |            TokenDeposit           |  + account: address  |
+|             token.move              |             WithdrawEvent              |            TokenWithdraw          |  + account: address  |
+|             token.move              |          CreateTokenDataEvent          |          TokenDataCreation        |  + creator: address  |
+|             token.move              |            MintTokenEvent              |                Mint               |  + creator: address  |
+|             token.move              |            BurnTokenEvent              |                Burn               |  + account: address  |
+|             token.move              |       MutateTokenPropertyMapEvent      |         MutatePropertyMap         |  + account: address  |
 
 
-### Event V2 Translation Engine
+### Exceptions
 
-Aptos Labs will support the event v2 translation engine to facilitate the migration process. Aptos Labs will provide the temporary REST API path `https://api.mainnet.aptoslabs.com/translated/v1`. Even after the event migration is enabled, the REST Node API will still be able to query the event v1. The supported APIs are as follows:
-- Events by creation number: `GET /accounts/{address}/events/{creation_number}`
-- Events by handle: `GET /accounts/{address}/events/{event_handle}/{field_name}`
-- Transactions: `GET /transactions`
-- Transactions by version: `GET /transactions/by_version/{txn_version}`
-- Transactions by hash: `GET /transactions/by_hash/{txn_hash}`
-- Account transactions: `GET /accounts/{address}/transactions`
-- Transaction simulation: `POST /transactions/simulate`
+- The Coin module will undergo maintenance and be migrated to the FA standard. Coin events will be silently replaced by fungible asset events.
+- NewBlockEvent will remain as v1.
+- Both NewEpochEvent and NewEpoch will be emitted.
 
-The event v2 translation engine will support translation for the account, coin and token related events, which are listed below:
-- CoinDeposit
-- CoinWithdraw
-- CoinRegister
-- KeyRotation
-- Transfer
-- TokenMutation
-- CollectionMutation
-- Mint
-- Burn
-- TokenDeposit
-- TokenWithdraw
-- BurnToken
-- MutatePropertyMap
-- MintToken
-- CreateCollection
-- TokenDataCreation
-- Offer
-- CancelOffer
-- Claim
-- CollectionDescriptionMutate
-- CollectionUriMutate
-- CollectionMaximumMutate
-- UriMutation
-- DefaultPropertyMutate
-- DescriptionMutate
-- RoyaltyMutate
-- MaximumMutate
-- OptInTransfer
 
 ## Reference Implementation
 
