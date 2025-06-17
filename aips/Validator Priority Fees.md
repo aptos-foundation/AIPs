@@ -19,7 +19,7 @@ requires (*optional): <AIP number(s)>
 
 There is currently no mechanism in the Aptos protocol that incentivizes validators to prioritize higher-priced transactions. As a result, no built-in priority fee market exists, which encourages the emergence of informal or "black market" mechanisms for transaction ordering. This becomes increasingly problematic as trading use cases grow, particularly those involving arbitrage opportunities, where fair and open competition over ordering is essential.
 
-This proposal introduces a simple and incentive-compatible mechanism for priority fees. We modify the current gas fee behavior so that only the first 100 Octas per gas unit (GU) are burned. Any excess over that threshold is paid directly to the validator who proposes the block containing the transaction. This allows users to compete for inclusion and ordering by paying validators directly, in a transparent and protocol-native way. 
+This proposal introduces a simple and incentive-compatible mechanism for priority fees. We modify the current gas fee behavior so that only the first 90 Octas per gas unit (GU) are burned. Any excess over that threshold is paid directly to the validator who proposes the block containing the transaction. This allows users to compete for inclusion and ordering by paying validators directly, in a transparent and protocol-native way. 
 
 
 ### Out of scope
@@ -28,7 +28,7 @@ This AIP does not address incentives for the Quorum Store, storage, block voting
 
 ## High-level Overview
 
-Users continue to specify a gas price per gas unit (GU) when submitting transactions, with a minimum of 100 Octas/GU. The key change is that only the first 100 Octas/GU are burned; any excess is paid directly to the validator that proposes the block containing the transaction.
+Users continue to specify a gas price per gas unit (GU) when submitting transactions, with a minimum of 100 Octas/GU. The key change is that only the first 90 Octas/GU are burned; the excess is paid directly to the validator that proposes the block containing the transaction.
 
 There is no change to the transaction submission APIs — users interact with the system exactly as they do today. This preserves compatibility while enabling a native mechanism for users to bid for execution priority by offering additional fees to validators. The result is a transparent, protocol-aligned incentive structure for transaction ordering.
 
