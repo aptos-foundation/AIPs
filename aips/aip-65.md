@@ -3,7 +3,7 @@ aip: 65
 title: Storage Fee for State Bytes refundable
 author: msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/328
-Status: In Review
+Status: Accepted
 last-call-end-date (*optional):
 type: Gas
 created: 12/12/2023

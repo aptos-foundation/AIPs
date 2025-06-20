@@ -3,8 +3,7 @@ aip: 77
 title: Multisig V2 Enhancement
 author: junkil-park (https://github.com/junkil-park), movekevin (https://github.com/movekevin)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/409
-Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+Status: Accepted
 type: Standard (Framework)
 created: 3/28/2024
 updated (*optional): <mm/dd/yyyy>

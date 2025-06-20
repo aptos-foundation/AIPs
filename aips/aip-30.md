@@ -4,7 +4,6 @@ title: Implement decrease in staking rewards
 author: michelle-aptos, xindingw, junkil-park
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/119
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Framework
 created: 5/3/2023
 updated (*optional): 7/28/2023

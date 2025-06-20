@@ -3,7 +3,7 @@ aip: 70
 title: Parallelize Fungible Assets
 author: igor-aptos (https://github.com/igor-aptos), vusirikala (https://github.com/vusirikala)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/209
-Status: In Review
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: 07/20/2023

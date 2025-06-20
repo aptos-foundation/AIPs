@@ -3,7 +3,7 @@ aip: 94
 title: Reduce stake lockup duration to 14 days and governance voting duration to 3 days per community vote
 author: Tony (https://github.com/tony001242), Eric (eric@amnis.com)
 discussions-to (*optional): 
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Core
 created: 7/11/2024

@@ -3,7 +3,7 @@ aip: 88
 title: BlockEpilogue to replace StateCheckpoint transaction
 author: igor-aptos (https://github.com/igor-aptos)
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+Status: In Review
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core)
 created: 06/06/2024

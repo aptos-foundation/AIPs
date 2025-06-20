@@ -3,9 +3,9 @@ aip: 61
 title: Keyless accounts
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/297
-Status: Approved
+Status: Accepted
 last-call-end-date (*optional): 02/15/2024
-type: <Standard (Core, Framework)>
+type: Standard (Core, Framework)
 created: 01/04/2024
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>

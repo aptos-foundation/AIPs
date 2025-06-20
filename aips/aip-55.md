@@ -3,8 +3,7 @@ aip: 55
 title: Generalize Transaction Authentication and Support Arbitrary K-of-N MultiKey Accounts
 author: davidiw, hariria
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/267
-Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+Status: Accepted
 type: Platform
 created: 10/16/2023
 updated (*optional): <mm/dd/yyyy>

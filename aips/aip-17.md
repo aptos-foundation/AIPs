@@ -4,7 +4,6 @@ title: Reducing Execution Costs by Decoupling Transaction Storage and Execution 
 author: msmouse, vgao1996, davidiw
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/79
 Status: Accepted
-last-call-end-date: TBD
 type: Standard
 created: 02/28/2023
 updated:

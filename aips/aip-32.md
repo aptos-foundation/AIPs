@@ -3,8 +3,7 @@ aip: 32
 title: Storage Deletion Refund
 author: msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/127
-Status: Ready for Review
-last-call-end-date: TBD
+Status: Accepted
 type: Standard (Core)
 created: 05/05/2023
 ---
