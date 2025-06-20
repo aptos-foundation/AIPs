@@ -4,7 +4,6 @@ title: Move Objects
 author: davidiw, wrwg
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/27
 Status: Accepted
-last-call-end-date:
 type: Standard (Framework)
 created: 2023/01/05
 updated: 2023/01/23

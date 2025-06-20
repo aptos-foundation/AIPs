@@ -3,8 +3,7 @@ aip: 31
 title: Allow listing for delegation pools
 author: junkil-park, movekevin, michelle-aptos, wintertoro, alexfilip2
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/121
-Status: In Review
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+Status: Accepted
 type: Framework
 created: 5/3/2023
 updated: 4/16/2024

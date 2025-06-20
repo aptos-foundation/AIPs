@@ -1,15 +1,15 @@
 ---
 aip: 39
-title: Separate gas payer
+title: Sponsored Transactions
 author: gerben-stavenga, movekevin, davidiw, kslee8224, neoul, styner32
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/173
-Status: Draft
+Status: Accepted
 last-call-end-date: TBD
 type: Standard (Core)
 created: 06/14/2023
 ---
 
-# AIP 39 - Separate gas payer
+# AIP 39 - Sponsored Transactions
 ## Summary
 
 This AIP proposes a mechanism for specifying a different gas payer account from the transaction sender. The gas for the transaction is deducted from the gas payer account while not giving access to its signer for any other purposes - the transaction would be executed exactly the same regardless of who pays for gas.

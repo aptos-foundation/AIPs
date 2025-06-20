@@ -2,9 +2,7 @@
 aip: 25
 title: Transaction Argument Support for Structs
 author: gerben-stavenga
-discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Accepted
-last-call-end-date (*optional): 
 type: Standard
 created: 04/16/2023
 updated (*optional): 04/16/2023

@@ -3,7 +3,6 @@ aip: 14
 title: Update vesting contract
 author: movekevin
 Status: Accepted
-last-call-end-date:
 type: Standard (Framework)
 created: 2023/02/10
 updated: 2023/02/10

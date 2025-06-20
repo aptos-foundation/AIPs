@@ -4,7 +4,6 @@ title: Update Simple Map To Save Gas
 author: areshand
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/15
 Status: Accepted
-last-call-end-date (*optional):
 type: Standard (framework)
 created: 12/8/2022
 ---

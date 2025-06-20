@@ -4,8 +4,7 @@ title: New cryptography natives for hashing and MultiEd25519 PK validation
 author: Alin Tomescu <alin@aptoslabs.com>
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/57
 Status: Accepted
-last-call-end-date (*optional):
-type: Standard Framework # <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
+type: Standard (Framework)
 created: 02/02/2022
 updated (*optional):
 requires (*optional):

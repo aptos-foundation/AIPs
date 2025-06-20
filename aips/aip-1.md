@@ -4,7 +4,6 @@ title: Proposer selection improvements
 author: igor-aptos
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/9
 Status: Accepted
-last-call-end-date (*optional):
 type: Standard (Core)
 created: 12/7/2022
 ---

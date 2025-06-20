@@ -3,7 +3,7 @@ aip: 96
 title: Federated Keyless accounts
 author: Alin Tomescu (alin@aptoslabs.com), davidiw, heliuchuan
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/490
-Status: Draft  #| Last Call | Accepted | Final | Rejected>
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Framework)>
 created: 08/21/2024
