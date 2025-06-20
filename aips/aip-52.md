@@ -2,13 +2,11 @@
 aip: 52
 title: Automated Account Creation for Sponsored Transactions
 author: davidiw
-discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+Status: Accepted
 type: Framework
 created: 10/04/2023
 updated (*optional): 12/11/2023
-requires (*optional): <AIP number(s)>
+requires (*optional): AIP-39
 ---
 
 # AIP-52 - Automated Account Creation for Sponsored Transactions

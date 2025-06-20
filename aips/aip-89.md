@@ -3,7 +3,7 @@ aip: 89
 title: Consensus Latency Reduction using Order Votes
 author: Satya Vusirikala, Daniel Xiang, Zekun Li
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/451
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): 06/25/2024
 type: Core
 created: 06/13/2024

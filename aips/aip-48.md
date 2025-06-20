@@ -3,7 +3,7 @@ aip: 48
 title: Allow direct commission change vesting contract
 author: wintertoro, movekevin, junkil-park
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/237
-Status: In Review
+Status: Accepted
 type: Standard Framework
 created: 08/23/2023
 ---

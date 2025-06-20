@@ -7,7 +7,7 @@ type: Standard (Framework)
 created: 03/07/2022
 ---
 
-# AIP-18 - Introducing SmartVector and SmartTable to apto_std
+# AIP-18 - Introducing SmartVector and SmartTable to aptos_std
 
 ## Summary
 

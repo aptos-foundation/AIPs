@@ -2,7 +2,7 @@
 aip: 35
 title: Charging Invariant Violation Errors 
 author: runtian@aptoslabs.com
-discussions-to: [<a url pointing to the official discussion thread>](https://github.com/aptos-foundation/AIPs/issues/144)
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/144
 Status: Accepted
 type: Informational
 created: 05/17/2023

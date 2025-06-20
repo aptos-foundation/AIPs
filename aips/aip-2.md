@@ -4,7 +4,6 @@ title: Multiple Token Changes
 author: areshand
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/2
 Status: Accepted
-last-call-end-date (*optional):
 type: Standard (framework)
 created: 12/7/2022
 ---

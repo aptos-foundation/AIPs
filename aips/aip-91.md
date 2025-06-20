@@ -1,9 +1,9 @@
 ---
 aip: 91
 title: Enum Types in the Move VM
-author: Wolfgang Grieskamp (wg@aptoslabs.comm)
+author: Wolfgang Grieskamp (wg@aptoslabs.com)
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft 
+Status: Accepted
 last-call-end-date (*optional): 8/5/2024
 type: Standard Language
 created: 7/21/2024

@@ -3,7 +3,7 @@ aip: 59
 title: Storage IO Gas Adjustments
 author: msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/291
-Status: Draft
+Status: Accepted
 last-call-end-date:
 type: Gas
 created: 12/12/2023

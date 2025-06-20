@@ -1,19 +1,11 @@
 ---
-
 aip: 51
-
 title: Changing beneficiaries for operators
-
 author: junkil-park, michelle-aptos, movekevin, wintertoro
-
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/251
-
 Status: In Review
-
 type: Standard Framework
-
 created: 10/3/2023
-
 ---
 
 

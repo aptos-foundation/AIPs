@@ -3,7 +3,7 @@ aip: 33
 title: Block Gas Limit
 author: danielxiangzl
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Execution
 created: 05/07/2023

@@ -3,7 +3,7 @@ aip: 93
 title: Consensus Observer
 author: Josh Lind (https://github.com/JoshLind) & Zekun Li (https://github.com/zekun000)
 discussions-to (*optional):
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional):
 type: Core
 created: 07/19/2024

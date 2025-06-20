@@ -4,7 +4,6 @@ title: Peer monitoring service
 author: joshlind
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/118
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Informational
 created: 5/3/2023
 updated (*optional): 5/3/2023

@@ -3,7 +3,7 @@ aip: 46
 title: New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255
 author: Michael Straka (michael@aptoslabs.com), Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/222
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: 07/21/2023

@@ -2,11 +2,9 @@
 aip: 34
 title: Unit Gas Price Estimation
 author: bchocho
-discussions-to (*optional): 
-Status: Draft
-last-call-end-date (*optional):
+Status: Accepted
 type: Standard
-created: <mm/dd/yyyy>
+created: 05/26/2023
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---

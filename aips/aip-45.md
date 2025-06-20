@@ -3,7 +3,7 @@ aip: 45
 title: Safe Burning of User-Owned Objects
 author: davidiw, movekevin, lightmark, bowenyang007, capcap, kent-white
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/232
-Status: In Review
+Status: Accepted
 type: Standard Framework
 created: 08/13/2023
 ---

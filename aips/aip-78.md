@@ -3,7 +3,7 @@ aip: 78
 title: Aptos Token Objects Framework Update
 author: johnchanguk
 discussions-to (*optional):
-Status: In Review
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Framework
 created: 03/23/2024

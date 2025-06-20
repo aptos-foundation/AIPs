@@ -3,7 +3,7 @@ aip: 79
 title: Implementation of instant on-chain randomness
 author: Alin Tomescu (alin@aptoslabs.com), Zhuolun "Daniel" Xiang (daniel@aptoslabs.com), Zhoujun Ma (zhoujun@aptoslabs.com)
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core, Networking, Framework)
 created: 02/12/2024

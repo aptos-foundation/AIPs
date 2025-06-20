@@ -3,7 +3,7 @@ aip: 87
 title: Introduce native API to evaluate aggregator value is greater or equal to given amount
 author: igor-aptos
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: <mm/dd/yyyy>

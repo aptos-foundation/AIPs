@@ -4,7 +4,6 @@ title: Resource Groups
 author: davidiw, wrwg, msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/26
 Status: Accepted
-last-call-end-date:
 type: Standard (Interface, Framework)
 created: 2023/1/5
 updated: N/A

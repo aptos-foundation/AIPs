@@ -3,7 +3,7 @@ aip: 90
 title: Add Apple as a supported OIDC provider
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/452
-Status: Draft # | Last Call | Accepted | Final | Rejected>
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
 created: 06/14/2024

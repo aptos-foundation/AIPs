@@ -3,7 +3,7 @@ aip: 99
 title: Disable Object Burn
 author: gregnazario (greg@aptoslabs.com)
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: 8/28/2024

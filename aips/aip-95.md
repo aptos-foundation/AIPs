@@ -3,7 +3,7 @@ aip: 95
 title: Collection Permissions Update
 author: johnchanguk, briungri
 discussions-to (*optional):
-Status: In Review
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Framework
 created: 07/15/2024

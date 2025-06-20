@@ -3,9 +3,9 @@ aip: 81
 title: Pepper service for keyless accounts
 author: Zhoujun Ma (zhoujun@aptoslabs.com)
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
+type: Informational
 created: 03/17/2024
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>

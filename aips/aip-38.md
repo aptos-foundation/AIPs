@@ -2,8 +2,7 @@
 aip: 38
 title: Deprecate Storage Gas Curves
 author: msmouse
-discussions-to (*optional):
-Status: Draft
+Status: Accepted
 type: Core
 created: 06/07/2023
 ---
