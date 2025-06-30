@@ -13,16 +13,16 @@ requires (*optional): <AIP number(s)>
 
 # AIP-X - Single-Hop Block Time
   
-(Please give a temporary file name to your AIP when first drafting it, such as `aip-x.md`. The AIP manager will assign a number to it after reviewing.)
+<!-- (Please give a temporary file name to your AIP when first drafting it, such as `aip-x.md`. The AIP manager will assign a number to it after reviewing.) -->
 
-(Please remove the questions in the "quote box". Provide complete context to the questions being asked in the content that you provide.)
+<!-- (Please remove the questions in the "quote box". Provide complete context to the questions being asked in the content that you provide.) -->
 
 ## Summary
 
- > Summarize in 3-5 sentences.
+ <!-- > Summarize in 3-5 sentences.
  > Define the problem we're solving.
  > How does this document propose solving it.
- > What are the goals and what is in scope? Any metrics?
+ > What are the goals and what is in scope? Any metrics? -->
 
 
 This AIP reduces the block time from two network hops to a single hop.
@@ -36,19 +36,18 @@ By halving the block time, this change is expected to:
   - **Shorter queuing delays**, as blocks are proposed more frequently
   - **Faster execution**, since blocks are smaller and can be processed more efficiently
 
-The core mechanism enabling this improvement is **Optimistic Proposal**. Under this approach, consensus leaders can propose new blocks without first gathering a quorum certificate (QC) for the parent block. Instead, they optimistically build upon the previous proposal without waiting for its QC, affectively reducing the block time by one network hop. 
-
+The core mechanism enabling this improvement is **Optimistic Proposal**. Under this approach, consensus leaders can propose new blocks without first gathering a quorum certificate (QC) for the parent block. Instead, they optimistically build upon the previous proposal without waiting for its QC, effectively reducing the block time by one network hop. 
 
 ### Out of scope
 
- > What are we committing to not doing and why are they scoped out?
+ <!-- > What are we committing to not doing and why are they scoped out? -->
 
-...
+<!-- ... -->
 
 ## High-level Overview
 
- > Define the straw man solution with enough details to make it clear why this is the preferred solution.
- > Please write a 2-3 paragraph high-level overview here and defer writing a more detailed description in [the specification section](#specification-and-implementation-details).
+ <!-- > Define the straw man solution with enough details to make it clear why this is the preferred solution.
+ > Please write a 2-3 paragraph high-level overview here and defer writing a more detailed description in [the specification section](#specification-and-implementation-details). -->
 
 At a high level, this proposal enhances the consensus protocol by introducing **optimistic proposals**, which enable **single-hop block time** in the common case.
 In the current Aptos consensus protocol, each leader must first collect a quorum of votes (also known as a **Quorum Certificate or QC**), for the previous round's proposal before making a new one. This requirement adds an additional network hop, delaying block proposals. We refer to such proposals that include the QC of their parent block as **regular proposals**.
@@ -85,9 +84,9 @@ In this example, three validators—**V1**, **V2**, and **V3**—participate in 
 
 ## Impact
 
- > Which audiences are impacted by this change? What type of action does the audience need to take?
+ <!-- > Which audiences are impacted by this change? What type of action does the audience need to take?
  > What might occur if we do not accept this proposal?
- > List out other AIPs this AIP is dependent on
+ > List out other AIPs this AIP is dependent on -->
 
 This proposal introduces an internal change to the blockchain's consensus protocol. The primary impact is as follows:
 
@@ -119,7 +118,7 @@ As a result, the existing block constraints—such as **gas limits and size thre
 
 ## Alternative Solutions
 
- > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
+ <!-- > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome? -->
 
 
 This solution is inspired by the **Moonshot consensus protocol**[^1], which introduces **optimistic block proposals**—allowing leaders to propose blocks without waiting for a parent QC.
@@ -145,7 +144,7 @@ We believe this tradeoff is reasonable, as consecutive honest leaders are **comm
 
 ## Specification and Implementation Details
 
- > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
+ <!-- > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations. -->
 
 ### Protocol Logic
 
@@ -217,14 +216,59 @@ Now consider two sub-cases based on what `L(r+2)` proposes:
 - **Sub-case 2.2:** `L(r+2)` proposes an **optimistic block** `B(r+2)`  
   - According to the protocol, `B(r+1)` contains `QC(r)`, and `B(r-1)` is ordered by the 2-chain rule.
 
+### Core Structures
+
+The following core structures are introduced to support optimistic proposals:
+
+```rust
+/// An optimistic proposal message that contains the block data and sync information.
+pub struct OptProposalMsg {
+    block_data: OptBlockData,
+    sync_info: SyncInfo,
+}
+```
+
+```rust
+/// Same as BlockData, without QC and with parent id
+pub struct OptBlockData {
+    pub epoch: u64,
+    pub round: Round,
+    pub timestamp_usecs: u64,
+    pub parent: BlockInfo,
+    pub block_body: OptBlockBody,
+}
+```
+
+```rust
+pub enum OptBlockBody {
+    V0 {
+        validator_txns: Vec<ValidatorTransaction>,
+        // T of the block (e.g. one or more transaction(s)
+        payload: Payload,
+        // Author of the block that can be validated by the author's public key and the signature
+        author: Author,
+        // QC of the grandparent block
+        grandparent_qc: QuorumCert,
+    },
+}
+```
 
 ## Reference Implementation
 
- > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
+ <!-- > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
  > What is the feature flag(s)? If there is no feature flag, how will this be enabled?
-...
+ -->
 
-## Testing 
+The reference implementation of this proposal is available at the following Pull Requests:
+- https://github.com/aptos-labs/aptos-core/pull/16126
+- https://github.com/aptos-labs/aptos-core/pull/16772
+
+The change is gated by two local consensus configuration:
+- `enable_optimistic_proposal_rx`: Enables optimistic proposal handling in the consensus protocol.
+- `enable_optimistic_proposal_tx`: Enables optimistic proposal generation and sending in the consensus protocol.
+
+
+<!-- ## Testing 
 
  > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out. Some examples include user stories, network health metrics, system metrics, E2E tests, unit tests, etc.) 
  > - When can we expect the results?
@@ -251,36 +295,51 @@ Now consider two sub-cases based on what `L(r+2)` proposes:
 
  > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in one year? In five years?
 
-...
+... -->
 
 ## Timeline
 
-### Suggested implementation timeline
+<!-- ### Suggested implementation timeline
 
  > Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
 
-...
+... -->
 
-### Suggested developer platform support timeline
-
+<!-- ### Suggested developer platform support timeline
  > **Optional:** Describe the plan to have SDK, API, CLI, Indexer support for this feature, if applicable. 
-
-...
+... -->
 
 ### Suggested deployment timeline
 
- > **Optional:** Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
+ <!-- > **Optional:** Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
  > You are responsible for updating this AIP with a better estimate, if any, after the AIP passes the gatekeeper’s design review.
  >
  > - On devnet?
  > - On testnet?
  > - On mainnet?
 
-...
+... -->
 
 
-## Open Questions (Optional)
+<!-- ## Open Questions (Optional)
 
  > Q&A here, some of them can have answers some of those questions can be things we have not figured out, but we should
 
-...
+... -->
+
+
+The deployment will be carried out in a slow rollout manner. The feature will be slowly rolled out devnet validators first one at a time, followed by testnet validators, and finally mainnet validators. The rollout will be paused at each stage to monitor the performance of the network and to ensure that the feature is working as expected.
+
+```mermaid
+gantt
+	title Deployment Timeline
+	dateFormat  YYYY-MM-DD
+	axisFormat %m-%d-%y
+	tickInterval 1week
+	excludes    weekends
+
+	section Rollout
+	Devnet       :, 2025-07-02, 7d
+	Testnet      :, 2025-07-14, 7d
+	Mainnet      :, 2025-07-28, 30d
+```
