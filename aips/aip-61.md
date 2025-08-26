@@ -957,7 +957,7 @@ The [OIDC specification](https://openid.net/specs/openid-connect-core-1_0.html) 
 
 ### JWT header and payload example
 
-This is a JWT obtained from the Google OAuth playground[^oauth-playground].
+This is a JWT obtained from the Google OAuth playground[^oauth-playground]. (For an Apple example, see [here](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-90.md#jwt-header-and-payload-example).)
 
 JWT header:
 
