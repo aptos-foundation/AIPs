@@ -112,6 +112,39 @@ As soon as possible. To be discussed and agreed upon.
 
 **Key question:** What would be a user-friendly recovery mechanism[^aip-61-recovery] for OIDC providers like Apple that have PPIDs?
 
+## Appendix
+
+### JWT header and payload example
+
+
+JWT header:
+
+```
+{
+  "kid": "dMlERBaFdK",
+  "alg": "RS256"
+}
+```
+
+JWT payload:
+
+```
+{
+  "iss": "https://appleid.apple.com",
+  "aud": "app.aptosconnect.web",
+  "exp": 1736540489,
+  "iat": 1736454089,
+  "sub": "001903.87e576838a114932b409b7bb34417904.1924",
+  "nonce": "15919628789903246873379427733051374218372906955101515791742506401291192372556",
+  "at_hash": "u_tp8X3aQKnxVnzUk3vECw",
+  "email": "k9rqh2nkm9@privaterelay.appleid.com",
+  "email_verified": true,
+  "is_private_email": true,
+  "auth_time": 1736454088,
+  "nonce_supported": true
+}
+```
+
 ## References
 
 [^aip-61]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md
