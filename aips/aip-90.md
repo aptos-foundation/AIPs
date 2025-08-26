@@ -116,6 +116,7 @@ As soon as possible. To be discussed and agreed upon.
 
 ### JWT header and payload example
 
+This is a JWT obtained from logging in with Apple into [Aptos Connect](https://aptosconnect.app).
 
 JWT header:
 
