@@ -833,9 +833,10 @@ The **advantages** of this approach are:
 3. The recovery service is stateless and does not store signed JWTs of previously-logged in users.
 4. A dishonest recovery service cannot, on its own, rotate the accounts of a user. The user must first sign in into the recovery service.
 
-A **disadvantage** of this approach is that if a user signs into an **actively-malicious** recovery service, that service can steal all of that user’s keyless accounts. So users must be vigilant about which recovery service they use.
-
-To mitigate this problem, it may be possible to distribute a recovery service via MPC techniques. This would ensure that the signed JWT cannot be stolen by a colluding minority of the servers. This is left as future work.
+The **disadvantages** of this approach are:
+1. If a user signs into an **actively-malicious** recovery service, that service can steal all of that user’s keyless accounts. So users must be vigilant about which recovery service they use.
+   - To mitigate this problem, it may be possible to distribute a recovery service via MPC techniques. This would ensure that the signed JWT cannot be stolen by a colluding minority of the servers. This is left as future work.
+2. For good UX, the recovery service should be able to easily identify all the `client_id`'s that the logged-in user has had a keyless account for. For this, the pepper service could be leveraged to maintain a database mapping `sub`'s (and `email`'s) to their list of `client_id`'s (and their associated website URL or application name). But this would leak that that particular user has logged into a particular website and requested a pepper for it.
 
 #### Other recovery paths
 
