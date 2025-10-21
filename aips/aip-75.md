@@ -133,7 +133,7 @@ The specific structure of the request JSON object is determined by:
 * Custom serialization logic for the [EphemeralPublicKey](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/authenticator.rs#L1121) and [Pepper](https://github.com/aptos-labs/aptos-core/blob/main/types/src/keyless/mod.rs#L163) types, defined in `aptos-types`
 
 ```rust
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, BCSCryptoHash, CryptoHasher)]
 pub struct RequestInput {
     pub jwt_b64: String,
     pub epk: EphemeralPublicKey,
@@ -144,8 +144,13 @@ pub struct RequestInput {
     pub pepper: Pepper,
     pub uid_key: String,
     pub extra_field: Option<String>,
-    pub aud_override: Option<String>,
+    pub idc_aud: Option<String>,
+    #[serde(default)]
+    pub use_insecure_test_jwk: bool,
+    #[serde(default)]
+    pub skip_aud_checks: bool,
 }
+
 ```
 
 #### Response format
