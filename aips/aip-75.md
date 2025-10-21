@@ -163,12 +163,14 @@ pub type PoseidonHash = [u8; 32];
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(untagged)]
+#[allow(clippy::large_enum_variant)] // EphemeralSignature has the WebAuthn (Passkey) variant which is large.
 pub enum ProverServiceResponse {
     Success {
         proof: Groth16Proof,
         #[serde(with = "hex")]
         public_inputs_hash: PoseidonHash,
-        training_wheels_signature: Ed25519Signature,
+        #[serde(with = "hex")]
+        training_wheels_signature: Vec<u8>,
     },
     Error {
         message: String,
