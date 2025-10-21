@@ -1041,9 +1041,9 @@ The design and implementation of JWK consensus is described in AIP-67[^aip-67], 
 
 ## References
 
-[^aip-67]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md
-[^aip-75]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-75.md
-[^aip-81]: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-81.md
+[^aip-67]: [AIP-67: JWK consensus](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md)
+[^aip-75]: [AIP-75: Prover service](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-75.md)
+[^aip-81]: [AIP-81: Pepper service](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-81.md)
 [^bn254]: https://hackmd.io/@jpw/bn254
 [^bonsay-pay]: https://www.risczero.com/news/bonsai-pay
 [^circom]: https://docs.circom.io/circom-language/signals/
