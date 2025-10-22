@@ -457,7 +457,7 @@ The **ZK relation $\mathcal{R}$** simply **performs the privacy-sensitive part o
 10. Verify the OIDC signature $\sigma_\mathsf{oidc}$ under $\mathsf{jwk}$ over the JWT $\mathsf{header}$ and payload $\mathsf{jwt}$.
 
 > [!TIP]
-> Importantly, the ZK proof $\pi$ leaks nothing about the privacy-sensitive inputs in $\textbf{w}$.
+> Importantly, the ZK proof $\pi$ leaks nothing about the privacy-sensitive inputs in $\textbf{w}$ and thus in $\textbf{w}_\mathsf{priv}$.
 
 > [!NOTE]
 > The additional $\mathsf{exp\\_horizon}$ variable is a layer of indirection. It ensures that when the $\mathsf{max\\_exp\\_horizon}$ parameter on chain changes ZKPs do not become stale since they take $\mathsf{exp\\_horizon}$ as an input, not $\mathsf{max\\_exp\\_horizon}$.
