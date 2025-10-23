@@ -98,7 +98,7 @@ Due to time constraints, engineering effort and security considerations, the alt
 
 ### Enum-based `Option` type
 
-Previously, the Option type in Move was implemented as a struct backed by a vector:
+Previously, the `Option` type in Move was implemented as a struct backed by a vector:
 
 ```move
     struct Option<Element> has copy, drop, store {
@@ -106,7 +106,7 @@ Previously, the Option type in Move was implemented as a struct backed by a vect
     }
 ```
 
-This design was inefficient because all operations on Option were implemented through vector operations. To improve performance and expressiveness, we refactored it into an enum form:
+This design was inefficient because all operations on `Option` were implemented through vector operations. To improve performance and expressiveness, it is replaced by an enum form:
 
 ```move
     enum Option<Element> has copy, drop, store {
@@ -120,13 +120,13 @@ This design was inefficient because all operations on Option were implemented th
 However, directly replacing the old implementation with this new one is not feasible for two reasons:
 
 - Backward compatibility: modifying the aptos-framework in an incompatible way is generally not allowed.
-- Ecosystem dependencies: existing indexer services and downstream ecosystem projects rely on the current JSON representation of Option. We must continue supporting the legacy format even after introducing the enum version.
+- Ecosystem dependencies: existing indexer services and downstream ecosystem projects rely on the current JSON representation of `Option`. The legacy format has to be supported even after introducing the enum version.
 
-To enable a smooth migration toward the new Option representation, we adopt a two-step process:
+To enable a smooth migration toward the new `Option` representation, a two-step process is adopted:
 
 Step 1: enable Enum Support in the VM
 
-The enum-based implementation of Option is compiled and embedded into the node binary. This allows the new enum features to be used without immediately modifying the framework code.
+The enum-based implementation of `Option` is compiled and embedded into the node binary. This allows the new enum features to be used without immediately modifying the framework code.
 
 A new feature flag, `ENABLE_ENUM_OPTION`, controls this behavior:
 
