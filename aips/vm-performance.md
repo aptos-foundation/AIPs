@@ -32,10 +32,10 @@ This AIP focuses specifically on Move VM & related execution performance improve
 The Move VM performance improvements are implemented as a collection of targeted optimizations that work together to enhance execution speed and reduce resource consumption.
 
 - **Compile-time Move Function Inlining**:
-  TODO(teng/vineeth)
+To reduce the execution overhead caused by function calls, the compiler provides an inlining optimization, which statically replaces a function call with the body of the called function. The compiler supports two levels of inlining. By default, a function can be inlined only when both the caller and callee are in the same package. In aggressive mode, inlining is extended to allow functions from different packages to be inlined as well.
 
 - **Enum-based `Option` Type**:
-  TODO(teng)
+The Move implementation of `Option` is changed from a struct to an enum, which provides a more natural representation and can also yield better performance than the struct-based design.
 
 - **Trusted Code**:
   TODO(wolfgang)
@@ -98,7 +98,51 @@ Due to time constraints, engineering effort and security considerations, the alt
 
 ### Enum-based `Option` type
 
-TODO(teng)
+Previously, the `Option` type in Move was implemented as a struct backed by a vector:
+
+```move
+    struct Option<Element> has copy, drop, store {
+        vec: vector<Element>
+    }
+```
+
+This design was inefficient because all operations on `Option` were implemented through vector operations. To improve performance and expressiveness, it is replaced by an enum form:
+
+```move
+    enum Option<Element> has copy, drop, store {
+        None,
+        Some {
+            e: Element,
+        }
+    }
+```
+
+However, directly replacing the old implementation with this new one is not feasible for two reasons:
+
+- Backward compatibility: modifying the aptos-framework in an incompatible way is generally not allowed.
+- Ecosystem dependencies: existing indexer services and downstream ecosystem projects rely on the current JSON representation of `Option`. The legacy format has to be supported even after introducing the enum version.
+
+To enable a smooth migration toward the new `Option` representation, a two-step process is adopted:
+
+Step 1: enable Enum Support in the VM
+
+The enum-based implementation of `Option` is compiled and embedded into the node binary. This allows the new enum features to be used without immediately modifying the framework code.
+
+A new feature flag, `ENABLE_ENUM_OPTION`, controls this behavior:
+
+- Whether the VM uses the enum representation or the legacy struct-based one;
+- Whether the local option module should be overridden by the precompiled version;
+- Whether compatibility validation for the option module should be temporarily disabled.
+
+Step 2: framework Upgrade and re-Enable Validation
+
+Since `ENABLE_ENUM_OPTION` disables compatibility checks for the option module, the framework can now be safely upgraded to adopt the new enum-based implementation.
+
+After this upgrade, a second feature flag, `ENABLE_FRAMEWORK_FOR_OPTION`, is introduced. When enabled, it:
+
+- Re-enables compatibility validation for the option module;
+- Switches the VM to use the framework-defined version instead of the precompiled one.
+
 
 ### Trusted Code
 
@@ -252,7 +296,9 @@ Hence, interpreter checks were removed.
 
 ### Enum-based `Option` Type
 
-TODO(teng)
+- [x] https://github.com/aptos-labs/aptos-core/pull/17698
+- [x] https://github.com/aptos-labs/aptos-core/pull/17751
+- [x] https://github.com/aptos-labs/aptos-core/pull/17776
 
 ### Trusted Code
 
