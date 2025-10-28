@@ -969,13 +969,14 @@ JWT header (85 bytes $\Rightarrow$ 113 bytes base64url encoding):
 }
 ```
 
-JWT payload (307 bytes $\Rightarrow$ 410 bytes base64url encoding):
+JWT payload (398 bytes $\Rightarrow$ 531 bytes base64url encoding):
 
 ```
 {
   "iss": "https://accounts.google.com",
   "azp": "407408718192.apps.googleusercontent.com",
   "aud": "407408718192.apps.googleusercontent.com",
+  "nonce": "15919628789903246873379427733051374218372906955101515791742506401291192372556",
   "sub": "103456789123450987654",
   "email": "alice@gmail.com",
   "email_verified": true,
