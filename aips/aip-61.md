@@ -959,7 +959,7 @@ The [OIDC specification](https://openid.net/specs/openid-connect-core-1_0.html) 
 
 This is a JWT obtained from the Google OAuth playground[^oauth-playground]. (For an Apple example, see [here](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-90.md#jwt-header-and-payload-example).)
 
-JWT header:
+JWT header (85 bytes $\Rightarrow$ 113 bytes base64url encoding):
 
 ```
 {
@@ -969,7 +969,7 @@ JWT header:
 }
 ```
 
-JWT payload:
+JWT payload (307 bytes $\Rightarrow$ 410 bytes base64url encoding):
 
 ```
 {
