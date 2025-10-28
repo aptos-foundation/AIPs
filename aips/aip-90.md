@@ -117,7 +117,7 @@ As soon as possible. To be discussed and agreed upon.
 ### JWT header and payload example
 
 
-JWT header:
+JWT header (40 bytes $\Rightarrow$ 54 bytes base64url encoding):
 
 ```
 {
@@ -126,7 +126,7 @@ JWT header:
 }
 ```
 
-JWT payload:
+JWT payload (448 bytes $\Rightarrow$ 598 bytes base64url encoding):
 
 ```
 {
