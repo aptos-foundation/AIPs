@@ -1,5 +1,5 @@
 ---
-aip: AIP-120
+aip: 120
 title: Trading Engine on Aptos
 author: igor-aptos, skedia, runtianz, brian
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/598

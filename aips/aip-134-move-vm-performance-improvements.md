@@ -1,5 +1,5 @@
 ---
-aip: AIP-134
+aip: 134
 title: Move VM Performance Improvements
 author: Move Team (TODO)
 discussions-to (*optional): TODO

@@ -7,7 +7,7 @@ Status: Accepted
 type: Framework
 created: 04/27/2024
 updated (*optional): <mm/dd/yyyy>
-requires: 21
+requires: AIP-21
 ---
 
 # AIP-83 - Framework-level Untransferable Fungible Asset Stores
