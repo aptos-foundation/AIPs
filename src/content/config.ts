@@ -94,23 +94,27 @@ export const collections = {
         author: z
           .union([z.string(), z.array(z.string())])
           .optional()
+          .nullable()
           .transform(toStringArray),
-        "discussions-to": z.string().optional(),
-        status: z.any().optional().transform(statusNormalize),
-        type: z.any().optional().transform(typeNormalize),
+        "discussions-to": z.string().optional().nullable(),
+        status: z.any().optional().nullable().transform(statusNormalize),
+        type: z.any().optional().nullable().transform(typeNormalize),
         created: z
           .union([z.string(), z.date()])
           .optional()
+          .nullable()
           .transform(toDate),
         updated: z
           .union([z.string(), z.date()])
           .optional()
+          .nullable()
           .transform(toDate),
         requires: z
           .union([z.string(), z.array(z.string())])
           .optional()
+          .nullable()
           .transform(toStringArray),
-        "last-call-end-date": z.string().optional(),
+        "last-call-end-date": z.string().optional().nullable(),
       }),
     }),
   }),
