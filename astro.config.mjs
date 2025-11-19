@@ -14,6 +14,18 @@ const site = isCI
 export default defineConfig({
   site,
   base,
+  vite: {
+    server: {
+      fs: {
+        // Allow serving files from the parent directories (for symlinks)
+        allow: [".."]
+      }
+    },
+    resolve: {
+      // Preserve symlinks to allow reading AIP files
+      preserveSymlinks: true
+    }
+  },
   markdown: {
     remarkPlugins: [remarkAipImages],
   },
