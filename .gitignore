@@ -1,3 +1,13 @@
 .idea
 notes.md
 .DS_Store
+
+# Astro/Starlight
+node_modules
+.astro
+dist
+.vercel
+.netlify
+.env
+.env.*
+package-lock.json
