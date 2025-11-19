@@ -7,7 +7,7 @@ Status: Accepted
 type: Standard (Framework)
 created: 2023/01/05
 updated: 2023/01/23
-requires: "AIP-9: Resource Groups"
+requires: AIP-9
 ---
 
 # AIP-10 - Move Objects

@@ -7,7 +7,7 @@ Status: Accepted
 type: Standard (Framework)
 created: 2023/3/18
 updated:
-requires: "AIP-11: Tokens as Objects"
+requires: AIP-11
 ---
 
 # AIP-22 - No-Code Digital Assets (Token Objects)

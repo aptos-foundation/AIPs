@@ -73,11 +73,14 @@ const toStringArray = (v?: unknown): string[] => {
   if (Array.isArray(v)) return v.map((x) => norm(x)).filter(Boolean);
   const s = norm(v);
   if (!s) return [];
-  if (s.includes(","))
+  // Handle both comma-separated and quoted comma-separated values
+  // e.g., "AIP-10, AIP-11" or '"AIP-10", "AIP-11"'
+  if (s.includes(",")) {
     return s
       .split(",")
-      .map((x) => norm(x))
+      .map((x) => x.replace(/^"|"$/g, "").trim()) // Remove surrounding quotes
       .filter(Boolean);
+  }
   return [s];
 };
 

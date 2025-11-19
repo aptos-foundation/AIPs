@@ -7,7 +7,7 @@ Status: Accepted
 type: Standard (Framework)
 created: 2023/1/9
 updated: 2023/3/18
-requires: "AIP-10: Move Objects"
+requires: AIP-10
 ---
 
 # AIP-11 - Digital Assets: Tokens as Objects
