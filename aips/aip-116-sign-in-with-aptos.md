@@ -5,7 +5,7 @@ author: aptqpv
 Status: Draft
 type: Standard (Ecosystem)
 created: 12/16/2024
-requires: 62
+requires: AIP-62
 ---
 
 # AIP-116 - Sign in with Aptos
