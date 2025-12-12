@@ -8,9 +8,7 @@ last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and
 type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
 created: 06/14/2024
 updated (*optional): <mm/dd/yyyy>
-requires (*optional):
- [AIP-67](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md)
- [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)
+requires (*optional): [AIP-67](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md), [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)
 ---
 
 # AIP-90: Add Apple as a supported OIDC provider
