@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-46 - New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255
+# AIP-46: New modules for ElGamal, Pedersen and Bulletproofs over Ristretto255
 
 ## Summary
 

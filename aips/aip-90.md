@@ -9,11 +9,11 @@ type: <Standard (Core, Networking, Interface, Application, Framework) | Informat
 created: 06/14/2024
 updated (*optional): <mm/dd/yyyy>
 requires (*optional): 
- - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md
- - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md 
+ - [AIP-67](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-67.md)
+ - [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-61.md)
 ---
 
-# AIP-90 - Add Apple as a supported OIDC provider
+# AIP-90: Add Apple as a supported OIDC provider
 
 ## Summary
 

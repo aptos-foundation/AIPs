@@ -9,11 +9,11 @@ type: Standard (Core, Framework)
 created: 01/04/2024
 updated (*optional): <mm/dd/yyyy>
 requires (*optional):
- - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md
+ - [AIP-55](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md)
  # <AIP number(s)>
 ---
 
-# AIP-61 - Keyless accounts
+# AIP-61: Keyless accounts
 
 ## Summary
 

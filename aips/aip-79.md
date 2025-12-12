@@ -11,7 +11,7 @@ updated (*optional): <mm/dd/yyyy>
 requires (*optional): <AIP number(s)>
 ---
 
-# AIP-79 - Implementation of instant on-chain randomness
+# AIP-79: Implementation of instant on-chain randomness
 
 ## Summary
 

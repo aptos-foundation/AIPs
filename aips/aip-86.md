@@ -9,7 +9,7 @@ type: Standard (Framework)
 created: 05/31/2024
 updated (*optional): <mm/dd/yyyy>
 requires (*optional):
- - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-20.md
+ - [AIP-20](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-20.md)
 
 ---
 
