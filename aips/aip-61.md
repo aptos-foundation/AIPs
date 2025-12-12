@@ -9,7 +9,7 @@ type: Standard (Core, Framework)
 created: 01/04/2024
 updated (*optional): <mm/dd/yyyy>
 requires (*optional):
- - [AIP-55](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md)
+ - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md
  # <AIP number(s)>
 ---
 
