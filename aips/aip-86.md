@@ -8,7 +8,8 @@ last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and
 type: Standard (Framework)
 created: 05/31/2024
 updated (*optional): <mm/dd/yyyy>
-requires (*optional): 20
+requires (*optional):
+ - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-20.md
 
 ---
 
