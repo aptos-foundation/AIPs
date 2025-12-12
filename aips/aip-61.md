@@ -8,7 +8,9 @@ last-call-end-date (*optional): 02/15/2024
 type: Standard (Core, Framework)
 created: 01/04/2024
 updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+requires (*optional):
+ - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-55.md
+ # <AIP number(s)>
 ---
 
 # AIP-61 - Keyless accounts
