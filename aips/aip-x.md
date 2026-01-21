@@ -66,31 +66,42 @@ schemes is out-of-scope for this AIP.
 
 The encrypted mempool comprises the following components:
 
-**A new _batch threshold encryption scheme_.** This allows validators to
-  perform a single threshold reconstruction of constant size per block,
-  regardless of the number of encrypted pending transactions confirmed. It
-  also allows for much of the computation required for decryption to be
-  pipelined off the critical path.
+**A new batch threshold encryption scheme.** The scheme allows validators
+to perform a single threshold reconstruction of constant size per block,
+regardless of the number of encrypted pending transactions confirmed. It
+also allows for much of the computation required for decryption to be
+pipelined off the critical path.
   
-**A new distributed key generation (DKG) protocol** for the 
-* Integration of 
-* Modification of the SDK
+**A new distributed key generation (DKG) protocol,** which the validators
+will run to generate a new encryption key for each epoch, and for which
+transaction payloads will be encrypted. This DKG makes use of a new
+publicly-verifiable secret sharing scheme (PVSS) designed for the system.
 
-Components:
+**Integration into consensus.** During consensus, the validators will send
+additional messages in order to enable decryption of the payloads which
+were included in the block. 
 
-- Batch threshold encryption
-- DKG
-  - PVSS
-- Modified SDK
+**Modification of the fullnode API to support receiving transactions with
+encrypted payloads.** We add a new transaction payload variant which
+represents encrypted payloads throughout their lifecycle (encrypted,
+successful decryption, decryption failure).
 
-Goal: ~2000 tps
+**Modification of the SDK to support sending encrypted transaction
+payloads.** The SDK will handle fetching the current encryption key,
+generating the payload ciphertext, and submitting the transaction with this
+encrypted payload.
 
+**A trusted setup ceremony.** The batch threshold encryption scheme
+requires running a one-time trusted setup ceremony, which each validator
+must store and use during decryption. 
 
 ## Impact
 
  > Which audiences are impacted by this change? What type of action does the audience need to take?
  > What might occur if we do not accept this proposal?
  > List out other AIPs this AIP is dependent on
+  
+  
 
 - Audience: traders on Aptos network, interacting with Decibel and w/ any
   other DEX on-chain
