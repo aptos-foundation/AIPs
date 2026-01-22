@@ -220,14 +220,24 @@ verbs, or functions.
   previous epoch's validators during the **DKG**. Each validator also
   obtains an encryption of its **master secret key share**, which it can
   decrypt with its consensus key.
-* At any time, a client may send a transaction with an encrypted payload.
+* At any time, a client may submit a transaction with an encrypted payload.
   To _encrypt_ the payload, the client must fetch the current **encryption
   key** from on-chain.
+* Whenever a validator receives a block proposal from the leader which
+  contains encrypted pending transactions, 
+  * _Compute a **digest**_ asfd
  
 ### The batch threshold encryption scheme
 
 The scheme is described in detail in the academic paper[^FPTX25e]. Below,
 we present an abbreviated form of the interface which the scheme provides, taken from [here](https://github.com/aptos-labs/aptos-core/blob/1b896ef2a971b917ecfccef7322fd074d6cc7425/crates/aptos-batch-encryption/src/traits.rs#L10).
+
+Efficiency properties:
+* constant-sized digest, constant-sized decryption key shares,
+  reconstruction independent of batch size
+
+Security guarantees:
+* 
 
 
 ```rust
@@ -235,31 +245,21 @@ pub trait BatchThresholdEncryption {
 
     // The trait's associated types are omitted from this description.
 
-    /// Derive a digest from a [`DigestKey`] and a slice of ciphertexts.
     fn digest(
         digest_key: &Self::DigestKey,
         cts: &[Self::Ciphertext],
         round: Self::Round,
     ) -> Result<(Self::Digest, Self::EvalProofsPromise)>;
 
-    /// Validators *must* verify each ciphertext before approving it to be decrypted, in order to
-    /// prevent malleability attacks. Verification happens w.r.t. some associated data that was
-    /// passed into the encrypt fn.
     fn verify_ct(ct: &Self::Ciphertext, associated_data: &impl AssociatedData) -> Result<()>;
 
-    /// Although I'd like to expose as little of the identities as possible, Daniel told me that
-    /// knowing the ID of a ciphertext will potentially help with deduplication.
     fn ct_id(ct: &Self::Ciphertext) -> Self::Id;
 
-    /// Compute KZG eval proofs. This will be the most expensive operation in the scheme.
     fn eval_proofs_compute_all(
         proofs: &Self::EvalProofsPromise,
         digest_key: &Self::DigestKey,
     ) -> Self::EvalProofs;
 
-    /// Compute KZG eval proofs. This will be the most expensive operation in the scheme. This
-    /// version uses a different (slower for our parameter regime) multi-point-eval algorithm,
-    /// from von zur Gathen and Gerhardt. Currently for benchmarking only, not for production use.
     fn eval_proofs_compute_all_vzgg_multi_point_eval(
         proofs: &Self::EvalProofsPromise,
         digest_key: &Self::DigestKey,
@@ -270,9 +270,6 @@ pub trait BatchThresholdEncryption {
         ct: &Self::Ciphertext,
     ) -> Option<Self::EvalProof>;
 
-    /// Derive a decryption key share given a [`SuccinctDigest`] and a round number, whose
-    /// corresponding reconstructed decryption key will be able to decrypt any ciphertext encrypted
-    /// to that round number and committed to by that digest.
     fn derive_decryption_key_share(
         msk_share: &Self::MasterSecretKeyShare,
         digest: &Self::Digest,
@@ -284,14 +281,11 @@ pub trait BatchThresholdEncryption {
         decryption_key_share: &Self::DecryptionKeyShare,
     ) -> Result<()>;
 
-    /// Reconstruct a decryption key from a set of [`DecryptionKeyShare`]s assuming the set of
-    /// shares surpasses the threshold.
     fn reconstruct_decryption_key(
         shares: &[Self::DecryptionKeyShare],
         config: &Self::ThresholdConfig,
     ) -> Result<Self::DecryptionKey>;
 
-    // TODO: verify decryption key?
 
     fn prepare_cts(
         cts: &[Self::Ciphertext],
@@ -299,7 +293,6 @@ pub trait BatchThresholdEncryption {
         eval_proofs: &Self::EvalProofs,
     ) -> Result<Vec<Self::PreparedCiphertext>>;
 
-    /// Decrypt a set of ciphertext using a decryption key and advice.
     fn decrypt<P: Plaintext>(
         decryption_key: &Self::DecryptionKey,
         cts: &[Self::PreparedCiphertext],
@@ -314,6 +307,17 @@ pub trait BatchThresholdEncryption {
 }
 ```
 
+### Integration into consensus
+
+TODO. 
+
+### The DKG
+
+TODO.
+
+### The new transaction format
+
+### The SDK modifications
 
 
 ## Reference Implementation
