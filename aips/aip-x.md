@@ -139,6 +139,7 @@ would be to have a contract on-chain that keeps a queue of confirmed encrypted
 pending transactions, and to have the committee decrypt transactions as
 soon as they reach this queue. But this would mean that these transactions
 would wait several rounds after they are confirmed in order to be executed.
+[Rex: should I mention Shutter network by name here?]
 
 **Identity-based encryption (IBE).** IBE allows for encrypting with respect
 to an arbitrary tag, called an ID, along with a master public key. The
@@ -153,7 +154,7 @@ height. Unfortunately, this fails to provide a meaningful notion of
 security. This is because any encrypted transaction which _targets_ a specific
 block is completely revealed, even _if it fails to be included in the
 block_, for instance because of congestion, or because the fullnode decides
-to censor it.
+to censor it. [Rex: should I mention fairblock by name here?]
 
 **Previous batch threshold encryption schemes.** Several previous works [cite]
 (including one by our team) study batch threshold encryption. Although they
@@ -165,6 +166,8 @@ computationally expensive, or have problems related to denial-of-service
 ## Specification and Implementation Details
 
  > How will we solve the problem? Describe in detail precisely how this proposal should be implemented. Include proposed design principles that should be followed in implementing this feature. Make the proposal specific enough to allow others to build upon it and perhaps even derive competing implementations.
+
+- Discuss technical goals of the system? (need to figure out how/where to discuss context-dependence)
 
 - Write out batch threshold encryption interface spec (essentially what's
   in the trait)
@@ -202,19 +205,19 @@ Risks are discussed in the next section.
  > - Link tests (e.g. unit, end-to-end, property, fuzz) in the reference implementation that validate both expected and unexpected behavior of this proposal
  > - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
 
-failed decryption could potentially halt the chain
+**failed decryption could potentially halt the chain**
 - describe how we implement in a way that prevents this from happening
 
-Simulation of encrypted txns is harder
+**Simulation of encrypted txns is harder**
 - trusted simulation-only nodes, run by foundation
 
-Max possible TPS is lower than unencrypted txn max TPS
-- We are making this feature optional. So max chain TPS will be unaffected
+**Max possible TPS is lower than unencrypted txn max TPS**
+- We are making this feature optional. So max chain TPS will be unaffected. 
+- List exploratory efforts to increase TPS?
 
-Has effect on e2e latency of chain
-- but net effect should be <10 milliseconds. And we can skip decryption if
-  no encrypted txns are in a block, so blocks that don't use this feature
-  will have no effect
+**Has effect on e2e latency of chain**
+- but net effect should be <10 milliseconds.
+- We will skip all decryption computation if no encrypted txns are in a block, so blocks that don't use this feature will see no effect on latency
 
 ## Future Potential
 
