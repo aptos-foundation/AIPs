@@ -171,10 +171,20 @@ computationally expensive, or have problems related to denial-of-service
  > specific enough to allow others to build upon it and perhaps even derive
  > competing implementations.
 
+- Discuss technical goals of the system? (need to figure out how/where to discuss context-dependence)
+
+- Write out batch threshold encryption interface spec (essentially what's
+  in the trait)
+- txn format spec
+- PVSS spec? (show how it connects to batch threshold encryption)
+- trusted setup: file plan, ceremony
+
 ### Background on Aptos blockchain
  
-As described in
-[AIP-79](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-79.md#background-on-aptos-blockchain): 
+
+[AIP-79](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-79.md#background-on-aptos-blockchain) gives an overview of the Aptos blockchain, quoted below,
+which is useful for understanding the modifications made by the encrypted
+mempool.
 
 > Aptos is a **proof-of-stake (PoS)** blockchain with a consensus algorithm
 > that operates in periodic two-hour intervals known as **epochs**. The set
@@ -194,29 +204,36 @@ As described in
 > and revealing randomness later on, which ensures the randomness is
 > unbiasable and unpredictable.
  
-### Batch threshold encryption scheme
+### The flow of transactions through the encrypted mempool
+
+We describe at a high level the flow which the system enables. This touches
+on every component of the system. Then, in the following sections, we
+elaborate on these components, the interfaces which they provide, and the
+manner in which they interact.
+
+The flow description introduces the terminology for the system. In the
+following, **bold terms** are nouns, or types, and _italic terms_ are
+verbs, or functions.
+
+* At the beginning of the epoch, the validators obtain the **encryption
+  key** for this epoch, which was generated and posted on-chain by the
+  previous epoch's validators during the **DKG**. Each validator also
+  obtains an encryption of its **master secret key share**, which it can
+  decrypt with its consensus key.
+* At any time, a client may send a transaction with an encrypted payload.
+  To _encrypt_ the payload, the client must fetch the current **encryption
+  key** from on-chain.
+ 
+### The batch threshold encryption scheme
 
 The scheme is described in detail in the academic paper[^FPTX25e]. Below,
 we present an abbreviated form of the interface which the scheme provides, taken from [here](https://github.com/aptos-labs/aptos-core/blob/1b896ef2a971b917ecfccef7322fd074d6cc7425/crates/aptos-batch-encryption/src/traits.rs#L10).
 
-At a high level, the scheme allows for the following flow:
-
-* At the beginning of the ech
 
 ```rust
 pub trait BatchThresholdEncryption {
 
     // The trait's associated types are omitted from this description.
-
-    /// Encrypt a plaintext with respect to any arbitrary associated data. This associated data is
-    /// "bound" to the resulting CT, such that it will only verify with respect to the same
-    /// associated data.
-    fn encrypt<R: CryptoRng + RngCore>(
-        ek: &Self::EncryptionKey,
-        rng: &mut R,
-        msg: &impl Plaintext,
-        associated_data: &impl AssociatedData,
-    ) -> Result<Self::Ciphertext>;
 
     /// Derive a digest from a [`DigestKey`] and a slice of ciphertexts.
     fn digest(
@@ -298,13 +315,6 @@ pub trait BatchThresholdEncryption {
 ```
 
 
-- Discuss technical goals of the system? (need to figure out how/where to discuss context-dependence)
-
-- Write out batch threshold encryption interface spec (essentially what's
-  in the trait)
-- txn format spec
-- PVSS spec? (show how it connects to batch threshold encryption)
-- trusted setup: file plan, ceremony
 
 ## Reference Implementation
 
