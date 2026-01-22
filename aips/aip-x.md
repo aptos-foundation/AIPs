@@ -86,10 +86,13 @@ encrypted payloads.** We add a new transaction payload variant which
 represents encrypted payloads throughout their lifecycle (encrypted,
 successful decryption, decryption failure).
 
-**Modification of the SDK to support sending encrypted transaction
-payloads.** The SDK will handle fetching the current encryption key,
-generating the payload ciphertext, and submitting the transaction with this
-encrypted payload.
+**Modification of the SDK and wallet standard to support sending encrypted
+transaction payloads.** Both the SDK and wallets supporting the feature
+will be modified for allowing submission of transactions with
+encrypted payloads. To do this, they will handle fetching the current
+encryption key, generating the payload ciphertext, and submitting the
+transaction with this encrypted payload. Submission with encrypted payload
+will be optional, to be determined by the user.
 
 **A trusted setup ceremony.** The batch threshold encryption scheme
 requires running a one-time trusted setup ceremony, which each validator
@@ -101,15 +104,32 @@ must store and use during decryption.
  > What might occur if we do not accept this proposal?
  > List out other AIPs this AIP is dependent on
   
-  
-
-- Audience: traders on Aptos network, interacting with Decibel and w/ any
-  other DEX on-chain
-- If we do not accept: users will have no protection from frontrunning.
+ - Dapp developers
+   - Familiarize themselves with the SDK modifications.
+ - Wallet developers
+   - If they choose to support sending transactions to the encrypted
+     mempool natively from their wallet, implement the new wallet standard
+     feature.
+- Audience: traders on Aptos network, interacting with Decibel and with any
+  other DEX on-chain.
+- If we do not accept this AIP: users will have no protection from frontrunning.
 
 ## Alternative Solutions
 
  > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
+
+**Classical threshold encryption.** Using a classical threshold encryption
+scheme would mean that for every encrypted pending transaction included in
+a block, the keyshare holders (in our case, the validators) would be
+required to perform a threshold decryption protocol. This means
+(1) generating and broadcasting a partial decryption per transaction, and (2) after
+receiving a stake-weight threshold of partial decryptions for that
+transaction, combining them to reconstruct the plaintext payload. This
+would cause prohibitively large computation and communication overheads for
+the validators. 
+
+**Identity-based encryption (IBE).** IBE allows for 
+
 
 Many alternatives for encrypted mempool:
 - naive threshold decryption: communication inefficient, conservative
