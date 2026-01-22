@@ -128,17 +128,39 @@ transaction, combining them to reconstruct the plaintext payload. This
 would cause prohibitively large computation and communication overheads for
 the validators. 
 
-**Identity-based encryption (IBE).** IBE allows for 
+One option for dealing with this cost is to offload it from the validators,
+and to trust some other committee of parties for decryption of transactions that
+make it into each block. But this would introduce a completely new trust
+assumption to the system in the form of this committee. A major goal of our
+system is to avoid introducing new trust assumptions. In addition to this,
+it seems difficult to instantiate this idea in a way that avoids a large
+latency overhead for encrypted pending transactions. The most natural way
+would be to have a contract on-chain that keeps a queue of confirmed encrypted
+pending transactions, and to have the committee decrypt transactions as
+soon as they reach this queue. But this would mean that these transactions
+would wait several rounds after they are confirmed in order to be executed.
 
+**Identity-based encryption (IBE).** IBE allows for encrypting with respect
+to an arbitrary tag, called an ID, along with a master public key. The
+corresponding master secret key holder (or a threshold of keyshare holders)
+can generate a decryption key, also with respect to an ID, that decrypts
+all ciphertexts encrypted to that ID. Setting the ID to be block height,
+one could attempt to use this to build an encrypted mempool with a single
+threshold reconstruction per block: during consensus, the validators
+reconstruct a decryption key with ID equal to the current block's height,
+which can decrypt all encrypted payloads submitted with respect to that
+height. Unfortunately, this fails to provide a meaningful notion of
+security. This is because any encrypted transaction which _targets_ a specific
+block is completely revealed, even _if it fails to be included in the
+block_, for instance because of congestion, or because the fullnode decides
+to censor it.
 
-Many alternatives for encrypted mempool:
-- naive threshold decryption: communication inefficient, conservative
-  estimate is at least 5x more computation on critical path
-  - Could offload to an external service. This would introduce additional
-    trust assumptions. We want to avoid introducing any trust assumptions,
-    so our system must run directly on our validators
-- naive IBE: does not provide correct security guarantees
-- BEAT-MEV: avenues for censorship
+**Previous batch threshold encryption schemes.** Several previous works [cite]
+(including one by our team) study batch threshold encryption. Although they
+solve the problems discussed above, all previous works either have
+user-experience issues related to transaction resubmission, are
+computationally expensive, or have problems related to denial-of-service
+(or some combination of the three).
 
 ## Specification and Implementation Details
 
