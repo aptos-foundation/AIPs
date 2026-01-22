@@ -170,91 +170,43 @@ computationally expensive, or have problems related to denial-of-service
  > should be followed in implementing this feature. Make the proposal
  > specific enough to allow others to build upon it and perhaps even derive
  > competing implementations.
+
+### Background on Aptos blockchain
  
-## Batch threshold encryption scheme
+As described in
+[AIP-79](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-79.md#background-on-aptos-blockchain): 
+
+> Aptos is a **proof-of-stake (PoS)** blockchain with a consensus algorithm
+> that operates in periodic two-hour intervals known as **epochs**. The set
+> of validators and their stake distribution remain fixed within each
+> epoch, and can change across epoch boundaries. The validators of the next
+> epoch do not come online until the new epoch starts.
+>
+> The blockchain also decouples **consensus** (i.e., currently a BFT
+> consensus protocol named [Jolteon](https://arxiv.org/abs/2106.10362))
+> from **execution** (i.e., an optimistic concurrency control execution
+> engine
+> named [BlockSTM](https://medium.com/aptoslabs/block-stm-how-we-execute-over-160k-transactions-per-second-on-the-aptos-blockchain-3b003657e4ba)),
+> where each block is first finalized by consensus and then executed to
+> update the blockchain state. This consensus-execution decoupling is
+> especially important for on-chain randomness, because it allows the
+> network to first commit to an ordering of transactions before computing
+> and revealing randomness later on, which ensures the randomness is
+> unbiasable and unpredictable.
+ 
+### Batch threshold encryption scheme
 
 The scheme is described in detail in the academic paper[^FPTX25e]. Below,
-we present the interface which the scheme provides.
+we present an abbreviated form of the interface which the scheme provides, taken from [here](https://github.com/aptos-labs/aptos-core/blob/1b896ef2a971b917ecfccef7322fd074d6cc7425/crates/aptos-batch-encryption/src/traits.rs#L10).
+
+At a high level, the scheme allows for the following flow:
+
+* At the beginning of the ech
 
 ```rust
 pub trait BatchThresholdEncryption {
-    type ThresholdConfig: aptos_crypto::SecretSharingConfig;
-    type SubTranscript: Subtranscript;
 
-    /// An encryption key for the scheme. Allows for generating ciphertexts. If we want to actually
-    /// deploy this scheme, the functionality here will have to be implemented in the SDK.
-    type EncryptionKey;
-
-    /// A digest key for the scheme. Allows for generating digests given a list of ciphertexts.
-    /// Internally, this is a modified KZG setup.
-    type DigestKey: Serialize + DeserializeOwned;
-
-    /// A ciphertext for the scheme. Internally, this is encrypted w.r.t. an ID and a round number,
-    /// but I think it makes sense not to expose the ID as part of the interface. (The round number
-    /// must be exposed since it must be given as input to [`PublicKey::encrypt`], and must agree
-    /// with the round number used when computing a decryption key.)
-    type Ciphertext: Serialize + DeserializeOwned + Eq + PartialEq + Serialize + Hash;
-
-    type PreparedCiphertext: Serialize + DeserializeOwned + Eq + PartialEq + Serialize;
-
-    /// The round number used when generating a digest. For security to hold, validators must only
-    /// generate a single decryption key corresponding to a round number.
-    type Round;
-
-    /// Internally, a KZG commitment to a set of IDs.
-    type Digest;
-
-    type EvalProofsPromise;
-
-    /// The eval proofs required for decryption.
-    type EvalProofs;
-
-    /// An individual eval proof.
-    type EvalProof;
-
-    /// A share of the master secret key, which allows for deriving
-    /// decryption key shares.
-    type MasterSecretKeyShare;
-
-    /// Used to verify whether a specific player's decryption key share is valid w.r.t. a specific
-    /// digest.
-    type VerificationKey: VerificationKey;
-
-    type DecryptionKeyShare: DecryptionKeyShare;
-
-    /// A decryption key that has been reconstructed by a threshold of decryption key shares.
-    type DecryptionKey;
-    type Id: PartialEq + Eq;
-
-    fn setup(
-        digest_key: &Self::DigestKey,
-        pvss_public_params: &<Self::SubTranscript as Subtranscript>::PublicParameters,
-        subtranscript: &Self::SubTranscript,
-        threshold_config: &Self::ThresholdConfig,
-        current_player: Player,
-        sk_share_decryption_key: &<Self::SubTranscript as Subtranscript>::DecryptPrivKey,
-    ) -> Result<(
-        Self::EncryptionKey,
-        Vec<Self::VerificationKey>,
-        Self::MasterSecretKeyShare,
-    )>;
-
-    /// Generates an (insecure) setup for the batch threshold encryption scheme. Consists of
-    /// a [`PublicKey`] which can be used to encrypt messages and to compute a digest from a list
-    /// of ciphertexts, along with a vector of shares of type [`MasterSecretKeyShare`], which share
-    /// the secret key according to the [`ThresholdConfig`] given as input. Eventually, this will
-    /// need to be replaced by a DKG.
-    fn setup_for_testing(
-        seed: u64,
-        max_batch_size: usize,
-        number_of_rounds: usize,
-        threshold_config: &Self::ThresholdConfig,
-    ) -> Result<(
-        Self::EncryptionKey,
-        Self::DigestKey,
-        Vec<Self::VerificationKey>,
-        Vec<Self::MasterSecretKeyShare>,
-    )>;
+    // The trait's associated types are omitted from this description.
 
     /// Encrypt a plaintext with respect to any arbitrary associated data. This associated data is
     /// "bound" to the resulting CT, such that it will only verify with respect to the same
