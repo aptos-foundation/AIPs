@@ -215,6 +215,10 @@ The flow description introduces the terminology for the system. In the
 following, **bold terms** are nouns, or types, and _italic terms_ are
 verbs, or functions.
 
+[Rex: idea is to ease into things here. Describe outline in broad terms,
+but defer pieces (i.e., in which consensus rounds the eval proof
+computation is computed)]
+
 * At the beginning of the epoch, the validators obtain the **encryption
   key** for this epoch, which was generated and posted on-chain by the
   previous epoch's validators during the **DKG**. Each validator also
@@ -225,7 +229,16 @@ verbs, or functions.
   key** from on-chain.
 * Whenever a validator receives a block proposal from the leader which
   contains encrypted pending transactions, 
-  * _Compute a **digest**_ asfd
+  * _Compute a succint_ **digest** which commits to the the transaction
+    payload ciphertexts.
+  * Using this digest, _derive a_ **decryption key share**. 
+  * While waiting for consensus on the block, perform other computation to
+    prepare the ciphertexts for being decrypted. This step is crucial for
+    achieving expanded upon in the next section.
+* Once consensus is reached on the block, each validator broadcasts the
+  _decryption key_ share to all other validators.
+* After receiving decryption keys [from](from) a threshold of validators, [Rex:
+  talk about stake weight here?]
  
 ### The batch threshold encryption scheme
 
@@ -237,7 +250,8 @@ Efficiency properties:
   reconstruction independent of batch size
 
 Security guarantees:
-* 
+* Non-malleability
+* Context-dependence
 
 
 ```rust
