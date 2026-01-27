@@ -331,7 +331,11 @@ plaintext immediately renders it invalid, so that `verify_ct` fails.
 payload, a malicious fullnode may simply pass the payload off as its own.
 That is, when it receives a transaction with an encrypted payload from
 a user, it can simply construct a new transaction with same encrypted
-payload as-is, sign the transaction as its own, and submit. 
+payload as-is, sign the transaction as its own, and submit. Even if the
+plaintext contains the sender public key, this is not verifiable until
+after decryption. As soon as the fullnode's malicious transaction gets
+included in a block and decrypted, the user's transaction intent is
+revealed.
 
 We must also present this type of payload theft. We do this using the
 notion of _encryption with associated data._ When encrypting, the user
