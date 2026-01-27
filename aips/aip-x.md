@@ -227,23 +227,12 @@ computation is computed)]
 * At any time, a client may submit a transaction with an encrypted payload.
   To _encrypt_ the payload, the client must fetch the current **encryption
   key** from on-chain.
-* Whenever a validator receives a block proposal from the leader which
-  contains encrypted pending transactions, 
-  * _Compute a succint_ **digest** which commits to the the transaction
-    payload ciphertexts.
-  * Using this digest, _derive a_ **decryption key share**. 
-  * While waiting for consensus on the block, perform other computation to
-    prepare the ciphertexts for being decrypted. This step is crucial for
-    achieving a fast decryption time, and is expanded upon in the next section.
-* Once consensus is reached on the block, each validator broadcasts the
-  **decryption key share** to all other validators.
-* After receiving decryption keys from a threshold of validators, each
-  validator _reconstructs_ the **decryption key** for the block, which is
-  able to decrypt all ciphertexts in the block. It adds this decryption key
-  to the block metadata, so that fullnodes can verify correct decryption.
-  [Rex: talk about stake weight here?]
-* Finally, each validator _decrypts_ all ciphertexts in the block. This
-  decryption is the only operation on the critical path.
+* Whenever the validators receives a block proposal from the leader which
+  contains valid encrypted pending transactions, they use the batch
+  threshold encryption scheme to generate decryption key shares, which they
+  then broadcast after reaching consensus on the block. Finally, they use
+  these shares to reconstruct the decryption key and to decrypt the
+  ciphertexts.
  
 ### The batch threshold encryption scheme
 
@@ -261,7 +250,9 @@ consensus is reached on the block. Specifically, the points in the above
 outline which involve the batch encryption scheme can be expanded as
 follows: 
 * The leader proposes a block containing encrypted transactions. Each of
-  these transactions should be verified using `verify_ct`. 
+  these transactions should be verified using `verify_ct` before proposing;
+  if verification fails on some of the ciphertexts in a block, the block is
+  considered invalid. 
 * After receiving a block proposal from the leader, each validator first
   invokes `verify_ct` on each ciphertext. If all ciphertexts are
   valid, the validator uses the `digest` method
@@ -315,11 +306,12 @@ provides, and defer a formal description to the academic paper[^FPTX25e].
   key.
 
 
-#### Non-malleability
+#### Non-malleability, and associated data
 
 As listed above, one important security property require is
 non-malleability of ciphertexts. Because this property is both important
-and relatively nuanced, we discuss some attack scenarios.
+and relatively nuanced, we pay special attention to it in this AIP Below we
+discuss some attack scenarios related to non-malleability.
 
 **Submitting a mauled ciphertext:** Imagine that a malicious fullnode
 receives a transaction with an encrypted payload from a user, then "mauls"
@@ -333,7 +325,19 @@ It is clear that we must prevent this scenario. Specifically, we ensure
 that any modification to a ciphertext which would change the underlying
 plaintext immediately renders it invalid, so that `verify_ct` fails.
 
-**Claiming ownership of a ciphertext:** 
+**Claiming ownership of a ciphertext:** Besides modifying an encrypted
+payload, a malicious fullnode may simply pass the payload off as its own.
+That is, when it receives a transaction with an encrypted payload from
+a user, it can simply construct a new transaction with same encrypted
+payload as-is, sign the transaction as its own, and submit. 
+
+We must also present this type of payload theft. We do this using the
+notion of _encryption with associated data._ When encrypting, the user
+specifies some "associated data," in our case, the sending address. The
+resulting ciphertext is then verified with respect to this same sending
+address. We ensure that just as above, any change in the sending address
+immediately renders the `(ct, sender)` pair invalid, so that `verify_ct`
+fails.
 
 #### The interface spec
 
@@ -412,8 +416,11 @@ TODO.
 
 ### The new transaction format
 
+TODO.
+
 ### The SDK modifications
 
+TODO.
 
 ## Reference Implementation
 
