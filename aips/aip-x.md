@@ -428,7 +428,7 @@ The fullnode will accept a new type of transaction with an encrypted
 payload. This new encrypted payload type `EncryptedPayload` is defined 
 [here](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/encrypted_payload.rs), and is presented below.
 
-```
+```rust
 pub enum EncryptedPayload {
     Encrypted {
         ciphertext: Ciphertext,
@@ -454,7 +454,7 @@ pub enum EncryptedPayload {
 }
 ```
 
-```
+```rust
 pub struct PayloadAssociatedData {
     sender: AccountAddress,
 }
