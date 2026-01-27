@@ -464,7 +464,7 @@ pub struct PayloadAssociatedData {
 The goals of this payload format are: 
 * to represent the transaction throughout its lifecycle (encrypted when
   first received, then decrypted, or failed to decrypt after consensus).
-* to authenticate the plaintext payload contents. Note that 
+* to authenticate the plaintext payload contents. 
 * to ensure we are using the non-malleability features of the batch
   threshold encryption scheme in order to avoid vulnerabilities.
 * to integrate well with account abstraction.
@@ -497,6 +497,12 @@ touching the ciphertext. Inclusion of the `sender` in the
 verified with respect to whatever signed the transaction, which precludes
 attacks such as the one described in the previous section.
 
+[TODO: talk about
+* verifying failed decryption on fullnodes
+* account abstraction
+* `extra_config`?
+* Double-check hash computation (is it actually implemented yet?)
+]
 
 ### The SDK modifications
 
