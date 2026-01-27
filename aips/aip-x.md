@@ -415,8 +415,6 @@ pub trait BatchThresholdEncryption {
 }
 ```
 
--------------------------------
-STOP READING HERE
 
 ### The DKG
 
@@ -496,6 +494,9 @@ touching the ciphertext. Inclusion of the `sender` in the
 `PayloadAssociatedData` means that authenticity of the ciphertext can be
 verified with respect to whatever signed the transaction, which precludes
 attacks such as the one described in the previous section.
+
+-------------------------------
+STOP READING HERE
 
 [TODO: talk about
 * verifying failed decryption on fullnodes
