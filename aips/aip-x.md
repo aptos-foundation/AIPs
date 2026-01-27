@@ -165,6 +165,9 @@ computationally expensive, or have problems related to denial-of-service
 
 ## Specification and Implementation Details
 
+-------------------------------
+START READING HERE
+
  > How will we solve the problem? Describe in detail precisely how this
  > proposal should be implemented. Include proposed design principles that
  > should be followed in implementing this feature. Make the proposal
@@ -404,6 +407,9 @@ pub trait BatchThresholdEncryption {
     ) -> Result<P>;
 }
 ```
+
+-------------------------------
+STOP READING HERE
 
 ### Integration into consensus
 
