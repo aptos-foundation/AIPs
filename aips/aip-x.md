@@ -283,6 +283,8 @@ follows:
   constant-sized. Specifically, in our scheme, they are 48 bytes each.
 * The amount of work to derive shares and reconstruct the decryption key
   should be constant.
+* The on-critical path computation should be as efficient as possible, to
+  avoid affecting latency of the network.
 
 **Security guarantees.** We describe informally the guarantees our scheme
 provides, and defer a formal description to the academic paper[^FPTX25e].
@@ -339,6 +341,11 @@ address. We ensure that just as above, any change in the sending address
 immediately renders the `(ct, sender)` pair invalid, so that `verify_ct`
 fails.
 
+**Formalizing these and other attack scenarios.** In the paper[^FPTX25e],
+we formalize a variant of CCA2-security, adapted to batch threshold
+encryption, which captures security against these and other types of
+attacks. We give a formal proof that our scheme satisfies this security
+definition.
 
 #### The interface spec
 
@@ -411,17 +418,85 @@ pub trait BatchThresholdEncryption {
 -------------------------------
 STOP READING HERE
 
-### Integration into consensus
-
-TODO. 
-
 ### The DKG
 
 TODO.
 
 ### The new transaction format
 
-TODO.
+The fullnode will accept a new type of transaction with an encrypted
+payload. This new encrypted payload type `EncryptedPayload` is defined 
+[here](https://github.com/aptos-labs/aptos-core/blob/main/types/src/transaction/encrypted_payload.rs), and is presented below.
+
+```
+pub enum EncryptedPayload {
+    Encrypted {
+        ciphertext: Ciphertext,
+        extra_config: TransactionExtraConfig,
+        payload_hash: HashValue,
+    },
+    FailedDecryption {
+        ciphertext: Ciphertext,
+        extra_config: TransactionExtraConfig,
+        payload_hash: HashValue,
+        eval_proof: EvalProof,
+    },
+    Decrypted {
+        ciphertext: Ciphertext,
+        extra_config: TransactionExtraConfig,
+        payload_hash: HashValue,
+        eval_proof: EvalProof,
+
+        // decrypted things
+        executable: TransactionExecutable,
+        decryption_nonce: u64,
+    },
+}
+```
+
+```
+pub struct PayloadAssociatedData {
+    sender: AccountAddress,
+}
+```
+
+
+The goals of this payload format are: 
+* to represent the transaction throughout its lifecycle (encrypted when
+  first received, then decrypted, or failed to decrypt after consensus).
+* to authenticate the plaintext payload contents. Note that 
+* to ensure we are using the non-malleability features of the batch
+  threshold encryption scheme in order to avoid vulnerabilities.
+* to integrate well with account abstraction.
+
+[Rex: I don't remember why the encrypt->sign design integrates better with
+account abstraction than the sign->encrypt->sign design. Need to ask
+someone about this.]
+
+To achieve these goals, we layer encryption and signing in the following
+manner.
+1. First, a single-use `decryption_nonce: u64` chosen at random.
+2. Then, the pair `(executable, decryption_nonce)` is encrypted, with
+   associated data `PayloadAssociatedData` containing the `sender`.
+3. The value `payload_hash = H(decryption_nonce, executable, sender,
+   sequence_number)` is computed. This is a hiding commitment to
+   `(executable, sender, sequence_number)`.
+4. Finally, the `EncryptedPayload::Encrypted` enum variant is initialized
+   with the `ciphertext` and the `payload_hash`. This is signed by the
+   user's signing key as part of the final transaction being submitted.
+   [Rex: explain extra_config?]
+
+
+This design means that the user signs both the ciphertext and a hiding
+commitment to the transaction payload contents. After decryption,
+since the commitment randomness `decryption_nonce` is revealed as part of
+the plaintext, validators and fullnodes may verify the signature and the
+commitment computation to establish authenticity of the payload, without
+touching the ciphertext. Inclusion of the `sender` in the
+`PayloadAssociatedData` means that authenticity of the ciphertext can be
+verified with respect to whatever signed the transaction, which precludes
+attacks such as the one described in the previous section.
+
 
 ### The SDK modifications
 
