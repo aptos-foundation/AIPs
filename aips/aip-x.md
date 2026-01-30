@@ -615,6 +615,8 @@ Risks are discussed in the next section.
  > - Link tests (e.g. unit, end-to-end, property, fuzz) in the reference implementation that validate both expected and unexpected behavior of this proposal
  > - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
 
+**Liveness issues.** TODO
+
 **The max possible encrypted transaction TPS is lower than the max TPS for
 unencrypted transactions.**
 - We are making this feature optional. So the max chain TPS will be unaffected. 
