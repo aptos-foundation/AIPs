@@ -444,19 +444,23 @@ two key differences separate it from the randomness PVSS:
   non-verifiable subtranscript. 
 
 We design the new DKG around these differences. The DKG will have an
-agreement phase designed to work with a non-aggregatable PVSS scheme.
-Specifically:
+agreement phase designed to work with a non-aggregatable PVSS scheme, and
+to prevent unnecessary communication overhead. Specifically:
 
 1. As with the previous DKG, each party will start by disseminating
    a transcript.
 2. One of the validators (e.g. the consensus leader) broadcast a _proposal_
-   $(Q, \mathsf{subtrx})$ consisting of a set $Q$ of party indices along
-   with subtranscript $\mathsf{subtrx}$, which is claimed to be the
-   aggregation of the transcripts from the parties in $Q$. Note that this
-   proposal is succinct; the proposer does not send the individual
+   $(Q, H(\mathsf{subtrx}))$ consisting of a set $Q$ of party indices along
+   with the hash of a subtranscript $\mathsf{subtrx}$, which is claimed to
+   be the aggregation of the transcripts from the parties in $Q$. Note that
+   this proposal is succinct; the proposer does not send the individual
    subtranscripts which were aggregated to produce $\mathsf{subtrx}$.
-3. 
-
+3. Each validator signs the proposal if the following hold:
+   - the weights of the parties in $Q$ pass the threshold
+   - it has received the transcript from every party in $Q$ and has
+     verified them
+   - It has verified that the subtranscripts from parties in $Q$ aggregate
+     to $\mathsf{subtrx}$ (checked via the hash).
 
 Details of this agreement phase are in the technical blog post.[^chunky]
 
@@ -588,16 +592,11 @@ STOP READING HERE
 
 ## Reference Implementation
 
- > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
- > What is the feature flag(s)? If there is no feature flag, how will this be enabled?
-
-TODO Point to all PRs
+* The batch encryption scheme is located at [https://github.com/aptos-labs/aptos-core/tree/main/crates/aptos-batch-encryption](https://github.com/aptos-labs/aptos-core/tree/main/crates/aptos-batch-encryption).
+* The PVSS scheme is located at [https://github.com/aptos-labs/aptos-core/tree/main/crates/aptos-dkg/src/pvss/chunky](https://github.com/aptos-labs/aptos-core/tree/main/crates/aptos-dkg/src/pvss/chunky).
+* The typescript encrypt function is located at [https://github.com/aptos-labs/aptos-core/tree/enc_txn_typescript_tests_3/crates/aptos-batch-encryption/ts-batch-encrypt](https://github.com/aptos-labs/aptos-core/tree/enc_txn_typescript_tests_3/crates/aptos-batch-encryption/ts-batch-encrypt).
 
 ## Testing 
-
- > - What is the testing plan? (other than load testing, all tests should be part of the implementation details and won’t need to be called out. Some examples include user stories, network health metrics, system metrics, E2E tests, unit tests, etc.) 
- > - When can we expect the results?
- > - What are the test results and are they what we expected? If not, explain the gap.
 
 Unit tests for each component, smoke tests, forge tests/benchmarks.
 
@@ -616,25 +615,39 @@ Risks are discussed in the next section.
  > - Link tests (e.g. unit, end-to-end, property, fuzz) in the reference implementation that validate both expected and unexpected behavior of this proposal
  > - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
 
-**failed decryption could potentially halt the chain**
-- describe how we implement in a way that prevents this from happening
+**The max possible encrypted transaction TPS is lower than the max TPS for
+unencrypted transactions.**
+- We are making this feature optional. So the max chain TPS will be unaffected. 
+- We are also exploring efforts to increase TPS with this system:
+  - Issuing multiple decryption keys per block
+  - Cryptography algorithmic improvements to increase performance
 
-**Simulation of encrypted txns is harder**
-- trusted simulation-only nodes, run by foundation
+**This system has an effect on end-to-end latency of chain.**
+- This net effect should be <10 milliseconds though.
+- We will skip all decryption computation if no encrypted txns are in
+  a block, so blocks that don't use this feature will see no effect on
+  latency.
 
-**Max possible TPS is lower than unencrypted txn max TPS**
-- We are making this feature optional. So max chain TPS will be unaffected. 
-- List exploratory efforts to increase TPS?
+**Privacy-preserving simulation of encrypted transactions.** Currently in
+the SDK, the default behavior is to send a transaction to the same fullnode
+both for simulation and for submission. Since transactions sent for
+simulation must be sent in the clear, this means the fullnode might be able
+to use a statistical/timing analysis to associate the final encrypted
+transaction with the cleartext version, breaking privacy.
+- We plan to fix this issue by providing sane defaults. Some options:
+  - When building a transaction with the encryption feature on, we can
+    default to sending to a different fullnode for simulation than the one
+    that will be used for submission. Taking this further, we can spin up
+    "simulation-only" fullnodes which take care of simulating encrypted
+    transactions.
+  - Simply disable simulation by default when encryption is on.
 
-**Has effect on e2e latency of chain**
-- but net effect should be <10 milliseconds.
-- We will skip all decryption computation if no encrypted txns are in a block, so blocks that don't use this feature will see no effect on latency
 
-## Future Potential
+## Future Potential/Open Questions
 
  > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in one year? In five years?
 
-- potentially could support more general-purpose on-chain decryption.
+- future plans: hide sender?
 
 ## Timeline
 
@@ -660,12 +673,6 @@ Risks are discussed in the next section.
 Devnet end of Jan/early February, mainnet end of Feburary/early march,
 testnet somewhere in between.
 
-
-## Open Questions (Optional)
-
- > Q&A here, some of them can have answers some of those questions can be things we have not figured out, but we should
-
-- future plans: hide sender?
 
 ...
 
