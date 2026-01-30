@@ -174,18 +174,11 @@ START READING HERE
  > specific enough to allow others to build upon it and perhaps even derive
  > competing implementations.
 
-- Discuss technical goals of the system? (need to figure out how/where to discuss context-dependence)
-
-- Write out batch threshold encryption interface spec (essentially what's
-  in the trait)
-- txn format spec
-- PVSS spec? (show how it connects to batch threshold encryption)
-- trusted setup: file plan, ceremony
 
 ### Background on Aptos blockchain
  
 
-[AIP-79](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-79.md#background-on-aptos-blockchain) gives an overview of the Aptos blockchain, quoted below,
+AIP-79[^AIP-79] gives an overview of the Aptos blockchain, quoted below,
 which is useful for understanding the modifications made by the encrypted
 mempool.
 
@@ -210,6 +203,8 @@ touches each component of the system. Then, in the following sections, we
 elaborate on these components, the interfaces which they provide, and the
 manner in which they interact.
 
+* Before the system is deployed, a trusted setup ceremony is run. The
+  validators must load the result of this ceremony before starting.
 * At the beginning of the epoch, the validators obtain the encryption
   key for this epoch, which was generated and posted on-chain by the
   previous epoch's validators during the DKG. Each validator also
@@ -398,6 +393,11 @@ pub trait BatchThresholdEncryption {
         config: &Self::ThresholdConfig,
     ) -> Result<Self::DecryptionKey>;
 
+    fn verify_decryption_key(
+        encryption_key: &Self::EncryptionKey,
+        digest: &Self::Digest,
+        decryption_key: &Self::DecryptionKey,
+    ) -> Result<()>;
 
     fn prepare_cts(
         cts: &[Self::Ciphertext],
@@ -420,9 +420,52 @@ pub trait BatchThresholdEncryption {
 ```
 
 
+
 ### The DKG
 
-TODO.
+The batch threshold encryption scheme requires the validators to share
+a field-element secret key. Clients must encrypt to the corresponding
+group-element public key. The Aptos network already runs a DKG every epoch
+which establishes a shared secret key for on-chain randomness[^AIP-79], but
+this secret key is a _group element_, and thus is incompatible with our
+scheme. Because of this, we construct a new DKG which is also run by the
+validators every epoch.
+
+As with the randomness DKG, our DKG is based on non-interactive PVSS, this
+time for field elements. The new PVSS scheme is described in a technical
+blog post[^chunky], and its formal description is out-of-scope for this
+AIP. Aside from being a field-element PVSS instead of a group-element PVSS,
+two key differences separate it from the randomness PVSS:
+
+* It is not aggregatable. That is, it is not possible to aggregate many
+  transcripts into one in a way that sums the corresponding secrets and
+  shares and maintains verifiability.
+* Although it is not aggregatable, it has an aggregatable but
+  non-verifiable subtranscript. 
+
+We design the new DKG around these differences. The DKG will have an
+agreement phase designed to work with a non-aggregatable PVSS scheme.
+Specifically:
+
+1. As with the previous DKG, each party will start by disseminating
+   a transcript.
+2. One of the validators (e.g. the consensus leader) broadcast a _proposal_
+   $(Q, \mathsf{subtrx})$ consisting of a set $Q$ of party indices along
+   with subtranscript $\mathsf{subtrx}$, which is claimed to be the
+   aggregation of the transcripts from the parties in $Q$. Note that this
+   proposal is succinct; the proposer does not send the individual
+   subtranscripts which were aggregated to produce $\mathsf{subtrx}$.
+3. 
+
+
+Details of this agreement phase are in the technical blog post.[^chunky]
+
+
+### The trusted setup
+
+The trusted setup consists of many shifts of a single powers-of-tau setup.
+Its specific structure is described in the paper[^FPTX25e]; more details on
+the ceremony design and implementation will follow.
 
 ### The new transaction format
 
@@ -489,36 +532,66 @@ manner.
    [Rex: explain extra_config?]
 
 
-This design means that the user signs both the ciphertext and a hiding
-commitment to the transaction payload contents. After decryption,
-since the commitment randomness `decryption_nonce` is revealed as part of
-the plaintext, validators and fullnodes may verify the signature and the
-commitment computation to establish authenticity of the payload, without
-touching the ciphertext. Inclusion of the `sender` in the
+This design means that by signing the transaction, the user signs both the
+ciphertext and a hiding commitment to the transaction payload contents.
+After decryption, since the commitment randomness `decryption_nonce` is
+revealed as part of the plaintext, validators and fullnodes may verify the
+signature and the commitment computation to establish authenticity of the
+payload, without touching the ciphertext. Inclusion of the `sender` in the
 `PayloadAssociatedData` means that authenticity of the ciphertext can be
 verified with respect to whatever signed the transaction, which precludes
 attacks such as the one described in the previous section.
 
--------------------------------
-STOP READING HERE
+In the case of a failed decryption, the result is stored in the
+`FailedDecryption` variant. During replay, fullnodes may verify the block
+decryption key using `verify_decryption_key`, and then may verify the
+decryption failure.
+
 
 [TODO: talk about
-* verifying failed decryption on fullnodes
-* account abstraction
 * `extra_config`?
 * Double-check hash computation (is it actually implemented yet?)
 ]
 
 ### The SDK modifications
 
-TODO.
+The goal of the encrypted mempool project is privacy of transaction
+payloads, and we achieve this by encrypting payloads before they reach the
+fullnode. It follows that *this encryption must be done client-side.*
+Specifically, either the user’s wallet or the SDK must allow for performing
+this encryption. 
+
+We will support three different client-side flows:
+
+- **Without wallet interaction:** encrypt and then sign on SDK side.
+    - Comparatively, this requires the highest level trust in the dApp,
+      since it’s assumed the dApp (i.e., the SDK) has access to the signing
+      key.
+- **With a wallet that has support for our feature:** encrypt and then
+  sign, all on the wallet side.
+    - This is the best in terms of trust (i.e., user only needs to trust
+      the wallet). The wallet can present the transaction in the clear to
+      the user for approval.
+    - Requires modifying the [wallet standard](https://github.com/aptos-labs/wallet-standard/blob/main/src/features/aptosSignAndSubmitTransaction.ts)
+      to add a new feature (e.g. `aptosEncryptSignAndSubmitTransaction`),
+      and then implementing that feature in e.g. Petra.
+- **With wallet interaction, but with a wallet that doesn’t support this
+  feature natively:** encrypt on SDK side, then sign on the wallet side.
+    - This is a backup option which would not provide good UX. Although the
+      wallet has final control, it is signing an encrypted payload. This
+      means the confirmation screen will be unintelligible, and the wallet
+      will not be able to simulate.
+
+
+-------------------------------
+STOP READING HERE
 
 ## Reference Implementation
 
  > This is an optional yet highly encouraged section where you may include an example of what you are seeking in this proposal. This can be in the form of code, diagrams, or even plain text. Ideally, we have a link to a living repository of code exemplifying the standard, or, for simpler cases, inline code.
  > What is the feature flag(s)? If there is no feature flag, how will this be enabled?
 
-Point to all PRs
+TODO Point to all PRs
 
 ## Testing 
 
@@ -526,7 +599,7 @@ Point to all PRs
  > - When can we expect the results?
  > - What are the test results and are they what we expected? If not, explain the gap.
 
-e2e benchmark results
+Unit tests for each component, smoke tests, forge tests/benchmarks.
 
 ## Risks and Drawbacks
 
@@ -569,12 +642,11 @@ Risks are discussed in the next section.
 
  > Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
 
-
-### Suggested developer platform support timeline
-
- > **Optional:** Describe the plan to have SDK, API, CLI, Indexer support for this feature, if applicable. 
-
-sdk design
+- Finishing validator code now, expect to be done end of January.
+- Afterwards, SDK engineer will finish SDK. Integration must wait for the
+  validator code to hit devnet in order to test. Estimate is that final
+  integration will take a couple days.
+- Plan to run trusted setup ceremony sometime in February.
 
 ### Suggested deployment timeline
 
@@ -585,10 +657,8 @@ sdk design
  > - On testnet?
  > - On mainnet?
 
-- devnet: end of jan/early feb?
-- mainnet??
-
-...
+Devnet end of Jan/early February, mainnet end of Feburary/early march,
+testnet somewhere in between.
 
 
 ## Open Questions (Optional)
@@ -604,3 +674,9 @@ sdk design
 [^FPTX25e]: **TrX: Encrypted Mempools in High Performance BFT Protocols**,
 by Rex Fernando, Guru-Vamsi Policharla, Andrei Tonkikh, and Zhuolun Xiang,
 2025, [[URL]](https://eprint.iacr.org/2025/2032.pdf)
+
+[^AIP-79]: **AIP-79: Implementation of instant on-chain randomness,**,
+by Alin Tomescu, Zhuolun Xiang, and Zhoujun Ma.
+2024, [[URL]](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-79.md#background-on-aptos-blockchain)
+
+[^chunky]: [https://alinush.github.io/chunky](https://alinush.github.io/chunky).
