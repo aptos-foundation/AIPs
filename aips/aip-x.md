@@ -615,7 +615,6 @@ Risks are discussed in the next section.
  > - Link tests (e.g. unit, end-to-end, property, fuzz) in the reference implementation that validate both expected and unexpected behavior of this proposal
  > - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
 
-**Liveness issues.** TODO
 
 **The max possible encrypted transaction TPS is lower than the max TPS for
 unencrypted transactions.**
@@ -629,6 +628,11 @@ unencrypted transactions.**
 - We will skip all decryption computation if no encrypted txns are in
   a block, so blocks that don't use this feature will see no effect on
   latency.
+
+**The system is directly integrated into consensus, and a failure could
+lead to the chain halting in the worst case.**  In such a catastrophic
+failure scenario, the validators can disable encrypted mempool while waiting for
+a hotfix.
 
 **Privacy-preserving simulation of encrypted transactions.** Currently in
 the SDK, the default behavior is to send a transaction to the same fullnode
