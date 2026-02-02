@@ -656,8 +656,6 @@ Devnet early February, mainnet end of Feburary/early march,
 testnet somewhere in between.
 
 
-...
-
 ## References
 
 [^FPTX25e]: **TrX: Encrypted Mempools in High Performance BFT Protocols**,
