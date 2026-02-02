@@ -61,9 +61,6 @@ schemes is out-of-scope for this AIP.
 
 ## High-level Overview
 
- > Define the straw man solution with enough details to make it clear why this is the preferred solution.
- > Please write a 2-3 paragraph high-level overview here and defer writing a more detailed description in [the specification section](#specification-and-implementation-details).
-
 The encrypted mempool comprises the following components:
 
 **A new batch threshold encryption scheme.** The scheme allows validators
@@ -100,10 +97,6 @@ must store and use during decryption.
 
 ## Impact
 
- > Which audiences are impacted by this change? What type of action does the audience need to take?
- > What might occur if we do not accept this proposal?
- > List out other AIPs this AIP is dependent on
-  
  - Dapp developers
    - Familiarize themselves with the SDK modifications.
  - Wallet developers
@@ -115,8 +108,6 @@ must store and use during decryption.
 - If we do not accept this AIP: users will have no protection from frontrunning.
 
 ## Alternative Solutions
-
- > Explain why you submitted this proposal specifically over alternative solutions. Why is this the best possible outcome?
 
 **Classical threshold encryption.** Using a classical threshold encryption
 scheme would mean that for every encrypted pending transaction included in
@@ -164,16 +155,6 @@ computationally expensive, or have problems related to denial-of-service
 (or some combination of the three).
 
 ## Specification and Implementation Details
-
--------------------------------
-START READING HERE
-
- > How will we solve the problem? Describe in detail precisely how this
- > proposal should be implemented. Include proposed design principles that
- > should be followed in implementing this feature. Make the proposal
- > specific enough to allow others to build upon it and perhaps even derive
- > competing implementations.
-
 
 ### Background on Aptos blockchain
  
@@ -587,14 +568,15 @@ We will support three different client-side flows:
       will not be able to simulate.
 
 
--------------------------------
-STOP READING HERE
-
 ## Reference Implementation
 
 * The batch encryption scheme is located at [https://github.com/aptos-labs/aptos-core/tree/main/crates/aptos-batch-encryption](https://github.com/aptos-labs/aptos-core/tree/main/crates/aptos-batch-encryption).
 * The PVSS scheme is located at [https://github.com/aptos-labs/aptos-core/tree/main/crates/aptos-dkg/src/pvss/chunky](https://github.com/aptos-labs/aptos-core/tree/main/crates/aptos-dkg/src/pvss/chunky).
 * The typescript encrypt function is located at [https://github.com/aptos-labs/aptos-core/tree/enc_txn_typescript_tests_3/crates/aptos-batch-encryption/ts-batch-encrypt](https://github.com/aptos-labs/aptos-core/tree/enc_txn_typescript_tests_3/crates/aptos-batch-encryption/ts-batch-encrypt).
+
+All cryptographic schemes are implemented over the BLS12-381 curve. The
+curve was chosen to match the validators' consensus keypairs, so that these
+keypairs may be reused as encryption keypairs during the DKG.
 
 ## Testing 
 
@@ -602,18 +584,9 @@ Unit tests for each component, smoke tests, forge tests/benchmarks.
 
 ## Risks and Drawbacks
 
- > - Express here the potential risks of taking on this proposal. What are the hazards? What can go wrong?
- > - Can this proposal impact backward compatibility?
- > - What is the mitigation plan for each risk or drawback?
-
 Risks are discussed in the next section.
 
 ## Security, Liveness, and Privacy Considerations
-
- > - How can this AIP potentially impact the security of the network and its users? How is this impact mitigated?
- > - Are there specific parts of the code that could introduce a security issue if not implemented properly?
- > - Link tests (e.g. unit, end-to-end, property, fuzz) in the reference implementation that validate both expected and unexpected behavior of this proposal
- > - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
 
 
 **The max possible encrypted transaction TPS is lower than the max TPS for
@@ -653,15 +626,25 @@ transaction with the cleartext version, breaking privacy.
 
  > Think through the evolution of this proposal well into the future. How do you see this playing out? What would this proposal result in one year? In five years?
 
-- future plans: hide sender?
+There are several potential improvements and extensions to the scheme
+itself. We can improve the efficiency of the batch encryption scheme to
+support more TPS. We are also exploring allowing for hiding both the
+payload and the sender when submitting to the encrypted mempool. Finally,
+it is interesting to think about supporting more general-purpose on-chain
+encryption efficiently with ideas similar to those in our system.
+
+This AIP also enables more generic threshold cryptography on the Aptos
+network. Specifically, the DKG for field elements can be used to
+instantiate many standard threshold cryptographic schemes over the
+validators.
+
 
 ## Timeline
 
 ### Suggested implementation timeline
 
- > Describe how long you expect the implementation effort to take, perhaps splitting it up into stages or milestones.
 
-- Finishing validator code now, expect to be done end of January.
+- Finishing validator code now, expect to be done very early February.
 - Afterwards, SDK engineer will finish SDK. Integration must wait for the
   validator code to hit devnet in order to test. Estimate is that final
   integration will take a couple days.
@@ -669,14 +652,7 @@ transaction with the cleartext version, breaking privacy.
 
 ### Suggested deployment timeline
 
- > **Optional:** Indicate a future release version as a *rough* estimate for when the community should expect to see this deployed on our three networks (e.g., release 1.7).
- > You are responsible for updating this AIP with a better estimate, if any, after the AIP passes the gatekeeper’s design review.
- >
- > - On devnet?
- > - On testnet?
- > - On mainnet?
-
-Devnet end of Jan/early February, mainnet end of Feburary/early march,
+Devnet early February, mainnet end of Feburary/early march,
 testnet somewhere in between.
 
 
