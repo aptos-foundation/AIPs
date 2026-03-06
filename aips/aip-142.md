@@ -1,0 +1,219 @@
+---
+aip: 142
+title: Public structs and enums
+author: Teng Zhang (teng@aptoslabs.com)
+discussions-to (*optional): <a url pointing to the official discussion thread>
+Status: Draft
+last-call-end-date: N/A
+type: Standard (Core)
+created: 04/03/2026
+updated: 04/03/2026
+requires: N/A
+---
+
+# AIP-142: Public Structs and Enums
+
+## Summary
+
+Currently, Move enforces strict encapsulation of struct and enum types, allowing their construction, deconstruction, and field access/modification only within the defining module. Although this model works well for structs as resources, it limits expressiveness and modularity of Move programs—particularly when building reusable libraries or composing cross-module abstractions. To address this limitation, we propose extending Move with explicit visibility modifiers for structs and enums, such as `public`, `friend`, and `package`. A `public` struct or enum would be fully accessible across modules, enabling external code to construct, destruct, pattern-match, inspect, or modify values as if the type were locally defined. Similarly, a `package` declaration would grant this level of access to all modules declared as friends of this module, while still restricting access from other modules. These visibility controls enhance the expressiveness of Move programs. For instance, an enum `Result<T,E>` can be defined in the standard library for returning and propagating errors.
+
+```rust
+module stdlib::result {
+    public enum Result<T, E> {
+        Ok(T),
+        Err(E)
+    }
+}
+```
+
+With `Result` declared as `public`, other modules—whether in the same package or in external packages—could return `Result` values, match on `Ok` or `Err` variants, and propagate errors in a clean, idiomatic style, as shown below.
+
+```rust
+module app::logic {
+    use stdlib::Result;
+    fun run(..) {
+       // Can match type from other module
+       match (prepare(..)) {
+           Result::Ok(x)  => execute(x),
+           Result::Err(e) => handle_error(e)
+       }
+    }
+}
+```
+
+With public structs/enums with the `copy` ability and without the `key` ability, struct/enum values can be passed into transactions:
+
+```rust
+module app::entries {
+    public struct Data(String, u64) has copy, drop;
+
+    // Can pass struct as transaction argument
+    entry fun run(s: &signer, data: Data) { .. }
+}
+```
+
+### Out of scope
+
+- Compiler changes (front-end parsing, AST/model support for visibility modifiers, and code generation of struct API wrapper functions) are not covered in this AIP and are documented separately.
+- CLI and TypeScript SDK support for public struct/enum transaction arguments are not included in this change and are tracked separately (see developer platform support below).
+
+## High-level Overview
+
+- **VM changes** (guarded by bytecode VERSION_10): new `FunctionAttribute` variants to annotate compiler-generated wrappers in the binary format; a new `struct_api_checker` bytecode verifier pass that enforces API integrity at publish and load time; and reference-safety special-casing for mutable borrow wrappers.
+- **Transaction argument support** (guarded by `PUBLIC_STRUCT_ENUM_ARGS` feature flag): validation that transaction argument types are public structs/enums with `copy` and without `key` ability; VM-level value construction by invoking the generated pack APIs; and JSON/API support for enum argument types.
+
+## Impact
+
+This feature has high impact for the language itself. Without support for `public` structs and enums, developers are forced to place all code that needs to construct, destruct, or pattern-match over a type into the same module that defines it.
+
+Moreover, ecosystem projects will greatly benefit from public structs/enums as transaction arguments. However, to actually use this feature, SDK, API, and CLI support are required.
+
+## Alternative Solutions
+
+There are no known viable alternatives for enabling structs and enums to be used directly as transaction arguments. Currently, users must pass individual fields as separate primitive or vector arguments and reconstruct the desired structure within the transaction logic. This approach is cumbersome and results in a poor developer and user experience.
+
+An alternative approach would be to allow direct cross-module access to `public` structs and enums without generating intermediary APIs. Compared to APIs, direct access will be more efficient with respect to gas usage. However, this would require significant changes to the VM, potentially breaking implicit invariants and introducing serious security risks. The compiler-generated public API approach offers the safest and most controlled path.
+
+## Specification and Implementation Details
+
+### Source language extension
+
+Extend the language with visibility modifiers `public`, `package`, and `friend` on struct and enum declarations, gated by **language version 2.4**:
+
+```rust
+public struct S<T> { ... }
+
+package struct S<T> { ... }
+
+friend struct S<T> { ... }
+
+public enum E<T> { ... }
+
+package enum E<T> { ... }
+
+friend enum E<T> { ... }
+```
+
+### Semantics
+
+- `public`: the type can be fully used outside the defining module—constructed, destructed, matched, and field-accessed.
+- `package`: same access, but restricted to modules within the same package.
+- `friend`: same access, but restricted to modules declared as friends.
+- No modifier: remains module-private, as in current Move.
+
+### Upgradability
+
+The compiler generates APIs for structs/enums with a visibility modifier, so upgradability rules map directly onto the generated function set:
+
+1. `private` structs/enums can be upgraded to `package`, `friend`, or `public`.
+2. `friend` or `package` structs/enums can be upgraded to `public`.
+3. `friend` or `package` structs/enums can be downgraded to `private`.
+4. Adding a new variant to a public enum is a compatible upgrade. However, callers using exhaustive match on the old variants will abort with `INCOMPLETE_MATCH_ABORT_CODE` at runtime when they encounter the new variant.
+
+### Notes
+
+- For consistency with function visibility modifier, `public(package)` and `public(friend)` are also supported, but these are not preferred.
+- Structs and enums with the `key` ability cannot have `public`, `package`, or `friend` visibility. Resource operations (`move_to`, `move_from`, `borrow_global`, etc.) are only permitted within the defining module, so exposing a `key` type publicly would allow other modules to construct or destruct values of that type while bypassing the intended resource ownership model.
+
+### VM changes
+
+The compiler generates appropriate (public, package, or friend) wrapper functions for each non-private struct or enum, and translates cross-module operations on those types into calls through the wrappers. For a struct `S` the wrappers are named `pack$S`, `unpack$S`, `borrow$S$<offset>`, `borrow_mut$S$<offset>`; for an enum `E` they are `pack$E$Variant`, `unpack$E$Variant`, `test_variant$E$Variant`, and `borrow$E$<offset>$<ty_order>`. The `$` character is reserved in identifiers for these generated names. The VM changes below operate on these wrappers.
+
+### FunctionAttribute variants and bytecode format
+
+To enable the VM and verifier to identify and validate compiler-generated wrapper functions, new `FunctionAttribute` variants are introduced and encoded in **Move bytecode VERSION_10**:
+
+| Attribute | Annotates | Description |
+| --- | --- | --- |
+| `Pack` | `pack$S` functions | Pack constructor for a non-private struct |
+| `PackVariant(variant_idx)` | `pack$E$Variant` functions | Pack constructor for a non-private enum variant |
+| `Unpack` | `unpack$S` functions | Unpack destructor for a non-private struct |
+| `UnpackVariant(variant_idx)` | `unpack$E$Variant` functions | Unpack destructor for a non-private enum variant |
+| `TestVariant(variant_idx)` | `test_variant$E$Variant` functions | Variant discriminator for non-private enums |
+| `BorrowFieldImmutable(offset)` | `borrow$...` functions | Immutable field borrow; `offset` is the field’s member index |
+| `BorrowFieldMutable(offset)` | `borrow_mut$...` functions | Mutable field borrow; `offset` is the field’s member index |
+
+These attributes are serialized/deserialized as part of the Move binary format and are gated to bytecode VERSION_10. 
+
+### Reference safety and dynamic reference checker special-casing
+
+Normally, simultaneous mutable borrows of two fields through function-call boundaries would be rejected by Move’s static reference-safety checker and flagged at runtime by the dynamic reference checker, because both conservatively assume that two outputs derived from the same mutable input may alias. The `borrow_mut$...` wrappers would trigger these false-positive violations even though each wrapper borrows a distinct, disjoint field.
+
+To address this, both the static reference-safety checker and the dynamic reference checker are updated to special-case calls to functions carrying a `BorrowFieldMutable` struct API attribute, treating them as transparent field borrows rather than opaque function calls. This makes the behavior of cross-module field access consistent with module-local field access.
+
+The safety of this special-casing is guaranteed by the `struct_api_checker` bytecode verifier pass (described below), which strictly validates that every function bearing a `BorrowFieldMutable(offset)` attribute genuinely performs a single-field mutable borrow at the declared offset and nothing else. Without this integrity guarantee, the special-casing could be exploited to bypass Move’s reference safety guarantees.
+
+### Bytecode verification pass: `struct_api_checker`
+
+A new `struct_api_checker` verifier pass runs at module publish and load time to enforce API integrity. It validates that compiler-generated wrapper functions correctly implement the contracts declared by their `FunctionAttribute`. Specifically, it checks:
+
+- **Name ↔ attribute correspondence** (bidirectional): a struct API name (e.g. `pack$S`, `borrow$S$0`) requires the matching `FunctionAttribute`, and vice versa. The attribute kind must match the name prefix (`pack$` ↔ `Pack`, `borrow$` ↔ `BorrowFieldImmutable`, etc.). At most one struct API attribute is allowed per function.
+- **Signature**: parameters and return types must match the struct/variant field types in order; borrow functions must return a reference with matching mutability.
+- **Index/offset consistency**: the offset or variant index in the function name must equal the attribute value, which must equal the index in the bytecode instruction.
+- **Bytecode pattern**: the function body must be exactly `MoveLoc*` + the corresponding instruction (`Pack`, `Unpack`, `ImmBorrowField`, etc.) + `Ret`.
+- **BorrowVariantField completeness**: a `BorrowVariantField` instruction must enumerate all variants sharing the same `(offset, type)`, in ascending order.
+
+### Verifier enforcement of upgrade correctness
+
+The `struct_api_checker` verifier pass enforces structural consistency of the generated APIs at publish time, catching any attempt to publish an inconsistent upgrade. Because the verifier runs as part of every module publish (and re-publish), these rules apply equally to initial publication and upgrades. A module upgrade that silently breaks struct API integrity cannot be committed to the chain.
+
+
+### Support for public structs/enums as transaction arguments
+
+Public structs/enums with `copy` and without `key` ability can be used as entry function and view function arguments, gated by the **`PUBLIC_STRUCT_ENUM_ARGS` on-chain feature flag**.
+
+### Eligibility rules
+
+The Aptos verifier enforces the following rules during transaction argument validation:
+
+1. The type must be a `public` struct or enum, identified by the presence of a public `pack$...` function carrying a `Pack` or `PackVariant` struct API attribute in the defining module.
+2. The type must have the `copy` ability and must not have `key` ability.
+3. All field types must be valid transaction argument types. 
+4. Types that are never allowed as transaction arguments (e.g., function types) must not appear anywhere in the type’s fields unless being used as phantom types.
+
+### Value construction
+
+When the VM processes entry function arguments that include a public struct/enum value:
+
+1. The VM locates the appropriate `pack$...` function using the `Pack` or `PackVariant` struct API attribute.
+2. It calls the pack function with the deserialized field values to materialize the struct/enum value.
+3. A pack-function cache is maintained to avoid repeated lazy-load gas charges across argument construction calls.
+4. DoS-bounding: the maximum number of pack function invocations is currently capped to 32 (subject to change) to prevent abuse when `PUBLIC_STRUCT_ENUM_ARGS` is enabled.
+
+## Reference Implementation
+
+Feature flag: `PUBLIC_STRUCT_ENUM_ARGS` gates transaction argument support for public structs/enums.
+
+- [PR #18117](https://github.com/aptos-labs/aptos-core/pull/18117) – VM: FunctionAttribute variants, bytecode VERSION_10
+- [PR #18165](https://github.com/aptos-labs/aptos-core/pull/18165) – VM: `struct_api_checker` verifier pass
+- [PR #18489](https://github.com/aptos-labs/aptos-core/pull/18489) – Transaction argument support
+
+## Testing
+
+- **Transactional tests** in move-vm covering all `struct_api_checker` validation rules: name–attribute correspondence, bytecode pattern matching, variant completeness, field offset completeness, and mutability consistency.
+- **E2E tests** in `public_structs_enums_upgrade.rs` covering:
+    - Cross-module struct operations: pack/unpack, borrow/borrow_mut, nested structs, generics, vectors, phantom type parameters.
+    - Cross-module enum operations: all variants, pattern matching, variant testing.
+    - Enum upgrade compatibility: adding a new variant and observing `INCOMPLETE_MATCH_ABORT_CODE` for unhandled exhaustive matches.
+- **API tests** covering JSON-to-BCS enum conversion, generic entry function argument handling and rejection paths (non-public, non-copy types).
+
+## Risks and Drawbacks
+
+This feature introduces conceptual risks that require careful consideration. In particular, exposing public structs and enums across module boundaries expands the surface area for misuse and could unintentionally violate internal invariants if not used carefully. While the design avoids deep VM changes by relying on compiler-generated APIs, it still touches sensitive components such as the verifier, binary format (VERSION_10), and transaction argument deserialization, all of which must be audited thoroughly. Additionally, there is a risk of overuse: developers may default to marking types as `public` for convenience, leading to tightly coupled modules, reduced encapsulation and module size increase. Leveraging linter might be able to mitigate this concern.
+
+## Security Considerations
+
+**Bytecode verification and reference safety.** The `struct_api_checker` verifier pass is the critical security boundary for this feature. By strictly validating at publish time that every function bearing a struct API attribute implements exactly the declared operation—and nothing else—it prevents malicious modules from abusing the reference-safety and dynamic reference checker special-casing introduced for `borrow_mut$...` wrappers. Without this pass, an attacker could publish a function carrying a `BorrowFieldMutable` attribute that performs arbitrary operations, and the VM’s reference checkers would treat it as a trusted transparent borrow, potentially allowing unsafe aliasing or bypassing Move’s resource safety guarantees. The verifier pass must be thoroughly audited to ensure its validation rules are both sound and complete.
+
+**Transaction argument safety.** Only `public` structs and enums with the `copy` ability and without the `key` ability are permitted as transaction arguments. The `copy` requirement is the key safety constraint: it ensures that no resource type (which by definition lacks `copy`) can ever be constructed from transaction arguments. This prevents attackers from conjuring resource values—such as coins or capability tokens—out of thin air by passing crafted arguments to an entry function. Field types are recursively validated with the same rules, so a resource type cannot be smuggled in through a nested field either. The overall effect is that the transaction argument path can only produce values that are freely duplicable and disposable, preserving Move’s resource safety invariants.
+
+## Timeline
+
+### Suggested implementation timeline
+
+TBD
+
+### Suggested developer platform support
+
+- **Aptos CLI** ([PR #18591](https://github.com/aptos-labs/aptos-core/pull/18591)): adds support for passing public struct/enum values as transaction arguments via `-json-file` in `aptos move run` and `aptos move view`. Includes an async struct/enum argument parser with on-chain ABI fetching and caching, special handling for common framework types (`String`, `Object<T>`, `FixedPoint*`, `Option<T>`), and CLI e2e tests.
+- **TypeScript SDK** ([aptos-ts-sdk PR #824](https://github.com/aptos-labs/aptos-ts-sdk/pull/824)): adds `MoveStructArgument` and `MoveEnumArgument` BCS-serializable types and a `StructEnumArgumentParser` that fetches module ABIs from the REST API to encode struct/enum arguments. Supports nested structs/enums (up to 7 levels), generic type parameter substitution, all Move primitive types, and framework wrapper types. Argument conversion functions are now async to support ABI fetching.
