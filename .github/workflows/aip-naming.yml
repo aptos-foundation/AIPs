@@ -32,15 +32,16 @@ jobs:
           if [ ${#bad_files[@]} -gt 0 ]; then
             echo "::error::The following AIP files do not follow the naming convention:"
             echo ""
+            for f in "${bad_files[@]}"; do
+              echo "  - $f"
+            done
+            echo ""
             echo "  Expected: aip-<NNN>-<slug>.md  (e.g., aip-061-keyless-accounts.md)"
             echo "  Drafts:   aip-xxx-<slug>.md    (e.g., aip-xxx-my-proposal.md)"
             echo ""
             echo "  <NNN> = zero-padded 3-digit number"
             echo "  <slug> = short kebab-case summary (lowercase letters, digits, hyphens)"
             echo ""
-            for f in "${bad_files[@]}"; do
-              echo "  - $f"
-            done
             exit 1
           fi
 
