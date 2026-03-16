@@ -1,0 +1,475 @@
+---
+aip: 137
+title: Post-quantum Aptos accounts via SLH-DSA-SHA2-128s signatures
+author: Alin Tomescu (alin@aptoslabs.com)
+discussions-to (*optional): https://github.com/aptos-foundation/AIPs/discussions/640 # a url pointing to the official discussion thread
+Status: Draft #<Draft | Last Call | Accepted | Final | Rejected>
+last-call-end-date (*optional): 02/09/2026 # the last date to leave feedbacks and reviews
+type: Standard (Core) # Standard (Core, Networking, Interface, Application, Framework) | Informational | Process
+created: 12/09/2025
+updated (*optional): 12/12/2025 # <mm/dd/yyyy>
+requires (*optional):
+ - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-080-standardize-private-keys.md 
+ # <AIP number(s)>
+---
+
+# AIP-137: Post-quantum Aptos accounts via SLH-DSA-SHA2-128s signatures
+
+ > It's like this: if you think quantum computers able to break 2048-bit cryptography within 3-5 years are a near-certainty, then I'd say your confidence is unwarranted.  
+ > [..]  
+ > On the other hand, if you think Bitcoin, and SSL, and all the other protocols based on Shor-breakable cryptography, are almost certainly safe for the next 5 years... then I submit that your confidence is also unwarranted.  
+ > Your confidence might then be like most physicists' confidence in 1938 that nuclear weapons were decades away, or like my own confidence in 2015 that an AI able to pass a reasonable Turing Test was decades away.  
+ > It might merely be the confidence that "this still looks like the work of decades—unless someone were to gather together all the scientific building blocks that have now been demonstrated, and scale them up like a stark raving madman."   
+ > The trouble is that sometimes people, y'know, do that.  
+ > -- Scott Aaronson[^sa-blog]
+
+## Summary
+
+This AIP proposes adding **SLH-DSA-SHA2-128s**[^FIPS205] as the first **post-quantum (PQ)** signature scheme for Aptos accounts.
+This scheme was recently standardized as post-quantum by NIST in FIPS-205[^FIPS205].
+Both its classical and quantum security rely solely on the security of the SHA2-256[^ABBplus22] hash function.
+
+ > [!NOTE]
+ > The v3.1 spec[^ABBplus22] clarifies in Section 7.2.2 that the $n=16$ SHA2 variants use SHA2-256.
+
+The spirit of this AIP is to conservatively-prepare for the looming threat of **cryptographically-relevant quantum computers (CRQCs)**, should they materialize in the next decade or less.
+
+Given how CRQCs timelines range anywhere from 5 to 50 years[^sa-blog], this AIP's _"conservative"_ approach means:
+ 
+ - the security assumptions behind the PQ scheme are abundantly cautious: i.e., breaking them quantumly or classically would be an immense technological surprise
+ - efficiency can be sacrificed, in favor of security
+ - the complexity of integrating the PQ scheme in Aptos is low
+
+In this sense, this AIP finds SLH-DSA to be an ideal candidate for such a _conservative_, _quantum-proof_, _low-complexity_ deployment. 
+In particular, the SLH-DSA family is appealing because it only relies on hash functions and is thus clearly not likely to be broken classically.
+(Furthermore, the relied-upon hash functions are already trusted today in the Aptos ecosystem.)
+This stands in contrast with other, more "aggressive", PQ schemes, which rely on exotic assumptions that may not even be classically-secure (e.g., see the [Rainbow discussion](#alternative-solutions)).
+As a result, such aggressive schemes need to be combined with a classically-secure scheme to mitigate risks, which increases complexity.
+
+### Out of scope
+
+ - ZKPoKs for [key rotation](https://aptos.dev/build/guides/key-rotation) in Aptos Move are out of scope: for now, key rotation will be done via the well-known private entry function: [`0x1::aptos_framework::account::rotate_authentication_key_call`](https://aptos.dev/move-reference/mainnet/aptos-framework/account#rotate_authentication_key_call).
+ - Aggressively-optimizing the choice of the signature scheme to maximize performance. This will be done later by adding more PQ schemes.
+
+## Impact
+
+If we accept, deploy and enable this proposal, it would impact almost all of the Aptos ecosystem:
+
+ - Aptos full nodes and validators will need to be upgraded to support deserializing and verifying these new signatures
+ - Indexer needs to become aware of the new signature scheme
+ - Wallets may choose to implement support for this scheme
+ - Aptos SDK and CLI needs to add support for managing accounts and creating signatures using this new scheme
+ - (There may be other components that were missed.)
+
+If we do not accept this proposal, it will leave us and our users open to technological surprise.
+In contrast, if accepted, Aptos governance can simply turn on post-quantum accounts as soon as rumors of a CRQC become sufficiently-worrisome.
+(Or, it can be turned on much earlier, to allow users to migrate when they deem it necessary.)
+
+## Alternative Solutions
+
+While alternative PQ signature schemes would have smaller signature sizes and verification times, the SLH-DSA family in FIPS-205[^FIPS205] is the most conservative choice security-wise: it relies solely on the (already-premised) security of SHA2-256.
+
+This makes it an ideal candidate to easily mitigate against the possibility that a **classical** (not even quantum) adversary may break the supposedly-PQ-secure scheme. 
+Such attacks have happened in the past on candidate PQ schemes: e.g., _Rainbow_, based on multivariate cryptography, was a NIST finalist yet it was completely broken on a commodity laptop in 2022[^Beul22].
+
+It also makes it a great choice for highly-conservative blockchain users who do not want to rely on new assumptions and/or aggressive parameterizations of novel, more-efficient, PQ signature schemes.
+
+### ML-DSA
+
+In the future, we may choose to additionally-support a member of the ML-DSA family from FIPS-204[^FIPS204], since the combined public key and signature size will be half of SLH-DSA's (e.g., ML-DSA-65 have 1,9252-byte pubkeys and 3,309-byte signatures).
+Another advantage of ML-DSA is that its signature verification time is even faster: it outperforms Ed25519's[^benching-pq]
+<!-- [should be slightly faster than SLH-DSA](https://x.com/alinush/status/1998517146104771038).-->
+As a disadvantage, ML-DSA's security is based on the hardness of the **module learning with errors (MLWE)** problem, which is less conservative.
+
+### Falcon
+
+Another candidate would be Falcon[^falcon], whose combined pubkey and signature size is $\approx$ 1.5 KiB.
+Furthermore, its verification time matches Ed25519 or is even faster.
+As disadvantages:
+ 1. Falcon requires floating point arithmetic, which makes implementing it very error prone.
+ 1. Falcon's security relies on the hardness of **SIS over NTRU lattices**, which is less conservative.
+
+## Specification and Implementation Details
+
+Notes:
+
+ - We use the SLH-DSA implementation in the `slh-dsa` crate[^slh-dsa] from the `RustCrypto/signatures`[^rust-crypto-sigs] ecosystem
+ - We implement the `aptos-crypto` traits for signatures, private keys and public keys.
+ - Currently, we use deterministic signing.
+ - We unit test for:
+	+ correctness (i.e., honestly-produced signatures pass verification)
+	+ SK, PK and signature (de)serialization work
+	+ key generation works
+    + deterministic signing being enabled
+ - **TODO:** Give the name of the feature flag.
+
+### AIP-80 prefixes
+
+AIP-80[^aip-80] defines a prefix for each key type (private / public) and its scheme (e.g., Ed25519, SLH-DSA-SHA2-128s).
+
+For our private keys, we propose:
+```
+"slh-dsa-sha2-128s-priv-"
+```
+While for our public keys:
+```
+"slh-dsa-sha2-128s-pub-"
+```
+
+### Indexer support
+
+For now, the TS SDK uses `"slh_dsa_sha2_128s"` as the scheme name, from the indexer's PoV.
+See `src/types/types.ts` in [`aptos-ts-sdk`](https://github.com/aptos-labs/aptos-ts-sdk) once [PR \#802](https://github.com/aptos-labs/aptos-ts-sdk/pull/802) merges:
+```typescript
+export function anyPublicKeyVariantToString(variant: AnyPublicKeyVariant): string {
+  switch (variant) {
+    case AnyPublicKeyVariant.Ed25519:
+      return "ed25519";
+    case AnyPublicKeyVariant.Secp256k1:
+      return "secp256k1";
+    case AnyPublicKeyVariant.Secp256r1:
+      return "secp256r1";
+    case AnyPublicKeyVariant.Keyless:
+      return "keyless";
+    case AnyPublicKeyVariant.FederatedKeyless:
+      return "federated_keyless";
+    case AnyPublicKeyVariant.SlhDsaSha2128s:
+      return "slh_dsa_sha2_128s";
+    default:
+      throw new Error("Unknown public key variant");
+  }
+}
+```
+ 
+### 48-byte SLH-DSA secret keys
+
+ > [!WARNING]
+ > **Hopefully, this is wrong, but:** the FIPS standard suggests SKs are only 32 bytes by (I think) assuming that the PK is available and not lost.
+ > This is not only unfortunate, but also misleading and potentially-dangerous, as it incorrectly suggests that given such a 32-byte SK the PK can be derived from it, which is simply **not** true.
+ > And, without the PK, signatures cannot be created even though the (32-byte) SK is available.
+ > This would cause users who only back up their SK to permanently lose access to their funds.
+ > 
+ > Therefore, in this AIP and in our implementation, we work with the **proper** SK, which is actually 48 bytes as it additionally-includes the "PK seed" component from the public key, which is picked randomly and independently from the other SK components.
+ > This proper SK is sufficient for signing and thus for restoring access to the account (e.g., after recovering it from a mnemonic).
+
+### Support for BIP-32 HD wallets
+
+ > [!WARNING]
+ > This will risk becoming non-standard as other chains and/or hardware wallets could also deploy SLH-DSA-SHA2-128s but choose to implement their own HD scheme.
+ >
+ > For now, this is just an initial attempt at having **something** working, rather than the final HD scheme.
+
+Our (temporary) decisions:
+
+ - We set the SLIP-0010[^slip-0010] `"Curve"` parameter to `"SLH-DSA-SHA2-128s seed"`
+ - We leave the "curve order" `n` set to $2^{256}$
+    + i.e., we work directly with the 32 byte sequences outputted by HMAC-SHA512 in BIP-32's[^bip-32] `CKDPriv`
+ - We enforce hardened derivation only
+    + This is natural, since there's no key homomorphism (like Ed25519)
+ - We set:
+    + the 16-byte SK seed and 16-byte PRF seed to the 32-byte secret key outputted by `CKDPriv`
+    + the 16-byte PK seed to the first 16 bytes of the (potentially-public) "chain code" outputted by `CKDPriv`
+       * **TODO:** Revise this since leaking the chain code will make it so that an adversary who has any leaked key in the BIP-32 tree of keys can obtain any other child key, it seems. (See [here](https://bitcoin.stackexchange.com/questions/41589/why-is-a-chain-code-needed-for-entropy-in-hd-wallets).) In fact, perhaps draw this tree to depict how it works for later reference.
+
+> [!WARNING]
+> We need to reason about the security of using the chain code in this way.
+
+In our TypeScript SDK, the implementation for deriving an SLH-DSA private key given a mnemonic-derived `seed` and a derivation path[^bip-44] `path` looks like this:
+```typescript
+    const { finalSecretKey, finalChainCode } = bip32derive("SLH-DSA-SHA2-128s seed", seed, path);
+
+    // We derive our 48-byte SLH-DSA key (three 16-byte seeds) from:
+    //  - the 32-byte BIP-32-derived, secret key 
+    //  - the first 16 bytes of the BIP-32-derived chain code
+
+    // First 32 bytes from the derived secret key
+    const slhDsaPrivateKey = new Uint8Array(48);
+    slhDsaPrivateKey.set(finalSecretKey, 0); 
+
+    // Last 16 bytes from the derived chain code
+    slhDsaPrivateKey.set(finalChainCode.slice(0, 16), 32);
+```
+
+### PRs
+
+ > [!NOTE]
+ > PRs checked with 'x' have been **merged**.
+
+ - [x] [Add SLH-DSA-SHA2-128s (FIPS 205) to `aptos-crypto` (#18293)](https://github.com/aptos-labs/aptos-core/pull/18293)
+ - [x] [Add SLH-DSA-SHA2-128s TXN authenticator (#18300)](https://github.com/aptos-labs/aptos-core/pull/18300)
+ - [ ] [Add SLH-DSA-SHA2-128s signatures to TS SDK (#802)](https://github.com/aptos-labs/aptos-ts-sdk/pull/802)
+ - [ ] Add indexer support
+ - [ ] Update Aptos docs
+ - [ ] Add CLI support
+ - [ ] **TODO:** Add future PRs here.
+
+### Testing
+
+Testing plan:
+
+ - [x] unit tests for the signature scheme
+ - [x] e2e smoke test ensuring that TXN signatures (do not) verify when the feature is (not) enabled
+ - [x] API test
+ - [x] e2e test using the SDK
+ - [ ] e2e test using CLI
+
+### Benchmarks 
+
+Signature sizes are 7,856 bytes.
+They are _large_, but not impractical.
+
+Public key sizes are 32 bytes.
+
+Secret key sizes are 48 bytes.
+
+The scheme is **sufficiently-fast** to be used on Aptos.
+
+x86_64 single-threaded benchmarks:
+```
+slh_dsa/sha2-128s/sig_deserialize
+                        time:   [1.8641 µs 1.9651 µs 2.0566 µs]
+                        thrpt:  [486.24 Kelem/s 508.88 Kelem/s 536.45 Kelem/s]
+
+slh_dsa/sha2-128s/pk_deserialize
+                        time:   [80.803 ns 96.276 ns 120.82 ns]
+                        thrpt:  [8.2768 Melem/s 10.387 Melem/s 12.376 Melem/s]
+
+slh_dsa/sha2-128s/sign_32_bytes
+                        time:   [284.77 ms 284.97 ms 285.30 ms]
+                        thrpt:  [3.5051  elem/s 3.5091  elem/s 3.5117  elem/s]
+
+slh_dsa/sha2-128s/verify_32_bytes
+                        time:   [291.21 µs 294.23 µs 297.16 µs]
+                        thrpt:  [3.3651 Kelem/s 3.3987 Kelem/s 3.4339 Kelem/s]
+
+```
+
+In particular, signature verification times are **5x slower than Ed25519** on x86_64:
+```
+ed25519/sig_verify_struct
+                        time:   [60.211 µs 60.236 µs 60.265 µs]
+                        thrpt:  [16.593 Kelem/s 16.601 Kelem/s 16.608 Kelem/s]
+```
+ 
+ > [!NOTE]
+ > To replicate these single-threaded benchmarks:  
+ > `cd aptos-core/crates/aptos-crypto/`  
+ > ` $ cargo bench -- slh_dsa/sha2-128s`  
+ > ` $ cargo bench -- ed25519/sig_verify`
+
+ > [!NOTE]
+ > For more PQ signature schemes benchmarks see (1) this public GitHub repo by Project 11[^benching-pq] and (2) this PQC Suite B README[^pqc-suite-b-benches].
+
+## Risks and Drawbacks
+
+### Aptos network performance impact
+ 
+TXN signatures will be larger: 7,856 bytes for the actual signature and 32 bytes for the public key: 82 $\times$ larger than Ed25519 (64 + 32 bytes) and 23 $\times$ larger than a `KeylessSignature` ($\approx$ 294 + 52 bytes).
+
+If PQ accounts become popular, then P2P and validator network traffic would increase, potentially leading to congestion.
+
+The historical state of the Aptos chain would also become larger.
+
+Fortunately, both can be mitigated against via adequate gas pricing **and** by adding support for [faster, more succinct PQ schemes](#alternative-solutions).
+(Recall that the gas cost of an Aptos TXN is already computed as a function of its size, including the signature size.)
+
+This AIP's main argument is that this loss in performance **is reasonable** given:
+1. the uncertainty around CRQCs
+1. the uncertainty behind some novel assumptions and/or parameterizations of PQ schemes
+1. the complexity of some PQ schemes (e.g., [Falcon](#falcon))
+1. the conservative nature of SLH-DSA's assumption: it relies solely on the security of the SHA2 hash function.
+
+Reiterating: more efficient schemes that make more exotic cryptographic assumptions can be deployed later (see [Alternative Solutions](#alternative-solutions)).
+
+ > [!NOTE]
+ > To replicate the `KeylessSignature` sizes:  
+ > ` $ cd aptos-core/types/src/keyless/`  
+ > ` $ cargo test -- test_keyless_groth16_sizes --ignored --nocapture`
+
+### Backwards compatibility
+
+This proposal can impact backward compatibility if deployed recklessly without feature gating.
+Naturally, we do feature gate our implementation.
+
+### Theoretically-bounded \# of signatures
+
+While the signature scheme is "stateless" (like Ed25519), it only supports signing $\le 2^{64}$ messages.
+Nonetheless, as clarified in FIPS-205, even _"if a key pair were used to sign 10 billion (_$10^{10}$_) messages per second, it would take over 58 years to sign_ $2^{64}$ _message[^FIPS205]."_
+
+### Efficiency within hardware wallets
+
+It is very important that Aptos account signature schemes, such as the one proposed here be hardware-wallet friendly
+Hardware wallets are one of the few ways in which Aptos users can more effectively secure their accounts to prevent key leak, key theft and key loss.
+
+Unfortunately, currently, hardware wallets are low-CPU, low-memory environments that may have trouble executing the SLH-DSA signing algorithm.
+
+Dicussions on the `bitcoindev@googlegroups.com` mailing list[^conduition-trezor] suggest that, for a Trezor Model T wallet, it takes **75 seconds** to create one SLH-DSA-SHA2-128s signature.
+The full benchmarks can be found [here](https://gist.github.com/onvej-sl/3851bdae7ae5aa1f2624ca769737ea2e) but are partially replicated below for posterity:
+
+| Operation or property             | FN-DSA-512       | ML-DSA-44       | SLH-DSA-SHA2-128s   | SLH-DSA-SHA2-128f  |
+|-----------------------------------|------------------|-----------------|---------------------|--------------------|
+| NIST security category[^nist-sec] | 1                | 2               | 1                   | 1                  |
+| `generate_keypair`                | 2,000 ms / 20 kB | 21 ms / 42 kB   | 9,800 ms / 3.3 kB   | 150 ms / 3 kB      |
+| `sign`                            | 510 ms / 44 kB   | 78 ms / 55 kB   | 75,000 ms / 10 kB   | 3,600 ms / 20 kB   |
+| `verify`                          | 7.0 ms / 5.0 KB  | 21 ms / 36 kB   | 75 ms / 2.0 kB      | 210 ms / 2.6 kB    |
+| Secret key size                   | 1281 B           | 2560 B          | 64 B                | 64 B               |
+| Public key size                   | 897 B            | 1312 B          | 32 B                | 32 B               |
+| Signature size                    | 666 B            | 2420 B          | 7856 B              | 17088 B            |
+| Full implementation size          | 61 kB            | 15 kB           | 13 kB               | 13 kB              |
+| Verification implementation size  | 11 kB            | 11 kB           | 11 kB               | 11 kB              |
+| Hash implementation size          | 4.7 kB           | 5.6 kB          | 8.2 kB              | 8.2 kB             |
+| Hash function used                | SHAKE-256        | SHAKE-128,256   | SHA-256             | SHA-256            |
+
+
+**Notes:** 
+ - The SLH-DSA-SHAKE2 numbers, excluded above, are several times slower than the SHA2 ones.
+ - FN-DSA-1024 ([Falcon?](#falcon)) runs out of memory
+ - ML-DSA-65 and 87 run out of memory
+
+## Security Considerations
+
+<!--
+ - How can this AIP potentially impact the security of the network and its users? How is this impact mitigated?
+ - Are there specific parts of the code that could introduce a security issue if not implemented properly?
+ - Link tests (e.g. unit, end-to-end, property, fuzz) in the reference implementation that validate both expected and unexpected behavior of this proposal
+ - Include any security-relevant documentation related to this proposal (e.g. protocols or cryptography specifications)
+-->
+
+The SLH-DSA signature scheme family was selected precisely due to its conservative approach to security.
+Since this family only relies on hash functions, it remains classically-secure under the same assumptions used throughout the Aptos ecosystem.
+Crucially, it also remains quantum-secure, unless better attacks that outperform Grover's search are discovered.
+
+### Choice of hash function
+
+The SHA2 variant of SLH-DSA was chosen due to its higher verification speed when compared to the SHAKE variants (e.g., see Macbook Pro M1 Max benchmarks[^rust-crypto-benches]).
+
+ > [!WARNING]
+ > This was the case on ARM, but we should also confirm on x86_64, while accounting for hardware acceleration differences.
+ > For example, the SPHINCS<sup>+</sup> reference implementation[^sphincsplus-git] with AVX2 instructions could be used.
+
+One could argue that the Keccak sponge-based SHAKE variants are more secure since they do not rely on Merkle-Damgaard.
+This is up for debate.
+
+Lastly, there are faster variants based on Blake3 being worked on.
+These are not standardized but may reach wide adoption due to their higher efficiency.
+If so, they can be proposed as a separate scheme in their own AIP.
+
+### Side-channel and fault attacks
+
+The NIST submission[^ABBplus22] states that SLH-DSA (referred to as "SPHINCS+") is naturally free of secret-dependent branches or memory accesses:
+
+ > Typical implementations of SPHINCS<sup>+</sup> are naturally free of any secret dependent branches or secretly indexed loads or stores. 
+ > SPHINCS<sup>+</sup> implementations are thus free of the two most notorious sources of timing variation.
+ > An exception is potentially SPHINCS<sup>+</sup>-Haraka, because Haraka is based on AES.
+
+Importantly, this AIP does not propose the Haraka variant.
+
+Regarding differential power and EM attacks, the NIST submission[^ABBplus22] also says:
+
+ > We expect that any implementation of SPHINCS<sup>+</sup> without dedicated protection against differential power or electromagnetic radiation (EM) attacks or against fault-injection attacks will be vulnerable to such attacks. 
+ > Deployment scenarios of SPHINCS<sup>+</sup> in which an attacker is assumed to have the power to mount such attacks require specially protected implementations.
+ > [..]
+ > One additional line of defense against such advanced implementation attacks is included in the speciﬁcation of SPHINCS<sup>+</sup>, namely the option to randomize the signing procedure via the value OptRand.
+
+This additional line of defense is referred to as **hedged signing** in FIPS-205[^FIPS205] and is currently _disabled_ in our [implementation](#specification-and-implementation-details) but could easily be enabled.
+
+ > "The difficulty of protecting SPHINCS+ from side-channel attacks is mostly determined by the difficulty of protecting a keyed hash implementation from side-channel attacks."[^nist-pq-round-3-status-report]
+
+In this sense, this AIP seeks to encourage discussion around whether the deployment scenario (e.g., software wallets, hardware wallets, web-based wallets) allow for differential power / EM attacks or for fault attacks.
+(Recall the discussion board is [here](https://github.com/aptos-foundation/AIPs/discussions/640).)
+
+## Future Potential
+
+One possibility is that a CRQC does _not_ materialize in the next 5 years **yet** a lot of concerned Aptos users have nonetheless chosen to use this scheme.
+The end result is that Aptos becomes an overall less efficient network.
+Fortunately, this is easy to detect and address by adding [more efficient PQ schemes](#alternative-solutions) and increasing the gas cost of SLH-DSA, forcing users to migrate.
+
+Another possibility is that a CRQC _does_ materialize sooner than expected.
+In that case, our users are either already rotated to this PQ scheme, or can rotate when they find out.
+
+In summary, there is both:
+ 
+ - **positive** potential of protecting the Aptos network in case of technological surprise
+ - low chance of _negative_ potential of slowing down the Aptos network, if too many users enable the PQ scheme **and** the Aptos network is too slow in introducing faster PQ schemes
+
+## Timeline
+
+### Suggested implementation timeline
+
+Milestones:
+
+ - [x] Add support in the `aptos-crypto` crate
+ - [x] Feature-gated Aptos VM signature verification logic for these new PQ accounts
+ - [x] TypeScript SDK support
+ - [x] Support to derive SKs from mnemonics
+ - [x] Feature-gated gas pricing for the new signature verification logic
+ - [ ] CLI support: key generation, key storage and signing
+ - [ ] Indexer support
+ - [ ] Developer documentation
+
+### Suggested developer platform support timeline
+
+See milestones above.
+
+### Suggested deployment timeline
+
+In the next year, there is no urgency to deploy this on any of the networks.
+
+Nonetheless, we can target a preliminary devnet deployment early next year.
+
+## Open Questions (Optional)
+
+### Q0: Threshold-friendly signature schemes
+
+**TODO:** Address the difficulty of thresholdizing hash-based signature schemes.
+
+### Q1: How to best-implement HD wallet support for this scheme?
+
+This is important as it allows software wallets to derive PQ accounts for their users using pre-existing mnemonics.
+
+One desiderata would be to maximize our chances of compatibility with future implementations in hardware wallets.
+
+The difficulty is that we are proverbially "shooting in the dark:" it's difficult to fathom what hardware wallet implementors like Ledger or Trezor will choose to do.
+
+### Q2: Should we use hedged (randomized) signing or deterministic signing (currently-enabled)?
+
+Hedged signing would add a layer of protection against differential power / EM attacks[^ABBplus22].
+See discussion in the [security section](#side-channel-and-fault-attacks).
+
+It is unclear what would be lost by enabling it, beyond some level of conceptual simplicity.
+
+### Q3: Should BHT-style[^BHT97] quantum attacks on hash functions simply be dismissed?
+
+They do not seem to be considered in the NIST submission[^ABBplus22].
+Perhaps their impracticality may be the reason?[^Bern09]
+
+### Q4: To what extent are RowHammer attacks on SLH-DSA concerning?
+
+e.g., a recent paper[^BPPplus25] shows RowHammer software-only attacks can be used to forge signatures.
+
+However, the paper cites these kinds of attacks as being applicable to other PQ schemes such as ML-DSA and Falcon.
+It may be that assuming the attacker is co-located on the same core with the victim is simply too powerful.
+
+[^aip-80]: [AIP-80: Standardize Private Keys](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-080-standardize-private-keys.md), Greg Nazario, 2024
+[^ABBplus22]: **SPHINCS+ – Submission to the 3rd round of the NIST post-quantum project. v3.1**; by Jean-Philippe Aumasson, Daniel J. Bernstein, Ward Beullens, Christoph Dobraunig, Maria Eichlseder, Scott Fluhrer, Stefan-Lukas Gazdag, Andreas Hülsing, Panos Kampanakis, Stefan Kölbl, Tanja Lange, Martin M. Lauridsen, Florian Mendel, Ruben Niederhagen, Christian Rechberger, Joost Rijneveld, Peter Schwabe, Bas Westerbaan; 2022; [[URL]](https://sphincs.org/data/sphincs+-r3.1-specification.pdf)
+[^benching-pq]: [Post-Quantum Signature Scheme Benchmarks](https://github.com/conor-deegan/benching-pq); Conor Deegan @ Project 11
+[^bip-32]: [BIP-32: Hierarchical Deterministic Wallets](https://en.bitcoin.it/wiki/BIP_0032#Child_key_derivation_(CKD)_functions)
+[^bip-44]: [Multi-Account Hierarchy for Deterministic Wallets](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)
+[^Bern09]: **Cost analysis of hash collisions : will quantum computers make SHARCS obsolete?**, by Daniel J. Bernstein, 2009, [[URL]](https://api.semanticscholar.org/CorpusID:596115)
+[^Beul22]: **Breaking Rainbow Takes a Weekend on a Laptop**; by Ward Beullens; 2022, [[URL]](https://eprint.iacr.org/2022/214)
+[^BHT97]: **Quantum cryptanalysis of hash and claw-free functions**; by Brassard, Gilles and Høyer, Peter and Tapp, Alain; in SIGACT News; 1997; [[URL]](https://doi.org/10.1145/261342.261346)
+[^BPPplus25]: **SLasH-DSA: Breaking SLH-DSA Using an Extensible End-To-End Rowhammer Framework**, by Jeremy Boy and Antoon Purnal and Anna Pätschke and Luca Wilke and Thomas Eisenbarth, 2025
+[^conduition-trezor]: [`conduition`'s reply in "Hash-Based Signatures for Bitcoin's Post-Quantum Future"](https://groups.google.com/g/bitcoindev/c/gOfL5ag_bDU/m/aFwBoubdCgAJ)
+[^consensus]: Of course, this assumes that other parts of the Aptos stack have also been made PQ-secure, such as the consensus protocol.
+[^falcon]: [Falcon: Fast-Fourier Lattice-based Compact Signatures over NTRU](https://falcon-sign.info)
+[^FIPS204]: [FIPS 204: Module-Lattice-Based Digital Signature Standard](https://csrc.nist.gov/pubs/fips/204/final); by National Institute of Standards and Technology (NIST); 2024
+[^FIPS205]: [FIPS 205: Stateless Hash-Based Digital Signature Standard](https://csrc.nist.gov/pubs/fips/205/final); by National Institute of Standards and Technology (NIST); 2024
+[^nist-pq-round-3-status-report]: [Status Report on the Third Round of the NIST Post-Quantum Cryptography Standardization Process](https://www.nist.gov/publications/status-report-third-round-nist-post-quantum-cryptography-standardization-process); Gorjan Alagic, David Cooper, Quynh Dang, Thinh Dang, John M. Kelsey, Jacob Lichtinger, Yi-Kai Liu, Carl A. Miller, Dustin Moody, Rene Peralta, Ray Perlner, Angela Robinson, Daniel Smith-Tone, Daniel Apon; July 5th, 2024
+[^nist-sec]: [Post-Quantum Cryptography - Security (Evaluation Criteria)](https://csrc.nist.gov/projects/post-quantum-cryptography/post-quantum-cryptography-standardization/evaluation-criteria/security-(evaluation-criteria)); by National Institute of Standards and Technology (NIST); 2017
+[^pqc-suite-b-benches]: [PQC Suite B: Faster Post-Quantum Cryptography with BLAKE3](https://github.com/PQC-Suite-B/)
+[^rust-crypto-benches]: [Post-quantum signature schemes: Performance of `RustCrypto/signatures`](https://alinush.github.io/post-quantum-signatures#performance-of-rustcryptosignatures), Alin Tomescu, 2025
+[^rust-crypto-sigs]: [RustCrypto/signatures](https://github.com/RustCrypto/signatures)
+[^sa-blog]: [Quantum Investment Bros: Have you no shame?](https://scottaaronson.blog/?p=9344), Scott Aaronson, Nov. 20th, 2025
+[^slh-dsa]: [slh-dsa crate](https://crates.io/crates/slh-dsa)
+[^slip-0010]: [SLIP-0010: Universal private key derivation from master private key](https://github.com/satoshilabs/slips/blob/master/slip-0010.md#master-key-generation)
+[^sphincsplus-git]: [sphincs/sphincsplus](https://github.com/sphincs/sphincsplus.git)
