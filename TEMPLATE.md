@@ -13,7 +13,7 @@ requires (*optional): <AIP number(s)>
 
 # AIP-X - (AIP title)
   
-(Please give a temporary file name to your AIP when first drafting it, such as `aip-x.md`. The AIP manager will assign a number to it after reviewing.)
+**File naming convention:** AIP files are named `aip-<NNN>-<slug>.md`, where `<NNN>` is a zero-padded 3-digit number and `<slug>` is a short, kebab-case summary of the title (e.g., `aip-061-keyless-accounts.md`). When first drafting, use a temporary name like `aip-xxx-<slug>.md`. The AIP manager will assign the final number after reviewing.
 
 (Please remove the questions in the "quote box". Provide complete context to the questions being asked in the content that you provide.)
 
