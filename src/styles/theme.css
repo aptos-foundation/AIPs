@@ -1,86 +1,16 @@
-/* Aptos branding and theme customizations */
+/* Aptos brand — mint accent, warm neutrals, IBM Plex Serif */
+
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
 
 :root {
-  /* Aptos brand colors - adjust these to match official Aptos colors */
-  --sl-color-accent-low: #1a4d2e;
-  --sl-color-accent: #4ade80;
-  --sl-color-accent-high: #86efac;
-  --sl-hue-accent: 142;
+  --sl-color-accent-low: hsl(109, 30%, 14%);
+  --sl-color-accent: hsl(109, 50%, 55%);
+  --sl-color-accent-high: hsl(109, 60%, 80%);
+  --sl-font: "IBM Plex Serif", var(--sl-font-system);
 }
 
-/* Enhanced code blocks */
-code {
-  font-size: 0.9em;
-}
-
-/* Better link styling */
-a:hover {
-  text-decoration: underline;
-}
-
-/* Enhanced table styling for AIPs */
-article table {
-  display: block;
-  max-width: 100%;
-  overflow-x: auto;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-}
-
-article table th,
-article table td {
-  padding: 0.75rem 1rem;
-  border: 1px solid var(--sl-color-gray-5);
-}
-
-article table th {
-  background: var(--sl-color-bg-sidebar);
-  font-weight: 600;
-}
-
-article table tr:nth-child(even) {
-  background: var(--sl-color-gray-7);
-}
-
-/* Improve code block visibility */
-pre {
-  padding: 1rem !important;
-  border-radius: 0.5rem;
-}
-
-/* Custom scrollbar for webkit browsers */
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--sl-color-gray-6);
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--sl-color-gray-4);
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--sl-color-gray-3);
-}
-
-/* Ensure proper spacing for hero sections */
-.hero {
-  padding: 2rem 0;
-}
-
-/* Better mobile responsiveness */
-@media (max-width: 768px) {
-  article table {
-    font-size: 0.9rem;
-  }
-  
-  article table th,
-  article table td {
-    padding: 0.5rem;
-  }
+:root[data-theme="light"] {
+  --sl-color-accent-high: hsl(109, 45%, 30%);
+  --sl-color-accent: hsl(109, 50%, 40%);
+  --sl-color-accent-low: hsl(109, 60%, 92%);
 }

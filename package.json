@@ -2,7 +2,6 @@
   "name": "aptos-improvement-proposals",
   "type": "module",
   "version": "1.0.0",
-  "packageManager": "pnpm@10.0.0",
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
@@ -12,13 +11,15 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.5",
-    "@astrojs/starlight": "^0.28.6",
-    "astro": "^4.16.19",
-    "sharp": "^0.33.5",
-    "unist-util-visit": "^5.0.0"
+    "@astrojs/check": "^0.9.8",
+    "@astrojs/starlight": "^0.38.1",
+    "astro": "^6.0.5",
+    "sharp": "^0.34.5",
+    "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.7",
+    "prettier": "^3.8.1",
     "typescript": "^5.9.3"
   }
 }

@@ -1,4 +1,5 @@
 import { defineCollection, z } from "astro:content";
+import { docsLoader } from "@astrojs/starlight/loaders";
 import { docsSchema } from "@astrojs/starlight/schema";
 
 /**
@@ -34,7 +35,7 @@ const statusNormalize = (raw?: unknown): string => {
 const typeNormalize = (raw?: unknown): string => {
   const t = norm(raw).toLowerCase();
   if (!t) return "Uncategorized";
-  
+
   const repl = t
     .replace(/standard\s*\(?\s*framework\)?/g, "framework")
     .replace(/standard\s*\(?\s*core\)?/g, "core")
@@ -86,7 +87,7 @@ const toStringArray = (v?: unknown): string[] => {
 
 export const collections = {
   docs: defineCollection({
-    type: "content",
+    loader: docsLoader(),
     schema: docsSchema({
       extend: z.object({
         aip: z.number().int().nonnegative().optional(),

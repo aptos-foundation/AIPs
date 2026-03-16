@@ -34,9 +34,14 @@ export default defineConfig({
       title: "Aptos Improvement Proposals (AIPs)",
       description:
         "Specifications and process for proposing and evolving the Aptos protocol and ecosystem.",
-      social: {
-        github: "https://github.com/aptos-foundation/AIPs",
-      },
+      favicon: "/favicon.svg",
+      social: [
+        {
+          icon: "github",
+          label: "GitHub",
+          href: "https://github.com/aptos-foundation/AIPs",
+        },
+      ],
       editLink: {
         baseUrl: "https://github.com/aptos-foundation/AIPs/edit/main/",
       },
@@ -56,6 +61,19 @@ export default defineConfig({
         },
       ],
       customCss: ["./src/styles/theme.css"],
+      defaultLocale: "root",
+      locales: {
+        root: {
+          label: "English",
+          lang: "en",
+        },
+      },
+      lastUpdated: true,
+      pagination: true,
+      tableOfContents: {
+        minHeadingLevel: 2,
+        maxHeadingLevel: 4,
+      },
     }),
   ],
 });
