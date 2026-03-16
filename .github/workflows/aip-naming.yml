@@ -1,0 +1,45 @@
+name: AIP Naming Convention
+
+on:
+  pull_request:
+    paths:
+      - 'aips/**'
+
+jobs:
+  check-naming:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check AIP file naming convention
+        run: |
+          # Pattern: aip-<NNN>-<slug>.md  or  aip-xxx-<slug>.md (drafts)
+          # <NNN> = zero-padded 3-digit number, <slug> = kebab-case lowercase
+          PATTERN='^aips/aip-(([0-9]{3})|xxx)-[a-z0-9]+(-[a-z0-9]+)*\.md$'
+
+          bad_files=()
+          for file in $(git diff --name-only --diff-filter=AR "${{ github.event.pull_request.base.sha }}" HEAD -- 'aips/'); do
+            # Skip non-files (e.g. the static/ directory)
+            [[ "$file" != *.md ]] && continue
+
+            if ! echo "$file" | grep -qE "$PATTERN"; then
+              bad_files+=("$file")
+            fi
+          done
+
+          if [ ${#bad_files[@]} -gt 0 ]; then
+            echo "::error::The following AIP files do not follow the naming convention:"
+            echo ""
+            echo "  Expected: aip-<NNN>-<slug>.md  (e.g., aip-061-keyless-accounts.md)"
+            echo "  Drafts:   aip-xxx-<slug>.md    (e.g., aip-xxx-my-proposal.md)"
+            echo ""
+            echo "  <NNN> = zero-padded 3-digit number"
+            echo "  <slug> = short kebab-case summary (lowercase letters, digits, hyphens)"
+            echo ""
+            for f in "${bad_files[@]}"; do
+              echo "  - $f"
+            done
+            exit 1
+          fi
+
+          echo "All AIP files follow the naming convention."
