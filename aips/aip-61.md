@@ -643,7 +643,7 @@ pub struct ZeroKnowledgeSig {
     /// in the IDC. This will allow users to recover keyless accounts bound to an application that
     /// is no longer online.
     pub override_aud_val: Option<String>,
-    /// A signature on the proof and the statement (via the training wheels SK) to mitigate against
+    /// A signature on the proof and the public input hash (via the training wheels SK) to mitigate against
     /// flaws in our circuit.
     pub training_wheels_signature: Option<EphemeralSignature>,
 }
