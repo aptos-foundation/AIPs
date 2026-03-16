@@ -43,3 +43,25 @@ jobs:
           fi
 
           echo "All AIP files follow the naming convention."
+
+      - name: Check for duplicate AIP numbers
+        run: |
+          # Extract AIP numbers from all .md files, excluding "xxx" drafts
+          dupes=$(ls aips/aip-*.md 2>/dev/null \
+            | sed -n 's|^aips/aip-\([0-9]\{3\}\)-.*\.md$|\1|p' \
+            | sort \
+            | uniq -d)
+
+          if [ -n "$dupes" ]; then
+            echo "::error::Duplicate AIP numbers found:"
+            echo ""
+            for num in $dupes; do
+              echo "  AIP-$num:"
+              ls aips/aip-${num}-*.md | sed 's/^/    /'
+            done
+            echo ""
+            echo "Each AIP number must be unique. Please resolve the duplicates."
+            exit 1
+          fi
+
+          echo "No duplicate AIP numbers found."
