@@ -51,6 +51,9 @@ export default defineConfig({
 			description:
 				"Specifications and process for proposing and evolving the Aptos protocol and ecosystem.",
 			favicon: "/favicon.svg",
+			components: {
+				Head: "./src/components/Head.astro",
+			},
 			head: [
 				{
 					tag: "meta",

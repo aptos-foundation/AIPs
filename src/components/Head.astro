@@ -1,0 +1,118 @@
+---
+/**
+ * Custom Head component that extends Starlight's default Head.
+ * Adds: JSON-LD structured data, llms.txt link, auto-generated descriptions,
+ * and og:image for the static OG image.
+ */
+
+const route = Astro.locals.starlightRoute;
+const { entry, head } = route;
+const data = entry.data as any;
+const siteUrl = Astro.site?.href?.replace(/\/$/, "") ?? "";
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+const pageUrl = `${siteUrl}${basePath}/${entry.id === "" ? "" : entry.id + "/"}`;
+const isAipPage = entry.id.startsWith("aips/");
+const ogImageUrl = `${siteUrl}${basePath}/og-image.png`;
+
+// Auto-generate description from body for AIP pages missing one
+const siteDescription = "Specifications and process for proposing and evolving the Aptos protocol and ecosystem.";
+let autoDescription: string | null = null;
+if (isAipPage && entry.body) {
+	const existing = data.description;
+	// If no description or it matches the site-wide default, auto-generate
+	if (!existing || existing === siteDescription) {
+		const body = entry.body.replace(/^---[\s\S]*?---\n*/, "").trim();
+		// Find first meaningful paragraph (skip headings, empty lines, frontmatter-like content)
+		const lines = body.split("\n");
+		let paragraph = "";
+		for (const line of lines) {
+			const trimmed = line.trim();
+			if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("|") || trimmed.startsWith("---") || trimmed.startsWith("```") || trimmed.startsWith("- ") || trimmed.startsWith(">")) continue;
+			paragraph = trimmed;
+			break;
+		}
+		if (paragraph) {
+			// Strip markdown formatting
+			const clean = paragraph
+				.replace(/!\[[^\]]*\]\([^)]+\)/g, "") // images
+				.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1") // links
+				.replace(/\[\^[^\]]+\]/g, "") // footnote refs
+				.replace(/[*_`~]/g, "") // emphasis
+				.replace(/\s{2,}/g, " ") // collapse whitespace
+				.trim();
+			if (clean.length > 10) {
+				autoDescription = clean.length > 160 ? clean.slice(0, 157) + "..." : clean;
+			}
+		}
+	}
+}
+
+// Build JSON-LD
+let jsonLd: Record<string, unknown>;
+if (isAipPage) {
+	const aipNum = data.aip;
+	const title = data.title ?? `AIP-${aipNum}`;
+	const authors = Array.isArray(data.author) ? data.author : data.author ? [data.author] : [];
+	jsonLd = {
+		"@context": "https://schema.org",
+		"@type": "TechArticle",
+		headline: `AIP-${aipNum}: ${title}`,
+		url: pageUrl,
+		...(autoDescription ? { description: autoDescription } : data.description ? { description: data.description } : {}),
+		...(authors.length > 0 ? { author: authors.map((a: string) => ({ "@type": "Person", name: a })) } : {}),
+		...(data.created ? { datePublished: data.created instanceof Date ? data.created.toISOString().split("T")[0] : String(data.created) } : {}),
+		...(data.updated ? { dateModified: data.updated instanceof Date ? data.updated.toISOString().split("T")[0] : String(data.updated) } : {}),
+		publisher: {
+			"@type": "Organization",
+			name: "Aptos Foundation",
+			url: "https://aptosfoundation.org",
+		},
+		isPartOf: {
+			"@type": "WebSite",
+			name: "Aptos Improvement Proposals",
+			url: `${siteUrl}${basePath}/`,
+		},
+	};
+} else {
+	jsonLd = {
+		"@context": "https://schema.org",
+		"@type": "WebSite",
+		name: "Aptos Improvement Proposals",
+		url: `${siteUrl}${basePath}/`,
+		description: siteDescription,
+		publisher: {
+			"@type": "Organization",
+			name: "Aptos Foundation",
+			url: "https://aptosfoundation.org",
+		},
+	};
+}
+
+// Filter out default description/og:description tags if we have an auto-generated one
+const filteredHead = autoDescription
+	? head.filter(({ tag, attrs }: any) => {
+		if (tag === "meta" && attrs?.name === "description") return false;
+		if (tag === "meta" && attrs?.property === "og:description") return false;
+		return true;
+	})
+	: head;
+---
+
+{/* Render Starlight's default head tags (filtered if we have auto-description) */}
+{filteredHead.map(({ tag: Tag, attrs, content }: any) => <Tag {...attrs} set:html={content} />)}
+
+{/* Auto-generated description overrides */}
+{autoDescription && <meta name="description" content={autoDescription} />}
+{autoDescription && <meta property="og:description" content={autoDescription} />}
+
+{/* OG image */}
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:image" content={ogImageUrl} />
+
+{/* LLM discoverability */}
+<link rel="alternate" type="text/plain" title="LLM-friendly content guide" href={`${basePath}/llms.txt`} />
+
+{/* JSON-LD structured data */}
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
