@@ -1,5 +1,6 @@
 ---
 aip: 98
+slug: aips/98
 title: Reduce minimal stake required to submit governance proposal from 10M to 1M
 author: sherry-x
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/502

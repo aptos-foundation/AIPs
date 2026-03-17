@@ -1,5 +1,6 @@
 ---
 aip: 15
+slug: aips/15
 title: Token Standard Reserved Properties
 author: areshand
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/28

@@ -1,13 +1,14 @@
 ---
 aip: 78
+slug: aips/78
 title: Aptos Token Objects Framework Update
 author: johnchanguk
-discussions-to (*optional):
+discussions-to:
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Framework
 created: 03/23/2024
-updated (*optional): <mm/dd/yyyy>
+updated: <mm/dd/yyyy>
 ---
 
 # AIP-78 - Aptos Token Objects Framework Update

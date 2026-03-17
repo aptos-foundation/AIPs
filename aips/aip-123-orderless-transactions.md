@@ -1,5 +1,6 @@
 ---
 aip: 123
+slug: aips/123
 title: Orderless transactions
 author: Satya Vusirikala, Igor Kabiljo
 Status: Draft

@@ -1,13 +1,14 @@
 ---
 aip: 128
+slug: aips/128
 title: Multisig Script Payloads
 author: gregnazario (greg@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/619
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/619
 Status: In Review
 type: Standard (Core, Framework)
 created: 06/05/2025
-updated (*optional): 06/23/2025
-requires (*optional): 12
+updated: 06/23/2025
+requires: 12
 ---
 
 # AIP-128 - Multisig Script Payloads

@@ -1,5 +1,6 @@
 ---
 aip: 14
+slug: aips/14
 title: Update vesting contract
 author: movekevin
 Status: Accepted

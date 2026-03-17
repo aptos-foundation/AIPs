@@ -1,13 +1,14 @@
 ---
 aip: 69
+slug: aips/69
 title: Start replication of Google JWK on chain
 author: Zhoujun Ma (zhoujun@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/349
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/349
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Networking, Framework)>
 created: <02/21/2024>
-requires (*optional): 67
+requires: 67
 ---
 
 # AIP-69 - Start replication of Google JWKs on chain

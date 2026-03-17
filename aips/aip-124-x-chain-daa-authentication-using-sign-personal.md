@@ -1,5 +1,6 @@
 ---
 aip: 124
+slug: aips/124
 title: x-chain DAA authentication using Sign Personal Message with Sui
 author: 0xmaayan, igor-aptos
 Status: Accepted

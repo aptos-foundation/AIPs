@@ -1,14 +1,15 @@
 ---
 aip: 135
+slug: aips/135
 title: Monotonically Increasing Counter Native Function
 author: vusirikala, igor-aptos
-discussions-to (*optional): 
+discussions-to: 
 Status: Draft
-last-call-end-date (*optional): 
+last-call-end-date: 
 type: Standard (Core)
 created: 10/23/2025
-updated (*optional): 
-requires (*optional): 
+updated: 
+requires: 
 ---
 
 # AIP-135 - Monotonically Increasing Counter Native Function

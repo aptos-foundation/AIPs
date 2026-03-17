@@ -1,5 +1,6 @@
 ---
 aip: 141
+slug: aips/141
 title: 10x Gas Fee Increase
 author: Calin Tataru (calin.tataru@aptoslabs.com)
 Status: Draft

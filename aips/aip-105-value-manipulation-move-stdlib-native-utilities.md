@@ -1,14 +1,15 @@
 ---
 aip: 105
+slug: aips/105
 title: Value manipulation move stdlib native utilities
 author: igor-aptos
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/529
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/529
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Framework
 created: <mm/dd/yyyy>
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-105 - Value manipulation move stdlib native utilities

@@ -1,5 +1,6 @@
 ---
 aip: 116
+slug: aips/116
 title: Sign in with Aptos
 author: aptqpv
 Status: Draft

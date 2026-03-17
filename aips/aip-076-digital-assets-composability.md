@@ -1,5 +1,6 @@
 ---
 aip: 76
+slug: aips/76
 title: Digital Assets Composability
 author: aladeenb (aladeen@codeandledger.com), jczhang
 discussions-to:  https://github.com/aptos-foundation/AIPs/pull/278#issue

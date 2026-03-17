@@ -1,5 +1,6 @@
 ---
 aip: 4
+slug: aips/4
 title: Update Simple Map To Save Gas
 author: areshand
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/15

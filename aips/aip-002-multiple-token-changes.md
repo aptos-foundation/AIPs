@@ -1,5 +1,6 @@
 ---
 aip: 2
+slug: aips/2
 title: Multiple Token Changes
 author: areshand
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/2

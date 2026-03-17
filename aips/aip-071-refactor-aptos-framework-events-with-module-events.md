@@ -1,8 +1,9 @@
 ---
 aip: 71
+slug: aips/71
 title: Refactor Aptos Framework Events with Module Events
 author: lightmark
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/367
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/367
 Status: Accepted
 type: Framework
 created: 02/22/2024

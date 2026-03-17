@@ -1,14 +1,15 @@
 ---
 aip: 140
+slug: aips/140
 title: "Aptos Tokenomics Update: Moving to Performance-Driven Supply Mechanisms"
 author: Aptos Foundation
-discussions-to (*optional): https://x.com/Aptos/status/2024216329826230392
+discussions-to: https://x.com/Aptos/status/2024216329826230392
 Status: Draft
-last-call-end-date (*optional): 03/06/2026
+last-call-end-date: 03/06/2026
 type: Tokenomics
 created: 02/18/2026
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-140: Aptos Tokenomics Update: Moving to Performance-Driven Supply Mechanisms

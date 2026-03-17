@@ -1,14 +1,15 @@
 ---
 aip: 133
+slug: aips/133
 title: Function Value Reflection in Move
 author: Wolfgang Grieskamp (wg@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/634
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/634
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core)
 created: 10/21/2025
-updated (*optional): 
-requires (*optional): 
+updated: 
+requires: 
 ---
 
 # AIP-133 - Function Value Reflection in Move

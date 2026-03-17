@@ -1,5 +1,6 @@
 ---
 aip: 10
+slug: aips/10
 title: Move Objects
 author: davidiw, wrwg
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/27

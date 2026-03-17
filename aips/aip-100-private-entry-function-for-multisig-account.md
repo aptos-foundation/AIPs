@@ -1,5 +1,6 @@
 ---
 aip: 100
+slug: aips/100
 title: Private Entry Function for Multisig Account Creation
 author: yeptos (https://github.com/yeptos), gregnazario (https://github.com/gregnazario)
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/498

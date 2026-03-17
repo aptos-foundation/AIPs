@@ -1,14 +1,15 @@
 ---
 aip: 130
+slug: aips/130
 title: Signed Integers in Move
 author: 0xAnto (anto@kanalabs.io), 0xbe1 (0xbe1@thalalabs.xyz), junxzm1990 (jun.xu@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/631
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/631
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core)
 created: 05/28/2025
-updated (*optional): 10/15/2025
-requires (*optional): <AIP number(s)>
+updated: 10/15/2025
+requires: <AIP number(s)>
 ---
 
 # AIP-130 - Signed Integers in Move

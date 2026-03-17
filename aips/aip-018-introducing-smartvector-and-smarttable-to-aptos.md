@@ -1,5 +1,6 @@
 ---
 aip: 18
+slug: aips/18
 title: Introducing SmartVector and SmartTable to aptos_std
 author: lightmark
 Status: Accepted

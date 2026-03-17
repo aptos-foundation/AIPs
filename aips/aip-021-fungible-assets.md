@@ -1,5 +1,6 @@
 ---
 aip: 21
+slug: aips/21
 title: Fungible Assets
 author: lightmark, movekevin, davidiw
 Status: Accepted

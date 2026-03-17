@@ -1,14 +1,15 @@
 ---
 aip: 109
+slug: aips/109
 title: Hide Unwanted Soulbound Objects
 author: gregnazario (greg@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/545
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/545
 Status: Draft
-last-call-end-date (*optional): 12/18/2024
+last-call-end-date: 12/18/2024
 type: Framework
 created: 12/11/2024
-updated (*optional): 12/11/2024
-requires (*optional): AIP-99
+updated: 12/11/2024
+requires: AIP-99
 ---
 
 # AIP-109 - Hide Unwanted Soulbound Objects

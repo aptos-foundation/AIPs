@@ -1,12 +1,13 @@
 ---
 aip: 52
+slug: aips/52
 title: Automated Account Creation for Sponsored Transactions
 author: davidiw
 Status: Accepted
 type: Framework
 created: 10/04/2023
-updated (*optional): 12/11/2023
-requires (*optional): AIP-39
+updated: 12/11/2023
+requires: AIP-39
 ---
 
 # AIP-52 - Automated Account Creation for Sponsored Transactions

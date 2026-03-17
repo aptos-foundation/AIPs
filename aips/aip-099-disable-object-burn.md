@@ -1,14 +1,15 @@
 ---
 aip: 99
+slug: aips/99
 title: Disable Object Burn
 author: gregnazario (greg@aptoslabs.com)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: 8/28/2024
-updated (*optional):
-requires (*optional):
+updated:
+requires:
 ---
 
 # AIP-99 - Disable Safe Burn of User-Owned Objects

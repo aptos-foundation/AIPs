@@ -1,5 +1,6 @@
 ---
 aip: 119
+slug: aips/119
 title: reduce staking rewards
 author: moonshiesty - moonshiesty@protonmail.com
 Status: Draft

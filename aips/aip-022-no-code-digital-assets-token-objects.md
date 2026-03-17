@@ -1,5 +1,6 @@
 ---
 aip: 22
+slug: aips/22
 title: No-Code Digital Assets (Token Objects)
 author: davidiw, movekevin, lightmark, capcap
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/31

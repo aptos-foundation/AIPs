@@ -1,14 +1,15 @@
 ---
 aip: 106
+slug: aips/106
 title: Baby Raptr (Optimistic Quorum Store)
 author: ibalajiarun, zekun000, sasha8
-discussions-to (*optional):
+discussions-to:
 Status: Final
-last-call-end-date (*optional):
+last-call-end-date:
 type: Informational
 created: 11/14/2024
-updated (*optional):
-requires (*optional):
+updated:
+requires:
 ---
 
 # AIP-106 - Baby Raptr (Optimistic Quorum Store)

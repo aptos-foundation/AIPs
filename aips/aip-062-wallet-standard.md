@@ -1,10 +1,11 @@
 ---
 aip: 62
+slug: aips/62
 title: Wallet Standard
 author: 0xmaayan, hardsetting, NorbertBodziony
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/306
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/306
 Status: Accepted
-last-call-end-date (*optional):
+last-call-end-date:
 type: Ecosystem Standard
 created: 29/01/2024
 ---

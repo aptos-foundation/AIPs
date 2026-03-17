@@ -1,14 +1,15 @@
 ---
 aip: 84
+slug: aips/84
 title: Improving Gas Coverage
 author: vgao1996
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/427
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/427
 Status: Accepted
-last-call-end-date (*optional): TBA
+last-call-end-date: TBA
 type: Standard (Gas)
 created: 03/24/2024
-updated (*optional): 03/24/2024
-requires (*optional): N/A
+updated: 03/24/2024
+requires: N/A
 ---
 
 # AIP-84 Improving Gas Coverage

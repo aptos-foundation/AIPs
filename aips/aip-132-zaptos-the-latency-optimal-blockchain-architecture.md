@@ -1,14 +1,15 @@
 ---
 aip: 132
+slug: aips/132
 title: Zaptos - the latency optimal blockchain architecture
 author: Zekun Li, Zhuolun Xiang
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Core
 created: 9/9/2025
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-132 - Zaptos on Validators

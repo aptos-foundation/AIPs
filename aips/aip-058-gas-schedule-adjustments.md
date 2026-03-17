@@ -1,14 +1,15 @@
 ---
 aip: 58
+slug: aips/58
 title: Gas Schedule Adjustments
 author: igor-aptos (https://github.com/igor-aptos), vgao1996 (https://github.com/vgao1996)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Gas)
 created: 11/19/2023
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-58 - Gas Schedule Adjustments

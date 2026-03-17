@@ -1,12 +1,13 @@
 ---
 aip: 126
+slug: aips/126
 title: Validator Priority Fees
 author: guy-goren, grao1991, Zekun Li
 Status: Draft
 type: Standard (Core)
 created: <04/09/2025>
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-126 - Validator Priority Fees

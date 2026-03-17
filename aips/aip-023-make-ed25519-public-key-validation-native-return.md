@@ -1,5 +1,6 @@
 ---
 aip: 23
+slug: aips/23
 title: Make Ed25519 public key validation native return `false` if key has the wrong length
 author: Michael Straka <michael@aptoslabs.com>
 Status: Accepted

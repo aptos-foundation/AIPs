@@ -1,5 +1,6 @@
 ---
 aip: 1
+slug: aips/1
 title: Proposer selection improvements
 author: igor-aptos
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/9

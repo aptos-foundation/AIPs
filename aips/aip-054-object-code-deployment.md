@@ -1,8 +1,9 @@
 ---
 aip: 54
+slug: aips/54
 title: Object code deployment
 author: movekevin, xbtmatt, johnchanguk
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/259
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/259
 Status: Accepted
 type: Standard (Framework)
 created: 10/09/2023

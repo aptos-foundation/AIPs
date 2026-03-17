@@ -1,14 +1,15 @@
 ---
 aip: 43
+slug: aips/43
 title: Parallelize Digital Assets (Token V2) minting/burning
 author: igor-aptos (https://github.com/igor-aptos), vusirikala (https://github.com/vusirikala)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/209
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/209
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: 07/20/2023
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): AIP-47, AIP-44
+updated: <mm/dd/yyyy>
+requires: AIP-47, AIP-44
 ---
 
 # AIP-43 - Parallelize Digital Assets (Token V2)

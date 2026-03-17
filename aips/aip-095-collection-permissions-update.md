@@ -1,13 +1,14 @@
 ---
 aip: 95
+slug: aips/95
 title: Collection Permissions Update
 author: johnchanguk, briungri
-discussions-to (*optional):
+discussions-to:
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Framework
 created: 07/15/2024
-updated (*optional): <mm/dd/yyyy>
+updated: <mm/dd/yyyy>
 ---
 
 # AIP-95 - Collection Permissions Update

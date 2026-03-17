@@ -1,5 +1,6 @@
 ---
 aip: 121
+slug: aips/121
 title: x-chain DAA authentication using Sign-in-With-Solana
 author: igor-aptos, brian, 0xmaayan, lightmark, hardsetting
 Status: Accepted

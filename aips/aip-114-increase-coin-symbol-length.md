@@ -1,14 +1,15 @@
 ---
 aip: 114
+slug: aips/114
 title: Increase Coin Symbol Length
 author: gregnazario
-discussions-to (*optional): N/A
+discussions-to: N/A
 Status: Accepted
-last-call-end-date (*optional): N/A
+last-call-end-date: N/A
 type: Standard (Framework)
 created: 02/01/2025
-updated (*optional): 02/24/2025
-requires (*optional): N/A
+updated: 02/24/2025
+requires: N/A
 ---
 
 # AIP-114 - Increase Coin Symbol Byte Length

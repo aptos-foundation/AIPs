@@ -1,17 +1,18 @@
 ---
 aip: 96
+slug: aips/96
 title: Federated Keyless accounts
 author: Alin Tomescu (alin@aptoslabs.com), davidiw, heliuchuan
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/490
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/490
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Framework)>
 created: 08/21/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional):
- - [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-061-keyless-accounts.md)
- - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-075-prover-service-for-keyless-accounts.md
- - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-081-pepper-service-for-keyless-accounts.md
+updated: <mm/dd/yyyy>
+requires:
+  - "AIP-61"
+  - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-075-prover-service-for-keyless-accounts.md
+  - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-081-pepper-service-for-keyless-accounts.md
 ---
 
 # AIP-96: Federated Keyless accounts

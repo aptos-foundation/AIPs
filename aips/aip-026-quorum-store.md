@@ -1,5 +1,6 @@
 ---
 aip: 26
+slug: aips/26
 title: Quorum Store
 author: bchocho
 Status: Accepted

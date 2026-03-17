@@ -1,14 +1,15 @@
 ---
 aip: 131
+slug: aips/131
 title: Single-Hop Block Time
 author: Zhuolun Xiang (daniel@aptoslabs.com), Balaji Arun (balaji@aptoslabs.com)
-discussions-to (*optional):
+discussions-to:
 Status: Final
-last-call-end-date (*optional):
+last-call-end-date:
 type: Informational
 created: 08/21/2025
-updated (*optional):
-requires (*optional):
+updated:
+requires:
 ---
 
 # AIP-131 - Single-Hop Block Time

@@ -1,14 +1,15 @@
 ---
 aip: 81
+slug: aips/81
 title: Pepper service for keyless accounts
 author: Zhoujun Ma (zhoujun@aptoslabs.com)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Informational
 created: 03/17/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-81 - Pepper service for keyless accounts
@@ -103,7 +104,7 @@ The reference implementation uses:
 The pepper service should publish its VUF public key by opening an endpoint for anyone to fetch its public key.
 
 Here is an example response from the reference implementation.
-```JSON
+```js
 {
   "public_key": "b601ec185c62da8f5c0402d4d4f987b63b06972c11f6f6f9d68464bda32fa502a5eac0adeda29917b6f8fa9bbe0f498209dcdb48d6a066c1f599c0502c5b4c24d4b057c758549e3e8a89ad861a82a789886d69876e6c6341f115c9ecc381eefd" // pinkas vuf public key serialized and hexlified
 }
@@ -122,7 +123,7 @@ The pepper request from user should contain the following data items.
 
 Here's an example request in JSON.
 
-```JSON
+```js
 {
   "epk": "002020fdbac9b10b7587bba7b5bc163bce69e796d71e4ed44c10fcb4488689f7a144", // EPK serialized and hexlified
   "exp_date_secs": 1710800689, // The EPK expiry date represented in seconds seince unix epoch
@@ -170,7 +171,7 @@ the pepper request should be rejected if any of the following checks fails.
 - Return `derived_pepper` and optionally `initial_account_address`.
 
 Below is an example pepper JSON response used in the reference implementation.
-```JSON
+```js
 {
   "pepper": "854bd1eb56dfe35467493723360bb547a3f06c7ffc0c59733191fb05e8743f", // `derived_pepper` hexlified
   "address": "0x56f36f5c9fd3f07f9ae0704b7980dd2598afebdd1dc952c60775cd9a5c7c0731" // the initial account address

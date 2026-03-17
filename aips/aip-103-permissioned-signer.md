@@ -1,14 +1,15 @@
 ---
 aip: 103
+slug: aips/103
 title: Permissioned Signer
 author: runtian-zhou wrwg igor-aptos davidiw lightmark
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Framework
 created: 09/26/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-103 - Permissioned Signer

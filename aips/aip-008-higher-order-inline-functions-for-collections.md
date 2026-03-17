@@ -1,5 +1,6 @@
 ---
 aip: 8
+slug: aips/8
 title: Higher-Order Inline Functions for Collections
 author: wrwg
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/33
@@ -29,7 +30,7 @@ Move has currently no traits which would allow to define an `Iterator` type whic
 
 Each iterable collection SHOULD offer the following three functions (illustrated by the `vector<T>` type):
 
-```move=
+```move
 public inline fun for_each<T>(v: vector<T>, f: |T|);
 public inline fun for_each_ref<T>(v: &vector<T>, f: |&T|);
 public inline fun for_each_mut<T>(v: &mut vector<T>, f: |&mut T|);
@@ -37,7 +38,7 @@ public inline fun for_each_mut<T>(v: &mut vector<T>, f: |&mut T|);
 
 Each of those functions iterates over the collection in the order specific to that collection. The first one consumes the collection, the second one allows to refer to the elements, and the last one to update the elements. Here is an example using `for_each_ref`:
 
-```move=
+```move
 fun sum(v: &vector<u64>): u64 {
   let r = 0;
   for_each_ref(v, |x| r = r + *x);
@@ -49,7 +50,7 @@ fun sum(v: &vector<u64>): u64 {
 
 Each iterable collection SHOULD offer the following three functions which transpose into a new collection of the same or different type:
 
-```move=
+```move
 public inline fun fold<T, R>(v: vector<T>, init: R, f: |R,T|R ): R;
 public inline fun map<T, S>(v: vector<T>, f: |T|S ): vector<S>;
 public inline fun filter<T:drop>(v: vector<T>, p: |&T|bool) ): vector<T>;
@@ -57,7 +58,7 @@ public inline fun filter<T:drop>(v: vector<T>, p: |&T|bool) ): vector<T>;
 
 To illustrate the semantics of the `fold` and the `map` function, we show the definition of the later in terms of the former:
 
-```move=
+```move
 public inline fun map<T, S>(v: vector<T>, f: |T|S): vector<S> {
     let result = vector<S>[];
     for_each(v, |elem| push_back(&mut result, f(elem)));

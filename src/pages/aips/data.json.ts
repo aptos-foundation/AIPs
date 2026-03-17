@@ -14,17 +14,17 @@ const numberFromSlug = (slug: string): number | undefined => {
  */
 export async function GET() {
 	try {
-		const docs = await getCollection("docs", (e) => e.slug.startsWith("aips/"));
+		const docs = await getCollection("docs", (e) => e.id.startsWith("aips/"));
 
 		const items = docs.map((e) => {
 			const data = e.data as any;
-			const n = data.aip ?? numberFromSlug(e.slug);
+			const n = data.aip ?? numberFromSlug(e.id);
 			const title = data.title ?? `AIP ${n ?? ""}`.trim();
 
 			return {
 				number: n ?? null,
-				slug: e.slug,
-				url: `/${e.slug}/`,
+				slug: e.id,
+				url: `/${e.id}/`,
 				title,
 				status: data.status ?? "Draft",
 				type: data.type ?? "Uncategorized",

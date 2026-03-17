@@ -1,5 +1,6 @@
 ---
 aip: 38
+slug: aips/38
 title: Deprecate Storage Gas Curves
 author: msmouse
 Status: Accepted

@@ -1,5 +1,6 @@
 ---
 aip: 59
+slug: aips/59
 title: Storage IO Gas Adjustments
 author: msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/291
@@ -7,8 +8,8 @@ Status: Accepted
 last-call-end-date:
 type: Gas
 created: 12/12/2023
-updated (*optional):
-requires (*optional):
+updated:
+requires:
 ---
 
 # AIP-59 - Storage IO Gas Adjustments

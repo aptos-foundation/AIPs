@@ -1,8 +1,9 @@
 ---
 aip: 36
+slug: aips/36
 title: Universally Unique Identifiers
 authors: satya@aptoslabs.com, ikabiljo@aptoslabs.com
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/154
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/154
 Status: Accepted
 type: Standard
 created: 06/01/2023

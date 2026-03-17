@@ -1,8 +1,9 @@
 ---
 aip: 67
+slug: aips/67
 title: Native Consensus for JSON Web Key (JWK)
 author: Zhoujun Ma (zhoujun@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/331
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/331
 Status: Accepted
 type: <Standard (Core, Networking, Framework)>
 created: <02/10/2024>

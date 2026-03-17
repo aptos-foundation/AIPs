@@ -1,12 +1,13 @@
 ---
 aip: 104
+slug: aips/104
 title: Account Abstraction
 author: lightmark, igor-aptos, davidiw
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/513
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/513
 Status: Draft
 type: Framework
 created: 10/01/2024
-updated (*optional): 01/24/2025
+updated: 01/24/2025
 ---
 
 # AIP-104 - Account Abstraction

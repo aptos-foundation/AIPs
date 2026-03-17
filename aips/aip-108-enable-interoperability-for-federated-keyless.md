@@ -1,13 +1,14 @@
 ---
 aip: 108
+slug: aips/108
 title: Enable interoperability for Federated Keyless Accounts for the same issuer (user-pool/tenant)
 author: Oliver He (oliver.he@aptoslabs.com)
 Status: Draft # | Last Call | Accepted | Final | Rejected>
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
 created: 11/08/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-103-permissioned-signer.md
+updated: <mm/dd/yyyy>
+requires: https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-103-permissioned-signer.md
 ---
 
 # AIP-108 - Enable interoperability for Federated Keyless Accounts for the same issuer (user-pool/tenant)
@@ -37,7 +38,7 @@ However, there are risks:
 > [!IMPORTANT]  
 > The changes are highlighted in $\textcolor{red}{red}$ and **bold**.
 
-```math
+$$
 \mathcal{R}\begin{pmatrix}
     \mathsf{pih};\\
     \textbf{w} = [
@@ -64,7 +65,7 @@ However, there are risks:
       )
     ]
 \end{pmatrix} = 1
-```
+$$
 
 The relation above is satisified if, and only if:
 

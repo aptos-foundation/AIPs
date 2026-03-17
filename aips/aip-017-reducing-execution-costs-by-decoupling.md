@@ -1,5 +1,6 @@
 ---
 aip: 17
+slug: aips/17
 title: Reducing Execution Costs by Decoupling Transaction Storage and Execution Charges
 author: msmouse, vgao1996, davidiw
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/79

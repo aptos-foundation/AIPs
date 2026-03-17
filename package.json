@@ -8,6 +8,7 @@
 		"build": "astro check && astro build",
 		"preview": "astro preview",
 		"check": "astro check",
+		"validate": "node scripts/validate-frontmatter.mjs",
 		"astro": "astro"
 	},
 	"dependencies": {

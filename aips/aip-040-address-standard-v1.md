@@ -1,14 +1,15 @@
 ---
 aip: 40
+slug: aips/40
 title: Address Standard v1
 author: banool
-discussions-to (*optional):
+discussions-to:
 Status: Accepted
-last-call-end-date (*optional): 07/10/2023
+last-call-end-date: 07/10/2023
 type: Standard
 created: 06/18/2023
 updated: 08/11/2023
-requires (*optional):
+requires:
 ---
 
 # AIP-40 - Address Standard v1

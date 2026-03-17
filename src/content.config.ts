@@ -112,7 +112,7 @@ export const collections = {
 					.nullable()
 					.transform(toDate),
 				requires: z
-					.union([z.string(), z.array(z.string())])
+					.union([z.string(), z.number(), z.array(z.string())])
 					.optional()
 					.nullable()
 					.transform(toStringArray),

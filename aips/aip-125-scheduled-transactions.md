@@ -1,14 +1,15 @@
 ---
 aip: 125
+slug: aips/125
 title: Scheduled Transactions
 author: Manu Dhundi (https://github.com/manudhundi) & Zekun Li (https://github.com/zekun000)
-discussions-to (*optional):
+discussions-to:
 Status: Draft
-last-call-end-date (*optional):
+last-call-end-date:
 type: Core, Framework
 created: 04/15/2025
 updated: 05/29/2025
-requires (*optional): <AIP number(s)>
+requires: <AIP number(s)>
 ---
 
 # AIP-125 - Scheduled Transactions

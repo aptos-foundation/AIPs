@@ -1,5 +1,6 @@
 ---
 aip: 113
+slug: aips/113
 title: Derivable Account Abstraction
 author: igor-aptos, lightmark
 Status: Draft

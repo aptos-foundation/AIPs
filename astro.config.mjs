@@ -1,6 +1,20 @@
+import { readdirSync } from "node:fs";
 import starlight from "@astrojs/starlight";
 import { defineConfig } from "astro/config";
 import remarkAipImages from "./scripts/remark-aip-images.mjs";
+
+// Generate redirects for zero-padded AIP numbers: /aips/001/ → /aips/1/
+const aipRedirects = {};
+for (const f of readdirSync("aips").filter((f) => f.endsWith(".md"))) {
+	const m = f.match(/^aip-(\d+)-/);
+	if (!m) continue;
+	const num = parseInt(m[1], 10);
+	const pad3 = String(num).padStart(3, "0");
+	const pad2 = String(num).padStart(2, "0");
+	if (pad3 !== String(num)) aipRedirects[`/aips/${pad3}`] = `/aips/${num}`;
+	if (pad2 !== String(num) && pad2 !== pad3)
+		aipRedirects[`/aips/${pad2}`] = `/aips/${num}`;
+}
 
 // Determine if we're in CI and configure base path accordingly
 const isCI = process.env.GITHUB_ACTIONS === "true";
@@ -14,6 +28,7 @@ const site = isCI
 export default defineConfig({
 	site,
 	base,
+	redirects: aipRedirects,
 	vite: {
 		server: {
 			fs: {

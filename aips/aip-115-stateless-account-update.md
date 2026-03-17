@@ -1,5 +1,6 @@
 ---
 aip: 115
+slug: aips/115
 title: Stateless Account Update
 author: lightmark, igor-aptos, davidiw
 Status: Draft

@@ -1,5 +1,6 @@
 ---
 aip: 129
+slug: aips/129
 title: Add extra information in transaction payload
 author: Satya Vusirikala, Igor Kabiljo
 Status: Draft

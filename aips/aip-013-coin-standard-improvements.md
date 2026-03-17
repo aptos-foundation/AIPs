@@ -1,5 +1,6 @@
 ---
 aip: 13
+slug: aips/13
 title: Coin Standard Improvements
 author: movekevin
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/24

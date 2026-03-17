@@ -1,5 +1,6 @@
 ---
 aip: 63
+slug: aips/63
 title: Coin to Fungible Asset Migration
 author: lightmark, davidiw, movekevin
 Status: Accepted
