@@ -19,10 +19,11 @@ for (const f of readdirSync("aips").filter((f) => f.endsWith(".md"))) {
 // Determine if we're in CI and configure base path accordingly
 const isCI = process.env.GITHUB_ACTIONS === "true";
 const repo = process.env.GITHUB_REPOSITORY?.split("/")[1] || "AIPs";
-const base = isCI ? `/${repo}` : "/";
+const previewBase = process.env.PREVIEW_BASE; // e.g. "/pr-preview/pr-42"
+const base = previewBase || (isCI ? `/${repo}` : "/");
 const site = isCI
-	? `https://aptos-foundation.github.io/${repo}/`
-	: "http://localhost:4321/";
+	? `https://aptos-foundation.github.io`
+	: "http://localhost:4321";
 
 // https://astro.build/config
 export default defineConfig({
@@ -50,6 +51,32 @@ export default defineConfig({
 			description:
 				"Specifications and process for proposing and evolving the Aptos protocol and ecosystem.",
 			favicon: "/favicon.svg",
+			head: [
+				{
+					tag: "meta",
+					attrs: { property: "og:type", content: "website" },
+				},
+				{
+					tag: "meta",
+					attrs: {
+						property: "og:site_name",
+						content: "Aptos Improvement Proposals",
+					},
+				},
+				{
+					tag: "meta",
+					attrs: { name: "twitter:card", content: "summary" },
+				},
+				{
+					tag: "link",
+					attrs: {
+						rel: "alternate",
+						type: "application/rss+xml",
+						title: "Aptos Improvement Proposals",
+						href: `${base.replace(/\/$/, "")}/aips/feed.xml`,
+					},
+				},
+			],
 			social: [
 				{
 					icon: "github",
