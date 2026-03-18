@@ -1,0 +1,34 @@
+# Aptos Improvement Proposals (AIPs)
+
+> Specifications and process for proposing and evolving the Aptos protocol and ecosystem.
+
+AIPs are design documents providing information to the Aptos community, describing new features or processes for the Aptos blockchain. Each AIP includes a technical specification, rationale, and reference implementation details.
+
+## Navigation
+
+- Full AIP index with content: /llms-full.txt
+- Structured JSON metadata for all AIPs: /aips/data.json
+- RSS feed of AIP updates: /aips/feed.xml
+- Browse AIPs on the web: https://aptos-foundation.github.io/AIPs/aips/
+
+## AIP Statuses
+
+- **Draft**: Initial proposal, open for discussion
+- **In Review**: Stable draft under community review
+- **Accepted**: Approved by maintainers, ready for implementation
+- **Rejected**: Not accepted by maintainers
+- **Final**: Deployed to mainnet
+- **On Hold**: Paused for further consideration
+
+## AIP Types
+
+Core, Framework, Gas, Cryptography, Ecosystem, Informational
+
+## Citation Format
+
+When referencing an AIP, use: "AIP-{number}: {title}"
+Example: "AIP-61: Keyless Accounts"
+
+## Source
+
+GitHub: https://github.com/aptos-foundation/AIPs

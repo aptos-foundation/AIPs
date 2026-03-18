@@ -1,0 +1,373 @@
+---
+import { Icon } from "@astrojs/starlight/components";
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+
+const title = "Browse AIPs";
+const description = "Explore all Aptos Improvement Proposals";
+---
+
+<StarlightPage frontmatter={{ title, description }}>
+  <div class="aip-browser">
+    <div class="controls">
+      <div class="control-group">
+        <label for="search">
+          <Icon name="magnifier" size="1.2rem" />
+          Search
+        </label>
+        <input
+          type="text"
+          id="search"
+          placeholder="Search by number or title..."
+          aria-label="Search AIPs"
+        />
+      </div>
+
+      <div class="control-group">
+        <label for="status-filter">
+          <Icon name="approve-check" size="1.2rem" />
+          Status
+        </label>
+        <select id="status-filter" aria-label="Filter by status">
+          <option value="">All Statuses</option>
+          <option value="Draft">Draft</option>
+          <option value="In Review">In Review</option>
+          <option value="Accepted">Accepted</option>
+          <option value="Rejected">Rejected</option>
+          <option value="On Hold">On Hold</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="type-filter">
+          <Icon name="setting" size="1.2rem" />
+          Category
+        </label>
+        <select id="type-filter" aria-label="Filter by category">
+          <option value="">All Categories</option>
+          <option value="Framework">Framework</option>
+          <option value="Core">Core</option>
+          <option value="Gas">Gas</option>
+          <option value="Cryptography">Cryptography</option>
+          <option value="Ecosystem">Ecosystem</option>
+          <option value="Informational">Informational</option>
+          <option value="Governance">Governance</option>
+          <option value="VM">VM</option>
+          <option value="Networking">Networking</option>
+          <option value="Language">Language</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="sort">
+          <Icon name="list-format" size="1.2rem" />
+          Sort by
+        </label>
+        <select id="sort" aria-label="Sort AIPs">
+          <option value="number">Number</option>
+          <option value="status">Status</option>
+          <option value="type">Category</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="stats" class="stats" aria-live="polite"></div>
+
+    <div id="loading" class="loading">Loading AIPs...</div>
+    <div id="error" class="error" style="display: none;"></div>
+
+    <div class="table-container">
+      <table id="aip-table">
+        <thead>
+          <tr>
+            <th>AIP</th>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="aip-list"></tbody>
+      </table>
+    </div>
+  </div>
+</StarlightPage>
+
+<style>
+  .aip-browser {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--sl-color-bg-sidebar);
+    border-radius: 0.5rem;
+  }
+
+  .control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .control-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--sl-color-text);
+  }
+
+  .control-group input,
+  .control-group select {
+    padding: 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.25rem;
+    background: var(--sl-color-black);
+    color: var(--sl-color-white);
+    font-size: 0.95rem;
+  }
+
+  .control-group input:focus,
+  .control-group select:focus {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+
+  .stats {
+    padding: 0.75rem 1rem;
+    background: var(--sl-color-bg-sidebar);
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    color: var(--sl-color-gray-2);
+  }
+
+  .loading,
+  .error {
+    padding: 2rem;
+    text-align: center;
+    font-size: 1.1rem;
+  }
+
+  .error {
+    color: var(--sl-color-red);
+  }
+
+  .table-container {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+    border: 1px solid var(--sl-color-gray-5);
+  }
+
+  #aip-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--sl-color-black);
+  }
+
+  #aip-table thead {
+    background: var(--sl-color-bg-sidebar);
+    position: sticky;
+    top: 0;
+  }
+
+  #aip-table th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid var(--sl-color-gray-5);
+  }
+
+  #aip-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--sl-color-gray-6);
+  }
+
+  #aip-table tbody tr:hover {
+    background: var(--sl-color-gray-7);
+  }
+
+  #aip-table a {
+    color: var(--sl-color-white);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  #aip-table a:hover {
+    color: var(--sl-color-accent);
+    text-decoration: underline;
+  }
+
+  .aip-number {
+    font-weight: 600;
+    color: var(--sl-color-accent);
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .status-Draft {
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-gray-1);
+  }
+
+  .status-Accepted {
+    background: var(--sl-color-green-high);
+    color: var(--sl-color-black);
+  }
+
+  .status-In\\ Review {
+    background: var(--sl-color-blue-high);
+    color: var(--sl-color-black);
+  }
+
+  .status-Rejected {
+    background: var(--sl-color-red-high);
+    color: var(--sl-color-black);
+  }
+
+  .status-On\\ Hold {
+    background: var(--sl-color-orange-high);
+    color: var(--sl-color-black);
+  }
+
+  @media (max-width: 768px) {
+    .controls {
+      grid-template-columns: 1fr;
+    }
+
+    #aip-table {
+      font-size: 0.9rem;
+    }
+
+    #aip-table th,
+    #aip-table td {
+      padding: 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  interface AIP {
+    number: number | null;
+    slug: string;
+    url: string;
+    title: string;
+    status: string;
+    type: string;
+    author: string[];
+    created: string | null;
+    updated: string | null;
+  }
+
+  let allAips: AIP[] = [];
+  let filteredAips: AIP[] = [];
+
+  const searchInput = document.getElementById("search") as HTMLInputElement;
+  const statusFilter = document.getElementById(
+    "status-filter"
+  ) as HTMLSelectElement;
+  const typeFilter = document.getElementById("type-filter") as HTMLSelectElement;
+  const sortSelect = document.getElementById("sort") as HTMLSelectElement;
+  const aipList = document.getElementById("aip-list") as HTMLElement;
+  const stats = document.getElementById("stats") as HTMLElement;
+  const loading = document.getElementById("loading") as HTMLElement;
+  const error = document.getElementById("error") as HTMLElement;
+
+  async function loadAips() {
+    try {
+      const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+      const response = await fetch(`${base}aips/data.json`);
+      if (!response.ok) throw new Error("Failed to load AIPs");
+      allAips = await response.json();
+      filteredAips = [...allAips];
+      loading.style.display = "none";
+      renderAips();
+    } catch (err) {
+      loading.style.display = "none";
+      error.style.display = "block";
+      error.textContent = "Error loading AIPs. Please try again later.";
+      console.error(err);
+    }
+  }
+
+  function filterAndSort() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const statusValue = statusFilter.value;
+    const typeValue = typeFilter.value;
+
+    filteredAips = allAips.filter((aip) => {
+      const matchesSearch =
+        !searchTerm ||
+        aip.title.toLowerCase().includes(searchTerm) ||
+        (aip.number && aip.number.toString().includes(searchTerm));
+      const matchesStatus = !statusValue || aip.status === statusValue;
+      const matchesType = !typeValue || aip.type === typeValue;
+      return matchesSearch && matchesStatus && matchesType;
+    });
+
+    const sortBy = sortSelect.value;
+    filteredAips.sort((a, b) => {
+      if (sortBy === "number") {
+        if (a.number === null) return 1;
+        if (b.number === null) return -1;
+        return a.number - b.number;
+      } else if (sortBy === "status") {
+        return a.status.localeCompare(b.status);
+      } else if (sortBy === "type") {
+        return a.type.localeCompare(b.type);
+      }
+      return 0;
+    });
+
+    renderAips();
+  }
+
+  function renderAips() {
+    const base = import.meta.env.BASE_URL.replace(/\/?$/, "/");
+    
+    stats.textContent = `Showing ${filteredAips.length} of ${allAips.length} AIPs`;
+
+    if (filteredAips.length === 0) {
+      aipList.innerHTML = `
+        <tr>
+          <td colspan="4" style="text-align: center; padding: 2rem; color: var(--sl-color-gray-3);">
+            No AIPs match your filters
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    aipList.innerHTML = filteredAips
+      .map((aip) => {
+        const statusClass = `status-${aip.status.replace(/\s+/g, "\\ ")}`;
+        return `
+        <tr>
+          <td><span class="aip-number">${aip.number ?? "—"}</span></td>
+          <td><a href="${base}${aip.slug}/">${aip.title}</a></td>
+          <td>${aip.type}</td>
+          <td><span class="status-badge ${statusClass}">${aip.status}</span></td>
+        </tr>
+      `;
+      })
+      .join("");
+  }
+
+  searchInput.addEventListener("input", filterAndSort);
+  statusFilter.addEventListener("change", filterAndSort);
+  typeFilter.addEventListener("change", filterAndSort);
+  sortSelect.addEventListener("change", filterAndSort);
+
+  loadAips();
+</script>

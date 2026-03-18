@@ -1,14 +1,15 @@
 ---
 aip: 112
+slug: aips/112
 title: Function Values the Move VM
 author: Wolfgang Grieskamp (wg@aptoslabs.comm)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Draft 
-last-call-end-date (*optional): 
+last-call-end-date: 
 type: Standard Language
 created: 1/13/2025
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-112 - Function Values in the Move VM

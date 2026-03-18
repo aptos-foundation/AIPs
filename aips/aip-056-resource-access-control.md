@@ -1,10 +1,11 @@
 ---
 aip: 56
+slug: aips/56
 title: Resource Access Control
 author: wg@aptoslabs.com
-discussions-to (*optional): 
+discussions-to: 
 Status: Draft 
-last-call-end-date (*optional): 
+last-call-end-date: 
 type: Standard
 created: <10/11/2023>
 updated: <03/27/2025>

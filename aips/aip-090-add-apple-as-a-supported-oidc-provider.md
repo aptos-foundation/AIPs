@@ -1,14 +1,15 @@
 ---
 aip: 90
+slug: aips/90
 title: Add Apple as a supported OIDC provider
 author: Alin Tomescu (alin@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/452
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/452
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
 created: 06/14/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional):
+updated: <mm/dd/yyyy>
+requires:
  - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-067-native-consensus-for-json-web-key-jwk.md
  - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-061-keyless-accounts.md
 ---

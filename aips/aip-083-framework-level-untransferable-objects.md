@@ -1,13 +1,14 @@
 ---
 aip: 83
+slug: aips/83
 title: Framework-level Untransferable Objects
 author: davidiw, 
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Accepted
 type: Framework
 created: 04/27/2024
-updated (*optional): <mm/dd/yyyy>
-requires: 21
+updated: <mm/dd/yyyy>
+requires: AIP-21
 ---
 
 # AIP-83 - Framework-level Untransferable Fungible Asset Stores

@@ -1,5 +1,6 @@
 ---
 aip: 51
+slug: aips/51
 title: Changing beneficiaries for operators
 author: junkil-park, michelle-aptos, movekevin, wintertoro
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/251

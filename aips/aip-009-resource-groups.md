@@ -1,5 +1,6 @@
 ---
 aip: 9
+slug: aips/9
 title: Resource Groups
 author: davidiw, wrwg, msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/26

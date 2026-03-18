@@ -1,13 +1,14 @@
 ---
 aip: 77
+slug: aips/77
 title: Multisig V2 Enhancement
 author: junkil-park (https://github.com/junkil-park), movekevin (https://github.com/movekevin)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/409
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/409
 Status: Accepted
 type: Standard (Framework)
 created: 3/28/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-77 - Multisig V2 Enhancement

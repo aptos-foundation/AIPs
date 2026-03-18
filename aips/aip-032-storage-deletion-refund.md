@@ -1,5 +1,6 @@
 ---
 aip: 32
+slug: aips/32
 title: Storage Deletion Refund
 author: msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/127

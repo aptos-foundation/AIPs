@@ -1,10 +1,11 @@
 ---
-aip: AIP-120
+aip: 120
+slug: aips/120
 title: Trading Engine on Aptos
 author: igor-aptos, skedia, runtianz, brian
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/598
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/598
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: 03/01/2025
 ---

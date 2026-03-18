@@ -1,11 +1,12 @@
 ---
 aip: 24
+slug: aips/24
 title: Move Library Updates
 author: gerben-stavenga
 Status: Accepted
 type: Standard
 created: 04/16/2023
-updated (*optional): 04/16/2023
+updated: 04/16/2023
 ---
 
 # AIP-24 - Move Library Updates

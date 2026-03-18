@@ -1,14 +1,15 @@
 ---
 aip: 82
+slug: aips/82
 title: Transaction context extension
 author: junkil-park (https://github.com/junkil-park), lightmark (https://github.com/lightmark), movekevin (https://github.com/movekevin)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: 4/2/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-82 - Transaction context extension

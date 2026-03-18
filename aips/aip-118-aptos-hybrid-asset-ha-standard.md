@@ -1,14 +1,15 @@
 ---
 aip: 118
+slug: aips/118
 title: Aptos Hybrid Asset (HA) Standard
 author: gregnazario, cylim226, decidethatlater, HugeMongooose, SuperSecretRare, 0xYZMIN
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Draft
-last-call-end-date (*optional): 10/15/2024
+last-call-end-date: 10/15/2024
 type: Ecosystem
 created: 10/3/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-118 - Aptos Hybrid Asset (HA) Standard

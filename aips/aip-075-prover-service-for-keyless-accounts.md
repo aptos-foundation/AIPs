@@ -1,13 +1,14 @@
 ---
 aip: 75
+slug: aips/75
 title: Prover service for keyless accounts
 author: Rex Fernando (rex.fernando@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/379
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/379
 Status: Accepted
 type: Informational
 created: 03/13/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): 61
+updated: <mm/dd/yyyy>
+requires: 61
 ---
 
 # AIP-75 - Prover service for keyless accounts
@@ -71,7 +72,7 @@ The most obvious alternative is requiring the user to generate a proof client-si
 
 As explained in AIP-61[^spec], to authenticate a transaction, a user needs a Groth16 ZKP for the relation $\mathcal{R}$, which encodes the logic of linking an **ephemeral public key (EPK)** to a keyless account, via a signed JWT with a nonce that encodes this EPK and an expiration date. Specifically, $\mathcal{R}$ has the following inputs:
 
-```math
+$$
 \mathcal{R}\begin{pmatrix}
 	\textbf{x} = [
         (\mathsf{iss\_val}, \mathsf{jwk}, \mathsf{header}), 
@@ -83,7 +84,8 @@ As explained in AIP-61[^spec], to authenticate a transaction, a user needs a Gro
         (\sigma_\mathsf{oidc}, \mathsf{jwt}), 
     \rho]
 \end{pmatrix},
-```
+$$
+
 and has verification logic as defined in[^spec]. 
 
 ### Protecting Against ZKP Bugs

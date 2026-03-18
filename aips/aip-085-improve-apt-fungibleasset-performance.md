@@ -1,14 +1,15 @@
 ---
 aip: 85
+slug: aips/85
 title: Improve APT FungibleAsset performance
 author: igor-aptos
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: <mm/dd/yyyy>
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-85 - Improve APT FA performance 

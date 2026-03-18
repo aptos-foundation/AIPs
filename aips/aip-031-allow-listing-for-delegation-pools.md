@@ -1,5 +1,6 @@
 ---
 aip: 31
+slug: aips/31
 title: Allow listing for delegation pools
 author: junkil-park, movekevin, michelle-aptos, wintertoro, alexfilip2
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/121

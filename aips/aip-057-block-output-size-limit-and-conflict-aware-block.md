@@ -1,14 +1,15 @@
 ---
 aip: 57
+slug: aips/57
 title: Block Output Size Limit and Conflict-Aware Block Gas Limit
 author: igor-aptos (https://github.com/igor-aptos)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core)
 created: <mm/dd/yyyy>
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-57 - Block Output Size Limit and Conflict-Aware Block Gas Limit

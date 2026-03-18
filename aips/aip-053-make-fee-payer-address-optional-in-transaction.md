@@ -1,12 +1,13 @@
 ---
 aip: 53
+slug: aips/53
 title: Make Fee Payer Address Optional in Transaction Authenticator
 author: davidiw
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/257
 Status: Accepted
 type: Framework
 created: 10/08/2023
-requires (*optional): 39
+requires: 39
 ---
 
 # AIP-53 - Make Fee Payer Address Optional in Transactions Authenticator

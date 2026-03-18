@@ -1,5 +1,6 @@
 ---
 aip: 27
+slug: aips/27
 title: Sender Aware Transaction Shuffling
 author: skedia@aptoslabs.com
 Status: Accepted

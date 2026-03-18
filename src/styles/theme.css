@@ -1,0 +1,16 @@
+/* Aptos brand — mint accent, warm neutrals, IBM Plex Serif */
+
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap");
+
+:root {
+	--sl-color-accent-low: hsl(109, 30%, 14%);
+	--sl-color-accent: hsl(109, 50%, 55%);
+	--sl-color-accent-high: hsl(109, 60%, 80%);
+	--sl-font: "IBM Plex Serif", var(--sl-font-system);
+}
+
+:root[data-theme="light"] {
+	--sl-color-accent-high: hsl(109, 45%, 30%);
+	--sl-color-accent: hsl(109, 50%, 40%);
+	--sl-color-accent-low: hsl(109, 60%, 92%);
+}

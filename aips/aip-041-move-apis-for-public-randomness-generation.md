@@ -1,14 +1,15 @@
 ---
 aip: 41
+slug: aips/41
 title: Move APIs for public randomness generation
 author: Alin Tomescu (alin@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/185
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/185
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: 06/27/2023
-updated (*optional): <07/28/2023>
-requires (*optional): <AIP number(s)>
+updated: <07/28/2023>
+requires: <AIP number(s)>
 ---
 
 # AIP-41: Move APIs for public randomness generation

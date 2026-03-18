@@ -1,8 +1,9 @@
 ---
 aip: 142
+slug: aips/142
 title: Public structs and enums
 author: Teng Zhang (teng@aptoslabs.com)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Draft
 last-call-end-date: N/A
 type: Standard (Core)

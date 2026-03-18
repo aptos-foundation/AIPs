@@ -1,5 +1,6 @@
 ---
 aip: 127
+slug: aips/127
 title: Lazy Loading
 author: George Mitenkov (george@aptoslabs.com)
 discussions-to:

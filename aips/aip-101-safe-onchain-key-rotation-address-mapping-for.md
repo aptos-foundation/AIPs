@@ -1,14 +1,15 @@
 ---
 aip: 101
+slug: aips/101
 title: Safe onchain key rotation address mapping for standard accounts
 author: Alex Kahn (43892045+alnoki@users.noreply.github.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/487
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/487
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard Framework
 created: 09/17/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-101 - Safe onchain key rotation address mapping for standard accounts

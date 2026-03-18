@@ -1,14 +1,15 @@
 ---
 aip: 88
+slug: aips/88
 title: BlockEpilogue to replace StateCheckpoint transaction
 author: igor-aptos (https://github.com/igor-aptos)
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: In Review
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core)
 created: 06/06/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): AIP-57
+updated: <mm/dd/yyyy>
+requires: AIP-57
 ---
 
 # AIP-88 - BlockEpilogue to replace StateCheckpoint transaction

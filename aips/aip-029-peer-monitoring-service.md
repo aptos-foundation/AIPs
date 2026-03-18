@@ -1,12 +1,13 @@
 ---
 aip: 29
+slug: aips/29
 title: Peer monitoring service
 author: joshlind
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/118
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/118
 Status: Accepted
 type: Informational
 created: 5/3/2023
-updated (*optional): 5/3/2023
+updated: 5/3/2023
 ---
 
 # AIP-29 - Peer monitoring service

@@ -1,10 +1,11 @@
 ---
 aip: 33
+slug: aips/33
 title: Block Gas Limit
 author: danielxiangzl
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Execution
 created: 05/07/2023
 ---

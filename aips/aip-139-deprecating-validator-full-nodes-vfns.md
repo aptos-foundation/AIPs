@@ -1,10 +1,11 @@
 ---
 aip: 139
+slug: aips/139
 title: Deprecating Validator Full Nodes (VFNs)
 author: Josh Lind (https://github.com/JoshLind)
-discussions-to (*optional):
+discussions-to:
 Status: Draft
-last-call-end-date (*optional):
+last-call-end-date:
 type: Core
 created: 02/09/2026
 ---

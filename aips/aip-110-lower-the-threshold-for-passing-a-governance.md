@@ -1,5 +1,6 @@
 ---
 aip: 110
+slug: aips/110
 title: Lower the Threshold for Passing a Governance Proposal from 400M APT to 300M APT
 author: sherry-x
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/551

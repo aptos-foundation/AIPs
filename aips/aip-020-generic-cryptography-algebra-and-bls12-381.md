@@ -1,8 +1,9 @@
 ---
 aip: 20
+slug: aips/20
 title: Generic Cryptography Algebra and BLS12-381 Implementation
 author: zhoujun-ma, alin
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/94
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/94
 Status: Accepted
 type: Standard (Framework)
 created: 2023/03/15

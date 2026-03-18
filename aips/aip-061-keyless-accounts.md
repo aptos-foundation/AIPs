@@ -1,14 +1,15 @@
 ---
 aip: 61
+slug: aips/61
 title: Keyless accounts
 author: Alin Tomescu (alin@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/297
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/297
 Status: Accepted
-last-call-end-date (*optional): 02/15/2024
+last-call-end-date: 02/15/2024
 type: Standard (Core, Framework)
 created: 01/04/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional):
+updated: <mm/dd/yyyy>
+requires:
  - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-055-generalize-transaction-authentication-and-support.md
  # <AIP number(s)>
 ---
@@ -235,9 +236,9 @@ The **public key** of a keyless account consists of:
 
 A bit more formally (but ignoring complex implementation details), the IDC is computed by hashing the fields above using a SNARK-friendly hash function $H'$:
 
-```math
+$$
 \mathsf{addr\_idc} = H'(\mathsf{uid\_key}, \mathsf{uid\_val}, \mathsf{aud\_val}; r),\ \text{where}\ r\stackrel{\$}{\gets} \{0,1\}^{256}
-```
+$$
 
 ### Peppers
 
@@ -261,9 +262,9 @@ Therefore, we introduce a **pepper service** that can help users derive and reme
 
 Next, the **authentication key** of a keyless account is simply the hash of its public key defined above. More formally, assuming any cryptographic hash function $H$, the authentication key is:
 
-```math
+$$
 \mathsf{auth\_key} = H(\mathsf{iss\_val}, \mathsf{addr\_idc})
-```
+$$
 
 **Note:** In practice, a domain separator is also hashed in above, but for simplicity of exposition, we ignore such details.
 
@@ -289,9 +290,9 @@ Before describing our fully privacy-preserving TXN signatures, we warm-up by des
 
 A **leaky signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf{txn}$ for an address with authentication key $\mathsf{auth\\_key}$ is defined as:
 
-```math
+$$
 \sigma_\mathsf{txn} = (\mathsf{uid\_key}, \mathsf{jwt}, \mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \sigma_\mathsf{oidc}, \mathsf{exp\_date}, \rho, r, \mathsf{idc\_aud\_val})
-```
+$$
 
 where:
 
@@ -356,9 +357,9 @@ This gets us to the _essence of this AIP_: we are now ready to describe how priv
 
 A **zero-knowledge signature** $\sigma_\mathsf{txn}$ over a transaction $\mathsf{txn}$ for an address with authentication key $\mathsf{auth\\_key}$ is defined as:
 
-```math
+$$
 \sigma_\mathsf{txn} = (\mathsf{header}, \mathsf{epk}, \sigma_\mathsf{eph}, \mathsf{exp\_date}, \mathsf{exp\_horizon}, \mathsf{extra\_field}, \mathsf{override\_aud\_val}, \sigma_\mathsf{tw}, \pi)
-```
+$$
 
 where:
 
@@ -409,7 +410,7 @@ In more detail, signature verification against the PK $(\mathsf{iss\\_val}, \mat
 
 #### The keyless ZK relation $$\mathcal{R}$$
 
-```math
+$$
 \mathcal{R}\begin{pmatrix}
     \mathsf{pih};\\
     \textbf{w} = [
@@ -435,7 +436,7 @@ In more detail, signature verification against the PK $(\mathsf{iss\\_val}, \mat
       )
     ]
 \end{pmatrix}
-```
+$$
 
 The **ZK relation $\mathcal{R}$** simply **performs the privacy-sensitive part of the verification** from the [leaky mode](#warm-up-leaky-signatures-that-reveal-the-users-and-apps-identity) above:
 

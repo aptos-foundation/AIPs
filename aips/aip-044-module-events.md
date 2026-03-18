@@ -1,5 +1,6 @@
 ---
 aip: 44
+slug: aips/44
 title: Module Events
 author: lightmark
 Status: Accepted

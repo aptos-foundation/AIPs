@@ -1,5 +1,6 @@
 ---
 aip: 50
+slug: aips/50
 title: Change commission rates in delegation pools
 author: junkil-park, michelle-aptos, movekevin, wintertoro
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/249

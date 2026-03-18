@@ -1,14 +1,15 @@
 ---
 aip: 92
+slug: aips/92
 title: Transaction Simulation Enhancement
 author: junkil-park (https://github.com/junkil-park), movekevin (https://github.com/movekevin), gregnazario (https://github.com/gregnazario)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/493
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/493
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Ecosystem)
 created: 6/25/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-92 - Transaction Simulation Enhancement

@@ -1,5 +1,6 @@
 ---
 aip: 123
+slug: aips/123
 title: Orderless transactions
 author: Satya Vusirikala, Igor Kabiljo
 Status: Draft
@@ -7,7 +8,7 @@ discussions-to: https://github.com/aptos-foundation/AIPs/issues/593
 type: Standard (Core, Framework)
 created: 04/25/2025
 updated: 06/05/2025
-requires: "AIP-129: Add extra information in transaction payload"
+requires: AIP-129
 ---
 
 # AIP 123: Orderless Transactions

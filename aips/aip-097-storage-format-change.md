@@ -1,5 +1,6 @@
 ---
 aip: 97
+slug: aips/97
 title: Storage Format Change 
 author: grao1991
 Status: Draft

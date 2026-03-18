@@ -1,13 +1,14 @@
 ---
 aip: 37
+slug: aips/37
 title: Filter duplicate transactions within a block
 author: bchocho
-discussions-to (*optional): <a url pointing to the official discussion thread>
+discussions-to: <a url pointing to the official discussion thread>
 Status: Accepted
 type: Standard Core
 created: 06/06/2023
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): AIP-26
+updated: <mm/dd/yyyy>
+requires: AIP-26
 ---
 
 # AIP-37 - Filter duplicate transactions within a block

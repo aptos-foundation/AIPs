@@ -1,5 +1,6 @@
 ---
 aip: 138
+slug: aips/138
 title: Move aborts with message
 author: Calin Tataru (calin.tataru@aptoslabs.com)
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/649

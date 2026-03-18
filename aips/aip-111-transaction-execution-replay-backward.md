@@ -1,10 +1,11 @@
 ---
 aip: 111
+slug: aips/111
 title: Transaction Execution Replay Backward Compatibility Policy
 author: sherry-x
 discussions-to: 
 Status: Draft
-last-call-end-date (*optional):
+last-call-end-date:
 type: Standard (Core)
 created: 12/04/2024
 ---

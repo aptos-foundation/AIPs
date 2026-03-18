@@ -1,5 +1,6 @@
 ---
 aip: 12
+slug: aips/12
 title: Multisig Account
 author: movekevin
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/50

@@ -1,13 +1,14 @@
 ---
 aip: 16
+slug: aips/16
 title: New cryptography natives for hashing and MultiEd25519 PK validation
 author: Alin Tomescu <alin@aptoslabs.com>
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/57
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/57
 Status: Accepted
 type: Standard (Framework)
 created: 02/02/2022
-updated (*optional):
-requires (*optional):
+updated:
+requires:
 ---
 
 # AIP 16: New cryptography natives for hashing and MultiEd25519 PK validation

@@ -1,5 +1,6 @@
 ---
 aip: 117
+slug: aips/117
 title: Add signer capability support for object code deployment
 author: mshakeg
 discussions-to:

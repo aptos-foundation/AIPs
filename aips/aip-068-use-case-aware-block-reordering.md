@@ -1,10 +1,11 @@
 ---
 aip: 68
+slug: aips/68
 title: Use Case Aware Block Reordering
 author: igor-aptos (https://github.com/igor-aptos), msmouse
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/333
 Status: Accepted
-last-call-end-date (*optional): 
+last-call-end-date: 
 type: Core
 created: 02/14/2024
 updated: 07/15/2024
@@ -58,7 +59,7 @@ For each output spot:
 
 On-chain configuration:
 
-```Rust
+```rust
 pub enum TransactionShufflerType {
     ...
     UseCaseAware {
@@ -78,7 +79,7 @@ https://github.com/aptos-labs/aptos-core/pull/13738
 
 The reference implementation makes use of a nested priority queue structure to implement the pending transaction pool.
 
-``` Rust
+```rust
 
 /// Structure to track:
 ///     1. all use cases and accounts that are subject to delaying, no matter they have pending txns

@@ -1,12 +1,13 @@
 ---
 aip: 34
+slug: aips/34
 title: Unit Gas Price Estimation
 author: bchocho
 Status: Accepted
 type: Standard
 created: 05/26/2023
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-34 - Unit Gas Price Estimation

@@ -1,14 +1,15 @@
 ---
 aip: 72
+slug: aips/72
 title: Minting Standard for Digital Assets
 author: johnchanguk, jillxuu, briungri, bowenyang007
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/370
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/370
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Digital Assets)
 created: 3/8/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
+updated: <mm/dd/yyyy>
+requires: <AIP number(s)>
 ---
 
 # AIP-72 - Minting Standard for Digital Assets

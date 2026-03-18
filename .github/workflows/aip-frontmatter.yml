@@ -1,0 +1,19 @@
+name: AIP Frontmatter Validation
+
+on:
+  pull_request:
+    paths:
+      - 'aips/**'
+
+jobs:
+  validate-frontmatter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Validate AIP frontmatter
+        run: node scripts/validate-frontmatter.mjs

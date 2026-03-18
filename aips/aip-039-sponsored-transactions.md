@@ -1,5 +1,6 @@
 ---
 aip: 39
+slug: aips/39
 title: Sponsored Transactions
 author: gerben-stavenga, movekevin, davidiw, kslee8224, neoul, styner32
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/173

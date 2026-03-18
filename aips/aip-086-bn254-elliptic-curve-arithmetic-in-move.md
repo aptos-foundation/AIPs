@@ -1,14 +1,15 @@
 ---
 aip: 86
+slug: aips/86
 title: BN254 elliptic curve arithmetic in Move
 author: Alin Tomescu (alin@aptoslabs.com)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/437
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/437
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: 05/31/2024
-updated (*optional): <mm/dd/yyyy>
-requires (*optional):
+updated: <mm/dd/yyyy>
+requires:
  - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-020-generic-cryptography-algebra-and-bls12-381.md
 
 ---

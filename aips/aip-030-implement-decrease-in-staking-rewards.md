@@ -1,12 +1,13 @@
 ---
 aip: 30
+slug: aips/30
 title: Implement decrease in staking rewards
 author: michelle-aptos, xindingw, junkil-park
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/119
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/119
 Status: Accepted
 type: Framework
 created: 5/3/2023
-updated (*optional): 7/28/2023
+updated: 7/28/2023
 ---
 
 # AIP-30 - Implement decrease in staking rewards

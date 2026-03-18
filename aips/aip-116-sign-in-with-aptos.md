@@ -1,11 +1,12 @@
 ---
 aip: 116
+slug: aips/116
 title: Sign in with Aptos
 author: aptqpv
-Status: Draft # <Draft | Last Call | Accepted | Final | Rejected>
+Status: Draft
 type: Standard (Ecosystem)
 created: 12/16/2024
-requires: 62
+requires: AIP-62
 ---
 
 # AIP-116 - Sign in with Aptos

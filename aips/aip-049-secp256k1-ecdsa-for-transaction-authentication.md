@@ -1,13 +1,14 @@
 ---
 aip: 49
+slug: aips/49
 title: secp256k1 ECDSA for Transaction Authentication
 author: davidiw
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/247
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/247
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Interface
 created: 09/28/2023
-updated (*optional): <mm/dd/yyyy>
+updated: <mm/dd/yyyy>
 ---
 
 # AIP-49 - Secp256k1 ECDSA for Transaction Authentication

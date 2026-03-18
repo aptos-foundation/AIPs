@@ -1,11 +1,12 @@
 ---
 aip: 19
+slug: aips/19
 title: Enable updating commission_percentage
 author: michelle-aptos, gerben-stavenga
 Status: Accepted
 type: Standard
 created: 3/8/2023
-updated (*optional): 3/8/2023
+updated: 3/8/2023
 
 ---
 

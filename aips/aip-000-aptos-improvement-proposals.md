@@ -1,5 +1,6 @@
 ---
 aip: 0
+slug: aips/0
 title: Aptos Improvement Proposals
 authors: aptos-foundation
 status: Accepted

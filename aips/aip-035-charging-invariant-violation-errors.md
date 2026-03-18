@@ -1,5 +1,6 @@
 ---
 aip: 35
+slug: aips/35
 title: Charging Invariant Violation Errors 
 author: runtian@aptoslabs.com
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/144

@@ -1,14 +1,15 @@
 ---
-aip: AIP-47
+aip: 47
+slug: aips/47
 title: Aggregators V2
 author: georgemitenkov (https://github.com/georgemitenkov), vusirikala (https://github.com/vusirikala), gelash (https://github.com/gelash), igor-aptos (https://github.com/igor-aptos)
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/226
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/226
 Status: Accepted
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
+last-call-end-date: <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core/Framework)
 created: 08/09/2023
-updated (*optional): 
-requires (*optional): 
+updated: 
+requires: 
 ---
 
 # AIP-47 - Aggregators V2
@@ -23,7 +24,7 @@ This AIP revamps and expands upon the current concept of Aggregators (which are 
 
 If we look at the example code below:
 
-```
+```move
 let a = borrow_global_mut<A>(shared_addr1);
 a.value += 1;                                  <-  concurrently changed often
 move_to(signer, B {value: a.value});           <-  used for write only
@@ -41,7 +42,7 @@ and can instead be modified in place with an actual value in the post-processing
 Aggregator represents a value that is being frequently changed, and AggregatorSnapshot represents a value that depends on an Aggregator value at particular time.
 Above code would be translated into a code that can be executed in parallel:
 
-```
+```move
 let a = borrow_global_mut<A>(shared_addr1);
 aggregator_v2::add(a.value, 1);                                       <-  concurrently changed often
 move_to(signer, B {value: aggregator_v2::snapshot(a.value)});     <-  used for write only
@@ -66,7 +67,7 @@ Explain why you submitted this proposal specifically over alternative solutions.
 ### High Level implementation
 
 Module structs and function signatures:
-```
+```move
 module aptos_framework::aggregator_v2 {
    struct Aggregator<IntElement> has store {
       value: IntElement,
@@ -135,7 +136,7 @@ We are going to take a cheap and speculative aggregator value, to use for transa
 
 Write on an aggregator can either be a Set(value) or Delta(value). Read constraints will be:
 
-```
+```move
 struct AggregatorReadConstraints {
   read: u128,
   is_explicit_read: bool,
@@ -148,7 +149,7 @@ struct AggregatorReadConstraints {
 
 We can validate, if given a new value for an aggregator that is different from `read`, if transaction is still valid via:
 
-```
+```move
 new_read + min_overflow > aggregator.limit &&
 new_read + max_achieved <= aggregator.limit &&
 new_read >= min_achieved_neg_delta &&

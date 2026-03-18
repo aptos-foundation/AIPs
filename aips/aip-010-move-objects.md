@@ -1,5 +1,6 @@
 ---
 aip: 10
+slug: aips/10
 title: Move Objects
 author: davidiw, wrwg
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/27
@@ -7,7 +8,7 @@ Status: Accepted
 type: Standard (Framework)
 created: 2023/01/05
 updated: 2023/01/23
-requires: "AIP-9: Resource Groups"
+requires: AIP-9
 ---
 
 # AIP-10 - Move Objects

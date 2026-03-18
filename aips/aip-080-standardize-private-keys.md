@@ -1,14 +1,15 @@
 ---
 aip: 80
+slug: aips/80
 title: Standardize Private Keys
 author: Greg Nazario - greg@aptoslabs.com
-discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/405
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/405
 Status: Accepted
-last-call-end-date (*optional): 04/30/2024
+last-call-end-date: 04/30/2024
 type: Standard (Ecosystem)
 created: 04/19/2024
-updated (*optional): 04/19/2024
-requires (*optional): N/A
+updated: 04/19/2024
+requires: N/A
 ---
 
 # AIP-80 - Standardize Private Keys
