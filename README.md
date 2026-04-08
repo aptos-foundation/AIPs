@@ -11,30 +11,16 @@ To vote on AIPs impacting the state of the Blockchain, go to https://governance.
 ## How to submit an AIP
 
  1. Fork this repo into your own GitHub
- 2. Copy [`TEMPLATE.md`](TEMPLATE.md) into your new AIP file in `aips/<your-feature-name-NO-AIP-#-here>.md`
-    + Name your AIP file based on your feature, not the AIP number, which will be picked for your later.
-    + e.g., `new-zero-knowledge-range-proof-verifiers.md` is a good name.
-    - ...but `aip-14.md` or `14.md` is **NOT** a good name.
+ 2. Copy [`TEMPLATE.md`](TEMPLATE.md) into your new AIP file in `aips/aip-xxx-<slug>.md`
+    + Name your AIP file using the format `aip-<NNN>-<slug>.md`, where `<NNN>` is a zero-padded 3-digit number and `<slug>` is a short kebab-case summary of the title.
+    + e.g., `aip-061-keyless-accounts.md` or `aip-143-confidential-apt.md`.
+    + When first drafting, use `aip-xxx-<slug>.md` as a placeholder — the AIP manager will assign the final number.
  3. Edit your AIP file
     - Fill in the YAML header (see instructions there)
     - Follow the template guidelines to the best of your ability
  4. Commit these changes to your repo
  5. Submit a pull request on GitHub to this repo.
  6. To start discussing your AIP, create a GH Issue for your AIP using the default Issue template
-
-## AIP Index
-
-Note: This is a subset of all the AIPs -- to see the full list of AIPs, please [click here](https://github.com/aptos-foundation/AIPs/wiki/Index-of-AIPs).
-
-| Number | Category | Title  | Author |
-|:---|:---|:---|:---
-| [AIP-109](https://github.com/aptos-foundation/AIPs/issues/545) | Framework | [Hide Unwanted Soulbound Objects](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-109.md)| gregnazario |
-| [AIP-110](https://github.com/aptos-foundation/AIPs/issues/551) | Governance | [Lower the Threshold for Passing a Governance Proposal from 400M APT to 300M APT](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-110.md)| sherry-x |
-| [AIP-111](https://github.com/aptos-foundation/AIPs/issues/555) | Blockchain | [Transaction Execution Replay Backward Compatibility Policy](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-111.md)| sherry-x |
-| [AIP-112](https://github.com/aptos-foundation/AIPs/issues/562) | Standard Language | [Function Values in the Move VM](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-112.md)| Wolfgang Grieskamp |
-| [AIP-113](https://github.com/aptos-foundation/AIPs/issues/563) | Framework | [Domain-based Account Abstraction](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-113.md)| igor-aptos, lightmark |
-| [AIP-114](https://github.com/aptos-foundation/AIPs/issues/564) | Framework | [Increase Coin Symbol Byte Length](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-114.md)| gregnazario |
-| ... | ... |||
 
 ## Types of AIPs
 * Standard: AIPs focusing on the changes to the Aptos blockchain.
