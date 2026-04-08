@@ -2,13 +2,9 @@
 aip: 144
 title: Encrypted Mempool
 author: Rex Fernando (rex.fernando@aptoslabs.com)
-discussions-to (*optional): <a url pointing to the official discussion thread>
 Status: Draft
-last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
-type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
+type: Core
 created: 01/09/2026
-updated (*optional): <mm/dd/yyyy>
-requires (*optional): <AIP number(s)>
 ---
 
 # AIP-144 - Encrypted Mempool
@@ -22,9 +18,9 @@ from which the validators choose transactions to build the next block.
 These transactions are public to all validators; this means that the block
 leader may choose to order or censor these transactions based on their
 behavior in a way that is most profitable for them. This phenomenon is
-known as MEV; it has been widely documented and studied in the past several
-years, and more adversarial forms of MEV such as sandwich attacks are
-recognized as a major problem for on-chain trading.
+known as Maximal Extractable Value (MEV); it has been widely documented and
+studied in the past several years, and more adversarial forms of MEV such
+as sandwich attacks are recognized as a major problem for on-chain trading.
 
 This AIP describes a new system to protect users on the Aptos network from
 harmful forms of MEV (i.e., frontrunning/sandwich attacks, censorship) by
@@ -44,8 +40,8 @@ have been prohibitively expensive in terms of both communication and
 computation, requiring `O(stake weight threshold)` communication per
 encrypted payload. This proposal avoids a similar blowup via a new _batch
 threshold encryption scheme_. Using this scheme, along with heavy
-pipelining, means that the encrypted mempool will support >1000 TPS, with
-minimal latency overhead for the network.
+pipelining, means that the encrypted mempool will support over 1000 TPS on
+launch, with minimal latency overhead for the network.
 
 ### Out of scope
 
@@ -130,7 +126,6 @@ would be to have a contract on-chain that keeps a queue of confirmed encrypted
 pending transactions, and to have the committee decrypt transactions as
 soon as they reach this queue. But this would mean that these transactions
 would wait several rounds after they are confirmed in order to be executed.
-[Rex: should I mention Shutter network by name here?]
 
 **Identity-based encryption (IBE).** IBE allows for encrypting with respect
 to an arbitrary tag, called an ID, along with a master public key. The
@@ -145,9 +140,9 @@ height. Unfortunately, this fails to provide a meaningful notion of
 security. This is because any encrypted transaction which _targets_ a specific
 block is completely revealed, even _if it fails to be included in the
 block_, for instance because of congestion, or because the fullnode decides
-to censor it. [Rex: should I mention fairblock by name here?]
+to censor it. 
 
-**Previous batch threshold encryption schemes.** Several previous works [cite]
+**Previous batch threshold encryption schemes.** Several previous works 
 (including one by our team) study batch threshold encryption. Although they
 solve the problems discussed above, all previous works either have
 user-experience issues related to transaction resubmission, are
@@ -242,7 +237,7 @@ follows:
   validator's `MasterSecretKeyShare`, and outputs a `DecryptionKeyShare`.
   _It does not broadcast this share until it receives consensus votes
   confirming the block._
-* Once the block is confirmec, each validator broadcasts this to the other
+* Once the block is confirmed, each validator broadcasts this to the other
   validators.
 * Finally, after receiving a threshold of `DecryptionKeyShare`s, each
   validators runs `reconstruct_decryption_key` to obtain the
@@ -252,7 +247,7 @@ follows:
 
 **Efficiency properties.**
 * The ciphertexts should have a small additive overhead relative to payload
-  plaintexts. [Rex: fill in concrete sizes]
+  plaintexts. 
 * The digest should be constant-sized, independent of the number of
   ciphertexts in the batch. Specifically, in our scheme, it is 48 bytes.
 * The decryption key shares and decryption key should also be
@@ -287,7 +282,7 @@ provides, and defer a formal description to the academic paper[^FPTX25e].
 #### Non-malleability, and associated data
 
 Although all security properties are formalized and proven in the academic
-paper, non-malleability particularly important and nuanced. Because of
+paper, non-malleability is particularly important and nuanced. Because of
 this, we pay special attention to it in the AIP. Below, we discuss some
 attack scenarios related to non-malleability.
 
@@ -306,14 +301,14 @@ plaintext immediately renders it invalid, so that `verify_ct` fails.
 **Claiming ownership of a ciphertext:** Besides modifying an encrypted
 payload, a malicious fullnode may simply pass the payload off as its own.
 That is, when it receives a transaction with an encrypted payload from
-a user, it can simply construct a new transaction with same encrypted
+a user, it can simply construct a new transaction with the same encrypted
 payload as-is, sign the transaction as its own, and submit. Even if the
 plaintext contains the sender public key, this is not verifiable until
 after decryption. As soon as the fullnode's malicious transaction gets
 included in a block and decrypted, the user's transaction intent is
 revealed.
 
-We must also present this type of payload theft. We do this using the
+We must also prevent this type of payload theft. We do this using the
 notion of _encryption with associated data._ When encrypting, the user
 specifies some "associated data," in our case, the sending address. The
 resulting ciphertext is then verified with respect to this same sending
@@ -499,10 +494,6 @@ The goals of this payload format are:
   threshold encryption scheme in order to avoid vulnerabilities.
 * to integrate well with account abstraction.
 
-[Rex: I don't remember why the encrypt->sign design integrates better with
-account abstraction than the sign->encrypt->sign design. Need to ask
-someone about this.]
-
 To achieve these goals, we layer encryption and signing in the following
 manner.
 1. First, a single-use `decryption_nonce: u64` chosen at random.
@@ -514,7 +505,6 @@ manner.
 4. Finally, the `EncryptedPayload::Encrypted` enum variant is initialized
    with the `ciphertext` and the `payload_hash`. This is signed by the
    user's signing key as part of the final transaction being submitted.
-   [Rex: explain extra_config?]
 
 
 This design means that by signing the transaction, the user signs both the
@@ -576,9 +566,6 @@ keypairs may be reused as encryption keypairs during the DKG.
 
 Unit tests for each component, smoke tests, forge tests/benchmarks.
 
-## Risks and Drawbacks
-
-Risks are discussed in the next section.
 
 ## Security, Liveness, and Privacy Considerations
 
@@ -636,23 +623,6 @@ This AIP also enables more generic threshold cryptography on the Aptos
 network. Specifically, the DKG for field elements can be used to
 instantiate many standard threshold cryptographic schemes over the
 validators.
-
-
-## Timeline
-
-### Suggested implementation timeline
-
-
-- Finishing validator code now, expect to be done very early February.
-- Afterwards, SDK engineer will finish SDK. Integration must wait for the
-  validator code to hit devnet in order to test. Estimate is that final
-  integration will take a couple days.
-- Plan to run trusted setup ceremony sometime in February.
-
-### Suggested deployment timeline
-
-The feature is currently in devnet. Expected testnet is sometime this
-month, and mainnet will be sometime next month.
 
 
 ## References
