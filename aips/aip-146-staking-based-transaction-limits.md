@@ -1,8 +1,8 @@
 ---
-aip:
+aip: 146
 title: Staking-Based Transaction Limits
 author: George Mitenkov (george@aptoslabs.com)
-discussions-to (*optional):
+discussions-to: https://github.com/aptos-foundation/AIPs/issues/669
 Status: Draft
 last-call-end-date (*optional):
 type: Standard (Core, Framework)
@@ -11,21 +11,25 @@ updated (*optional): 04/15/2026
 requires (*optional):
 ---
 
-# AIP-X - Staking-Based Transaction Limits
+# AIP-146 - Staking-Based Transaction Limits
 
 ## Summary
 
 Today, all Aptos transactions share the same execution gas limits.
 However, some workloads such as complex DEX operations (liquidations), large state migrations, and emergency updates need more compute than the standard limit allows.
-Right now, there is no mechanism to request it.
+Right now, there is no mechanism to request higher limits.
 
 This AIP introduces an opt-in mechanism for higher limits, backed by staking proof.
-Users who prove they control significant stake can request having higher multipliers (above 1x and up to 100x) on gas schedule limits (which otherwise default to 1x).
+Users who prove they control significant stake can request higher multipliers (above 1x and up to 100x) on gas schedule limits (which otherwise default to 1x).
 
-Currently, only execution and IO limits can be increased.
-Also, these 3 forms of staking proof are supported: **stake pool ownership**, **delegated voter status**, and **delegation pool delegation**.
+The rationale is straightforward: large APT stakers are inherently aligned with the network's long-term health.
+Transaction and gas limits exist to protect the system from spam and maintain high performance, but large stakers are far more likely to have legitimate needs for higher limits than malicious intent.
+Tying elevated limits to staking proof strikes a practical balance — it enables more complex on-chain use cases while preserving network performance and resilience.
+
+In the initial implementation, only execution and IO limits can be increased.
+For the staking proof, the following options are supported: **stake pool ownership**, **delegated voter status**, and **delegation pool delegation**.
 Eligibility is determined by matching the sender's committed stake against a governance-configurable vector of tiers.
-Additionally, a **10x minimum gas unit price** is required for all staking-backed requests.
+All staking-backed requests also require a **10x minimum gas unit price**.
 
 ### Out of scope
 
@@ -34,7 +38,7 @@ Additionally, a **10x minimum gas unit price** is required for all staking-backe
 
 ## High-level Overview
 
-A new `transaction_limits.move` module is added which adds a config to store vectors of tiers for different limits.
+A new `transaction_limits.move` module stores a governance-configurable vector of tiers for different limits.
 Each tier pairs a minimum committed stake with a multiplier (in basis points, where 1x = 100 basis points).
 When a transaction carries a `UserTxnLimitsRequest`, the prologue validates that the sender is authorized to use the specified stake, and that the committed stake meets the threshold for the requested multipliers.
 The smallest tier whose multiplier is greater than or equal to the requested multiplier is chosen, so requests for non-standard values (e.g. 3.23x) need the same stake amount as the next available tier.
@@ -50,6 +54,7 @@ Wallet and SDK developers will need to support constructing `TransactionExtraCon
 
 **Flat fee with per-epoch slot cap.**
 An alternative design would charge a flat premium (e.g., 100 APT) and cap the number of high-limit transactions per epoch via a counter.
+However, a flat fee does not scale with the degree of privilege requested, and a per-epoch cap introduces contention for limited slots.
 
 **Gas price multiplier only.**
 Requiring a higher gas price alone (without staking proof) would increase cost but not tie it to a verifiable economic stake.
@@ -75,8 +80,8 @@ pub enum TransactionExtraConfig {
 
 ### RequestedMultipliers, UserTxnLimitsRequest, and TxnLimitsRequest
 
-Multipliers are expressed in basis points (100 = 1x, 200 = 2x, 250 = 2.5x) and wrapped in an enum.
-Hence, multipliers for other dimensions can be added in the future. 
+Multipliers are expressed in basis points (100 = 1x, 200 = 2x, 250 = 2.5x).
+They are wrapped in a versioned enum so that new dimensions can be added in the future.
 
 ```rust
 pub enum RequestedMultipliers {
@@ -134,7 +139,7 @@ enum TxnLimitsConfig has key {
 
 Tiers must be monotonically ordered: minimum stakes are non-decreasing and multipliers are strictly increasing.
 This is enforced on initialization and update.
-Matching `RequestedMultipliers` and `UserTxnLimitsRequest` enums are defined in Move with the same BCS layout as the Rust types.
+Corresponding `RequestedMultipliers` and `UserTxnLimitsRequest` enums are defined in Move with the same BCS layout as the Rust types.
 
 #### Initialization
 
@@ -174,7 +179,7 @@ Governance can add, remove, or modify tiers without code changes.
 
 #### Tier matching
 
-When validating a request, the module finds the smallest tier whose multiplier is greater than or equalt to the requested multiplier and returns its `min_stake`.
+When validating a request, the module finds the smallest tier whose multiplier is greater than or equal to the requested multiplier and returns its `min_stake`.
 For example, if tiers are `[2x: 1M, 4x: 10M, 8x: 50M]` and the user requests 3x, the 4x tier is selected with a 10M APT threshold.
 If no tier can cover the request, the transaction is rejected.
 
@@ -206,10 +211,10 @@ New v3 versions of the unified prologue functions extend v2 with an additional `
 
 Before the Move prologue runs, Rust validates:
 
-1. If the payload contains a `txn_limits_request` but feature is not enabled, the transaction is discarded with `FEATURE_UNDER_GATING`.
+1. If the payload contains a `txn_limits_request` but the feature is not enabled, the transaction is discarded with `FEATURE_UNDER_GATING`.
 
 2. Multipliers are greater than 100 and at most 10000.
-   This ensures that gas meter is always created with bounded limits, preventing overflow issues prior to Move prologue validation.
+   This ensures that the gas meter is always created with bounded limits, preventing overflow issues prior to Move prologue validation.
 
 3. Staking-backed requests require `gas_unit_price >= 10 * min_price_per_gas_unit`.
    Failing this check produces `GAS_UNIT_PRICE_BELOW_MIN_BOUND`.
@@ -250,7 +255,7 @@ Aborts from the `transaction_limits` module are routed through a dedicated error
 
 ## Reference Implementation
 
-PR: https://github.com/aptos-labs/aptos-core/pull/19109,  gated under `TRANSACTION_LIMITS` feature flag.
+PR: https://github.com/aptos-labs/aptos-core/pull/19109, gated under `TRANSACTION_LIMITS` feature flag.
 
 ## Testing
 
@@ -261,9 +266,9 @@ The `transaction_limits.move` module includes unit tests covering tier construct
 - Tier matching rounds up to the smallest tier >= the requested multiplier.
 - Requesting a multiplier beyond all configured tiers is rejected.
 - Stake validation checks execution and IO thresholds independently.
-- Validation aborts on unsatidifed requests.
+- Validation aborts on unsatisfied requests.
 
-End-to-end Move tests (`e2e-move-tests/src/tests/transaction_limits.rs`) cover similar scenarios, in addition testing error propagation.
+End-to-end Move tests (`e2e-move-tests/src/tests/transaction_limits.rs`) cover similar scenarios and additionally test error propagation.
 
 ## Risks and Drawbacks
 
@@ -271,6 +276,7 @@ End-to-end Move tests (`e2e-move-tests/src/tests/transaction_limits.rs`) cover s
   This is by design since it ties the privilege to economic stake, but it means smaller participants cannot access higher multipliers.
 - A stake pool owner can set any address as delegated voter, effectively granting elevated limits to that address.
   If a pool owner's key is compromised, the attacker can delegate voter rights to their own address.
+  This risk is inherent to the delegation model and is not new — a compromised owner key already enables other harmful actions such as changing the operator or withdrawing stake.
 - High IO multipliers let a single transaction perform significantly more state reads/writes.
   This is mitigated by the high stake requirements for upper tiers, 10x gas price floor, and internal VM limits on write-set size.
 
@@ -286,13 +292,13 @@ End-to-end Move tests (`e2e-move-tests/src/tests/transaction_limits.rs`) cover s
 
 4. Multipliers must be more than 1x and at most 100x, and must match a configured tier.
    This is enforced in the Move prologue.
-   Basis-point arithmetic uses `saturating_mul` in the gas meter to prevent overflow but imposed limits make overflow not even possible.
+   Basis-point arithmetic uses `saturating_mul` in the gas meter as a safeguard, though the enforced bounds on multipliers (1x-100x) already make overflow impossible.
 
 5. A user's eligibility can change between epochs as stake is added or removed.
    The prologue reads current on-chain staking state, so eligibility is always up to date.
 
-6. There is no artificial limit on how many high-limit transactions can occur per epoch.
-   Rate limiting is implicit through the staking requirement and gas price floor.
+6. There is no per-epoch cap on high-limit transactions.
+   This is a deliberate choice: the staking requirement and 10x gas price floor already provide economic rate-limiting, and an artificial cap would create slot contention among legitimate users.
 
 7. Tiers are always well-ordered and validated at construction time.
    Governance cannot accidentally create a config where a lower stake unlocks a higher multiplier.
@@ -301,7 +307,7 @@ End-to-end Move tests (`e2e-move-tests/src/tests/transaction_limits.rs`) cover s
 
 - The `RequestedMultipliers` enum can be extended to cover new dimensions (e.g. transaction size, storage) via a V2 variant.
 - Wallet and CLI tooling can expose high-limit transaction construction as a first-class feature for stakers.
-- Rate0limitin can be added to cap number of higher-limit transactions per block or per epoch.
+- Rate limiting can be added to cap the number of high-limit transactions per block or per epoch.
 
 ## Timeline
 
