@@ -7,11 +7,20 @@ Status: Draft
 last-call-end-date (*optional):
 type: Standard (Core, Framework)
 created: 04/14/2026
-updated (*optional): 04/15/2026
+updated (*optional): 04/19/2026
 requires (*optional):
 ---
 
 # AIP-146 - Staking-Based Transaction Limits
+
+***Experimental Feature Disclaimer:***
+*This feature is being introduced on an experimental basis.*
+*The staking-based transaction limits mechanism may be modified, restricted, or removed at any time if it introduces risks to network performance, security, or fairness.*
+*This includes, but is not limited to 1) adjusting minimum stake requirements, 2) changing multiplier tiers, 3) revoking access to elevated limits, 4) disabling the feature entirely.*
+*As such, developers should not build systems that critically depend on guaranteed access to higher transaction limits.*
+*In the event of abuse or unintended consequences, the network may enforce changes or revoke privileges without prior notice.*
+*Future iterations of this feature may also introduce different mechanisms or requirements for accessing elevated limits.*
+*This feature is intended to be iterated on based on real-world usage and feedback.*
 
 ## Summary
 
@@ -158,8 +167,8 @@ Genesis uses the following default tiers:
 | Tier | Multiplier   | Execution min stake | IO min stake |
 |------|--------------|---------------------|--------------|
 | 1    | 2x (200 bps) | 1M APT              | 5M APT       |
-| 2    | 4x (400 bps) | 10M APT             | 20M APT      |
-| 3    | 8x (800 bps) | 50M APT             | 100M APT     |
+| 2    | 4x (400 bps) | 5M APT              | 10M APT      |
+| 3    | 8x (800 bps) | 10M APT             | 20M APT      |
 
 IO thresholds are higher than execution thresholds because IO operations are more expensive for the network.
 
