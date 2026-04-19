@@ -29,7 +29,7 @@ However, some workloads such as complex DEX operations (liquidations), large sta
 Right now, there is no mechanism to request higher limits.
 
 This AIP introduces an opt-in mechanism for higher limits, backed by staking proof.
-Users who prove they control significant stake can request higher multipliers (above 1x and up to 100x) on gas schedule limits (which otherwise default to 1x).
+Fee payers who prove they control significant stake can sponsor transactions with higher multipliers (above 1x and up to 100x) on gas schedule limits (which otherwise default to 1x).
 
 The rationale is straightforward: large APT stakers are inherently aligned with the network's long-term health.
 Transaction and gas limits exist to protect the system from spam and maintain high performance, but large stakers are far more likely to have legitimate needs for higher limits than malicious intent.
@@ -37,7 +37,7 @@ Tying elevated limits to staking proof strikes a practical balance — it enable
 
 In the initial implementation, only execution and IO limits can be increased.
 For the staking proof, the following options are supported: **stake pool ownership**, **delegated voter status**, and **delegation pool delegation**.
-Eligibility is determined by matching the sender's committed stake against a governance-configurable vector of tiers.
+Eligibility is determined by matching the fee payer's committed stake against a governance-configurable vector of tiers.
 All staking-backed requests also require a **10x minimum gas unit price**.
 
 ### Out of scope
@@ -49,7 +49,7 @@ All staking-backed requests also require a **10x minimum gas unit price**.
 
 A new `transaction_limits.move` module stores a governance-configurable vector of tiers for different limits.
 Each tier pairs a minimum committed stake with a multiplier (in basis points, where 1x = 100 basis points).
-When a transaction carries a `UserTxnLimitsRequest`, the prologue validates that the sender is authorized to use the specified stake, and that the committed stake meets the threshold for the requested multipliers.
+When a transaction carries a `UserTxnLimitsRequest`, the prologue validates that the fee payer is authorized to use the specified stake, and that the committed stake meets the threshold for the requested multipliers.
 The smallest tier whose multiplier is greater than or equal to the requested multiplier is chosen, so requests for non-standard values (e.g. 3.23x) need the same stake amount as the next available tier.
 The gas meter applies the requested multipliers to the base limit.
 
@@ -102,12 +102,12 @@ The user-facing request is BCS-serialized in the transaction payload:
 
 ```rust
 pub enum UserTxnLimitsRequest {
-    /// Sender holds the OwnerCapability for a stake pool. The pool address
+    /// Fee payer holds the OwnerCapability for a stake pool. The pool address
     /// is derived from the capability on-chain.
     StakePoolOwner { multipliers: RequestedMultipliers },
-    /// Sender is the delegated voter of the specified stake pool.
+    /// Fee payer is the delegated voter of the specified stake pool.
     DelegatedVoter { pool_address: AccountAddress, multipliers: RequestedMultipliers },
-    /// Sender is a delegator in the specified delegation pool.
+    /// Fee payer is a delegator in the specified delegation pool.
     DelegationPoolDelegator { pool_address: AccountAddress, multipliers: RequestedMultipliers },
 }
 ```
@@ -198,16 +198,16 @@ Move prologue validates submitted requests.
 
 ```move
 friend fun validate_high_txn_limits(
-    sender: address,
+    fee_payer: address,
     request: UserTxnLimitsRequest,
 ) acquires TxnLimitsConfig
 ```
 
 This function:
 1. Validates authorization based on the request variant:
-   - `StakePoolOwner`: checks that the sender holds an `OwnerCapability` and derives the pool address from it.
-   - `DelegatedVoter`: checks that the stake pool exists and the sender is its delegated voter.
-   - `DelegationPoolDelegator`: checks that the delegation pool exists and reads the sender's committed stake (`active + pending_inactive`).
+   - `StakePoolOwner`: checks that the fee payer holds an `OwnerCapability` and derives the pool address from it.
+   - `DelegatedVoter`: checks that the stake pool exists and the fee payer is its delegated voter.
+   - `DelegationPoolDelegator`: checks that the delegation pool exists and reads the fee payer's committed stake (`active + pending_inactive`).
 2. Validates that both multipliers are greater than 100 bps (1x) and at most 10000 (100x).
 3. Finds the matching tier for each dimension (execution and IO).
 4. Checks that the committed stake meets both thresholds.
@@ -250,15 +250,16 @@ The gas meter receives `Option<&TxnLimitsRequest>` and configures limits accordi
 
 New `StatusCode`s were added for prologue failures.
 
-| StatusCode                           | Code | Meaning                                                       |
-|--------------------------------------|------|---------------------------------------------------------------|
-| `NOT_STAKE_POOL_OWNER`               | 46   | Sender does not hold an `OwnerCapability`                     |
-| `NOT_DELEGATED_VOTER`                | 47   | Sender is not the delegated voter of the specified stake pool |
-| `INSUFFICIENT_STAKE`                 | 48   | Committed stake is too low for the requested multiplier tier  |
-| `INVALID_HIGH_TXN_LIMITS_MULTIPLIER` | 49   | Multiplier is <= 100 bps (i.e. <= 1x)                         |
-| `STAKE_POOL_NOT_FOUND`               | 50   | No stake pool exists at the specified address                 |
-| `DELEGATION_POOL_NOT_FOUND`          | 51   | No delegation pool exists at the specified address            |
-| `MULTIPLIER_NOT_AVAILABLE`           | 52   | Requested multiplier exceeds all configured tiers             |
+| StatusCode                                      | Code | Meaning                                                          |
+|-------------------------------------------------|------|------------------------------------------------------------------|
+| `NOT_STAKE_POOL_OWNER`                          | 46   | Fee payer does not hold an `OwnerCapability`                     |
+| `NOT_DELEGATED_VOTER`                           | 47   | Fee payer is not the delegated voter of the specified stake pool |
+| `INSUFFICIENT_STAKE`                            | 48   | Committed stake is too low for the requested multiplier tier     |
+| `INVALID_HIGH_TXN_LIMITS_MULTIPLIER`            | 49   | Multiplier is <= 100 bps (i.e. <= 1x)                            |
+| `STAKE_POOL_NOT_FOUND`                          | 50   | No stake pool exists at the specified address                    |
+| `DELEGATION_POOL_NOT_FOUND`                     | 51   | No delegation pool exists at the specified address               |
+| `MULTIPLIER_NOT_AVAILABLE`                      | 52   | Requested multiplier exceeds all configured tiers                |
+| `HIGH_LIMIT_TXN_GAS_UNIT_PRICE_BELOW_MIN_BOUND` | 53   | Gas unit price is below the 10x minimum gas unit price           |
 
 Aborts from the `transaction_limits` module are routed through a dedicated error conversion path, to map to these status codes.
 
