@@ -3,7 +3,7 @@ aip: 143
 title: "Confidential APT"
 author: "@alinush, @sherry-x"
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/discussions/663
-Status: Draft
+Status: Approved
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard
 created: 03/04/2026
