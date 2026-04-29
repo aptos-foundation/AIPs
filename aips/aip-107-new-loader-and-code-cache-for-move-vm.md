@@ -3,7 +3,7 @@ aip: 107
 title: New Loader and Code Cache for Move VM
 author: George Mitenkov (george@aptoslabs.com)
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/533
-Status: Draft
+Status: Accepted
 last-call-end-date: N/A
 type: Core
 created: 11/18/2024

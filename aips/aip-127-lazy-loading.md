@@ -3,7 +3,7 @@ aip: 127
 title: Lazy Loading
 author: George Mitenkov (george@aptoslabs.com)
 discussions-to:
-Status: Draft
+Status: Accepted
 last-call-end-date: N/A
 type: Core
 created: 04/28/2025

@@ -2,7 +2,7 @@
 aip: 119
 title: reduce staking rewards
 author: moonshiesty - moonshiesty@protonmail.com
-Status: Draft
+Status: Accepted
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/587
 type: Core
 created: 4/17/2025

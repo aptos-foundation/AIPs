@@ -2,7 +2,7 @@
 aip: 108
 title: Enable interoperability for Federated Keyless Accounts for the same issuer (user-pool/tenant)
 author: Oliver He (oliver.he@aptoslabs.com)
-Status: Draft # | Last Call | Accepted | Final | Rejected>
+Status: Draft
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: <Standard (Core, Networking, Interface, Application, Framework) | Informational | Process>
 created: 11/08/2024
