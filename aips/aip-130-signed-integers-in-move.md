@@ -3,7 +3,7 @@ aip: 130
 title: Signed Integers in Move
 author: 0xAnto (anto@kanalabs.io), 0xbe1 (0xbe1@thalalabs.xyz), junxzm1990 (jun.xu@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/631
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core)
 created: 05/28/2025

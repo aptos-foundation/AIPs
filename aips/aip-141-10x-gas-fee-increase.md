@@ -2,7 +2,7 @@
 aip: 141
 title: 10x Gas Fee Increase
 author: Calin Tataru (calin.tataru@aptoslabs.com)
-Status: Draft
+Status: Accepted
 last-call-end-date: N/A
 type: Standard (Core)
 created: 04/03/2026

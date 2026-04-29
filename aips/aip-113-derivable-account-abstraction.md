@@ -2,7 +2,7 @@
 aip: 113
 title: Derivable Account Abstraction
 author: igor-aptos, lightmark
-Status: Draft
+Status: Accepted
 type: Framework
 created: 02/14/2024
 ---

@@ -2,7 +2,7 @@
 aip: 129
 title: Add extra information in transaction payload
 author: Satya Vusirikala, Igor Kabiljo
-Status: Draft
+Status: Accepted
 discussions-to: https://github.com/aptos-foundation/AIPs/pull/590
 type: Core
 created: 4/25/2025

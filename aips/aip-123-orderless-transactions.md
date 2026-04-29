@@ -2,7 +2,7 @@
 aip: 123
 title: Orderless transactions
 author: Satya Vusirikala, Igor Kabiljo
-Status: Draft
+Status: Accepted
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/593
 type: Standard (Core, Framework)
 created: 04/25/2025

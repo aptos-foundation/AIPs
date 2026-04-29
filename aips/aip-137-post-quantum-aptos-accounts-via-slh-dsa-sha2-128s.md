@@ -3,7 +3,7 @@ aip: 137
 title: Post-quantum Aptos accounts via SLH-DSA-SHA2-128s signatures
 author: Alin Tomescu (alin@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/discussions/640 # a url pointing to the official discussion thread
-Status: Accepted #<Draft | Last Call | Accepted | Final | Rejected>
+Status: Accepted
 last-call-end-date (*optional): 02/09/2026 # the last date to leave feedbacks and reviews
 type: Standard (Core) # Standard (Core, Networking, Interface, Application, Framework) | Informational | Process
 created: 12/09/2025

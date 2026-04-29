@@ -2,7 +2,7 @@
 aip: 115
 title: Stateless Account Update
 author: lightmark, igor-aptos, davidiw
-Status: Draft
+Status: Accepted
 type: Framework
 created: <10/21/2024>
 ---

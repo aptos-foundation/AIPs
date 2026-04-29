@@ -3,7 +3,7 @@ aip: 112
 title: Function Values the Move VM
 author: Wolfgang Grieskamp (wg@aptoslabs.comm)
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft 
+Status: Accepted
 last-call-end-date (*optional): 
 type: Standard Language
 created: 1/13/2025
