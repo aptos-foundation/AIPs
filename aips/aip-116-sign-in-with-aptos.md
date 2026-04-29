@@ -2,7 +2,7 @@
 aip: 116
 title: Sign in with Aptos
 author: aptqpv
-Status: Draft
+Status: Accepted
 type: Standard (Ecosystem)
 created: 12/16/2024
 requires: 62
