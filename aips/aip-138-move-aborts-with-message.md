@@ -3,7 +3,7 @@ aip: 138
 title: Move aborts with message
 author: Calin Tataru (calin.tataru@aptoslabs.com)
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/649
-Status: Draft
+Status: Accepted
 last-call-end-date: N/A
 type: Standard (Core)
 created: 22/01/2026
