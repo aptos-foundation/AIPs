@@ -3,11 +3,11 @@ aip: 146
 title: Staking-Based Transaction Limits
 author: George Mitenkov (george@aptoslabs.com)
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/669
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional):
 type: Standard (Core, Framework)
 created: 04/14/2026
-updated (*optional): 04/19/2026
+updated (*optional): 07/06/2026
 requires (*optional):
 ---
 
