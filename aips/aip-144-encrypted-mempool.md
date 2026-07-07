@@ -2,7 +2,7 @@
 aip: 144
 title: Encrypted Mempool
 author: Rex Fernando (rex.fernando@aptoslabs.com)
-Status: Draft
+Status: Accepted
 type: Core
 created: 01/09/2026
 ---
