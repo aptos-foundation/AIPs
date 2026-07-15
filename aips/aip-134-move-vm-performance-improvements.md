@@ -3,7 +3,7 @@ aip: AIP-134
 title: Move VM Performance Improvements
 author: Move Team (TODO)
 discussions-to (*optional): TODO
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): 
 type: Core
 created: 16/10/2025

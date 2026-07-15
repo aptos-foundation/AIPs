@@ -3,7 +3,7 @@ aip: 7
 title: Transaction fee distribution
 author: georgemitenkov
 discussions-to: https://github.com/aptos-foundation/AIPs/issues/23
-Status: Draft
+Status: Rejected
 last-call-end-date (*optional):
 type: Standard (framework)
 created: 12/20/2022
