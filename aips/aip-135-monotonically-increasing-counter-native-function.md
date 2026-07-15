@@ -3,7 +3,7 @@ aip: 135
 title: Monotonically Increasing Counter Native Function
 author: vusirikala, igor-aptos
 discussions-to (*optional): 
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): 
 type: Standard (Core)
 created: 10/23/2025
