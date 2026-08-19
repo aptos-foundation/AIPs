@@ -3,7 +3,7 @@ aip: 82
 title: Transaction context extension
 author: junkil-park (https://github.com/junkil-park), lightmark (https://github.com/lightmark), movekevin (https://github.com/movekevin)
 discussions-to (*optional): <a url pointing to the official discussion thread>
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Framework)
 created: 4/2/2024

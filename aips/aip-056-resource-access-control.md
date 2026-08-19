@@ -3,7 +3,7 @@ aip: 56
 title: Resource Access Control
 author: wg@aptoslabs.com
 discussions-to (*optional): 
-Status: Draft 
+Status: Rejected
 last-call-end-date (*optional): 
 type: Standard
 created: <10/11/2023>

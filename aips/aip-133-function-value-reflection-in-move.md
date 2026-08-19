@@ -3,7 +3,7 @@ aip: 133
 title: Function Value Reflection in Move
 author: Wolfgang Grieskamp (wg@aptoslabs.com)
 discussions-to (*optional): https://github.com/aptos-foundation/AIPs/issues/634
-Status: Draft
+Status: In Review
 last-call-end-date (*optional): <mm/dd/yyyy the last date to leave feedbacks and reviews>
 type: Standard (Core)
 created: 10/21/2025
