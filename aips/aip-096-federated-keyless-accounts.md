@@ -9,7 +9,7 @@ type: <Standard (Core, Framework)>
 created: 08/21/2024
 updated (*optional): <mm/dd/yyyy>
 requires (*optional):
- - [AIP-61](https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-061-keyless-accounts.md)
+ - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-061-keyless-accounts.md
  - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-075-prover-service-for-keyless-accounts.md
  - https://github.com/aptos-foundation/AIPs/blob/main/aips/aip-081-pepper-service-for-keyless-accounts.md
 ---
