@@ -3,7 +3,7 @@ aip: 147
 title: Periodic Testnet State Resets
 author: Sherry Xiao (sherry@aptoslabs.com)
 discussions-to: 
-Status: Draft
+Status: Accepted
 last-call-end-date (*optional):
 type: Process
 created: 08/19/2026
